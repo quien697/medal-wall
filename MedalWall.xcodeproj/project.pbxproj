@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		60D2C09E2EA7CFEC000A6C4A /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 60D2C09D2EA7CFEC000A6C4A /* README.md */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		60B570C02EA616CA000B3FDE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		60B570B02EA616C8000B3FDE /* MedalWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MedalWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		60B570BF2EA616CA000B3FDE /* MedalWallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MedalWallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		60B570C92EA616CA000B3FDE /* MedalWallUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MedalWallUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		60D2C09D2EA7CFEC000A6C4A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +80,7 @@
 		60B570A72EA616C8000B3FDE = {
 			isa = PBXGroup;
 			children = (
+				60D2C09D2EA7CFEC000A6C4A /* README.md */,
 				60B570B22EA616C8000B3FDE /* MedalWall */,
 				60B570C22EA616CA000B3FDE /* MedalWallTests */,
 				60B570CC2EA616CA000B3FDE /* MedalWallUITests */,
@@ -212,6 +218,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60D2C09E2EA7CFEC000A6C4A /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
