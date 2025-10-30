@@ -1,0 +1,44 @@
+//
+//  ContentView.swift
+//  MedalWall
+//
+//  Created by Quien on 2025-10-20.
+//
+
+import SwiftUI
+
+struct ContentView: View {
+  @State private var selection: Tab = .profile
+  
+  enum Tab {
+    case profile
+    case medal
+    case race
+  }
+  
+  var body: some View {
+    TabView(selection: $selection) {
+      ProfileView()
+        .tabItem {
+          Label("You", systemImage: "star")
+        }
+        .tag(Tab.profile)
+      
+      MedalsView()
+        .tabItem {
+          Label("Medal", systemImage: "star")
+        }
+        .tag(Tab.medal)
+      
+      RacesView()
+        .tabItem {
+          Label("Race", systemImage: "star")
+        }
+        .tag(Tab.race)
+    }
+  }
+}
+
+#Preview {
+  ContentView()
+}
