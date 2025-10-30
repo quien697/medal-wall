@@ -12,7 +12,6 @@ import SwiftData
 struct MedalWallApp: App {
   var sharedModelContainer: ModelContainer = {
     let schema = Schema([
-      Item.self,
       User.self,
       Race.self,
       RaceCategory.self,
