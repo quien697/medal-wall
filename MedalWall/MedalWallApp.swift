@@ -13,11 +13,17 @@ struct MedalWallApp: App {
   var sharedModelContainer: ModelContainer = {
     let schema = Schema([
       Item.self,
+      User.self,
+      Race.self,
+      RaceCategory.self,
+      Medal.self,
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
     
     do {
-      return try ModelContainer(for: schema, configurations: [modelConfiguration])
+      let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+      RaceDataSeeder.insertDefaultData(into: container)
+      return container
     } catch {
       fatalError("Could not create ModelContainer: \(error)")
     }
