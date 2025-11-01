@@ -11,67 +11,32 @@ import SwiftData
 struct RacesView: View {
   @Environment(\.modelContext) private var modelContext
   @Query private var races: [Race]
+  @State private var selectedRace: Race? = nil
+  @State private var isShowEditor = false
   
   var body: some View {
     NavigationSplitView {
-      List {
-        ForEach(races) { race in
-          NavigationLink {
-            Text("Race Detail")
-            
+      List(races, selection: $selectedRace) { race in
+        NavigationLink(value: race) {
+          VStack(alignment: .leading) {
             Text(race.name)
               .font(.headline)
-          } label: {
-            VStack(alignment: .leading) {
-              Text(race.name)
-                .font(.headline)
-              Text(race.location.formatted)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-              Text(race.date.formatted(date: .abbreviated, time: .omitted))
-                .font(.caption)
-            }
-          }
-        }
-        .onDelete(perform: deleteRaces)
-      }
-      .toolbar {
-        ToolbarItem(placement: .navigationBarTrailing) {
-          EditButton()
-        }
-        ToolbarItem {
-          Button(action: addRace) {
-            Label("Add Item", systemImage: "plus")
+            Text(race.location.formatted)
+              .font(.subheadline)
+              .foregroundStyle(.secondary)
+            Text(race.date.formatted(date: .abbreviated, time: .omitted))
+              .font(.caption)
           }
         }
       }
+      .navigationTitle("Races")
     } detail: {
-      Text("Select an item")
-    }
-  }
-  
-  private func addRace() {
-    withAnimation {
-      let newRace = Race(
-        id: UUID(),
-        name: "New Race Number \(Range(1...100).randomElement()!)",
-        date: Date(),
-        location: RaceLocation(
-          country: "Taiwan",
-          city: "Taipei"
-        ),
-        categories: []
-      )
-      modelContext.insert(newRace)
-    }
-  }
-  
-  private func deleteRaces(offsets: IndexSet) {
-    withAnimation {
-      for index in offsets {
-        modelContext.delete(races[index])
+      if let race = selectedRace {
+        RaceDetailView(race: race)
+      } else {
+        Text("Select a race")
       }
-    }
+    } // NavigationSplitView
   }
 }
 
