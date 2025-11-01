@@ -42,6 +42,8 @@ enum DefaultRaces {
     vancouver.categories = [
       RaceCategory(id: UUID(), race: vancouver, distance: .fullMarathon, name: "Full Marathon"),
       RaceCategory(id: UUID(), race: vancouver, distance: .halfMarathon, name: "Falf Marathon"),
+      RaceCategory(id: UUID(), race: vancouver, distance: .`10K`, name: "10K"),
+      RaceCategory(id: UUID(), race: vancouver, distance: .`5K`, name: "5K"),
     ]
     
     return [taipei, vancouver]
