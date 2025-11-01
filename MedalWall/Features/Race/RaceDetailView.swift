@@ -16,7 +16,10 @@ struct RaceDetailView: View {
     ScrollView {
       VStack(spacing: 12) {
         ZStack {
-          Image(.taipeiMarathon)
+          Image(race.name
+            .lowercased()
+            .replacingOccurrences(of: " ", with: "-")
+          )
             .resizable()
             .scaledToFit()
             .clipShape(.rect(cornerRadius: 12))
@@ -54,7 +57,7 @@ struct RaceDetailView: View {
         Divider()
         
         HStack(alignment: .top) {
-          Image(systemName: "mappin.and.ellipse")
+          Image(systemName: "location.fill")
             .font(.subheadline)
             .foregroundStyle(.secondary)
           
@@ -87,7 +90,7 @@ struct RaceDetailView: View {
         
         if let url = race.url {
           HStack(alignment: .top) {
-            Image(systemName: "arrow.up.right.square")
+            Image(systemName: "globe")
               .font(.subheadline)
               .foregroundStyle(.secondary)
             

@@ -13,7 +13,7 @@ enum DefaultRaces {
   static func all() -> [Race] {
     let taipei = Race(
       id: UUID(),
-      name: "Taipei Marathon 2024",
+      name: "Taipei Marathon",
       date: Date(),
       location: RaceLocation(
         country: "Taiwan",
@@ -29,8 +29,8 @@ enum DefaultRaces {
     
     let vancouver = Race(
       id: UUID(),
-      name: "BMO Vancouver Marathon 2024",
-      date: Date(),
+      name: "BMO Vancouver Marathon",
+      date: DateComponents(calendar: .current, year: 2026, month: 5, day: 3).date!,
       location: RaceLocation(
         country: "Canada",
         province: "BC",

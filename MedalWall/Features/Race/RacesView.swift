@@ -42,5 +42,5 @@ struct RacesView: View {
 
 #Preview {
   RacesView()
-    .modelContainer(for: Race.self, inMemory: true)
+    .modelContainer(PreviewContainer.shared)
 }
