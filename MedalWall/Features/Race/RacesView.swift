@@ -10,9 +10,10 @@ import SwiftData
 
 struct RacesView: View {
   @Environment(\.modelContext) private var modelContext
-  @Query private var races: [Race]
   @State private var selectedRace: Race? = nil
-  @State private var isShowEditor = false
+  @State private var isShowAddView = false
+  
+  @Query private var races: [Race]
   
   var body: some View {
     NavigationSplitView {
@@ -30,6 +31,18 @@ struct RacesView: View {
         }
       }
       .navigationTitle("Races")
+      .toolbar {
+        ToolbarItem(placement: .topBarTrailing) {
+          Button("Add Race", systemImage: "plus") {
+            isShowAddView.toggle()
+          }
+        }
+      }
+      .sheet(isPresented: $isShowAddView) {
+        RaceEditView(viewModel: RaceEditViewModel(
+          race: selectedRace, context: modelContext)
+        )
+      }
     } detail: {
       if let race = selectedRace {
         RaceDetailView(race: race)
