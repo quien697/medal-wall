@@ -1,11 +1,11 @@
 //
-//  RaceDistanceUnit.swift
+//  MeasurementUnit.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-10-30.
 //
 
-enum RaceDistanceUnit: String, Codable {
+enum MeasurementUnit: String, Codable {
   case km
   case mi
   

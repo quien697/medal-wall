@@ -11,29 +11,25 @@ import SwiftData
 @Model
 final class User {
   @Attribute(.unique) var id: UUID
-  var firstName: String
-  var lastName: String
+  var name: UserName
   var avatar: String?
   var gender: Gender?
   var birthdate: Date?
-  var unit: RaceDistanceUnit
-  
   @Relationship(deleteRule: .cascade, inverse: \Medal.user)
   var medals: [Medal] = []
+  var unit: MeasurementUnit
   
   init(
-    id: UUID,
-    firstName: String,
-    lastName: String,
+    id: UUID = UUID(),
+    name: UserName,
     avatar: String? = nil,
     gender: Gender? = nil,
     birthdate: Date? = nil,
-    unit: RaceDistanceUnit = .km,
-    medals: [Medal] = []
+    medals: [Medal] = [],
+    unit: MeasurementUnit = .km,
   ) {
     self.id = id
-    self.firstName = firstName
-    self.lastName = lastName
+    self.name = name
     self.avatar = avatar
     self.gender = gender
     self.birthdate = birthdate

@@ -1,0 +1,54 @@
+//
+//  RaceDistanceCategory.swift
+//  MedalWall
+//
+//  Created by Quien on 2025-11-05.
+//
+
+import SwiftUI
+
+/// Represents standard or custom marathon distance categories,
+/// used to display each distance with a distinct color.
+enum RaceDistanceCategory: CustomStringConvertible {
+  case full
+  case half
+  case `10K`
+  case `5K`
+  case custom(Double)
+  
+  var description: String {
+    switch self {
+    case .full: return "Full Marathon"
+    case .half: return "Half Marathon"
+    case .`10K`: return "10K"
+    case .`5K`: return "5K"
+    case .custom(let value):
+      return "\(value)K"
+    }
+  }
+  
+  var value: Double {
+    switch self {
+    case .full: return 42.195
+    case .half: return 21.0975
+    case .`10K`: return 10
+    case .`5K`: return 5
+    case .custom(let value): return value
+    }
+  }
+  
+  var group: RaceDistanceCategoryGroup {
+    switch value {
+    case ..<5: return .fun
+    case 5..<15: return .mini
+    case 15..<25: return .half
+    case 25..<40: return .long
+    case 40..<45: return .full
+    default: return .ultra
+    }
+  }
+  
+  var color: Color {
+    group.color
+  }
+}
