@@ -7,7 +7,7 @@
 
 /// Represents a specific marathon distance combined with its details
 struct RaceDistance {
-  let Category: RaceDistanceCategory
+  let category: RaceDistanceCategory
   let type: RaceDistanceType
 }
 
@@ -18,6 +18,7 @@ enum RaceDistanceType: String {
   
   var id: String { rawValue }
   
+  nonisolated
   var displayName: String {
     switch self {
     case .inPerson: return "In-person"

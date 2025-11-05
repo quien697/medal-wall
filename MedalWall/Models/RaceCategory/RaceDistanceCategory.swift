@@ -16,6 +16,7 @@ enum RaceDistanceCategory: CustomStringConvertible {
   case `5K`
   case custom(Double)
   
+  nonisolated
   var description: String {
     switch self {
     case .full: return "Full Marathon"
@@ -27,6 +28,7 @@ enum RaceDistanceCategory: CustomStringConvertible {
     }
   }
   
+  nonisolated
   var value: Double {
     switch self {
     case .full: return 42.195

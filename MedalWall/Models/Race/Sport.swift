@@ -11,6 +11,7 @@ enum Sport: String {
   
   var id: String { rawValue }
   
+  nonisolated
   var displayName: String {
     switch self {
     case .running: return "Running"

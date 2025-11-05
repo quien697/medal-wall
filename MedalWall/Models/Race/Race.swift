@@ -13,35 +13,43 @@ final class Race {
   @Attribute(.unique) var id: UUID
   var name: String
   var photo: String?
-  var dates: [Date]
-  var location: RaceLocation
-  var sport: Sport
-  var type: RaceType
+  var date: Date
+  var country: String
+  var province: String?
+  var city: String
+  var district: String?
+  var sport: String
+  var type: String
   var url: String?
-  var distances: [RaceDistance]
   var updateTime: Date
+  
+  @Relationship(deleteRule: .cascade, inverse: \RaceCategory.race)
+  var categories: [RaceCategory] = []
   
   init(
     id: UUID = UUID(),
     name: String,
     photo: String? = nil,
-    dates: [Date],
+    date: Date,
     location: RaceLocation,
-    sport: Sport,
+    sport: Sport = .running,
     type: RaceType,
     url: String? = nil,
-    distances: [RaceDistance],
-    updateTime: Date
+    updateTime: Date,
+    categories: [RaceCategory]
   ) {
     self.id = id
     self.name = name
     self.photo = photo
-    self.dates = dates
-    self.location = location
-    self.sport = sport
-    self.type = type
+    self.date = date
+    self.country = location.country
+    self.province = location.province
+    self.city = location.city
+    self.district = location.district
+    self.sport = sport.displayName
+    self.type = type.displayName
     self.url = url
-    self.distances = distances
     self.updateTime = updateTime
+    self.categories = categories
   }
 }

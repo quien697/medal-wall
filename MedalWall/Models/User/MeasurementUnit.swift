@@ -11,6 +11,7 @@ enum MeasurementUnit: String, Codable {
   
   var id: String { rawValue }
   
+  nonisolated
   var displayName: String {
     switch self {
     case .km: return "km"

@@ -13,6 +13,7 @@ enum RaceType: String {
   
   var id: String { rawValue }
   
+  nonisolated
   var displayName: String {
     switch self {
     case .road: return "Road"

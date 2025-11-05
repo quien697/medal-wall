@@ -11,6 +11,7 @@ enum Gender: String, Codable {
   
   var id: String { rawValue }
   
+  nonisolated
   var displayName: String {
     switch self {
     case .male: return "Male"
