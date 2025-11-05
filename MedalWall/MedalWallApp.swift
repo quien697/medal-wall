@@ -18,10 +18,12 @@ struct MedalWallApp: App {
       Medal.self,
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-    
+
     do {
       let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
-      RaceDataSeeder.insertDefaultData(into: container)
+      let context = ModelContext(container)
+      try DefaultDataSeeder.seed(in: context)
+      
       return container
     } catch {
       fatalError("Could not create ModelContainer: \(error)")
