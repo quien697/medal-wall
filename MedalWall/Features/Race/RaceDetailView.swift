@@ -20,10 +20,7 @@ struct RaceDetailView: View {
       ScrollView {
         VStack(spacing: 12) {
           ZStack {
-            Image(race.name
-              .lowercased()
-              .replacingOccurrences(of: " ", with: "-")
-            )
+            Image(race.photo ?? "")
             .resizable()
             .scaledToFit()
             .clipShape(.rect(cornerRadius: 12))
@@ -89,9 +86,9 @@ struct RaceDetailView: View {
             .padding(.vertical, 6)
           }
           
-          Divider()
-          
           if let url = race.url {
+            Divider()
+            
             HStack(alignment: .top) {
               Image(systemName: "globe")
                 .font(.subheadline)
@@ -105,6 +102,21 @@ struct RaceDetailView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 6)
           }
+        }
+        .cardStyle(paddingV: 15)
+        
+        VStack {
+          HStack(alignment: .top) {
+            Text("Last Updated:")
+              .font(.footnote)
+              .foregroundStyle(.secondary)
+            
+            Text(race.updateTime.formatted(date: .abbreviated, time: .standard))
+              .font(.footnote)
+              .foregroundColor(.secondary)
+          }
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .padding(.vertical, 6)
         }
         .cardStyle(paddingV: 15)
       } // ScrollView
@@ -139,9 +151,8 @@ struct RaceDetailView: View {
   }
 }
 
-#Preview {
-  let context = ModelContext(PreviewContainer.shared)
-  let race = try! context.fetch(FetchDescriptor<Race>())[1]
-  RaceDetailView(race: race)
-    .modelContainer(PreviewContainer.shared)
+#Preview(traits: .sampleData) {
+  @Previewable @Query(sort: \Race.date) var races: [Race]
+  
+  RaceDetailView(race: races[0])
 }

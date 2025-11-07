@@ -18,7 +18,6 @@ extension Race {
         country: "Taiwan",
         city: "Taipei"
       ),
-      type: .road,
       url: "https://taipeicitymarathon.com",
       updateTime: Date(),
       categories: [],
@@ -26,13 +25,12 @@ extension Race {
     let vancouver: Race = Race(
       name: "BMO Vancouver Marathon",
       photo: "bmo-vancouver-marathon",
-      date: DateComponents(calendar: .current, year: 2026, month: 5, day: 9).date!,
+      date: DateComponents(calendar: .current, year: 2026, month: 5, day: 3).date!,
       location: RaceLocation(
         country: "Canada",
         province: "BC",
         city: "Vancouver"
       ),
-      type: .road,
       url: "https://bmovanmarathon.ca/",
       updateTime: Date(),
       categories: [],

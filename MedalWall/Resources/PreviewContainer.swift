@@ -10,7 +10,7 @@ import SwiftData
 
 struct SampleData: PreviewModifier {
   
-  static func makeSharedContext() async throws -> ModelContainer {
+  static func makeSharedContext() throws -> ModelContainer {
     let schema = Schema([
       User.self,
       Race.self,

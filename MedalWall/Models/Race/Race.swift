@@ -26,6 +26,15 @@ final class Race {
   @Relationship(deleteRule: .cascade, inverse: \RaceCategory.race)
   var categories: [RaceCategory] = []
   
+  var location: RaceLocation {
+    RaceLocation(
+      country: country,
+      province: province,
+      city: city,
+      district: district
+    )
+  }
+  
   init(
     id: UUID = UUID(),
     name: String,
@@ -33,7 +42,7 @@ final class Race {
     date: Date,
     location: RaceLocation,
     sport: Sport = .running,
-    type: RaceType,
+    type: RaceType = .road,
     url: String? = nil,
     updateTime: Date,
     categories: [RaceCategory]

@@ -19,14 +19,24 @@ struct RacesView: View {
     NavigationSplitView {
       List(races, selection: $selectedRace) { race in
         NavigationLink(value: race) {
-          VStack(alignment: .leading) {
-            Text(race.name)
-              .font(.headline)
-            Text(race.location.formatted)
-              .font(.subheadline)
-              .foregroundStyle(.secondary)
-            Text(race.date.formatted(date: .abbreviated, time: .omitted))
-              .font(.caption)
+          HStack {
+            Image(race.photo ?? "")
+              .resizable()
+              .scaledToFit()
+              .frame(width: 60, height: 60)
+              .clipShape(.rect(cornerRadius: 10))
+            
+            VStack(alignment: .leading) {
+              Text(race.name)
+                .font(.headline)
+              
+              Text(race.location.formatted)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+              
+              Text(race.date.formatted(date: .abbreviated, time: .omitted))
+                .font(.caption)
+            }
           }
         }
       }
@@ -39,7 +49,7 @@ struct RacesView: View {
         }
       }
       .sheet(isPresented: $isShowAddView) {
-        RaceEditView(viewModel: RaceEditViewModel(
+        RaceAddView(viewModel: RaceEditViewModel(
           race: selectedRace, context: modelContext)
         )
       }
@@ -53,7 +63,6 @@ struct RacesView: View {
   }
 }
 
-#Preview {
+#Preview(traits: .sampleData) {
   RacesView()
-    .modelContainer(PreviewContainer.shared)
 }

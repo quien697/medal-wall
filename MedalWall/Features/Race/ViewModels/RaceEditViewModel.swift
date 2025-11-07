@@ -10,16 +10,15 @@ import SwiftData
 
 @Observable
 class RaceEditViewModel {
-  var id: UUID
   var name: String
+  var photo: String
   var date: Date
   var country: String
   var province: String
   var city: String
   var district: String
-  var postalCode: String
   var url: String
-  var isOfficial: Bool
+  var updateTime: Date
   var categories: [RaceCategory]
   var isNewRace: Bool
   
@@ -31,29 +30,27 @@ class RaceEditViewModel {
     
     if let race {
       self.race = race
-      self.id = race.id
       self.name = race.name
+      self.photo = race.photo ?? ""
       self.date = race.date
       self.country = race.location.country
       self.province = race.location.province ?? ""
       self.city = race.location.city
       self.district = race.location.district ?? ""
-      self.postalCode = race.location.postalCode ?? ""
       self.url = race.url ?? ""
-      self.isOfficial = race.isOfficial
+      self.updateTime = race.updateTime
       self.categories = race.categories
       self.isNewRace = false
     } else {
-      self.id = UUID()
       self.name = ""
+      self.photo = ""
       self.date = Date()
       self.country = ""
       self.province = ""
       self.city = ""
       self.district = ""
-      self.postalCode = ""
       self.url = ""
-      self.isOfficial = true
+      self.updateTime = Date()
       self.categories = []
       self.isNewRace = true
     }
@@ -66,28 +63,24 @@ class RaceEditViewModel {
   }
   
   func save() throws {
-    let location = RaceLocation(
-      country: country,
-      province: province.isEmpty ? nil : province,
-      city: city,
-      district: district.isEmpty ? nil : district,
-      postalCode: postalCode.isEmpty ? nil : postalCode
-    )
-    
     if let race {
       race.name = name
+      race.photo = photo.isEmpty ? nil : photo
       race.date = date
-      race.location = location
+      race.country = country
+      race.province = province.isEmpty ? nil : province
+      race.city = city
+      race.district = district.isEmpty ? nil : province
       race.url = url.isEmpty ? nil : url
-      race.isOfficial = isOfficial
+      race.updateTime = Date()
       race.categories = categories
     } else {
       let newRace = Race(
-        id: id,
         name: name,
         date: date,
-        location: location,
+        location: RaceLocation(country: country, city: city),
         url: url.isEmpty ? nil : url,
+        updateTime: updateTime,
         categories: categories
       )
       

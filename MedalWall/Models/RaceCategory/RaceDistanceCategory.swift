@@ -19,8 +19,8 @@ enum RaceDistanceCategory: CustomStringConvertible {
   nonisolated
   var description: String {
     switch self {
-    case .full: return "Full Marathon"
-    case .half: return "Half Marathon"
+    case .full: return "42K"
+    case .half: return "21K"
     case .`10K`: return "10K"
     case .`5K`: return "5K"
     case .custom(let value):

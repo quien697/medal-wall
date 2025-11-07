@@ -26,17 +26,12 @@ struct RaceEditView: View {
           TextField("Province (option)", text: $viewModel.province)
           TextField("City", text: $viewModel.city)
           TextField("District (option)", text: $viewModel.district)
-          TextField("PostalCode (option)", text: $viewModel.postalCode)
         }
         
         Section("Additional Details") {
           TextField("Official Website (option)", text: $viewModel.url)
             .keyboardType(.URL)
             .textInputAutocapitalization(.never)
-          
-          Toggle("Is offical event?", isOn: $viewModel.isOfficial)
-            .disabled(true)
-            .tint(.gray.opacity(0.5))
         }
       }
       .navigationTitle("\(viewModel.isNewRace ? "Add" : "Edit") Race")
@@ -64,9 +59,8 @@ struct RaceEditView: View {
   }
 }
 
-#Preview {
-  let context = ModelContext(PreviewContainer.shared)
-  let race = try! context.fetch(FetchDescriptor<Race>())[1]
-  RaceEditView(viewModel: RaceEditViewModel(race: race, context: context))
-    .modelContainer(PreviewContainer.shared)
+#Preview(traits: .sampleData) {
+  @Previewable @Query(sort: \Race.date) var races: [Race]
+  let context = try! ModelContext(SampleData.makeSharedContext())
+  RaceEditView(viewModel: RaceEditViewModel(race: races[0], context: context))
 }
