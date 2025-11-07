@@ -18,13 +18,13 @@ struct RaceDetailView: View {
   var body: some View {
     NavigationStack {
       ScrollView {
-        VStack(spacing: 12) {
+        CardSection(spacing: 12) {
           ZStack {
             Image(race.photo ?? "")
             .resizable()
             .scaledToFit()
             .clipShape(.rect(cornerRadius: 12))
-          }
+          } // ZStack
           .frame(maxWidth: .infinity)
           .frame(height: 240)
           .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -36,89 +36,46 @@ struct RaceDetailView: View {
             
             Text(race.location.formatted)
               .font(.subheadline)
-          }
+          } // VStack
           .padding(.horizontal, 12)
           .padding(.top, 12)
-        }
-        .cardStyle()
+        } // CardSection
         
-        VStack {
-          HStack(alignment: .top) {
-            Image(systemName: "clock")
-              .font(.subheadline)
-              .foregroundStyle(.secondary)
-            
+        CardSection(title: "Details") {
+          CardListItem(systemName: "clock") {
             Text(race.date.formatted(date: .abbreviated, time: .omitted))
-              .font(.subheadline)
-              .foregroundColor(.primary)
+              .modifier(TextStyleModifier.Card.listText)
           }
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .padding(.vertical, 6)
           
-          Divider()
-          
-          HStack(alignment: .top) {
-            Image(systemName: "location.fill")
-              .font(.subheadline)
-              .foregroundStyle(.secondary)
-            
+          CardListItem(systemName: "location.fill") {
             Text(race.location.formatted)
-              .font(.subheadline)
-              .foregroundColor(.primary)
+              .modifier(TextStyleModifier.Card.listText)
           }
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .padding(.vertical, 6)
           
           if race.categories.count != 0 {
-            Divider()
-            
-            HStack(alignment: .top) {
-              Image(systemName: "figure.run")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-              
+            CardListItem(systemName: "figure.run") {
               Text(race.categories
                 .compactMap { $0.name }
                 .joined(separator: ", ")
               )
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 6)
           }
           
           if let url = race.url {
-            Divider()
-            
-            HStack(alignment: .top) {
-              Image(systemName: "globe")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-              
+            CardListItem(systemName: "globe") {
               Link("Visit Website", destination: URL(string: url)!)
-                .font(.subheadline)
-                .foregroundColor(.blue)
+                .modifier(TextStyleModifier.Card.listLink)
                 .underline(true, color: .blue.opacity(0.8))
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 6)
           }
-        }
-        .cardStyle(paddingV: 15)
+        } // CardSection
         
-        VStack {
-          HStack(alignment: .top) {
-            Text("Last Updated:")
-              .font(.footnote)
-              .foregroundStyle(.secondary)
-            
+        CardSection(title: "Last Updated") {
+          CardListItem() {
             Text(race.updateTime.formatted(date: .abbreviated, time: .standard))
-              .font(.footnote)
-              .foregroundColor(.secondary)
+              .cardTextStyle(color: .secondary, font: .footnote)
           }
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .padding(.vertical, 6)
-        }
-        .cardStyle(paddingV: 15)
+        } // CardSection
       } // ScrollView
       .padding(.horizontal)
       .background(.ultraThinMaterial)
