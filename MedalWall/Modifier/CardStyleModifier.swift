@@ -19,7 +19,7 @@ struct CardStyleModifier: ViewModifier {
       .padding(.horizontal, paddingH)
       .padding(.vertical, paddingV)
       .background(.background)
-      .cornerRadius(cornerRadius)
+      .clipShape(.rect(cornerRadius: cornerRadius))
       .shadow(color: .black.opacity(0.2), radius: 4)
       .padding(.horizontal, marginH)
       .padding(.vertical, marginV)

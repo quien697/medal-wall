@@ -38,19 +38,4 @@ enum RaceDistanceCategory: CustomStringConvertible {
     case .custom(let value): return value
     }
   }
-  
-  var group: RaceDistanceCategoryGroup {
-    switch value {
-    case ..<5: return .fun
-    case 5..<15: return .mini
-    case 15..<25: return .half
-    case 25..<40: return .long
-    case 40..<45: return .full
-    default: return .ultra
-    }
-  }
-  
-  var color: Color {
-    group.color
-  }
 }

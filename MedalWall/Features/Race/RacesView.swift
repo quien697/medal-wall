@@ -55,7 +55,7 @@ struct RacesView: View {
       }
     } detail: {
       if let race = selectedRace {
-        RaceDetailView(race: race)
+        RaceDetailView(viewModel: RaceDetailViewModel(race: race))
       } else {
         Text("Select a race")
       }

@@ -26,15 +26,6 @@ final class Race {
   @Relationship(deleteRule: .cascade, inverse: \RaceCategory.race)
   var categories: [RaceCategory] = []
   
-  var location: RaceLocation {
-    RaceLocation(
-      country: country,
-      province: province,
-      city: city,
-      district: district
-    )
-  }
-  
   init(
     id: UUID = UUID(),
     name: String,
@@ -60,5 +51,17 @@ final class Race {
     self.url = url
     self.updateTime = updateTime
     self.categories = categories
+  }
+}
+
+/// Extends Race with computed values
+extension Race {
+  var location: RaceLocation {
+    RaceLocation(
+      country: country,
+      province: province,
+      city: city,
+      district: district
+    )
   }
 }

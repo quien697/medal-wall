@@ -12,7 +12,9 @@ struct RaceAddView: View {
   let viewModel: RaceEditViewModel
   
   var body: some View {
-    RaceEditView(viewModel: viewModel)
+    NavigationStack {
+      RaceEditView(viewModel: viewModel)
+    }
   }
 }
 

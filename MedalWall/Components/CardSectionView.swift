@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct CardSection<Content: View>: View {
-  let title: String?
-  let alignment: HorizontalAlignment
-  let spacing: CGFloat?
-  let content: Content
+  private let title: String?
+  private let alignment: HorizontalAlignment
+  private let spacing: CGFloat?
+  private let content: Content
   
   init(
     title: String? = nil,

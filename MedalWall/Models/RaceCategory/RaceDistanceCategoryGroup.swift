@@ -18,6 +18,7 @@ enum RaceDistanceCategoryGroup: String, CaseIterable {
   
   var id: String { rawValue }
   
+  nonisolated
   var color: Color {
     switch self {
     case .fun: return .teal.opacity(0.2)
