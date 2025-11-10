@@ -16,7 +16,7 @@ class RaceDetailViewModel {
     self.race = race
   }
   
-  var categoriesByType: [String: [RaceCategory]] {
-    Dictionary(grouping: race.categories) { $0.type }
+  var distancesByType: [String: [RaceDistance]] {
+    Dictionary(grouping: race.distances) { $0.type.displayName }
   }
 }

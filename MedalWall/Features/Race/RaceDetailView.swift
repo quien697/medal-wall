@@ -13,7 +13,6 @@ struct RaceDetailView: View {
   @State private var isShowEditor = false
   @State private var isShowDeleteConfirm = false
   @State var viewModel: RaceDetailViewModel
-//  let race: Race
   
   var body: some View {
     ScrollView {
@@ -51,27 +50,27 @@ struct RaceDetailView: View {
             .modifier(TextStyleModifier.Card.listText)
         }
         
-        if viewModel.race.categories.count != 0 {
+        if viewModel.race.distances.count != 0 {
           CardListItem(systemName: "figure.run",alignment: .top) {
             VStack(alignment: .leading) {
-              ForEach(viewModel.categoriesByType.keys.sorted(), id: \.self) { type in
+              ForEach(viewModel.distancesByType.keys.sorted(), id: \.self) { type in
                 Text(type)
                   .modifier(TextStyleModifier.Card.listText)
                 
                 HStack {
-                  ForEach((viewModel.categoriesByType[type] ?? []).sorted(by: { $0.distance > $1.distance })) { category in
-                    Text(category.name)
+                  ForEach((viewModel.distancesByType[type] ?? []).sortedByDistance()) { distance in
+                    Text(distance.category.description)
                       .font(.subheadline)
                       .foregroundStyle(.primary)
                       .padding(.vertical, 7)
                       .padding(.horizontal)
-                      .background(category.color)
+                      .background(distance.category.color)
                       .clipShape(.rect(cornerRadius: 12))
-                  }
-                }
-              }
-            }
-          }
+                  } // ForEach
+                } // HStack
+              } // ForEach
+            } // VStack
+          } // CardListItem
         }
         
         if let url = viewModel.race.url {

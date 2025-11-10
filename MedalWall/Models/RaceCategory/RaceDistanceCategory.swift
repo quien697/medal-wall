@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Represents standard or custom marathon distance categories,
 /// used to display each distance with a distinct color.
-enum RaceDistanceCategory: CustomStringConvertible {
+enum RaceDistanceCategory: CustomStringConvertible, Hashable {
   case full
   case half
   case `10K`
@@ -36,6 +36,35 @@ enum RaceDistanceCategory: CustomStringConvertible {
     case .`10K`: return 10
     case .`5K`: return 5
     case .custom(let value): return value
+    }
+  }
+  
+  var group: RaceDistanceCategoryGroup {
+    switch value {
+    case ..<5: return .fun
+    case 5..<15: return .mini
+    case 15..<25: return .half
+    case 25..<40: return .long
+    case 40..<45: return .full
+    default: return .ultra
+    }
+  }
+  
+  var color: Color {
+    group.color
+  }
+}
+
+///
+extension RaceDistanceCategory {
+  nonisolated
+  init(value: Double) {
+    switch value {
+    case 42.195: self = .full
+    case 21.0975: self = .half
+    case 10: self = .`10K`
+    case 5: self = .`5K`
+    default: self = .custom(value)
     }
   }
 }

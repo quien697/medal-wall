@@ -10,17 +10,18 @@ import SwiftData
 
 @Observable
 class RaceEditViewModel {
-  var name: String
-  var photo: String
-  var date: Date
-  var country: String
-  var province: String
-  var city: String
-  var district: String
-  var url: String
-  var updateTime: Date
-  var categories: [RaceCategory]
-  var isNewRace: Bool
+  var name: String = ""
+  var photo: String = ""
+  var date: Date = Date()
+  var country: String = ""
+  var province: String = ""
+  var city: String = ""
+  var district: String = ""
+  var url: String = ""
+  var updateTime: Date = Date()
+  var categories: [RaceCategory] = []
+  var distances: [RaceDistance] = []
+  var isNewRace: Bool = true
   
   private let context: ModelContext
   private var race: Race?
@@ -40,19 +41,8 @@ class RaceEditViewModel {
       self.url = race.url ?? ""
       self.updateTime = race.updateTime
       self.categories = race.categories
+      self.distances = race.distances
       self.isNewRace = false
-    } else {
-      self.name = ""
-      self.photo = ""
-      self.date = Date()
-      self.country = ""
-      self.province = ""
-      self.city = ""
-      self.district = ""
-      self.url = ""
-      self.updateTime = Date()
-      self.categories = []
-      self.isNewRace = true
     }
   }
   
@@ -60,6 +50,10 @@ class RaceEditViewModel {
     !name.trimmingCharacters(in: .whitespaces).isEmpty &&
     !country.trimmingCharacters(in: .whitespaces).isEmpty &&
     !city.trimmingCharacters(in: .whitespaces).isEmpty
+  }
+  
+  var distancesByType: [String: [RaceDistance]] {
+    Dictionary(grouping: distances) { $0.type.displayName }
   }
   
   func save() throws {
@@ -70,10 +64,14 @@ class RaceEditViewModel {
       race.country = country
       race.province = province.isEmpty ? nil : province
       race.city = city
-      race.district = district.isEmpty ? nil : province
+      race.district = district.isEmpty ? nil : district
       race.url = url.isEmpty ? nil : url
       race.updateTime = Date()
-      race.categories = categories
+      race.categories.forEach(context.delete)
+      race.categories.removeAll()
+      race.categories = distances.map { distance in
+        RaceCategory(distance: distance, race: race)
+      }
     } else {
       let newRace = Race(
         name: name,
@@ -81,8 +79,11 @@ class RaceEditViewModel {
         location: RaceLocation(country: country, city: city),
         url: url.isEmpty ? nil : url,
         updateTime: updateTime,
-        categories: categories
+        categories: []
       )
+      newRace.categories = distances.map { distance in
+        RaceCategory(distance: distance, race: newRace)
+      }
       
       context.insert(newRace)
     }

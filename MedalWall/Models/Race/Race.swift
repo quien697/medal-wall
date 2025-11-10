@@ -64,4 +64,12 @@ extension Race {
       district: district
     )
   }
+  var distances: [RaceDistance] {
+    categories.map {
+      RaceDistance(
+        category: RaceDistanceCategory(value: $0.distance),
+        type: RaceDistanceType(rawValue: $0.type) ?? .inPerson
+      )
+    }
+  }
 }

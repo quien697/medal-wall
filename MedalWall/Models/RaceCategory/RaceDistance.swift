@@ -5,14 +5,22 @@
 //  Created by Quien on 2025-10-30.
 //
 
+import Foundation
+
 /// Represents a specific marathon distance combined with its details
-struct RaceDistance {
-  let category: RaceDistanceCategory
-  let type: RaceDistanceType
+struct RaceDistance: Identifiable, Hashable {
+  let id: UUID = UUID()
+  var category: RaceDistanceCategory
+  var type: RaceDistanceType
+  
+  static let `default` = RaceDistance(
+    category: .full,
+    type: .inPerson
+  )
 }
 
 /// Defines the participation format for a race
-enum RaceDistanceType: String {
+enum RaceDistanceType: String, Hashable {
   case inPerson
   case virtual
   
@@ -26,4 +34,3 @@ enum RaceDistanceType: String {
     }
   }
 }
-
