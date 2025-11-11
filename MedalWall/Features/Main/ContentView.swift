@@ -20,19 +20,19 @@ struct ContentView: View {
     TabView(selection: $selection) {
       ProfileView()
         .tabItem {
-          Label("You", systemImage: "star")
+          Label("You", systemImage: "person.crop.circle")
         }
         .tag(Tab.profile)
       
       MedalsView()
         .tabItem {
-          Label("Medal", systemImage: "star")
+          Label("Medal", systemImage: "medal")
         }
         .tag(Tab.medal)
       
       RacesView()
         .tabItem {
-          Label("Race", systemImage: "star")
+          Label("Race", systemImage: "figure.run")
         }
         .tag(Tab.race)
     }
