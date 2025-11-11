@@ -52,8 +52,12 @@ class RaceEditViewModel {
     !city.trimmingCharacters(in: .whitespaces).isEmpty
   }
   
-  var distancesByType: [String: [RaceDistance]] {
-    Dictionary(grouping: distances) { $0.type.displayName }
+  func addDistance(_ distance: RaceDistance) {
+    distances.append(distance)
+  }
+  
+  func deleteDistance(at offsets: IndexSet) {
+    distances.remove(atOffsets: offsets)
   }
   
   func save() throws {
@@ -89,5 +93,19 @@ class RaceEditViewModel {
     }
     
     try context.save()
+  }
+}
+
+extension RaceEditViewModel {
+  
+  func binding(for distance: RaceDistance) -> Binding<RaceDistance> {
+    guard let index = distances.firstIndex(of: distance) else {
+      fatalError("Binding not found for distance \(distance)")
+    }
+    
+    return Binding(
+      get: { self.distances[index] },
+      set: { self.distances[index] = $0 }
+    )
   }
 }

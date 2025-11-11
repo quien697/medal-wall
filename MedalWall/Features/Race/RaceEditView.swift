@@ -31,28 +31,42 @@ struct RaceEditView: View {
       } // Section
       
       Section("Race Distance") {
-        ForEach(viewModel.distances.enumerated(), id: \.element.id) { index, distance in
-          NavigationLink {
-            NavigationStack {
-              RaceDistanceEditView(distance: $viewModel.distances[index])
-            }
-          } label: {
-            HStack {
-              Image(systemName: "figure.run")
-                .padding(8)
-                .background(distance.category.color)
-                .clipShape(.circle)
-              
-              Text(distance.category.description)
-              
-              Spacer()
-              
-              Text(distance.type.displayName)
+        if viewModel.distances.isEmpty {
+          HStack {
+            Image(systemName: "figure.run")
+              .padding(8)
+              .background(.gray.opacity(0.2))
+              .clipShape(.circle)
+            
+            Text("No distances yet")
+            
+            Spacer()
+          }
+        } else {
+          ForEach(viewModel.distances.sortedByTypeAndDistance(), id: \.self) { distance in
+            NavigationLink {
+              NavigationStack {
+                RaceDistanceEditView(distance: viewModel.binding(for: distance))
+                  .navigationTitle("Edit Distance")
+              }
+            } label: {
+              HStack {
+                Image(systemName: "figure.run")
+                  .padding(8)
+                  .background(distance.category.color)
+                  .clipShape(.circle)
+                
+                Text(distance.category.description)
+                
+                Spacer()
+                
+                Text(distance.type.displayName)
+              }
             }
           }
-        }
-        .onDelete { indices in
-          print("delete = \(indices)")
+          .onDelete { indices in
+            print("delete = \(indices)")
+          }
         }
         
         Button {
