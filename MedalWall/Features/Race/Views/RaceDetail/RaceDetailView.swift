@@ -10,6 +10,7 @@ import SwiftData
 
 struct RaceDetailView: View {
   @Environment(\.modelContext) private var modelContext
+  @Environment(\.dismiss) private var dismiss
   @State private var isShowEditor = false
   @State private var isShowDeleteConfirm = false
   @State var viewModel: RaceDetailViewModel
@@ -30,7 +31,7 @@ struct RaceDetailView: View {
       ToolbarItem(placement: .topBarTrailing) {
         Menu("More Options", systemImage: "ellipsis") {
           Button {
-            isShowEditor.toggle()
+            isShowEditor = true
           } label: {
             Label("Edit Race", systemImage: "square.and.pencil")
           }
@@ -51,6 +52,16 @@ struct RaceDetailView: View {
           race: viewModel.race, context: modelContext))
       }
     } // sheet
+    .alert("Delete \(viewModel.race.name)?", isPresented: $isShowDeleteConfirm) {
+      Button("Delete", role: .destructive) {
+        modelContext.delete(viewModel.race)
+        try? modelContext.save()
+        dismiss()
+      }
+      Button("Cancel", role: .cancel) { }
+    } message: {
+      Text("This action cannot be undone.")
+    }
   }
 }
 

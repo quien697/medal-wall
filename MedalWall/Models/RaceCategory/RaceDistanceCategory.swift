@@ -55,7 +55,7 @@ enum RaceDistanceCategory: CustomStringConvertible, Hashable {
   }
 }
 
-///
+/// Initializes a distance category from a numeric distance value (in kilometers)..
 extension RaceDistanceCategory {
   nonisolated
   init(value: Double) {
