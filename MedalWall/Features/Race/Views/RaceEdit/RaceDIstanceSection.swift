@@ -48,7 +48,7 @@ struct RaceDIstanceSection: View {
           }
         }
         .onDelete { indices in
-          print("delete = \(indices)")
+          viewModel.deleteDistance(at: indices)
         }
       }
       
