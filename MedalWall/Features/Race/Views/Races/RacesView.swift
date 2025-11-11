@@ -19,32 +19,14 @@ struct RacesView: View {
     NavigationSplitView {
       List(races, selection: $selectedRace) { race in
         NavigationLink(value: race) {
-          HStack {
-            Image(race.photo ?? "")
-              .resizable()
-              .scaledToFit()
-              .frame(width: 60, height: 60)
-              .clipShape(.rect(cornerRadius: 10))
-            
-            VStack(alignment: .leading) {
-              Text(race.name)
-                .font(.headline)
-              
-              Text(race.location.formatted)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-              
-              Text(race.date.formatted(date: .abbreviated, time: .omitted))
-                .font(.caption)
-            }
-          }
+          RaceRowView(race: race)
         }
       }
       .navigationTitle("Races")
       .toolbar {
         ToolbarItem(placement: .topBarTrailing) {
           Button("Add Race", systemImage: "plus") {
-            isShowAddView.toggle()
+            isShowAddView = true
           }
         }
       }

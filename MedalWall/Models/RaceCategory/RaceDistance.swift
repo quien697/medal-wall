@@ -19,18 +19,18 @@ struct RaceDistance: Identifiable, Hashable {
   )
 }
 
-/// Defines the participation format for a race
-enum RaceDistanceType: String, Hashable {
-  case inPerson
-  case virtual
+extension Array where Element == RaceDistance {
   
-  var id: String { rawValue }
+  func sortedByDistance() -> [RaceDistance] {
+    self.sorted { $0.category.value > $1.category.value }
+  }
   
-  nonisolated
-  var displayName: String {
-    switch self {
-    case .inPerson: return "In-person"
-    case .virtual: return "Virtual"
+  func sortedByTypeAndDistance() -> [RaceDistance] {
+    self.sorted {
+      if $0.type != $1.type {
+        return $0.type.rawValue < $1.type.rawValue
+      }
+      return $0.category.value > $1.category.value
     }
   }
 }

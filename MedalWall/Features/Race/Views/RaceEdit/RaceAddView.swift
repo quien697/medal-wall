@@ -21,5 +21,6 @@ struct RaceAddView: View {
 #Preview(traits: .sampleData) {
   @Previewable @Query(sort: \Race.date) var races: [Race]
   let context = try! ModelContext(SampleData.makeSharedContext())
+  
   RaceAddView(viewModel: RaceEditViewModel(race: races[0], context: context))
 }
