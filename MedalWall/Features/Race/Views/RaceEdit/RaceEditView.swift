@@ -13,6 +13,7 @@ struct RaceEditView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var newRaceDistance = RaceDistance.default
   @State private var isShowRaceDistanceAddView = false
+  @State private var errorWrapper: ErrorWrapper?
   @State var viewModel: RaceEditViewModel
   
   var body: some View {
@@ -43,7 +44,7 @@ struct RaceEditView: View {
             try viewModel.save()
             dismiss()
           } catch {
-            print("Error saving race: \(error)")
+            errorWrapper = ErrorWrapper(error: error, guidance: "Race event was not recorded. Try again later.")
           }
         }
         .disabled(!viewModel.isFormValid)
@@ -51,6 +52,11 @@ struct RaceEditView: View {
     } // toolbar
     .sheet(isPresented: $isShowRaceDistanceAddView) {
       RaceDistanceAddView(viewModel: viewModel)
+    }
+    .sheet(item: $errorWrapper) {
+      dismiss()
+    } content: { wrapper in
+      ErrorView(errorWrapper: wrapper)
     }
   }
 }

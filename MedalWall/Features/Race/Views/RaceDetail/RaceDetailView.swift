@@ -13,6 +13,7 @@ struct RaceDetailView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var isShowEditor = false
   @State private var isShowDeleteConfirm = false
+  @State private var errorWrapper: ErrorWrapper?
   @State var viewModel: RaceDetailViewModel
   
   var body: some View {
@@ -52,11 +53,18 @@ struct RaceDetailView: View {
           race: viewModel.race, context: modelContext))
       }
     } // sheet
+    .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
+      ErrorView(errorWrapper: wrapper)
+    } // sheet
     .alert("Delete \(viewModel.race.name)?", isPresented: $isShowDeleteConfirm) {
       Button("Delete", role: .destructive) {
-        modelContext.delete(viewModel.race)
-        try? modelContext.save()
-        dismiss()
+        do {
+          modelContext.delete(viewModel.race)
+          try modelContext.save()
+          dismiss()
+        } catch {
+          errorWrapper = ErrorWrapper(error: error, guidance: "Race event couldn't be deleted. Try again later.")
+        }
       }
       Button("Cancel", role: .cancel) { }
     } message: {
