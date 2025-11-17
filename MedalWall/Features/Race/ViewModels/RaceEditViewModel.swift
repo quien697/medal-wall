@@ -12,13 +12,13 @@ import SwiftData
 class RaceEditViewModel {
   var name: String = ""
   var photo: String = ""
-  var date: Date = Date()
+  var date: Date = .now
   var country: String = ""
   var province: String = ""
   var city: String = ""
   var district: String = ""
   var url: String = ""
-  var updateTime: Date = Date()
+  var updateTime: Date = .now
   var categories: [RaceCategory] = []
   var distances: [RaceDistance] = []
   var isNewRace: Bool = true
@@ -70,7 +70,7 @@ class RaceEditViewModel {
       race.city = city
       race.district = district.isEmpty ? nil : district
       race.url = url.isEmpty ? nil : url
-      race.updateTime = Date()
+      race.updateTime = .now
       race.categories.forEach(context.delete)
       race.categories.removeAll()
       race.categories = distances.map { distance in

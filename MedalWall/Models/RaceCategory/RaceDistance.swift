@@ -13,10 +13,9 @@ struct RaceDistance: Identifiable, Hashable {
   var category: RaceDistanceCategory
   var type: RaceDistanceType
   
-  static let `default` = RaceDistance(
-    category: .full,
-    type: .inPerson
-  )
+  static var `default`: RaceDistance {
+    RaceDistance(category: .full, type: .inPerson)
+  }
 }
 
 extension Array where Element == RaceDistance {
