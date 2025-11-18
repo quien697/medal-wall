@@ -37,9 +37,9 @@ struct RaceDistanceTests {
     
     let sorted = list.sortedByDistance()
     
-    #expect(sorted[0].category == .full)     // 42.195
-    #expect(sorted[1].category == .half)     // 21.0975
-    #expect(sorted[2].category == .`5K`)      // 5
+    #expect(sorted[0].category == .full)
+    #expect(sorted[1].category == .half)
+    #expect(sorted[2].category == .`5K`)
   }
   
   @MainActor

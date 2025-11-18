@@ -34,9 +34,30 @@
 		60D2C09D2EA7CFEC000A6C4A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		605C9AA02ECB0935007D3A96 /* Exceptions for "MedalWall" folder in "MedalWallTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Models/Race/Race.swift,
+				Models/Race/RaceLocation.swift,
+				Models/Race/RaceType.swift,
+				Models/Race/Sport.swift,
+				Models/RaceCategory/RaceCategory.swift,
+				Models/RaceCategory/RaceDistance.swift,
+				Models/RaceCategory/RaceDistanceCategory.swift,
+				Models/RaceCategory/RaceDistanceCategoryGroup.swift,
+				Models/RaceCategory/RaceDistanceType.swift,
+			);
+			target = 60B570BE2EA616CA000B3FDE /* MedalWallTests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		60B570B22EA616C8000B3FDE /* MedalWall */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				605C9AA02ECB0935007D3A96 /* Exceptions for "MedalWall" folder in "MedalWallTests" target */,
+			);
 			path = MedalWall;
 			sourceTree = "<group>";
 		};

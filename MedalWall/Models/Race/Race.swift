@@ -35,8 +35,7 @@ final class Race {
     sport: Sport = .running,
     type: RaceType = .road,
     url: String? = nil,
-    updateTime: Date,
-    categories: [RaceCategory]
+    updateTime: Date
   ) {
     self.id = id
     self.name = name
@@ -46,11 +45,10 @@ final class Race {
     self.province = location.province
     self.city = location.city
     self.district = location.district
-    self.sport = sport.displayName
-    self.type = type.displayName
+    self.sport = sport.rawValue
+    self.type = type.rawValue
     self.url = url
     self.updateTime = updateTime
-    self.categories = categories
   }
 }
 

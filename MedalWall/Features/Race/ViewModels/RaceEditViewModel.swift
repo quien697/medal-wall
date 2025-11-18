@@ -82,8 +82,7 @@ class RaceEditViewModel {
         date: date,
         location: RaceLocation(country: country, city: city),
         url: url.isEmpty ? nil : url,
-        updateTime: updateTime,
-        categories: []
+        updateTime: updateTime
       )
       newRace.categories = distances.map { distance in
         RaceCategory(distance: distance, race: newRace)

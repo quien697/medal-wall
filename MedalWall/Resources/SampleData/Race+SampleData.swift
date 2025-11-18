@@ -19,8 +19,7 @@ extension Race {
         city: "Taipei"
       ),
       url: "https://taipeicitymarathon.com",
-      updateTime: Date(),
-      categories: [],
+      updateTime: .now,
     )
     let vancouver: Race = Race(
       name: "BMO Vancouver Marathon",
@@ -32,8 +31,7 @@ extension Race {
         city: "Vancouver"
       ),
       url: "https://bmovanmarathon.ca/",
-      updateTime: Date(),
-      categories: [],
+      updateTime: .now,
     )
     
     taipei.categories = [
