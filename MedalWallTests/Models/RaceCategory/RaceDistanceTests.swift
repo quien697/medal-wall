@@ -34,7 +34,6 @@ struct RaceDistanceTests {
       .init(category: .half, type: .virtual),
       .init(category: .full, type: .inPerson)
     ]
-    
     let sorted = list.sortedByDistance()
     
     #expect(sorted[0].category == .full)
@@ -51,7 +50,6 @@ struct RaceDistanceTests {
       .init(category: .`10K`, type: .inPerson),
       .init(category: .`5K`, type: .virtual)
     ]
-    
     let sorted = list.sortedByTypeAndDistance()
     
     // In-person first (alphabetical rawValue: inPerson < virtual)

@@ -11,17 +11,9 @@ import SwiftData
 @testable import MedalWall
 
 struct RaceCategoryTests {
-  
-  private func makeContainer() throws -> ModelContainer {
-    let schema = Schema([Race.self, RaceCategory.self])
-    let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-    return try ModelContainer(for: schema, configurations: [modelConfiguration])
-  }
-  
+
   @Test("RaceCategory initializes correctly from RaceDistance")
   func testRaceCategoryInit() throws {
-    let container = try makeContainer()
-    let context = ModelContext(container)
     let race = Race(
       name: "Test Marathon",
       date: .now,
@@ -31,8 +23,6 @@ struct RaceCategoryTests {
       ),
       updateTime: .now,
     )
-    context.insert(race)
-    
     let distance = RaceDistance(category: .half, type: .inPerson)
     let category = RaceCategory(distance: distance, race: race)
     
@@ -44,8 +34,9 @@ struct RaceCategoryTests {
   
   @Test("RaceCategory is attached to its parent Race")
   func testRelationship() throws {
-    let container = try makeContainer()
-    let context = ModelContext(container)
+    let schema = Schema([Race.self, RaceCategory.self])
+    let context = try TestModelContainer.makeContext(with: schema)
+    
     let race = Race(
       name: "Test Marathon",
       date: .now,

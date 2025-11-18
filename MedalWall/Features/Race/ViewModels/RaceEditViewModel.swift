@@ -19,7 +19,6 @@ class RaceEditViewModel {
   var district: String = ""
   var url: String = ""
   var updateTime: Date = .now
-  var categories: [RaceCategory] = []
   var distances: [RaceDistance] = []
   var isNewRace: Bool = true
   
@@ -40,7 +39,6 @@ class RaceEditViewModel {
       self.district = race.location.district ?? ""
       self.url = race.url ?? ""
       self.updateTime = race.updateTime
-      self.categories = race.categories
       self.distances = race.distances
       self.isNewRace = false
     }
@@ -71,10 +69,11 @@ class RaceEditViewModel {
       race.district = district.isEmpty ? nil : district
       race.url = url.isEmpty ? nil : url
       race.updateTime = .now
-      race.categories.forEach(context.delete)
-      race.categories.removeAll()
-      race.categories = distances.map { distance in
-        RaceCategory(distance: distance, race: race)
+      for category in race.categories {
+        context.delete(category)
+      }
+      race.categories = distances.map {
+        RaceCategory(distance: $0, race: race)
       }
     } else {
       let newRace = Race(
@@ -82,10 +81,9 @@ class RaceEditViewModel {
         date: date,
         location: RaceLocation(country: country, city: city),
         url: url.isEmpty ? nil : url,
-        updateTime: updateTime
       )
-      newRace.categories = distances.map { distance in
-        RaceCategory(distance: distance, race: newRace)
+      newRace.categories = distances.map {
+        RaceCategory(distance: $0, race: newRace)
       }
       
       context.insert(newRace)
@@ -99,7 +97,8 @@ extension RaceEditViewModel {
   
   func binding(for distance: RaceDistance) -> Binding<RaceDistance> {
     guard let index = distances.firstIndex(of: distance) else {
-      fatalError("Binding not found for distance \(distance)")
+      assertionFailure("Binding not found for distance \(distance)")
+      return .constant(distance)
     }
     
     return Binding(

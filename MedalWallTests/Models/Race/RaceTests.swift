@@ -12,13 +12,6 @@ import SwiftData
 
 struct RaceTests {
   
-  private func makeContainer() throws -> ModelContainer {
-    let schema = Schema([Race.self, RaceCategory.self])
-    let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-    return try ModelContainer(for: schema, configurations: [modelConfiguration])
-  }
-  
-  // MARK: - Test stored properties
   @Test("Race initializes with correct stored properties")
   func testRaceInit() throws {
     let race = Race(
@@ -42,8 +35,9 @@ struct RaceTests {
   
   @Test("Race persists into SwiftData and retrieves correctly")
   func testRacePersistence() throws {
-    let container = try makeContainer()
-    let context = ModelContext(container)
+    let schema = Schema([Race.self, RaceCategory.self])
+    let context = try TestModelContainer.makeContext(with: schema)
+    
     let race = Race(
       name: "Boston Marathon",
       date: .now,
@@ -68,8 +62,9 @@ struct RaceTests {
   
   @Test("Race updates correctly and persists changes")
   func testRaceEditing() throws {
-    let container = try makeContainer()
-    let context = ModelContext(container)
+    let schema = Schema([Race.self, RaceCategory.self])
+    let context = try TestModelContainer.makeContext(with: schema)
+    
     let race = Race(
       name: "LA Marathon (before edit)",
       date: .now,
@@ -121,8 +116,9 @@ struct RaceTests {
   
   @Test("Race.distances correctly converts RaceCategory → RaceDistance")
   func testRaceDistancesComputed() throws {
-    let container = try makeContainer()
-    let context = ModelContext(container)
+    let schema = Schema([Race.self, RaceCategory.self])
+    let context = try TestModelContainer.makeContext(with: schema)
+    
     let race = Race(
       name: "Sun Run Marathon",
       date: .now,

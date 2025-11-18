@@ -35,7 +35,8 @@ final class Race {
     sport: Sport = .running,
     type: RaceType = .road,
     url: String? = nil,
-    updateTime: Date
+    updateTime: Date = .now,
+    categories: [RaceCategory] = []
   ) {
     self.id = id
     self.name = name
