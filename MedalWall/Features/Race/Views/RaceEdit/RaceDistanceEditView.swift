@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import _SwiftData_SwiftUI
 
 struct RaceDistanceEditView: View {
   @Environment(\.dismiss) private var dismiss
@@ -46,10 +45,8 @@ struct RaceDistanceEditView: View {
   }
 }
 
-#Preview(traits: .sampleData) {
-  @Previewable @Query(sort: \Race.date) var races: [Race]
-  
+#Preview {
   NavigationStack{
-    RaceDistanceEditView(distance: .constant(races[0].distances[0]))
+    RaceDistanceEditView(distance: .constant(Race.sampleData[0].distances[0]))
   }
 }

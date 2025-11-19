@@ -18,6 +18,7 @@ struct RaceLocationTests {
       city: "New Taipei City",
       district: "Wanli"
     )
+    
     #expect(location.formatted == "Wanli, New Taipei City, Taiwan, Taiwan")
   }
   
@@ -29,6 +30,7 @@ struct RaceLocationTests {
       city: "Taipei",
       district: "Xinyi",
     )
+    
     #expect(loc.formatted == "Xinyi, Taipei, Taiwan")
   }
   
@@ -40,6 +42,7 @@ struct RaceLocationTests {
       city: "Banff",
       district: nil,
     )
+    
     #expect(loc.formatted == "Banff, AB, Canada")
   }
   
@@ -51,6 +54,7 @@ struct RaceLocationTests {
       city: "Osaka",
       district: nil,
     )
+    
     #expect(loc.formatted == "Osaka, Japan")
   }
 }

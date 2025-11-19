@@ -24,7 +24,11 @@ enum RaceDistanceCategory: CustomStringConvertible, Hashable {
     case .`10K`: return "10K"
     case .`5K`: return "5K"
     case .custom(let value):
-      return "\(value)K"
+      if value.truncatingRemainder(dividingBy: 1) == 0 {
+        return "\(Int(value))K"
+      } else {
+        return "\(value)K"
+      }
     }
   }
   
