@@ -10,7 +10,6 @@ import Testing
 
 struct RaceDistanceTests {
   
-  @MainActor
   @Test("Default RaceDistance is .full & .inPerson")
   func testDefault() {
     let distance = RaceDistance.default
@@ -19,7 +18,6 @@ struct RaceDistanceTests {
     #expect(distance.type == .inPerson)
   }
   
-  @MainActor
   @Test("RaceDistance ID is unique")
   func testUniqueID() {
     let distance1 = RaceDistance.default
@@ -28,7 +26,48 @@ struct RaceDistanceTests {
     #expect(distance1.id != distance2.id)
   }
   
-  @MainActor
+  // MARK: - compare
+  @Test("Different types are not equal even if distance same")
+  func testDifferentTypes() {
+    let a = RaceDistance(category: .`10K`, type: .inPerson)
+    let b = RaceDistance(category: .custom(10), type: .virtual)
+    
+    #expect(a != b)
+  }
+  
+  @Test("Different distances are not equal")
+  func testDifferentDistances() {
+    let a = RaceDistance(category: .half, type: .inPerson) // .half = 21.0975
+    let b = RaceDistance(category: .custom(21), type: .inPerson)
+    
+    #expect(a != b)
+  }
+  
+  @Test("Hash values match when RaceDistance is equal")
+  func testHashEquality1() {
+    let a = RaceDistance(category: .full, type: .inPerson)
+    let b = RaceDistance(category: .full, type: .inPerson)
+    
+    #expect(a.hashValue == b.hashValue)
+  }
+  
+  @Test("Hash values match when RaceDistance is equal")
+  func testHashEquality2() {
+    let a = RaceDistance(category: .`10K`, type: .inPerson) // .`10K` = 10
+    let b = RaceDistance(category: .custom(10), type: .inPerson)
+    
+    #expect(a.hashValue == b.hashValue)
+  }
+  
+  @Test("Hash values differ when RaceDistance is not equal")
+  func testHashInequality() {
+    let a = RaceDistance(category: .`10K`, type: .inPerson) // .`10K`
+    let b = RaceDistance(category: .custom(11), type: .inPerson)
+    
+    #expect(a.hashValue != b.hashValue)
+  }
+  
+  // MARK: - extension
   @Test("sortedByDistance sorts by descending km")
   func testSortedByDistance() {
     // Arrange
@@ -47,7 +86,6 @@ struct RaceDistanceTests {
     #expect(sorted[2].category == .`5K`)
   }
   
-  @MainActor
   @Test("sortedByTypeAndDistance sorts by type first, then distance")
   func testSortedByTypeAndDistance() {
     // Arrange

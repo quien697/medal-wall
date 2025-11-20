@@ -62,7 +62,7 @@ struct RaceEditViewModelTests {
     let context = try TestModelContainer.makeContext(with: schema)
     
     let vm = RaceEditViewModel(race: nil, context: context)
-    vm.addDistance(RaceDistance.default)
+    try vm.addDistance(RaceDistance.default)
     #expect(vm.distances.count == 1)
     
     vm.deleteDistance(at: IndexSet(integer: 0))
