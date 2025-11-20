@@ -11,7 +11,7 @@ import SwiftData
 @testable import MedalWall
 
 struct RaceEditViewModelTests {
-
+  
   @Test("Init loads existing race data")
   func testInitExistingRace() throws {
     let schema = Schema([Race.self, RaceCategory.self])
@@ -56,17 +56,53 @@ struct RaceEditViewModelTests {
     #expect(vm.isFormValid == true)
   }
   
-  @Test("Add and delete distances")
-  func testAddDeleteDistance() throws {
-    let schema = Schema([Race.self, RaceCategory.self])
-    let context = try TestModelContainer.makeContext(with: schema)
+  @Test("Add distances with the correct value")
+  func testAddDistance() throws {
+    let vm = RaceDistanceFactory()
     
-    let vm = RaceEditViewModel(race: nil, context: context)
-    try vm.addDistance(RaceDistance.default)
-    #expect(vm.distances.count == 1)
+    try vm.addDistance(RaceDistance(category: .half, type: .virtual))
+    #expect(vm.distances.count == 4)
+  }
+  
+  @Test("Add distances should throw duplicate error")
+  func testAddDistanceThrowsDuplicateError() throws {
+    let vm = RaceDistanceFactory()
     
-    vm.deleteDistance(at: IndexSet(integer: 0))
-    #expect(vm.distances.isEmpty)
+    #expect(throws: RaceEditError.duplicateDistance) {
+      try vm.addDistance(RaceDistance.default)
+    }
+  }
+  
+  @Test("Updating a distance replaces the correct value")
+  func testUpdateDistance() throws {
+    let vm = RaceDistanceFactory()
+    let old = vm.distances[1]
+    let new = RaceDistance(category: .custom(25), type: .inPerson)
+    
+    try vm.updateDistance(old: old, with: new)
+    
+    #expect(vm.distances.count == 3)
+    #expect(vm.distances.contains(new))
+  }
+  
+  @Test("Updating to an existing distance should throw duplicate error")
+  func testUpdateDistanceThrowsDuplicateError() throws {
+    let vm = RaceDistanceFactory()
+    let old = vm.distances[1]
+    let new = vm.distances[0]
+    
+    #expect(throws: RaceEditError.duplicateDistance) {
+      try vm.updateDistance(old: old, with: new)
+    }
+  }
+  
+  @Test("Delete distances")
+  func testDeleteDistance() throws {
+    let vm = RaceDistanceFactory()
+    
+    vm.deleteDistance(at: IndexSet(integer: 1))
+    
+    #expect(vm.distances.count == 2)
   }
   
   @Test("Saving a new race inserts it into context")
@@ -81,6 +117,7 @@ struct RaceEditViewModelTests {
     vm.distances = [
       RaceDistance(category: .full, type: .inPerson)
     ]
+    
     try vm.save()
     
     let races = try context.fetch(FetchDescriptor<Race>())
@@ -109,6 +146,7 @@ struct RaceEditViewModelTests {
     vm.distances = [
       RaceDistance(category: .half, type: .virtual)
     ]
+    
     try vm.save()
     
     #expect(race.name == "Boston Marathon (after edit)")
