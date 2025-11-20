@@ -8,6 +8,10 @@
 import SwiftUI
 import SwiftData
 
+enum RaceEditError: LocalizedError {
+  case duplicateDistance
+}
+
 @Observable
 class RaceEditViewModel {
   var name: String = ""
@@ -50,8 +54,22 @@ class RaceEditViewModel {
     !city.trimmingCharacters(in: .whitespaces).isEmpty
   }
   
-  func addDistance(_ distance: RaceDistance) {
-    distances.append(distance)
+  func addDistance(_ distance: RaceDistance) throws {
+    if distances.contains(distance) {
+      throw RaceEditError.duplicateDistance
+    } else {
+      distances.append(distance)
+    }
+  }
+  
+  func updateDistance(old: RaceDistance, with new: RaceDistance) throws {
+    if distances.contains(new) {
+      throw RaceEditError.duplicateDistance
+    } else {
+      if let index = distances.firstIndex(of: old) {
+        distances[index] = new
+      }
+    }
   }
   
   func deleteDistance(at offsets: IndexSet) {
@@ -90,20 +108,5 @@ class RaceEditViewModel {
     }
     
     try context.save()
-  }
-}
-
-extension RaceEditViewModel {
-  
-  func binding(for distance: RaceDistance) -> Binding<RaceDistance> {
-    guard let index = distances.firstIndex(of: distance) else {
-      assertionFailure("Binding not found for distance \(distance)")
-      return .constant(distance)
-    }
-    
-    return Binding(
-      get: { self.distances[index] },
-      set: { self.distances[index] = $0 }
-    )
   }
 }

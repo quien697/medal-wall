@@ -1,5 +1,5 @@
 //
-//  RaceDIstanceSection.swift
+//  RaceDistanceSection.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-11-11.
@@ -8,9 +8,11 @@
 import SwiftUI
 import SwiftData
 
-struct RaceDIstanceSection: View {
+struct RaceDistanceSection: View {
+  @Environment(\.dismiss) private var dismiss
   @Binding var viewModel: RaceEditViewModel
   @Binding var isPresented: Bool
+  @State private var errorWrapper: ErrorWrapper?
   
   var body: some View {
     Section("Race Distance") {
@@ -29,8 +31,17 @@ struct RaceDIstanceSection: View {
         ForEach(viewModel.distances.sortedByTypeAndDistance(), id: \.self) { distance in
           NavigationLink {
             NavigationStack {
-              RaceDistanceEditView(distance: viewModel.binding(for: distance))
-                .navigationTitle("Edit Distance")
+              RaceDistanceEditView(
+                mode: .edit,
+                distance: distance,
+                onSave: { updatedDistance in
+                  do {
+                    try viewModel.updateDistance(old: distance, with: updatedDistance)
+                  } catch {
+                    errorWrapper = ErrorWrapper(error: error, guidance: "Duplicate distance found. Please choose a different distance.")
+                  }
+                }
+              )
             }
           } label: {
             HStack {
@@ -66,6 +77,9 @@ struct RaceDIstanceSection: View {
         }
       }
     } // Section
+    .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
+      ErrorView(errorWrapper: wrapper)
+    } // sheet
   }
 }
 
@@ -74,7 +88,7 @@ struct RaceDIstanceSection: View {
   let context = try! ModelContext(SampleData.makeSharedContext())
   
   Form {
-    RaceDIstanceSection(
+    RaceDistanceSection(
       viewModel: .constant(RaceEditViewModel(race: races.first!, context: context)),
       isPresented: .constant(true)
     )

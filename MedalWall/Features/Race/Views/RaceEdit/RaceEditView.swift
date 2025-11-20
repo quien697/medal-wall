@@ -8,12 +8,15 @@
 import SwiftUI
 import SwiftData
 
+enum Mode { case add, edit }
+
 struct RaceEditView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
   @State private var newRaceDistance = RaceDistance.default
   @State private var isShowRaceDistanceAddView = false
-  @State private var errorWrapper: ErrorWrapper?
+  @State private var saveRaceErrorWrapper: ErrorWrapper?
+  @State private var addDistanceErrorWrapper: ErrorWrapper?
   @State var viewModel: RaceEditViewModel
   
   var body: some View {
@@ -22,7 +25,7 @@ struct RaceEditView: View {
       
       RaceLocationSection(viewModel: $viewModel)
       
-      RaceDIstanceSection(
+      RaceDistanceSection(
         viewModel: $viewModel,
         isPresented: $isShowRaceDistanceAddView
       )
@@ -44,20 +47,29 @@ struct RaceEditView: View {
             try viewModel.save()
             dismiss()
           } catch {
-            errorWrapper = ErrorWrapper(error: error, guidance: "Race event was not recorded. Try again later.")
+            saveRaceErrorWrapper = ErrorWrapper(error: error, guidance: "Race event was not recorded. Try again later.")
           }
         }
         .disabled(!viewModel.isFormValid)
       } // ToolbarItem
     } // toolbar
     .sheet(isPresented: $isShowRaceDistanceAddView) {
-      RaceDistanceAddView(viewModel: viewModel)
+      RaceDistanceAddView(onSave: { newDistance in
+        do {
+          try viewModel.addDistance(newDistance)
+        } catch {
+         addDistanceErrorWrapper = ErrorWrapper(error: error, guidance: "Duplicate distance found. Please choose a different distance.")
+        }
+      })
     }
-    .sheet(item: $errorWrapper) {
+    .sheet(item: $saveRaceErrorWrapper) {
       dismiss()
     } content: { wrapper in
       ErrorView(errorWrapper: wrapper)
     }
+    .sheet(item: $addDistanceErrorWrapper, onDismiss: nil) { wrapper in
+      ErrorView(errorWrapper: wrapper)
+    } // sheet
   }
 }
 

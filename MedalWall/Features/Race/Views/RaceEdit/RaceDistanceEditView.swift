@@ -9,31 +9,47 @@ import SwiftUI
 
 struct RaceDistanceEditView: View {
   @Environment(\.dismiss) private var dismiss
-  @Binding var distance: RaceDistance
+  @State private var draftDistance: RaceDistance
+  @State private var customValue: Double
+  
+  let mode: Mode
+  let distance: RaceDistance
+  let onSave: (RaceDistance) -> Void
+  
+  init(mode: Mode, distance: RaceDistance, onSave: @escaping (RaceDistance) -> Void) {
+    self.mode = mode
+    self.distance = distance
+    self.draftDistance = distance
+    self.customValue = {
+      if case .custom(let value) = distance.category { return value }
+      return 0
+    }()
+    self.onSave = onSave
+  }
   
   var body: some View {
     Form {
       Section("Distance") {
-        Picker("Distance", selection: $distance.category) {
+        Picker("Distance", selection: $draftDistance.category) {
           Text("Full Marathon").tag(RaceDistanceCategory.full)
           Text("Half Marathon").tag(RaceDistanceCategory.half)
           Text("10K").tag(RaceDistanceCategory.`10K`)
           Text("5K").tag(RaceDistanceCategory.`5K`)
-          Text("Custom").tag(RaceDistanceCategory.custom(distance.category.value))
+          Text("Custom").tag(RaceDistanceCategory.custom(customValue))
         }
         .pickerStyle(.navigationLink)
         
-        if case .custom = distance.category {
-          TextField("Custom distance (km)", value: Binding(
-            get: { distance.category.value },
-            set: { distance.category = .custom($0) }
-          ), format: .number)
-          .keyboardType(.decimalPad)
+        if case .custom = draftDistance.category {
+          TextField("Custom distance (km)", value: $customValue, format: .number)
+            .keyboardType(.decimalPad)
+            .onChange(of: customValue) { _, newValue in
+              draftDistance.category = .custom(newValue)
+            }
         }
       } // Section
       
       Section("Distance Type") {
-        Picker("Distance Type", selection: $distance.type) {
+        Picker("Distance Type", selection: $draftDistance.type) {
           Text(RaceDistanceType.inPerson.displayName)
             .tag(RaceDistanceType.inPerson)
           Text(RaceDistanceType.virtual.displayName)
@@ -42,11 +58,32 @@ struct RaceDistanceEditView: View {
         .pickerStyle(.segmented)
       } // Section
     } // Form
+    .navigationTitle(mode == .add ? "Add Distance" : "Edit Distance")
+    .toolbar {
+      if mode == .add {
+        ToolbarItem(placement: .cancellationAction) {
+          Button("Cancel") {
+            dismiss()
+          }
+        }
+      }
+      
+      ToolbarItem(placement: .confirmationAction) {
+        Button(mode == .add ? "Add": "Update") {
+          onSave(draftDistance)
+          dismiss()
+        }
+      }
+    }
   }
 }
 
 #Preview {
   NavigationStack{
-    RaceDistanceEditView(distance: .constant(Race.sampleData[0].distances[0]))
+    RaceDistanceEditView(
+      mode: .add,
+      distance: Race.sampleData[0].distances[0],
+      onSave: { _ in print("onSave") }
+    )
   }
 }

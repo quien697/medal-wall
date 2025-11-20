@@ -16,6 +16,16 @@ struct RaceDistance: Identifiable, Hashable {
   static var `default`: RaceDistance {
     RaceDistance(category: .full, type: .inPerson)
   }
+  
+  static func ==(lhs: RaceDistance, rhs: RaceDistance) -> Bool {
+    lhs.category.value == rhs.category.value &&
+    lhs.type == rhs.type
+  }
+  
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(category.value)
+    hasher.combine(type)
+  }
 }
 
 extension Array where Element == RaceDistance {
