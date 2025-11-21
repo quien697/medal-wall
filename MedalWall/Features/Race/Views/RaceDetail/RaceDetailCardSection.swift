@@ -6,11 +6,13 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct RaceDetailCardSection: View {
-  @Environment(\.modelContext) private var modelContext
   let viewModel: RaceDetailViewModel
+  
+  init(race: Race) {
+    self.viewModel = RaceDetailViewModel(race: race)
+  }
   
   var body: some View {
     CardSection(title: "Details") {
@@ -59,6 +61,5 @@ struct RaceDetailCardSection: View {
 }
 
 #Preview {
-  RaceDetailCardSection(
-    viewModel: RaceDetailViewModel(race: Race.sampleData.first!))
+  RaceDetailCardSection(race: Race.sampleData.first!)
 }

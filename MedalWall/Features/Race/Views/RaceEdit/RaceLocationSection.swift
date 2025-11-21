@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct RaceLocationSection: View {
-  @Binding var viewModel: RaceEditViewModel
+  @Bindable var viewModel: RaceEditViewModel
   
   var body: some View {
     Section("Race Location") {
@@ -23,11 +23,10 @@ struct RaceLocationSection: View {
 
 #Preview(traits: .sampleData) {
   @Previewable @Query(sort: \Race.date) var races: [Race]
-  let context = try! ModelContext(SampleData.makeSharedContext())
   
   Form {
     RaceLocationSection(
-      viewModel: .constant(RaceEditViewModel(race: races.first!, context: context))
+      viewModel: RaceEditViewModel(race: races.first!)
     )
   }
 }

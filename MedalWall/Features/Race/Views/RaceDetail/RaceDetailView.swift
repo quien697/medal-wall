@@ -14,13 +14,18 @@ struct RaceDetailView: View {
   @State private var isShowEditor = false
   @State private var isShowDeleteConfirm = false
   @State private var errorWrapper: ErrorWrapper?
-  @State var viewModel: RaceDetailViewModel
+  
+  let viewModel: RaceDetailViewModel
+  
+  init(race: Race) {
+    self.viewModel = RaceDetailViewModel(race: race)
+  }
   
   var body: some View {
     ScrollView {
       RaceHeroCardSection(race: viewModel.race)
       
-      RaceDetailCardSection(viewModel: viewModel)
+      RaceDetailCardSection(race: viewModel.race)
       
       RaceLastUpdatedCardSection(race: viewModel.race)
     } // ScrollView
@@ -49,8 +54,8 @@ struct RaceDetailView: View {
     } // toolbar
     .sheet(isPresented: $isShowEditor) {
       NavigationStack {
-        RaceEditView(viewModel: RaceEditViewModel(
-          race: viewModel.race, context: modelContext))
+        RaceEditView(race: viewModel.race)
+          .modelContainer(modelContext.container)
       }
     } // sheet
     .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
@@ -74,7 +79,5 @@ struct RaceDetailView: View {
 }
 
 #Preview(traits: .sampleData) {
-  @Previewable @Query(sort: \Race.date) var races: [Race]
-  
-  RaceDetailView(viewModel: RaceDetailViewModel(race: races[0]))
+  RaceDetailView(race: Race.sampleData.first!)
 }

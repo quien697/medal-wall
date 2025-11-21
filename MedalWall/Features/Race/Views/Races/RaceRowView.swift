@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import _SwiftData_SwiftUI
 
 struct RaceRowView: View {
   let race: Race
@@ -35,7 +34,5 @@ struct RaceRowView: View {
 }
 
 #Preview(traits: .sampleData) {
-  @Previewable @Query(sort: \Race.date) var races: [Race]
-  
-  RaceRowView(race: races.first!)
+  RaceRowView(race: Race.sampleData.first!)
 }

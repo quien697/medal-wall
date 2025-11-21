@@ -17,21 +17,28 @@ struct RaceEditView: View {
   @State private var isShowRaceDistanceAddView = false
   @State private var saveRaceErrorWrapper: ErrorWrapper?
   @State private var addDistanceErrorWrapper: ErrorWrapper?
-  @State var viewModel: RaceEditViewModel
+  @State private var viewModel: RaceEditViewModel
+  
+  init(race: Race?) {
+    self._viewModel = State(initialValue: RaceEditViewModel(race: race))
+  }
   
   var body: some View {
     Form {
-      RaceInfoSection(viewModel: $viewModel)
+      RaceInfoSection(viewModel: viewModel)
       
-      RaceLocationSection(viewModel: $viewModel)
+      RaceLocationSection(viewModel: viewModel)
       
       RaceDistanceSection(
-        viewModel: $viewModel,
+        viewModel: viewModel,
         isPresented: $isShowRaceDistanceAddView
       )
       
-      RaceAdditionalSection(viewModel: $viewModel)
+      RaceAdditionalSection(viewModel: viewModel)
     } // Form
+    .task {
+      viewModel.attachContext(modelContext)
+    }
     .navigationTitle("\(viewModel.isNewRace ? "Add" : "Edit") Race")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
@@ -58,7 +65,7 @@ struct RaceEditView: View {
         do {
           try viewModel.addDistance(newDistance)
         } catch {
-         addDistanceErrorWrapper = ErrorWrapper(error: error, guidance: "Duplicate distance found. Please choose a different distance.")
+          addDistanceErrorWrapper = ErrorWrapper(error: error, guidance: "Duplicate distance found. Please choose a different distance.")
         }
       })
     }
@@ -75,8 +82,8 @@ struct RaceEditView: View {
 
 #Preview(traits: .sampleData) {
   @Previewable @Query(sort: \Race.date) var races: [Race]
-  let context = try! ModelContext(SampleData.makeSharedContext())
+  
   NavigationStack {
-    RaceEditView(viewModel: RaceEditViewModel(race: races[0], context: context))
+    RaceEditView(race: races[0])
   }
 }

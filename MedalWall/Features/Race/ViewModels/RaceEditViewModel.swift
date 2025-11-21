@@ -26,11 +26,11 @@ class RaceEditViewModel {
   var distances: [RaceDistance] = []
   var isNewRace: Bool = true
   
-  private let context: ModelContext
-  private var race: Race?
+  private var context: ModelContext?
+  private(set) var race: Race?
   
-  init(race: Race?, context: ModelContext) {
-    self.context = context
+  init(race: Race?) {
+    self.race = race
     
     if let race {
       self.race = race
@@ -46,6 +46,10 @@ class RaceEditViewModel {
       self.distances = race.distances
       self.isNewRace = false
     }
+  }
+  
+  func attachContext(_ context: ModelContext) {
+    self.context = context
   }
   
   var isFormValid: Bool {
@@ -77,6 +81,8 @@ class RaceEditViewModel {
   }
   
   func save() throws {
+    guard let context else { return }
+    
     if let race {
       race.name = name
       race.photo = photo.isEmpty ? nil : photo

@@ -50,16 +50,14 @@ struct RacesView: View {
         viewModel.races = races
       }
       .sheet(isPresented: $isShowAddView) {
-        RaceAddView(viewModel: RaceEditViewModel(
-          race: selectedRace, context: modelContext)
-        )
+        RaceAddView()
       }
       .sheet(isPresented: $isShowFilterView) {
         RaceFilterView(filter: $filter)
       }
     } detail: {
       if let race = selectedRace {
-        RaceDetailView(viewModel: RaceDetailViewModel(race: race))
+        RaceDetailView(race: race)
       } else {
         Text("Select a race")
       }

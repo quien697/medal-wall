@@ -42,6 +42,7 @@
 				Models/Error/ErrorWrapper.swift,
 				Models/Medal/Medal.swift,
 				Models/Race/Race.swift,
+				Models/Race/RaceFilter.swift,
 				Models/Race/RaceLocation.swift,
 				Models/Race/RaceType.swift,
 				Models/Race/Sport.swift,

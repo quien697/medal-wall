@@ -10,7 +10,7 @@ import SwiftData
 
 struct RaceDistanceSection: View {
   @Environment(\.dismiss) private var dismiss
-  @Binding var viewModel: RaceEditViewModel
+  @Bindable var viewModel: RaceEditViewModel
   @Binding var isPresented: Bool
   @State private var errorWrapper: ErrorWrapper?
   
@@ -85,11 +85,10 @@ struct RaceDistanceSection: View {
 
 #Preview(traits: .sampleData) {
   @Previewable @Query(sort: \Race.date) var races: [Race]
-  let context = try! ModelContext(SampleData.makeSharedContext())
   
   Form {
     RaceDistanceSection(
-      viewModel: .constant(RaceEditViewModel(race: races.first!, context: context)),
+      viewModel: RaceEditViewModel(race: races.first!),
       isPresented: .constant(true)
     )
   }
