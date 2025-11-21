@@ -71,4 +71,8 @@ extension RaceDistanceCategory {
     default: self = .custom(value)
     }
   }
+  
+  static var standardCases: [RaceDistanceCategory] {
+    [.full, .half, .`10K`, .`5K`]
+  }
 }

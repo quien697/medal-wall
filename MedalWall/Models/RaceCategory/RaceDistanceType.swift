@@ -6,7 +6,7 @@
 //
 
 /// Defines the participation format for a race
-enum RaceDistanceType: String, Hashable {
+enum RaceDistanceType: String, Hashable, CaseIterable {
   case inPerson
   case virtual
   
