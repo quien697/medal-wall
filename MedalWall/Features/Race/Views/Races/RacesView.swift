@@ -32,14 +32,14 @@ struct RacesView: View {
       .animation(.default, value: filter.searchQuery)
       .toolbar {
         ToolbarItem(placement: .topBarTrailing) {
-          Button("Filter", systemImage: "slider.horizontal.3") {
-            isShowFilterView = true
+          Button("Add Race", systemImage: "plus") {
+            isShowAddView = true
           }
         }
         
         ToolbarItem(placement: .topBarTrailing) {
-          Button("Add Race", systemImage: "plus") {
-            isShowAddView = true
+          Button("Filter", systemImage: "slider.horizontal.3") {
+            isShowFilterView = true
           }
         }
       }
