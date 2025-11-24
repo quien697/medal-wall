@@ -76,8 +76,10 @@ class RaceEditViewModel {
     }
   }
   
-  func deleteDistance(at offsets: IndexSet) {
-    distances.remove(atOffsets: offsets)
+  func deleteDistance(_ distance: RaceDistance) {
+    if let index = distances.firstIndex(of: distance) {
+      distances.remove(at: index)
+    }
   }
   
   func save() throws {

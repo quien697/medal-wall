@@ -84,6 +84,6 @@ struct RaceEditView: View {
   @Previewable @Query(sort: \Race.date) var races: [Race]
   
   NavigationStack {
-    RaceEditView(race: races[0])
+    RaceEditView(race: races.first!)
   }
 }

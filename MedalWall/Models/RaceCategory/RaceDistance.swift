@@ -42,4 +42,8 @@ extension Array where Element == RaceDistance {
       return $0.category.value > $1.category.value
     }
   }
+  
+  func groupedByType() -> [RaceDistanceType: [RaceDistance]] {
+    Dictionary(grouping: self.sortedByDistance()) { $0.type }
+  }
 }

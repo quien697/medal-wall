@@ -15,23 +15,19 @@ struct RaceDetailView: View {
   @State private var isShowDeleteConfirm = false
   @State private var errorWrapper: ErrorWrapper?
   
-  let viewModel: RaceDetailViewModel
-  
-  init(race: Race) {
-    self.viewModel = RaceDetailViewModel(race: race)
-  }
+  let race: Race
   
   var body: some View {
     ScrollView {
-      RaceHeroCardSection(race: viewModel.race)
+      RaceHeroCardSection(race: race)
       
-      RaceDetailCardSection(race: viewModel.race)
+      RaceDetailCardSection(race: race)
       
-      RaceLastUpdatedCardSection(race: viewModel.race)
+      RaceLastUpdatedCardSection(race: race)
     } // ScrollView
     .padding(.horizontal)
     .background(.ultraThinMaterial)
-    .navigationTitle(viewModel.race.name)
+    .navigationTitle(race.name)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
@@ -54,17 +50,17 @@ struct RaceDetailView: View {
     } // toolbar
     .sheet(isPresented: $isShowEditor) {
       NavigationStack {
-        RaceEditView(race: viewModel.race)
+        RaceEditView(race: race)
           .modelContainer(modelContext.container)
       }
     } // sheet
     .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
       ErrorView(errorWrapper: wrapper)
     } // sheet
-    .alert("Delete \(viewModel.race.name)?", isPresented: $isShowDeleteConfirm) {
+    .alert("Delete \(race.name)?", isPresented: $isShowDeleteConfirm) {
       Button("Delete", role: .destructive) {
         do {
-          modelContext.delete(viewModel.race)
+          modelContext.delete(race)
           try modelContext.save()
           dismiss()
         } catch {

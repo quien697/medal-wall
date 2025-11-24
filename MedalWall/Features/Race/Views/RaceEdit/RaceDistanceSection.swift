@@ -15,9 +15,13 @@ struct RaceDistanceSection: View {
   @State private var errorWrapper: ErrorWrapper?
   
   var body: some View {
+    let groupedDistances = viewModel.distances.groupedByType()
+    
     Section("Race Distance") {
       if viewModel.distances.isEmpty {
         HStack {
+          Text("")
+          
           Image(systemName: "figure.run")
             .padding(8)
             .background(.gray.opacity(0.2))
@@ -28,38 +32,28 @@ struct RaceDistanceSection: View {
           Spacer()
         }
       } else {
-        ForEach(viewModel.distances.sortedByTypeAndDistance(), id: \.self) { distance in
-          NavigationLink {
-            NavigationStack {
-              RaceDistanceEditView(
-                mode: .edit,
-                distance: distance,
-                onSave: { updatedDistance in
-                  do {
-                    try viewModel.updateDistance(old: distance, with: updatedDistance)
-                  } catch {
-                    errorWrapper = ErrorWrapper(error: error, guidance: "Duplicate distance found. Please choose a different distance.")
-                  }
+        ForEach(RaceDistanceType.allCases) { type in
+          if let distances = groupedDistances[type], !distances.isEmpty {
+            Text(type.displayName)
+              .font(.headline)
+            
+            ForEach(distances) { distance in
+              RaceDistanceSectionRow(distance: distance) { updatedDistance in
+                do {
+                  try viewModel.updateDistance(old: distance, with: updatedDistance)
+                } catch {
+                  errorWrapper = ErrorWrapper(error: error, guidance: "Duplicate distance found. Please choose a different distance.")
                 }
-              )
-            }
-          } label: {
-            HStack {
-              Image(systemName: "figure.run")
-                .padding(8)
-                .background(distance.category.color)
-                .clipShape(.circle)
-              
-              Text(distance.category.description)
-              
-              Spacer()
-              
-              Text(distance.type.displayName)
+              }
+              .swipeActions(edge: .trailing) {
+                Button(role: .destructive) {
+                  viewModel.deleteDistance(distance)
+                } label: {
+                  Label("Delete", systemImage: "trash")
+                }
+              }
             }
           }
-        }
-        .onDelete { indices in
-          viewModel.deleteDistance(at: indices)
         }
       }
       
