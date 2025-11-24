@@ -19,7 +19,7 @@ struct RaceTests {
       location: RaceLocation(
         country: "Taiwan",
         city: "Taipei"
-      ),
+      )
     )
     
     #expect(race.name == "Taipei Marathon")
