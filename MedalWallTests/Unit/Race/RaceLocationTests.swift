@@ -11,7 +11,7 @@ import Testing
 struct RaceLocationTests {
   
   @Test("Formatted string includes district, city, province and country when all exist")
-  func formatted_fullLocation() {
+  func formattedFullLocation() {
     let location = RaceLocation(
       country: "Taiwan",
       province: "Taiwan",
@@ -23,7 +23,7 @@ struct RaceLocationTests {
   }
   
   @Test("Formatted string ignores province when nil")
-  func formatted_withoutProvince() {
+  func formattedWithoutProvince() {
     let loc = RaceLocation(
       country: "Taiwan",
       province: nil,
@@ -35,7 +35,7 @@ struct RaceLocationTests {
   }
   
   @Test("Formatted string ignores district when nil")
-  func formatted_withoutDistrict() {
+  func formattedWithoutDistrict() {
     let loc = RaceLocation(
       country: "Canada",
       province: "AB",
@@ -47,7 +47,7 @@ struct RaceLocationTests {
   }
   
   @Test("Formatted string ignores district and province when nil")
-  func formatted_withoutProvinceAndDistrict() {
+  func formattedWithoutProvinceAndDistrict() {
     let loc = RaceLocation(
       country: "Japan",
       province: nil,

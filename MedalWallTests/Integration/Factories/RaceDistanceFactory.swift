@@ -14,8 +14,10 @@ final class RaceDistanceFactory {
   init() {
     self.distances = [
       RaceDistance(category: .full, type: .inPerson),   // 42.195
-      RaceDistance(category: .half, type: .inPerson),   // 21.0975
       RaceDistance(category: .`10K`, type: .inPerson),  // 10
+      RaceDistance(category: .`5K`, type: .inPerson),   // 5
+      RaceDistance(category: .full, type: .virtual),    // 42.195
+      RaceDistance(category: .half, type: .virtual),    // 21.0975
     ]
   }
   
@@ -36,7 +38,9 @@ final class RaceDistanceFactory {
     }
   }
   
-  func deleteDistance(at offsets: IndexSet) {
-    distances.remove(atOffsets: offsets)
+  func deleteDistance(_ distance: RaceDistance) {
+    if let index = distances.firstIndex(of: distance) {
+      distances.remove(at: index)
+    }
   }
 }

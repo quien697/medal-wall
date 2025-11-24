@@ -13,7 +13,7 @@ import SwiftData
 struct RaceEditViewModelTests {
   
   @Test("Init loads existing race data")
-  func testInitExistingRace() throws {
+  func testInitExistRace() throws {
     let schema = Schema([Race.self, RaceCategory.self])
     let context = try TestModelContainer.makeContext(with: schema)
     
@@ -33,7 +33,7 @@ struct RaceEditViewModelTests {
     context.insert(category)
     race.categories = [category]
     
-    let vm = RaceEditViewModel(race: race, context: context)
+    let vm = RaceEditViewModel(race: race)
     
     #expect(vm.name == "Taipei Marathon")
     #expect(vm.country == "Taiwan")
@@ -43,10 +43,7 @@ struct RaceEditViewModelTests {
   
   @Test("Form validation works")
   func testFormValidation() throws {
-    let schema = Schema([Race.self, RaceCategory.self])
-    let context = try TestModelContainer.makeContext(with: schema)
-    
-    let vm = RaceEditViewModel(race: nil, context: context)
+    let vm = RaceEditViewModel(race: nil)
     vm.name = ""
     vm.country = "Taiwan"
     vm.city = "Taipei"
@@ -60,8 +57,11 @@ struct RaceEditViewModelTests {
   func testAddDistance() throws {
     let vm = RaceDistanceFactory()
     
-    try vm.addDistance(RaceDistance(category: .half, type: .virtual))
-    #expect(vm.distances.count == 4)
+    #expect(vm.distances.count == 5)
+    
+    try vm.addDistance(RaceDistance(category: .custom(33), type: .virtual))
+    
+    #expect(vm.distances.count == 6)
   }
   
   @Test("Add distances should throw duplicate error")
@@ -76,12 +76,12 @@ struct RaceEditViewModelTests {
   @Test("Updating a distance replaces the correct value")
   func testUpdateDistance() throws {
     let vm = RaceDistanceFactory()
-    let old = vm.distances[1]
+    let old = vm.distances[1]   // 10K, in-person
     let new = RaceDistance(category: .custom(25), type: .inPerson)
     
     try vm.updateDistance(old: old, with: new)
     
-    #expect(vm.distances.count == 3)
+    #expect(vm.distances.count == 5)
     #expect(vm.distances.contains(new))
   }
   
@@ -99,10 +99,12 @@ struct RaceEditViewModelTests {
   @Test("Delete distances")
   func testDeleteDistance() throws {
     let vm = RaceDistanceFactory()
+    let distance = RaceDistance(category: .`5K`, type: .inPerson)
+
+    vm.deleteDistance(distance)
     
-    vm.deleteDistance(at: IndexSet(integer: 1))
-    
-    #expect(vm.distances.count == 2)
+    #expect(vm.distances.count == 4)
+    #expect(!vm.distances.contains(distance))
   }
   
   @Test("Saving a new race inserts it into context")
@@ -110,7 +112,8 @@ struct RaceEditViewModelTests {
     let schema = Schema([Race.self, RaceCategory.self])
     let context = try TestModelContainer.makeContext(with: schema)
     
-    let vm = RaceEditViewModel(race: nil, context: context)
+    let vm = RaceEditViewModel(race: nil)
+    vm.attachContext(context)
     vm.name = "Tokyo Marathon 2026"
     vm.country = "Japan"
     vm.city = "Tokyo"
@@ -126,8 +129,8 @@ struct RaceEditViewModelTests {
     #expect(races.first?.name == "Tokyo Marathon 2026")
   }
   
-  @Test("Saving updates existing race")
-  func testSaveExistingRace() throws {
+  @Test("Updates existing race and save")
+  func testSaveExistRace() throws {
     let schema = Schema([Race.self, RaceCategory.self])
     let context = try TestModelContainer.makeContext(with: schema)
     
@@ -140,7 +143,8 @@ struct RaceEditViewModelTests {
     )
     context.insert(race)
     
-    let vm = RaceEditViewModel(race: race, context: context)
+    let vm = RaceEditViewModel(race: race)
+    vm.attachContext(context)
     vm.name = "Boston Marathon (after edit)"
     vm.city = "New York"
     vm.distances = [

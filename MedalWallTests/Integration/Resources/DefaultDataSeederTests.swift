@@ -12,7 +12,7 @@ import SwiftData
 struct DefaultDataSeederTests {
   
   @Test("Seeder inserts all default data")
-  func testSeederInsertsDefaultData() throws {
+  func testInsertsDefaultData() throws {
     let schema = Schema([
       User.self,
       Race.self,
@@ -29,7 +29,7 @@ struct DefaultDataSeederTests {
   }
   
   @Test("Seeder does not insert duplicates")
-  func testSeederIdempotency() throws {
+  func testNoInsertDuplicates() throws {
     let schema = Schema([
       User.self,
       Race.self,

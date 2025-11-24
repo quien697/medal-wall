@@ -41,7 +41,7 @@ struct RaceIntegrationTests {
   }
   
   @Test("Race updates correctly and persists changes")
-  func testRaceEditing() throws {
+  func testRaceEdit() throws {
     let schema = Schema([Race.self, RaceCategory.self])
     let context = try TestModelContainer.makeContext(with: schema)
     
