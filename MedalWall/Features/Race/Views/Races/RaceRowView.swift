@@ -12,11 +12,19 @@ struct RaceRowView: View {
   
   var body: some View {
     HStack {
-      Image(race.photo ?? "")
-        .resizable()
-        .scaledToFit()
-        .frame(width: 60, height: 60)
-        .clipShape(.rect(cornerRadius: 10))
+      if let photo = race.photo {
+        Image(uiImage: photo)
+          .resizable()
+          .scaledToFit()
+          .frame(width: 60, height: 60)
+          .clipShape(.rect(cornerRadius: 12))
+      } else {
+        Image(systemName: "photo.fill")
+          .resizable()
+          .scaledToFit()
+          .frame(width: 60, height: 60)
+          .clipShape(.rect(cornerRadius: 12))
+      }
       
       VStack(alignment: .leading) {
         Text(race.name)

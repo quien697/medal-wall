@@ -13,10 +13,17 @@ struct RaceHeroCardSection: View {
   var body: some View {
     CardSection(spacing: 12) {
       ZStack {
-        Image(race.photo ?? "")
-          .resizable()
-          .scaledToFit()
-          .clipShape(.rect(cornerRadius: 12))
+        if let uiImage = race.photo {
+          Image(uiImage: uiImage)
+            .resizable()
+            .scaledToFit()
+            .clipShape(.rect(cornerRadius: 12))
+        } else {
+          Image(systemName: "photo.fill")
+            .resizable()
+            .scaledToFit()
+            .clipShape(.rect(cornerRadius: 12))
+        }
       } // ZStack
       .frame(maxWidth: .infinity)
       .frame(height: 240)

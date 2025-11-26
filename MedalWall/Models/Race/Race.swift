@@ -6,13 +6,14 @@
 //
 
 import Foundation
+import UIKit
 import SwiftData
 
 @Model
 final class Race {
   @Attribute(.unique) var id: UUID
   var name: String
-  var photo: String?
+  var photoData: Data?
   var date: Date
   var country: String
   var province: String?
@@ -29,7 +30,7 @@ final class Race {
   init(
     id: UUID = UUID(),
     name: String,
-    photo: String? = nil,
+    photoData: Data? = nil,
     date: Date,
     location: RaceLocation,
     sport: Sport = .running,
@@ -40,7 +41,7 @@ final class Race {
   ) {
     self.id = id
     self.name = name
-    self.photo = photo
+    self.photoData = photoData
     self.date = date
     self.country = location.country
     self.province = location.province
@@ -55,6 +56,14 @@ final class Race {
 
 /// Extends Race with computed values
 extension Race {
+  var photo: UIImage? {
+    if let photoData {
+      return UIImage(data: photoData)
+    }
+    
+    return nil
+  }
+  
   var location: RaceLocation {
     RaceLocation(
       country: country,

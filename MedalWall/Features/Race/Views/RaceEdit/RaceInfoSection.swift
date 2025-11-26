@@ -14,7 +14,6 @@ struct RaceInfoSection: View {
   var body: some View {
     Section("Race Info") {
       TextField("Race Name", text: $viewModel.name)
-      TextField("Race Photo (option)", text: $viewModel.photo)
       DatePicker("Date", selection: $viewModel.date, displayedComponents: .date)
     }
   }

@@ -15,7 +15,8 @@ enum RaceEditError: LocalizedError {
 @Observable
 class RaceEditViewModel {
   var name: String = ""
-  var photo: String = ""
+  var photoData: Data? = nil
+  var photo: UIImage? = nil
   var date: Date = .now
   var country: String = ""
   var province: String = ""
@@ -35,7 +36,8 @@ class RaceEditViewModel {
     if let race {
       self.race = race
       self.name = race.name
-      self.photo = race.photo ?? ""
+      self.photoData = race.photoData
+      self.photo = race.photo
       self.date = race.date
       self.country = race.location.country
       self.province = race.location.province ?? ""
@@ -56,6 +58,21 @@ class RaceEditViewModel {
     !name.trimmingCharacters(in: .whitespaces).isEmpty &&
     !country.trimmingCharacters(in: .whitespaces).isEmpty &&
     !city.trimmingCharacters(in: .whitespaces).isEmpty
+  }
+  
+  func updatePhoto(with data: Data?) {
+    self.photoData = data
+    
+    if let data {
+      self.photo = UIImage(data: data)
+    } else {
+      self.photo = nil
+    }
+  }
+  
+  func clearPhoto() {
+    self.photoData = nil
+    self.photo = nil
   }
   
   func addDistance(_ distance: RaceDistance) throws {
@@ -87,7 +104,7 @@ class RaceEditViewModel {
     
     if let race {
       race.name = name
-      race.photo = photo.isEmpty ? nil : photo
+      race.photoData = photoData
       race.date = date
       race.country = country
       race.province = province.isEmpty ? nil : province
@@ -104,8 +121,14 @@ class RaceEditViewModel {
     } else {
       let newRace = Race(
         name: name,
+        photoData: photoData,
         date: date,
-        location: RaceLocation(country: country, city: city),
+        location: RaceLocation(
+          country: country,
+          province: province.isEmpty ? nil : province,
+          city: city,
+          district: district.isEmpty ? nil : district
+        ),
         url: url.isEmpty ? nil : url,
       )
       newRace.categories = distances.map {
