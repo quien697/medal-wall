@@ -9,22 +9,22 @@ import SwiftUI
 import SwiftData
 
 struct RaceInfoSection: View {
-  @Bindable var viewModel: RaceEditViewModel
+  @Binding var name: String
+  @Binding var date: Date
   
   var body: some View {
     Section("Race Info") {
-      TextField("Race Name", text: $viewModel.name)
-      DatePicker("Date", selection: $viewModel.date, displayedComponents: .date)
+      TextField("Race Name", text: $name)
+      DatePicker("Date", selection: $date, displayedComponents: .date)
     }
   }
 }
 
 #Preview(traits: .sampleData) {
-  @Previewable @Query(sort: \Race.date) var races: [Race]
-  
   Form {
     RaceInfoSection(
-      viewModel: RaceEditViewModel(race: races.first!)
+      name: .constant("Taipei Marathon"),
+      date: .constant(.now)
     )
   }
 }

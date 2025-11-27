@@ -9,11 +9,11 @@ import SwiftUI
 import SwiftData
 
 struct RaceAdditionalSection: View {
-  @Bindable var viewModel: RaceEditViewModel
+  @Binding var url: String
   
   var body: some View {
     Section("Additional Details") {
-      TextField("Official Website (option)", text: $viewModel.url)
+      TextField("Official Website (option)", text: $url)
         .keyboardType(.URL)
         .textInputAutocapitalization(.never)
     }
@@ -24,8 +24,6 @@ struct RaceAdditionalSection: View {
   @Previewable @Query(sort: \Race.date) var races: [Race]
   
   Form {
-    RaceAdditionalSection(
-      viewModel: RaceEditViewModel(race: races.first!)
-    )
+    RaceAdditionalSection(url: .constant("http://example.com"))
   }
 }

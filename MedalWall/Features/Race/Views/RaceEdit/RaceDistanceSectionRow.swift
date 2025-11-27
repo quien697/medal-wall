@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RaceDistanceSectionRow: View {
   let distance: RaceDistance
-  let onSave: (RaceDistance) -> Void
+  let onUpdate: (RaceDistance) -> Void
   
   var body: some View {
     NavigationLink {
@@ -17,7 +17,7 @@ struct RaceDistanceSectionRow: View {
         RaceDistanceEditView(
           mode: .edit,
           distance: distance,
-          onSave: onSave
+          onUpdate: onUpdate
         )
       }
     } label: {
@@ -40,5 +40,8 @@ struct RaceDistanceSectionRow: View {
 }
 
 #Preview {
-  RaceDistanceSectionRow(distance: RaceDistance.default, onSave: { _ in print("onSave") })
+  RaceDistanceSectionRow(
+    distance: RaceDistance.default,
+    onUpdate: { _ in }
+  )
 }

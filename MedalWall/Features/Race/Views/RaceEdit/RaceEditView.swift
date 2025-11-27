@@ -16,9 +16,9 @@ struct RaceEditView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var selectedRacePhotoItem: PhotosPickerItem?
   @State private var newRaceDistance = RaceDistance.default
-  @State private var isShowRaceDistanceAddView = false
-  @State private var saveRaceErrorWrapper: ErrorWrapper?
-  @State private var addDistanceErrorWrapper: ErrorWrapper?
+  @State private var isShowRaceDistanceAddView: Bool = false
+  @State private var errorWrapper: ErrorWrapper?
+  @State private var shouldDismiss: Bool = false
   @State private var viewModel: RaceEditViewModel
   
   init(race: Race?) {
@@ -27,75 +27,39 @@ struct RaceEditView: View {
   
   var body: some View {
     Form {
-//      Section("Race Image") {
-//        PhotosPicker(
-//          selection: $selectedRacePhotoItem,
-//          matching: .images,
-//          photoLibrary: .shared()
-//        ) {
-//          if let uiImage = viewModel.photo {
-//            Image(uiImage: uiImage)
-//              .resizable()
-//              .scaledToFill()
-//              .clipShape(.rect(cornerRadius: 12))
-//              .overlay(alignment: .topTrailing) {
-//                Button {
-//                  selectedRacePhotoItem = nil
-//                  viewModel.clearPhoto()
-//                } label: {
-//                  Image(systemName: "xmark.circle.fill")
-//                    .font(.system(size: 32))
-//                    .symbolRenderingMode(.hierarchical)
-//                    .foregroundStyle(.white)
-//                    .shadow(radius: 2)
-//                }
-//                .padding()
-//              }
-//          } else {
-//            ContentUnavailableView {
-//              Image(systemName: "photo.fill")
-//                .resizable()
-//                .scaledToFit()
-//                .frame(width: 60)
-//                .padding(.bottom, 10)
-//              
-//              Text("Add Photo")
-//                .font(.headline)
-//            }
-//            .background(.thinMaterial)
-//            .frame(height: 250)
-//            .overlay(
-//              RoundedRectangle(cornerRadius: 12)
-//                .stroke(Color.blue, style: StrokeStyle(lineWidth: 2, dash: [10, 2]))
-//            )
-//          }
-//        } // PhotosPicker
-//        .onChange(of: selectedRacePhotoItem) { _, newItem in
-//          guard let newItem else { return }
-//          
-//          Task {
-//            if let data = try await newItem.loadTransferable(type: Data.self) {
-//              viewModel.updatePhoto(with: data)
-//            }
-//          }
-//        } // onChange
-//      }
-      
       RacePhotoSection(
         data: $viewModel.photoData,
         image: $viewModel.photo
       )
       
-      RaceInfoSection(viewModel: viewModel)
-      
-      RaceLocationSection(viewModel: viewModel)
-      
-      RaceDistanceSection(
-        viewModel: viewModel,
-        isPresented: $isShowRaceDistanceAddView
+      RaceInfoSection(
+        name: $viewModel.name,
+        date: $viewModel.date
       )
       
-      RaceAdditionalSection(viewModel: viewModel)
+      RaceLocationSection(
+        country: $viewModel.country,
+        province: $viewModel.province,
+        city: $viewModel.city,
+        district: $viewModel.district
+      )
+      
+      RaceDistanceSection(
+        isPresented: $isShowRaceDistanceAddView,
+        distances: viewModel.distances,
+        onUpdate: { distance, updatedDistance in
+          do {
+            try viewModel.updateDistance(old: distance, with: updatedDistance)
+          } catch {
+            errorWrapper = ErrorWrapper(error: error, guidance: "Duplicate distance found. Please choose a different distance.")
+          }
+        },
+        onDelete: { distance in
+          viewModel.deleteDistance(distance)
+        }
+      )
+      
+      RaceAdditionalSection(url: $viewModel.url)
     } // Form
     .task {
       viewModel.attachContext(modelContext)
@@ -115,7 +79,8 @@ struct RaceEditView: View {
             try viewModel.save()
             dismiss()
           } catch {
-            saveRaceErrorWrapper = ErrorWrapper(error: error, guidance: "Race event was not recorded. Try again later.")
+            shouldDismiss = true
+            errorWrapper = ErrorWrapper(error: error, guidance: "Race event was not recorded. Try again later.")
           }
         }
         .disabled(!viewModel.isFormValid)
@@ -126,18 +91,18 @@ struct RaceEditView: View {
         do {
           try viewModel.addDistance(newDistance)
         } catch {
-          addDistanceErrorWrapper = ErrorWrapper(error: error, guidance: "Duplicate distance found. Please choose a different distance.")
+          errorWrapper = ErrorWrapper(error: error, guidance: "Duplicate distance found. Please choose a different distance.")
         }
       })
     }
-    .sheet(item: $saveRaceErrorWrapper) {
-      dismiss()
-    } content: { wrapper in
-      ErrorView(errorWrapper: wrapper)
+    .sheet(item: $errorWrapper, onDismiss: {
+        if shouldDismiss {
+            dismiss()
+          shouldDismiss = false
+        }
+    }) { wrapper in
+        ErrorView(errorWrapper: wrapper)
     }
-    .sheet(item: $addDistanceErrorWrapper, onDismiss: nil) { wrapper in
-      ErrorView(errorWrapper: wrapper)
-    } // sheet
   }
 }
 

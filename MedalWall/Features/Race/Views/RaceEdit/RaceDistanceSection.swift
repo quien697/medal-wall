@@ -9,16 +9,17 @@ import SwiftUI
 import SwiftData
 
 struct RaceDistanceSection: View {
-  @Environment(\.dismiss) private var dismiss
-  @Bindable var viewModel: RaceEditViewModel
   @Binding var isPresented: Bool
-  @State private var errorWrapper: ErrorWrapper?
+  
+  let distances: [RaceDistance]
+  let onUpdate: (RaceDistance, RaceDistance) -> Void
+  let onDelete: (RaceDistance) -> Void
   
   var body: some View {
-    let groupedDistances = viewModel.distances.groupedByType()
+    let groupedDistances = distances.groupedByType()
     
     Section("Race Distance") {
-      if viewModel.distances.isEmpty {
+      if distances.isEmpty {
         HStack {
           Text("")
           
@@ -39,15 +40,11 @@ struct RaceDistanceSection: View {
             
             ForEach(distances) { distance in
               RaceDistanceSectionRow(distance: distance) { updatedDistance in
-                do {
-                  try viewModel.updateDistance(old: distance, with: updatedDistance)
-                } catch {
-                  errorWrapper = ErrorWrapper(error: error, guidance: "Duplicate distance found. Please choose a different distance.")
-                }
+                onUpdate(distance, updatedDistance)
               }
               .swipeActions(edge: .trailing) {
                 Button(role: .destructive) {
-                  viewModel.deleteDistance(distance)
+                  onDelete(distance)
                 } label: {
                   Label("Delete", systemImage: "trash")
                 }
@@ -71,19 +68,16 @@ struct RaceDistanceSection: View {
         }
       }
     } // Section
-    .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
-      ErrorView(errorWrapper: wrapper)
-    } // sheet
   }
 }
 
 #Preview(traits: .sampleData) {
-  @Previewable @Query(sort: \Race.date) var races: [Race]
-  
   Form {
     RaceDistanceSection(
-      viewModel: RaceEditViewModel(race: races.first!),
-      isPresented: .constant(true)
+      isPresented: .constant(true),
+      distances: Race.sampleData.first!.distances,
+      onUpdate: { _, _ in },
+      onDelete: { _ in }
     )
   }
 }

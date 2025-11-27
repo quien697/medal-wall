@@ -51,7 +51,6 @@ struct RaceDetailView: View {
     .sheet(isPresented: $isShowEditor) {
       NavigationStack {
         RaceEditView(race: race)
-          .modelContainer(modelContext.container)
       }
     } // sheet
     .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in

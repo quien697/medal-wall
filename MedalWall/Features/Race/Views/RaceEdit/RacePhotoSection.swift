@@ -9,9 +9,10 @@ import SwiftUI
 import PhotosUI
 
 struct RacePhotoSection: View {
-  @State private var selectedItem: PhotosPickerItem? = nil
   @Binding var data: Data?
   @Binding var image: UIImage?
+  
+  @State private var selectedItem: PhotosPickerItem? = nil
   
   var body: some View {
     Section("Race Image") {

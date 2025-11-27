@@ -16,7 +16,7 @@ struct RaceDistanceAddView: View {
       RaceDistanceEditView(
         mode: .add,
         distance: .default,
-        onSave: onSave
+        onUpdate: onSave
       )
     }
   }

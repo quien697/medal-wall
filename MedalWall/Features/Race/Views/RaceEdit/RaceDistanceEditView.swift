@@ -14,9 +14,9 @@ struct RaceDistanceEditView: View {
   
   let mode: Mode
   let distance: RaceDistance
-  let onSave: (RaceDistance) -> Void
+  let onUpdate: (RaceDistance) -> Void
   
-  init(mode: Mode, distance: RaceDistance, onSave: @escaping (RaceDistance) -> Void) {
+  init(mode: Mode, distance: RaceDistance, onUpdate: @escaping (RaceDistance) -> Void) {
     self.mode = mode
     self.distance = distance
     self.draftDistance = distance
@@ -24,7 +24,7 @@ struct RaceDistanceEditView: View {
       if case .custom(let value) = distance.category { return value }
       return 0
     }()
-    self.onSave = onSave
+    self.onUpdate = onUpdate
   }
   
   var body: some View {
@@ -70,7 +70,7 @@ struct RaceDistanceEditView: View {
       
       ToolbarItem(placement: .confirmationAction) {
         Button(mode == .add ? "Add": "Update") {
-          onSave(draftDistance)
+          onUpdate(draftDistance)
           dismiss()
         }
       }
@@ -83,7 +83,7 @@ struct RaceDistanceEditView: View {
     RaceDistanceEditView(
       mode: .add,
       distance: Race.sampleData[0].distances[0],
-      onSave: { _ in print("onSave") }
+      onUpdate: { _ in }
     )
   }
 }
