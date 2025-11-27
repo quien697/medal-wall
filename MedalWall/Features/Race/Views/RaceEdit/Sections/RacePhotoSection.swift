@@ -13,32 +13,29 @@ struct RacePhotoSection: View {
   @Binding var image: UIImage?
   
   @State private var selectedItem: PhotosPickerItem? = nil
+  @State private var buttonName: String = "Pick"
   
   var body: some View {
     Section("Race Image") {
-      PhotosPicker(
-        selection: $selectedItem,
-        matching: .images,
-        photoLibrary: .shared()
-      ) {
+      ZStack {
         if let uiImage = image {
           Image(uiImage: uiImage)
-            .resizable()
-            .scaledToFill()
-            .clipShape(.rect(cornerRadius: 12))
+            .raceHero()
             .overlay(alignment: .topTrailing) {
               Button {
                 selectedItem = nil
                 self.data = nil
                 self.image = nil
               } label: {
-                Image(systemName: "xmark.circle.fill")
-                  .font(.system(size: 32))
-                  .symbolRenderingMode(.hierarchical)
+                Image(systemName: "xmark")
+                  .font(.system(size: 15))
+                  .padding(8)
+                  .background(.black)
                   .foregroundStyle(.white)
+                  .clipShape(.circle)
                   .shadow(radius: 2)
               }
-              .padding()
+              .padding(-10)
             }
         } else {
           ContentUnavailableView {
@@ -46,31 +43,53 @@ struct RacePhotoSection: View {
               .resizable()
               .scaledToFit()
               .frame(width: 60)
+              .foregroundStyle(.gray)
               .padding(.bottom, 10)
             
-            Text("Add Photo")
+            Text("No Race Photo")
               .font(.headline)
+              .foregroundStyle(.gray)
           }
           .background(.thinMaterial)
-          .frame(height: 250)
+          .frame(width: 240, height: 240)
           .overlay(
             RoundedRectangle(cornerRadius: 12)
-              .stroke(Color.blue, style: StrokeStyle(lineWidth: 2, dash: [10, 2]))
+              .stroke(.gray, style: StrokeStyle(lineWidth: 2, dash: [10, 2]))
           )
         }
-      } // PhotosPicker
-      .onChange(of: selectedItem) { _, newItem in
-        guard let newItem else { return }
-        
-        Task {
-          if let data = try await newItem.loadTransferable(type: Data.self),
-             let image = UIImage(data: data) {
-            self.data = data
-            self.image = image
+      } // ZStack
+      .frame(maxWidth: .infinity)
+      .padding()
+      
+      VStack(alignment: .center) {
+        PhotosPicker(
+          selection: $selectedItem,
+          matching: .images,
+          photoLibrary: .shared()
+        ) {
+          HStack(alignment: .center) {
+            Text("Pcik Photo")
+              .font(.headline)
+              .frame(maxWidth: .infinity)
+              .foregroundStyle(.white)
+              .padding()
           }
         }
-      } // onChange
-    }
+        .onChange(of: selectedItem) { _, newItem in
+          guard let newItem else { return }
+          
+          Task {
+            if let data = try await newItem.loadTransferable(type: Data.self),
+               let image = UIImage(data: data) {
+              self.data = data
+              self.image = image
+            }
+          }
+        } // onChange
+      }
+      .background(.blue)
+      .clipShape(.rect(cornerRadius: 12))
+    } // Section
   }
 }
 

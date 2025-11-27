@@ -12,11 +12,11 @@ struct RaceDistanceEditView: View {
   @State private var draftDistance: RaceDistance
   @State private var customValue: Double
   
-  let mode: Mode
+  let mode: RaceEditMode
   let distance: RaceDistance
   let onUpdate: (RaceDistance) -> Void
   
-  init(mode: Mode, distance: RaceDistance, onUpdate: @escaping (RaceDistance) -> Void) {
+  init(mode: RaceEditMode, distance: RaceDistance, onUpdate: @escaping (RaceDistance) -> Void) {
     self.mode = mode
     self.distance = distance
     self.draftDistance = distance

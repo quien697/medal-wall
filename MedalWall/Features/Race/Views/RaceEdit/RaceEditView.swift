@@ -9,7 +9,7 @@ import SwiftUI
 import PhotosUI
 import SwiftData
 
-enum Mode { case add, edit }
+enum RaceEditMode { case add, edit }
 
 struct RaceEditView: View {
   @Environment(\.modelContext) private var modelContext
