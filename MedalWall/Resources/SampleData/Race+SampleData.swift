@@ -6,13 +6,14 @@
 //
 
 import Foundation
+import UIKit
 
 extension Race {
   @MainActor
   static let sampleData: [Race] = {
     let taipei: Race = Race(
       name: "Taipei Marathon",
-      photo: "taipei-marathon",
+      photoData: UIImage(named: "taipei-marathon")?.jpegData(compressionQuality: 0.9),
       date: DateComponents(calendar: .current, year: 2025, month: 12, day: 21).date!,
       location: RaceLocation(
         country: "Taiwan",
@@ -23,7 +24,7 @@ extension Race {
     )
     let vancouver: Race = Race(
       name: "BMO Vancouver Marathon",
-      photo: "bmo-vancouver-marathon",
+      photoData: UIImage(named: "bmo-vancouver-marathon")?.pngData(),
       date: DateComponents(calendar: .current, year: 2026, month: 5, day: 3).date!,
       location: RaceLocation(
         country: "Canada",
