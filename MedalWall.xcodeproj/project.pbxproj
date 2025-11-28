@@ -40,7 +40,6 @@
 			membershipExceptions = (
 				Features/Race/ViewModels/RaceEditViewModel.swift,
 				Features/Race/ViewModels/RacesViewModel.swift,
-				Models/Error/ErrorWrapper.swift,
 				Models/Medal/Medal.swift,
 				Models/Race/Race.swift,
 				Models/Race/RaceFilter.swift,
@@ -60,6 +59,7 @@
 				"Resources/SampleData/Medal+SampleData.swift",
 				"Resources/SampleData/Race+SampleData.swift",
 				"Resources/SampleData/User+SampleData.swift",
+				Shared/Errors/ErrorWrapper.swift,
 			);
 			target = 60B570BE2EA616CA000B3FDE /* MedalWallTests */;
 		};

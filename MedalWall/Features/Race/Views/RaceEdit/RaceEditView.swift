@@ -51,7 +51,7 @@ struct RaceEditView: View {
           do {
             try viewModel.updateDistance(old: distance, with: updatedDistance)
           } catch {
-            errorWrapper = ErrorWrapper(error: error, guidance: "Duplicate distance found. Please choose a different distance.")
+            errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
           }
         },
         onDelete: { distance in
@@ -75,12 +75,13 @@ struct RaceEditView: View {
       
       ToolbarItem(placement: .confirmationAction) {
         Button(viewModel.isNewRace ? "Add" : "Save") {
+          
           do {
             try viewModel.save()
             dismiss()
           } catch {
             shouldDismiss = true
-            errorWrapper = ErrorWrapper(error: error, guidance: "Race event was not recorded. Try again later.")
+            errorWrapper = ErrorWrapper(error: AppError.raceSaveFailed)
           }
         }
         .disabled(!viewModel.isFormValid)
@@ -91,7 +92,7 @@ struct RaceEditView: View {
         do {
           try viewModel.addDistance(newDistance)
         } catch {
-          errorWrapper = ErrorWrapper(error: error, guidance: "Duplicate distance found. Please choose a different distance.")
+          errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
         }
       })
     }

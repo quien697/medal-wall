@@ -38,7 +38,7 @@ struct RacesView: View {
         }
         
         ToolbarItem(placement: .topBarTrailing) {
-          Button("Filter", systemImage: "slider.horizontal.3") {
+          Button("Filter", systemImage: "ellipsis") {
             isShowFilterView = true
           }
         }

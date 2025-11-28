@@ -48,6 +48,20 @@ struct RaceDetailView: View {
         } // Menu
       } // ToolbarItem
     } // toolbar
+    .alert("Delete \(race.name)?", isPresented: $isShowDeleteConfirm) {
+      Button("Delete", role: .destructive) {
+        do {
+          modelContext.delete(race)
+          try modelContext.save()
+          dismiss()
+        } catch {
+          errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
+        }
+      }
+      Button("Cancel", role: .cancel) { }
+    } message: {
+      Text("This action cannot be undone.")
+    }
     .sheet(isPresented: $isShowEditor) {
       NavigationStack {
         RaceEditView(race: race)
@@ -56,20 +70,6 @@ struct RaceDetailView: View {
     .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
       ErrorView(errorWrapper: wrapper)
     } // sheet
-    .alert("Delete \(race.name)?", isPresented: $isShowDeleteConfirm) {
-      Button("Delete", role: .destructive) {
-        do {
-          modelContext.delete(race)
-          try modelContext.save()
-          dismiss()
-        } catch {
-          errorWrapper = ErrorWrapper(error: error, guidance: "Race event couldn't be deleted. Try again later.")
-        }
-      }
-      Button("Cancel", role: .cancel) { }
-    } message: {
-      Text("This action cannot be undone.")
-    }
   }
 }
 

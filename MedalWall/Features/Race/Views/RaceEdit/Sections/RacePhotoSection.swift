@@ -14,6 +14,7 @@ struct RacePhotoSection: View {
   
   @State private var selectedItem: PhotosPickerItem? = nil
   @State private var buttonName: String = "Pick"
+  @State private var errorWrapper: ErrorWrapper?
   
   var body: some View {
     Section("Race Image") {
@@ -79,10 +80,16 @@ struct RacePhotoSection: View {
           guard let newItem else { return }
           
           Task {
-            if let data = try await newItem.loadTransferable(type: Data.self),
-               let image = UIImage(data: data) {
-              self.data = data
-              self.image = image
+            do {
+              if let data = try await newItem.loadTransferable(type: Data.self),
+                 let image = UIImage(data: data) {
+                self.data = data
+                self.image = image
+              } else {
+                errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
+              }
+            } catch {
+              errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
             }
           }
         } // onChange
@@ -90,6 +97,9 @@ struct RacePhotoSection: View {
       .background(.blue)
       .clipShape(.rect(cornerRadius: 12))
     } // Section
+    .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
+      ErrorView(errorWrapper: wrapper)
+    }
   }
 }
 
