@@ -26,20 +26,20 @@ struct RaceCategoryIntegrationTests {
         city: "Los ANgeles",
       ),
     )
-    context.insert(race)
-    
     let distance = RaceDistance(category: .`10K`, type: .virtual)
     let category = RaceCategory(distance: distance, race: race)
-    context.insert(category)
     race.categories.append(category)
-    try context.save()
+    context.insert(category)
     
-    let fetched = try context.fetch(FetchDescriptor<Race>())
-    let fetchedRace = fetched.first!
+    let fetchedRaces = try context.fetch(FetchDescriptor<Race>())
+    #expect(fetchedRaces.count == 1)
     
+    let fetchedRace = fetchedRaces.first!
     #expect(fetchedRace.categories.count == 1)
-    #expect(fetchedRace.categories[0].name == "10K")
-    #expect(fetchedRace.categories[0].distance == 10)
-    #expect(fetchedRace.categories[0].type == "virtual")
+    
+    let fetchedRaceCategory = fetchedRace.categories.first!
+    #expect(fetchedRaceCategory.name == "10K")
+    #expect(fetchedRaceCategory.distance == 10)
+    #expect(fetchedRaceCategory.type == "virtual")
   }
 }

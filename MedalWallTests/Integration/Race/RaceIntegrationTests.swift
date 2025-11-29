@@ -17,6 +17,10 @@ struct RaceIntegrationTests {
     let schema = Schema([Race.self, RaceCategory.self])
     let context = try TestModelContainer.makeContext(with: schema)
     
+    // test before
+    let races = try context.fetch(FetchDescriptor<Race>())
+    #expect(races.count == 0)
+    
     let race = Race(
       name: "Boston Marathon",
       date: .now,
@@ -28,12 +32,12 @@ struct RaceIntegrationTests {
       url: "https://www.baa.org/races/boston-marathon/",
     )
     context.insert(race)
-    try context.save()
     
-    let fetched = try context.fetch(FetchDescriptor<Race>())
-    let fetchedRace = fetched.first!
+    // test after
+    let fetchedRaces = try context.fetch(FetchDescriptor<Race>())
+    #expect(fetchedRaces.count == 1)
     
-    #expect(fetched.count == 1)
+    let fetchedRace = fetchedRaces.first!
     #expect(fetchedRace.name == "Boston Marathon")
     #expect(fetchedRace.country == "USA")
     #expect(fetchedRace.city == "Boston")
@@ -55,17 +59,23 @@ struct RaceIntegrationTests {
       ),
     )
     context.insert(race)
-    try context.save()
+    
+    // test before
+    let races = try context.fetch(FetchDescriptor<Race>())
+    #expect(races.count == 1)
+    #expect(races.first?.name == "LA Marathon (before edit)")
     
     race.name = "LA Marathon (after edit)"
     race.city = "Seattle"
     race.updateTime = .now
     try context.save()
     
-    let fetched = try context.fetch(FetchDescriptor<Race>())
-    let updated = fetched.first!
+    // test after
+    let fetchedRaces = try context.fetch(FetchDescriptor<Race>())
+    #expect(fetchedRaces.count == 1)
     
-    #expect(updated.name == "LA Marathon (after edit)")
-    #expect(updated.city == "Seattle")
+    let fetchedRace = fetchedRaces.first!
+    #expect(fetchedRace.name == "LA Marathon (after edit)")
+    #expect(fetchedRace.city == "Seattle")
   }
 }
