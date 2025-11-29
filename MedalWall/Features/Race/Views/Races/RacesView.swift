@@ -21,15 +21,33 @@ struct RacesView: View {
     let viewModel = RacesViewModel(races: races, filter: filter)
     
     NavigationSplitView {
-      List(viewModel.visibleRaces, selection: $selectedRace) { race in
-        NavigationLink(value: race) {
-          RaceRowView(race: race)
+      ZStack {
+        if viewModel.races.isEmpty {
+          ContentUnavailableView {
+            Label("No Race Events", systemImage: "figure.run")
+          } description: {
+            Text("There aren't any race events yet.")
+          }
+        } else {
+          if viewModel.visibleRaces.isEmpty {
+            ContentUnavailableView {
+              Label("No Results", systemImage: "magnifyingglass")
+            } description: {
+              Text("No rsults found")
+            }
+          } else {
+            List(viewModel.visibleRaces, selection: $selectedRace) { race in
+              NavigationLink(value: race) {
+                RaceRowView(race: race)
+              }
+            }
+            .animation(.default, value: viewModel.visibleRaces)
+          }
         }
       }
       .navigationTitle("Races")
       .searchable(text: $filter.searchQuery, prompt: "Find a race event")
       .autocorrectionDisabled()
-      .animation(.default, value: filter.searchQuery)
       .toolbar {
         ToolbarItem(placement: .topBarTrailing) {
           Button("Add Race", systemImage: "plus") {
