@@ -11,9 +11,12 @@ import SwiftData
 struct RacesView: View {
   @Environment(\.modelContext) private var modelContext
   @State private var selectedRace: Race? = nil
+  @State private var selectedRaceToDelete: Race? = nil
   @State private var isShowAddView = false
+  @State private var isShowDeleteConfirm = false
   @State private var isShowFilterView = false
   @State private var filter: RaceFilter = .default
+  @State private var errorWrapper: ErrorWrapper?
   
   @Query(sort: \Race.date, animation: .default) private var races: [Race]
   
@@ -39,6 +42,14 @@ struct RacesView: View {
             List(viewModel.visibleRaces, selection: $selectedRace) { race in
               NavigationLink(value: race) {
                 RaceRowView(race: race)
+                  .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                      selectedRaceToDelete = race
+                      isShowDeleteConfirm = true
+                    } label: {
+                      Label("Delete", systemImage: "trash")
+                    }
+                  }
               }
             }
             .animation(.default, value: viewModel.visibleRaces)
@@ -72,6 +83,21 @@ struct RacesView: View {
       }
       .sheet(isPresented: $isShowFilterView) {
         RaceFilterView(filter: $filter)
+      }
+      .alert(isPresented: $isShowDeleteConfirm) {
+        .deleteConfirmation(
+          name: selectedRaceToDelete?.name ?? "Race",
+          onDelete: {
+            if let race = selectedRaceToDelete {
+              do {
+                try viewModel.attachContext(modelContext)
+                try viewModel.deleteRace(race)
+              } catch {
+                errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
+              }
+            }
+          }
+        )
       }
     } detail: {
       if let race = selectedRace {
