@@ -38,6 +38,7 @@
 		605C9AA02ECB0935007D3A96 /* Exceptions for "MedalWall" folder in "MedalWallTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Data/RaceRepository.swift,
 				Features/Race/ViewModels/RaceDetailViewModel.swift,
 				Features/Race/ViewModels/RaceEditViewModel.swift,
 				Features/Race/ViewModels/RacesViewModel.swift,

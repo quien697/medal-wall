@@ -23,7 +23,7 @@ final class RaceDistanceFactory {
   
   func addDistance(_ distance: RaceDistance) throws {
     if distances.contains(distance) {
-      throw RaceEditError.duplicateDistance
+      throw AppError.duplicateDistance
     } else {
       distances.append(distance)
     }
@@ -31,7 +31,7 @@ final class RaceDistanceFactory {
   
   func updateDistance(old: RaceDistance, with new: RaceDistance) throws {
     if distances.contains(new) {
-      throw RaceEditError.duplicateDistance
+      throw AppError.duplicateDistance
     }
     if let index = distances.firstIndex(of: old) {
       distances[index] = new

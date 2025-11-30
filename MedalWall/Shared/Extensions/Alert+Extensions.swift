@@ -8,6 +8,7 @@
 import SwiftUI
 
 extension Alert {
+  
   static func deleteConfirmation(
     name: String,
     onDelete: @escaping () -> Void

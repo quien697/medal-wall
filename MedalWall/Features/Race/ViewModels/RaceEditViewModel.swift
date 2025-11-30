@@ -129,7 +129,7 @@ class RaceEditViewModel {
         RaceCategory(distance: $0, race: newRace)
       }
       
-      try repository.addRace(newRace)
+      try repository.insertRace(newRace)
     }
     
     try repository.save()

@@ -25,7 +25,7 @@ final class RaceRepository {
   }
   
   // MARK: - Race
-  func addRace(_ race: Race) throws {
+  func insertRace(_ race: Race) throws {
     guard let context else { throw AppError.contextNotAttached }
     context.insert(race)
   }
