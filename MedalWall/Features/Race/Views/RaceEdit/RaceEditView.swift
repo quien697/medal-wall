@@ -62,7 +62,11 @@ struct RaceEditView: View {
       RaceAdditionalSection(url: $viewModel.url)
     } // Form
     .task {
-      viewModel.attachContext(modelContext)
+      do {
+        try viewModel.attachContext(modelContext)
+      } catch {
+        errorWrapper = ErrorWrapper(error: AppError.contextNotAttached)
+      }
     }
     .navigationTitle("\(viewModel.isNewRace ? "Add" : "Edit") Race")
     .navigationBarTitleDisplayMode(.inline)
@@ -97,12 +101,12 @@ struct RaceEditView: View {
       })
     }
     .sheet(item: $errorWrapper, onDismiss: {
-        if shouldDismiss {
-            dismiss()
-          shouldDismiss = false
-        }
+      if shouldDismiss {
+        dismiss()
+        shouldDismiss = false
+      }
     }) { wrapper in
-        ErrorView(errorWrapper: wrapper)
+      ErrorView(errorWrapper: wrapper)
     }
   }
 }

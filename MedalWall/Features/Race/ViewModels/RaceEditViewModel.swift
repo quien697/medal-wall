@@ -8,10 +8,6 @@
 import SwiftUI
 import SwiftData
 
-enum RaceEditError: LocalizedError {
-  case duplicateDistance
-}
-
 @Observable
 class RaceEditViewModel {
   var name: String = ""
@@ -27,10 +23,11 @@ class RaceEditViewModel {
   var distances: [RaceDistance] = []
   var isNewRace: Bool = true
   
-  private var context: ModelContext?
+  private let repository: RaceRepository
   private(set) var race: Race?
   
-  init(race: Race?) {
+  init(race: Race?, repository: RaceRepository = RaceRepository()) {
+    self.repository = repository
     self.race = race
     
     if let race {
@@ -50,8 +47,8 @@ class RaceEditViewModel {
     }
   }
   
-  func attachContext(_ context: ModelContext) {
-    self.context = context
+  func attachContext(_ context: ModelContext) throws {
+    repository.attachContext(context)
   }
   
   var isFormValid: Bool {
@@ -77,7 +74,7 @@ class RaceEditViewModel {
   
   func addDistance(_ distance: RaceDistance) throws {
     if distances.contains(distance) {
-      throw RaceEditError.duplicateDistance
+      throw AppError.duplicateDistance
     } else {
       distances.append(distance)
     }
@@ -85,7 +82,7 @@ class RaceEditViewModel {
   
   func updateDistance(old: RaceDistance, with new: RaceDistance) throws {
     if distances.contains(new) {
-      throw RaceEditError.duplicateDistance
+      throw AppError.duplicateDistance
     } else {
       if let index = distances.firstIndex(of: old) {
         distances[index] = new
@@ -100,8 +97,6 @@ class RaceEditViewModel {
   }
   
   func save() throws {
-    guard let context else { return }
-    
     if let race {
       race.name = name
       race.photoData = photoData
@@ -111,9 +106,8 @@ class RaceEditViewModel {
       race.city = city
       race.district = district.isEmpty ? nil : district
       race.url = url.isEmpty ? nil : url
-      race.updateTime = .now
       for category in race.categories {
-        context.delete(category)
+        try repository.deleteCategory(category)
       }
       race.categories = distances.map {
         RaceCategory(distance: $0, race: race)
@@ -135,9 +129,9 @@ class RaceEditViewModel {
         RaceCategory(distance: $0, race: newRace)
       }
       
-      context.insert(newRace)
+      try repository.addRace(newRace)
     }
     
-    try context.save()
+    try repository.save()
   }
 }

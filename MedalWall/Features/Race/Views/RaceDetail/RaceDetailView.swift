@@ -14,20 +14,25 @@ struct RaceDetailView: View {
   @State private var isShowEditor = false
   @State private var isShowDeleteConfirm = false
   @State private var errorWrapper: ErrorWrapper?
+  @State private var viewModel: RaceDetailViewModel
   
-  let race: Race
+  init(race: Race) {
+    self._viewModel = State(initialValue: RaceDetailViewModel(race: race))
+  }
   
   var body: some View {
+    let viewModel = RaceDetailViewModel(race: viewModel.race)
+    
     ScrollView {
-      RaceHeroCardSection(race: race)
+      RaceHeroCardSection(race: viewModel.race)
       
-      RaceDetailCardSection(race: race)
+      RaceDetailCardSection(race: viewModel.race)
       
-      RaceLastUpdatedCardSection(race: race)
+      RaceLastUpdatedCardSection(race: viewModel.race)
     } // ScrollView
     .padding(.horizontal)
     .background(.ultraThinMaterial)
-    .navigationTitle(race.name)
+    .navigationTitle(viewModel.race.name)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
@@ -48,23 +53,23 @@ struct RaceDetailView: View {
         } // Menu
       } // ToolbarItem
     } // toolbar
-    .alert("Delete \(race.name)?", isPresented: $isShowDeleteConfirm) {
-      Button("Delete", role: .destructive) {
-        do {
-          modelContext.delete(race)
-          try modelContext.save()
-          dismiss()
-        } catch {
-          errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
+    .alert(isPresented: $isShowDeleteConfirm) {
+      .deleteConfirmation(
+        name: viewModel.race.name,
+        onDelete: {
+          do {
+            try viewModel.attachContext(modelContext)
+            try viewModel.deleteRace(viewModel.race)
+            dismiss()
+          } catch {
+            errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
+          }
         }
-      }
-      Button("Cancel", role: .cancel) { }
-    } message: {
-      Text("This action cannot be undone.")
+      )
     }
     .sheet(isPresented: $isShowEditor) {
       NavigationStack {
-        RaceEditView(race: race)
+        RaceEditView(race: viewModel.race)
       }
     } // sheet
     .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in

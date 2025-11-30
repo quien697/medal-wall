@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @Observable
 final class RacesViewModel {
+  private let repository: RaceRepository
   var races: [Race]
   var filter: RaceFilter
   
@@ -18,9 +20,23 @@ final class RacesViewModel {
     return searched
   }
   
-  init(races: [Race], filter: RaceFilter) {
+  init(
+    races: [Race],
+    filter: RaceFilter,
+    repository: RaceRepository = RaceRepository())
+  {
     self.races = races
     self.filter = filter
+    self.repository = repository
+  }
+  
+  func attachContext(_ context: ModelContext) throws {
+    repository.attachContext(context)
+  }
+  
+  func deleteRace(_ race: Race) throws {
+    try repository.deleteRace(race)
+    try repository.save()
   }
   
   private func applyFilter(to races: [Race]) -> [Race] {

@@ -26,6 +26,10 @@ struct ErrorView: View {
           .font(.body)
           .multilineTextAlignment(.center)
         
+        Text(errorWrapper.error.guidance)
+          .font(.body)
+          .multilineTextAlignment(.center)
+        
         Button("Continue") {
           dismiss()
         }
