@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 import SwiftData
 
 @Model
@@ -13,9 +14,10 @@ final class User {
   @Attribute(.unique) var id: UUID
   var firstName: String
   var lastName: String
-  var avatar: String?
+  var avatarData: Data?
+  var bio: String?
   var gender: String?
-  var birthdate: Date?
+  var birthday: Date?
   var unit: String
   
   @Relationship(deleteRule: .cascade, inverse: \Medal.user)
@@ -24,19 +26,32 @@ final class User {
   init(
     id: UUID = UUID(),
     name: UserName,
-    avatar: String? = nil,
+    avatarData: Data? = nil,
+    bio: String? = nil,
     gender: Gender? = nil,
-    birthdate: Date? = nil,
+    birthday: Date? = nil,
     unit: MeasurementUnit = .km,
     medals: [Medal] = []
   ) {
     self.id = id
     self.firstName = name.firstName
     self.lastName = name.lastName
-    self.avatar = avatar
+    self.avatarData = avatarData
+    self.bio = bio
     self.gender = gender?.displayName
-    self.birthdate = birthdate
+    self.birthday = birthday
     self.unit = unit.displayName
     self.medals = medals
+  }
+}
+
+/// Extends Race with computed values
+extension User {
+  var avatar: UIImage? {
+    if let avatarData {
+      return UIImage(data: avatarData)
+    }
+    
+    return nil
   }
 }

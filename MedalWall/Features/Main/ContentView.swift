@@ -18,11 +18,13 @@ struct ContentView: View {
   
   var body: some View {
     TabView(selection: $selection) {
-      ProfileView()
-        .tabItem {
-          Label("You", systemImage: "person.crop.circle")
-        }
-        .tag(Tab.profile)
+      NavigationStack {
+        ProfileView()
+      }
+      .tabItem {
+        Label("You", systemImage: "person.crop.circle")
+      }
+      .tag(Tab.profile)
       
       MedalsView()
         .tabItem {
