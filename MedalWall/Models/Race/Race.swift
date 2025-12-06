@@ -55,6 +55,7 @@ final class Race {
 }
 
 /// Extends Race with computed values
+/// Will stay here until v2
 extension Race {
   var photo: UIImage? {
     if let photoData {
