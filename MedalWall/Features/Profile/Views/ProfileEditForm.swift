@@ -149,6 +149,11 @@ struct ProfileEditForm: View {
         .disabled(!viewModel.isFormValid)
       }
     } // toolbar
+    .sheet(item: $errorWrapper, onDismiss: {
+      dismiss()
+    }) { wrapper in
+      ErrorView(errorWrapper: wrapper)
+    }
   }
 }
 
