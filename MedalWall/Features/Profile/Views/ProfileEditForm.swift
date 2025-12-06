@@ -27,7 +27,22 @@ struct ProfileEditForm: View {
           if let uiImage = viewModel.avatar {
             Image(uiImage: uiImage)
               .avatar()
-              .foregroundStyle(.gray)
+              .overlay(alignment: .topTrailing) {
+                Button {
+                  selectedAvatarItem = nil
+                  self.viewModel.avatarData = nil
+                  self.viewModel.avatar = nil
+                } label: {
+                  Image(systemName: "xmark")
+                    .font(.system(size: 15))
+                    .padding(8)
+                    .background(.black)
+                    .foregroundStyle(.white)
+                    .clipShape(.circle)
+                    .shadow(radius: 2)
+                }
+                .padding(-10)
+              }
           } else {
             Image(systemName: "photo.circle.fill")
               .avatar()
