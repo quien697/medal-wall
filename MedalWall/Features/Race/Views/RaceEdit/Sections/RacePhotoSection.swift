@@ -13,13 +13,12 @@ struct RacePhotoSection: View {
   @Binding var image: UIImage?
   
   @State private var selectedItem: PhotosPickerItem? = nil
-  @State private var buttonName: String = "Pick"
   @State private var errorWrapper: ErrorWrapper?
   
   var body: some View {
     Section("Race Image") {
-      ZStack {
-        if let uiImage = image {
+      if let uiImage = image {
+        ZStack {
           Image(uiImage: uiImage)
             .raceHero()
             .overlay(alignment: .topTrailing) {
@@ -38,64 +37,61 @@ struct RacePhotoSection: View {
               }
               .padding(-10)
             }
-        } else {
-          ContentUnavailableView {
-            Image(systemName: "photo.fill")
-              .resizable()
-              .scaledToFit()
-              .frame(width: 60)
-              .foregroundStyle(.gray)
-              .padding(.bottom, 10)
-            
-            Text("No Race Photo")
-              .font(.headline)
-              .foregroundStyle(.gray)
-          }
-          .background(.thinMaterial)
-          .frame(width: 240, height: 240)
-          .overlay(
-            RoundedRectangle(cornerRadius: 12)
-              .stroke(.gray, style: StrokeStyle(lineWidth: 2, dash: [10, 2]))
-          )
         }
-      } // ZStack
-      .frame(maxWidth: .infinity)
-      .padding()
-      
-      VStack(alignment: .center) {
-        PhotosPicker(
-          selection: $selectedItem,
-          matching: .images,
-          photoLibrary: .shared()
-        ) {
-          HStack(alignment: .center) {
-            Text("Pcik Photo")
-              .font(.headline)
-              .frame(maxWidth: .infinity)
-              .foregroundStyle(.white)
-              .padding()
-          }
-        }
-        .onChange(of: selectedItem) { _, newItem in
-          guard let newItem else { return }
+        .frame(maxWidth: .infinity)
+      } else {
+        ContentUnavailableView {
+          Image(systemName: "photo.fill")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 60)
+            .foregroundStyle(.gray)
+            .padding(.bottom, 10)
           
-          Task {
-            do {
-              if let data = try await newItem.loadTransferable(type: Data.self),
-                 let image = UIImage(data: data) {
-                self.data = data
-                self.image = image
-              } else {
-                errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
-              }
-            } catch {
-              errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
-            }
-          }
-        } // onChange
+          Text("No Race Photo")
+            .font(.headline)
+            .foregroundStyle(.gray)
+        }
+        .background(.thinMaterial)
+        .frame(width: 240, height: 240)
+        .overlay(
+          RoundedRectangle(cornerRadius: 12)
+            .stroke(.gray, style: StrokeStyle(lineWidth: 2, dash: [10, 2]))
+        )
       }
-      .background(.blue)
-      .clipShape(.rect(cornerRadius: 12))
+      
+      PhotosPicker(
+        selection: $selectedItem,
+        matching: .images,
+        photoLibrary: .shared()
+      ) {
+        HStack(alignment: .center) {
+          Text("Pcik Photo")
+            .font(.headline)
+            .frame(maxWidth: .infinity)
+            .foregroundStyle(.white)
+            .padding()
+            .background(.primary)
+            .clipShape(.rect(cornerRadius: 12))
+        }
+      }
+      .onChange(of: selectedItem) { _, newItem in
+        guard let newItem else { return }
+        
+        Task {
+          do {
+            if let data = try await newItem.loadTransferable(type: Data.self),
+               let image = UIImage(data: data) {
+              self.data = data
+              self.image = image
+            } else {
+              errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
+            }
+          } catch {
+            errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
+          }
+        } // Task
+      } // onChange
     } // Section
     .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
       ErrorView(errorWrapper: wrapper)
