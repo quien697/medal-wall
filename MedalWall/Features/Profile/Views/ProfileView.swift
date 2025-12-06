@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct ProfileView: View {
+  @State private var isShowProfileAddView = false
   @State private var isShowSettingsView = false
   
   @Query private var users: [User]
@@ -34,13 +35,13 @@ struct ProfileView: View {
               Text("\(user.firstName), \(user.lastName)")
                 .font(.title)
               
-              if let bio = user.bio {
+              if let bio = user.bio, !bio.isEmpty {
                 Text(bio)
                   .font(.headline)
               }
-            }
+            } // VStack
             .frame(maxWidth: .infinity)
-          }
+          } // CardSection
           
           CardSection(title: "Info") {
             if let gender = user.genderEnum {
@@ -54,8 +55,8 @@ struct ProfileView: View {
                 Text("\(birthday.formatted(date: .abbreviated, time: .omitted))")
               }
             }
-          }
-        }
+          } // CardSection
+        } // ScrollView
         .toolbar {
           ToolbarItem(placement: .topBarTrailing) {
             Button("Settings", systemImage: "gearshape.fill") {
@@ -68,14 +69,19 @@ struct ProfileView: View {
           Label("No User Found", systemImage: "person.fill")
         } description: {
           Button {
-            print("add a new user")
+            isShowProfileAddView = true
           } label: {
             Text("Creating a new user")
               .padding(.top, 10)
           }
-        }
+        } // ContentUnavailableView
       }
     } // NavigationStack
+    .sheet(isPresented: $isShowProfileAddView) {
+      NavigationStack {
+        ProfileAddView()
+      }
+    }
     .sheet(isPresented: $isShowSettingsView) {
       NavigationStack{
         SettingsView()

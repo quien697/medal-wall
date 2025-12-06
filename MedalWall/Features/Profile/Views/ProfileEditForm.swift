@@ -128,8 +128,16 @@ struct ProfileEditForm: View {
       } // Section
     } // Form
     .toolbar {
+      if viewModel.isNewProfile {
+        ToolbarItem(placement: .cancellationAction) {
+          Button("Cancel") {
+            dismiss()
+          }
+        }
+      }
+      
       ToolbarItem(placement: .topBarTrailing) {
-        Button("Save") {
+        Button(viewModel.isNewProfile ? "Add" : "Save") {
           do {
             try viewModel.attachContext(modelContext)
             try viewModel.save()
@@ -138,6 +146,7 @@ struct ProfileEditForm: View {
             errorWrapper = ErrorWrapper(error: AppError.userSaveFailed)
           }
         }
+        .disabled(!viewModel.isFormValid)
       }
     } // toolbar
   }

@@ -18,6 +18,7 @@ class ProfileEditViewModel {
   var birthday: Date = .now
   var isBirthdaySet: Bool = false
   var unit: MeasurementUnit = .km
+  var isNewProfile: Bool = true
   
   private let repository: UserRepository
   private(set) var profile: User?
@@ -38,11 +39,17 @@ class ProfileEditViewModel {
         self.isBirthdaySet = true
       }
       self.unit = profile.unitEnum
+      self.isNewProfile = false
     }
   }
   
   func attachContext(_ context: ModelContext) throws {
     repository.attachContext(context)
+  }
+  
+  var isFormValid: Bool {
+    !userName.firstName.trimmingCharacters(in: .whitespaces).isEmpty &&
+    !userName.lastName.trimmingCharacters(in: .whitespaces).isEmpty
   }
   
   func updateAvatar(with data: Data?) {
@@ -61,9 +68,7 @@ class ProfileEditViewModel {
   }
   
   func save() throws {
-    print("save")
     if let profile {
-      print("update")
       profile.firstName = userName.firstName
       profile.lastName = userName.lastName
       profile.avatarData = avatarData
@@ -72,12 +77,18 @@ class ProfileEditViewModel {
       profile.birthday = isBirthdaySet ? birthday : nil
       profile.unit = unit.rawValue
     } else {
-//      let newProfile =
-//      
-//      try repository.insertRace(newRace)
+      let newProfile = User(
+        name: userName,
+        avatarData: avatarData,
+        bio: bio,
+        gender: gender,
+        birthday: isBirthdaySet ? birthday : nil,
+        unit: unit
+      )
+      
+      try repository.insertRace(newProfile)
     }
-    print("before save()")
+    
     try repository.save()
-    print("after save()")
   }
 }
