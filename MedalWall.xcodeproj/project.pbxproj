@@ -39,6 +39,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Data/RaceRepository.swift,
+				Data/UserRepository.swift,
 				Features/Race/ViewModels/RaceDetailViewModel.swift,
 				Features/Race/ViewModels/RaceEditViewModel.swift,
 				Features/Race/ViewModels/RacesViewModel.swift,

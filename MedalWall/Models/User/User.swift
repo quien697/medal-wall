@@ -38,14 +38,15 @@ final class User {
     self.lastName = name.lastName
     self.avatarData = avatarData
     self.bio = bio
-    self.gender = gender?.displayName
+    self.gender = gender?.rawValue
     self.birthday = birthday
-    self.unit = unit.displayName
+    self.unit = unit.rawValue
     self.medals = medals
   }
 }
 
 /// Extends Race with computed values
+/// Will stay here until v2
 extension User {
   var avatar: UIImage? {
     if let avatarData {
@@ -53,5 +54,13 @@ extension User {
     }
     
     return nil
+  }
+  
+  var genderEnum: Gender? {
+    Gender(rawValue: gender ?? "")
+  }
+  
+  var unitEnum: MeasurementUnit {
+    MeasurementUnit(rawValue: unit) ?? .km
   }
 }

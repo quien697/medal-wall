@@ -12,6 +12,7 @@ enum AppError: LocalizedError, Identifiable {
   case contextNotAttached
   case raceSaveFailed
   case raceDeleteFailed
+  case userSaveFailed
   
   // Validation Errors
   case duplicateDistance
@@ -30,9 +31,11 @@ enum AppError: LocalizedError, Identifiable {
     case .contextNotAttached:
       "Context hasn't attached yet"
     case .raceSaveFailed:
-      "Save Failed"
+      "Race Save Failed"
     case .raceDeleteFailed:
-      "Delete Failed"
+      "Race Delete Failed"
+    case .userSaveFailed:
+      "User Save Failed"
     case .duplicateDistance:
       "Duplicate Distance"
     case .photoLoadFailed:
@@ -52,6 +55,8 @@ enum AppError: LocalizedError, Identifiable {
       "We couldn't save your race event."
     case .raceDeleteFailed:
       "We couldn't delete this race event. Please try again."
+    case .userSaveFailed:
+      "We couldn't save your user information."
     case .duplicateDistance:
       "This distance already exists."
     case .photoLoadFailed:
@@ -67,7 +72,7 @@ enum AppError: LocalizedError, Identifiable {
     switch self {
     case .contextNotAttached:
       "Please restart the app. If the problem continues, contact support."
-    case .raceSaveFailed, .raceDeleteFailed:
+    case .raceSaveFailed, .raceDeleteFailed, .userSaveFailed:
       "Please try it again."
     case .duplicateDistance:
       "Please try selecting a different distance or type."

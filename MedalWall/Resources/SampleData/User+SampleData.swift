@@ -14,6 +14,6 @@ extension User {
     avatarData: UIImage(named: "quien")?.jpegData(compressionQuality: 0.9),
     bio: "Fake it till make it!",
     gender: .male,
-    birthday: .now
+    birthday: DateComponents(calendar: .current, year: 1989, month: 11, day: 23).date!
   )
 }

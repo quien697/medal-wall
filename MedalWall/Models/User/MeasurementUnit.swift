@@ -5,7 +5,7 @@
 //  Created by Quien on 2025-10-30.
 //
 
-enum MeasurementUnit: String, Codable {
+enum MeasurementUnit: String, Codable, CaseIterable {
   case km
   case mi
   

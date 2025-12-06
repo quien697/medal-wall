@@ -9,21 +9,27 @@ import SwiftUI
 import SwiftData
 
 struct ProfileView: View {
-  @Environment(\.modelContext) private var context
+  @State private var isShowSettingsView = false
   
   @Query private var users: [User]
   
+  private var user: User? { users.first }
+  
   var body: some View {
     Group {
-      if let user = users.first {
+      if let user {
         ScrollView {
           CardSection {
-            VStack {
-              Image(.quien)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 100, height: 100)
-                .clipShape(Circle())
+            VStack(alignment: .center, spacing: 16) {
+              if let uiImage = user.avatar {
+                Image(uiImage: uiImage)
+                  .avatar()
+                  .foregroundStyle(.gray)
+              } else {
+                Image(systemName: "person.circle.fill")
+                  .avatar()
+                  .foregroundStyle(.gray)
+              }
               
               Text("\(user.firstName), \(user.lastName)")
                 .font(.title)
@@ -34,14 +40,12 @@ struct ProfileView: View {
               }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 50)
-            .padding(.horizontal)
           }
           
           CardSection(title: "Info") {
-            if let gender = user.gender {
+            if let gender = user.genderEnum {
               CardListItem(systemName: "person.fill") {
-                Text(gender)
+                Text(gender.displayName)
               }
             }
             
@@ -52,6 +56,13 @@ struct ProfileView: View {
             }
           }
         }
+        .toolbar {
+          ToolbarItem(placement: .topBarTrailing) {
+            Button("Settings", systemImage: "gearshape.fill") {
+              isShowSettingsView = true
+            }
+          }
+        } // toolbar
       } else {
         ContentUnavailableView {
           Label("No User Found", systemImage: "person.fill")
@@ -65,13 +76,11 @@ struct ProfileView: View {
         }
       }
     } // NavigationStack
-    .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Button("Settings", systemImage: "gearshape.fill") {
-          
-        }
+    .sheet(isPresented: $isShowSettingsView) {
+      NavigationStack{
+        SettingsView()
       }
-    } // toolbar
+    }
   }
 }
 
