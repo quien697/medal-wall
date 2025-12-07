@@ -18,62 +18,59 @@ struct RaceFilterView: View {
   }
   
   var body: some View {
-    NavigationStack {
-      Form {
-        Section("Race Type") {
-          ForEach(RaceDistanceType.allCases, id: \.self) { type in
-            Toggle(isOn: Binding(
-              get: { draftFilter.selectedTypes.contains(type) },
-              set: { isOn in
-                if isOn {
-                  draftFilter.selectedTypes.insert(type)
-                } else {
-                  draftFilter.selectedTypes.remove(type)
-                }
+    Form {
+      Section("Race Type") {
+        ForEach(RaceDistanceType.allCases, id: \.self) { type in
+          Toggle(isOn: Binding(
+            get: { draftFilter.selectedTypes.contains(type) },
+            set: { isOn in
+              if isOn {
+                draftFilter.selectedTypes.insert(type)
+              } else {
+                draftFilter.selectedTypes.remove(type)
               }
-            )) {
-              Text(type.displayName)
             }
+          )) {
+            Text(type.displayName)
           }
-        }
-        
-        Section("Race Distance") {
-          ForEach(RaceDistanceCategory.standardCases, id: \.self) { category in
-            Toggle(isOn: Binding(
-              get: { draftFilter.selectedCategories.contains(category) },
-              set: { isOn in
-                if isOn {
-                  draftFilter.selectedCategories.insert(category)
-                } else {
-                  draftFilter.selectedCategories.remove(category)
-                }
+        } // ForEach
+      } // Section
+      
+      Section("Race Distance") {
+        ForEach(RaceDistanceCategory.standardCases, id: \.self) { category in
+          Toggle(isOn: Binding(
+            get: { draftFilter.selectedCategories.contains(category) },
+            set: { isOn in
+              if isOn {
+                draftFilter.selectedCategories.insert(category)
+              } else {
+                draftFilter.selectedCategories.remove(category)
               }
-            )) {
-              Text(category.description)
             }
+          )) {
+            Text(category.description)
           }
-
-        }
-        
-        if !draftFilter.isEmpty {
-          Button("Clean Filters", role: .destructive) {
-            draftFilter = .default
-          }
+        } // ForEach
+      } // Section
+      
+      if !draftFilter.isEmpty {
+        Button("Clean Filters", role: .destructive) {
+          draftFilter = .default
         }
       }
-      .navigationTitle("Filters")
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button("Cancel") { dismiss() }
-        }
-        ToolbarItem(placement: .confirmationAction) {
-          Button("Apply") {
-            filter = draftFilter
-            dismiss()
-          }
+    } // Form
+    .navigationTitle("Filters")
+    .toolbar {
+      ToolbarItem(placement: .cancellationAction) {
+        Button("Cancel") { dismiss() }
+      }
+      ToolbarItem(placement: .confirmationAction) {
+        Button("Apply") {
+          filter = draftFilter
+          dismiss()
         }
       }
-    }
+    } // toolbar
   }
 }
 

@@ -76,7 +76,7 @@ struct ProfileView: View {
           }
         } // ContentUnavailableView
       }
-    } // NavigationStack
+    } // Group
     .sheet(isPresented: $isShowProfileAddView) {
       NavigationStack {
         ProfileAddView()

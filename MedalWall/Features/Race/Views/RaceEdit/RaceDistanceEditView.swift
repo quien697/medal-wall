@@ -74,7 +74,7 @@ struct RaceDistanceEditView: View {
           dismiss()
         }
       }
-    }
+    } // toolbar
   }
 }
 

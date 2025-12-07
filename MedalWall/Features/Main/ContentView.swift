@@ -26,17 +26,21 @@ struct ContentView: View {
       }
       .tag(Tab.profile)
       
-      MedalsView()
-        .tabItem {
-          Label("Medal", systemImage: "medal")
-        }
-        .tag(Tab.medal)
+      NavigationStack {
+        MedalsView()
+      }
+      .tabItem {
+        Label("Medal", systemImage: "medal")
+      }
+      .tag(Tab.medal)
       
-      RacesView()
-        .tabItem {
-          Label("Race", systemImage: "figure.run")
-        }
-        .tag(Tab.race)
+      NavigationStack {
+        RacesView()
+      }
+      .tabItem {
+        Label("Race", systemImage: "figure.run")
+      }
+      .tag(Tab.race)
     }
   }
 }

@@ -35,7 +35,7 @@ struct RaceDistanceSectionRow: View {
         
         Text(distance.type.displayName)
       }
-    }
+    } // NavigationLink
   }
 }
 

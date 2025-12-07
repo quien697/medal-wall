@@ -11,7 +11,6 @@ import SwiftData
 struct RacesView: View {
   @Environment(\.modelContext) private var modelContext
   @State private var selectedRace: Race? = nil
-  @State private var selectedRaceToDelete: Race? = nil
   @State private var isShowAddView = false
   @State private var isShowDeleteConfirm = false
   @State private var isShowFilterView = false
@@ -23,89 +22,85 @@ struct RacesView: View {
   var body: some View {
     let viewModel = RacesViewModel(races: races, filter: filter)
     
-    NavigationSplitView {
-      ZStack {
-        if viewModel.races.isEmpty {
+    Group {
+      if viewModel.races.isEmpty {
+        ContentUnavailableView {
+          Label("No Race Events", systemImage: "figure.run")
+        } description: {
+          Text("There aren't any race events yet.")
+        }
+      } else {
+        if viewModel.visibleRaces.isEmpty {
           ContentUnavailableView {
-            Label("No Race Events", systemImage: "figure.run")
+            Label("No Results", systemImage: "magnifyingglass")
           } description: {
-            Text("There aren't any race events yet.")
+            Text("No rsults found")
           }
         } else {
-          if viewModel.visibleRaces.isEmpty {
-            ContentUnavailableView {
-              Label("No Results", systemImage: "magnifyingglass")
-            } description: {
-              Text("No rsults found")
-            }
-          } else {
-            List(viewModel.visibleRaces, selection: $selectedRace) { race in
-              NavigationLink(value: race) {
-                RaceRowView(race: race)
-                  .swipeActions(edge: .trailing) {
-                    Button(role: .destructive) {
-                      selectedRaceToDelete = race
-                      isShowDeleteConfirm = true
-                    } label: {
-                      Label("Delete", systemImage: "trash")
-                    }
+          List(viewModel.visibleRaces, selection: $selectedRace) { race in
+            NavigationLink {
+              RaceDetailView(race: race)
+            } label: {
+              RaceRowView(race: race)
+                .swipeActions(edge: .trailing) {
+                  Button(role: .destructive) {
+                    selectedRace = race
+                    isShowDeleteConfirm = true
+                  } label: {
+                    Label("Delete", systemImage: "trash")
                   }
-              }
+                }
             }
-            .animation(.default, value: viewModel.visibleRaces)
           }
+          .animation(.default, value: viewModel.visibleRaces)
         }
       }
-      .navigationTitle("Races")
-      .searchable(text: $filter.searchQuery, prompt: "Find a race event")
-      .autocorrectionDisabled()
-      .toolbar {
-        ToolbarItem(placement: .topBarTrailing) {
-          Button("Add Race", systemImage: "plus") {
-            isShowAddView = true
-          }
-        }
-        
-        ToolbarItem(placement: .topBarTrailing) {
-          Button("Filter", systemImage: "ellipsis") {
-            isShowFilterView = true
-          }
+    } // Group
+    .navigationTitle("Races")
+    .searchable(text: $filter.searchQuery, prompt: "Find a race event")
+    .autocorrectionDisabled()
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Button("Add Race", systemImage: "plus") {
+          isShowAddView = true
         }
       }
-      .onAppear {
-        viewModel.races = races
+      
+      ToolbarItem(placement: .topBarTrailing) {
+        Button("Filter", systemImage: "ellipsis") {
+          isShowFilterView = true
+        }
       }
-      .onChange(of: races) {
-        viewModel.races = races
-      }
-      .sheet(isPresented: $isShowAddView) {
-        RaceAddView()
-      }
-      .sheet(isPresented: $isShowFilterView) {
+    }
+    .onAppear {
+      viewModel.races = races
+    }
+    .onChange(of: races) {
+      viewModel.races = races
+    }
+    .sheet(isPresented: $isShowAddView) {
+      RaceAddView()
+    }
+    .sheet(isPresented: $isShowFilterView) {
+      NavigationStack {
         RaceFilterView(filter: $filter)
       }
-      .alert(isPresented: $isShowDeleteConfirm) {
-        .deleteConfirmation(
-          name: selectedRaceToDelete?.name ?? "Race",
-          onDelete: {
-            if let race = selectedRaceToDelete {
-              do {
-                try viewModel.attachContext(modelContext)
-                try viewModel.deleteRace(race)
-              } catch {
-                errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
-              }
+    }
+    .alert(isPresented: $isShowDeleteConfirm) {
+      .deleteConfirmation(
+        name: selectedRace?.name ?? "Race",
+        onDelete: {
+          if let race = selectedRace {
+            do {
+              try viewModel.attachContext(modelContext)
+              try viewModel.deleteRace(race)
+            } catch {
+              errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
             }
           }
-        )
-      }
-    } detail: {
-      if let race = selectedRace {
-        RaceDetailView(race: race)
-      } else {
-        Text("Select a race")
-      }
-    } // NavigationSplitView
+        }
+      )
+    } // alert
   }
 }
 
