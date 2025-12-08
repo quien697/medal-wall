@@ -86,7 +86,7 @@ class ProfileEditViewModel {
         unit: unit
       )
       
-      try repository.insertRace(newProfile)
+      try repository.insertUser(newProfile)
     }
     
     try repository.save()

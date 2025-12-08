@@ -13,18 +13,18 @@ import SwiftData
 
 struct RaceEditViewModelTests {
   
-  @Test("Init with nil race")
-  func testInitNewRace() throws {
+  @Test("Init with nil")
+  func testInitNil() throws {
     let vm = RaceEditViewModel(race: nil)
     
-    #expect(vm.isNewRace == true)
+    #expect(vm.isNewRace)
     #expect(vm.name.isEmpty)
     #expect(vm.photoData == nil)
     #expect(vm.country.isEmpty)
     #expect(vm.distances.isEmpty)
   }
   
-  @Test("Init loads existing race data")
+  @Test("Init loads existing race")
   func testInitExistingRace() throws {
     let race = Race(
       name: "Taipei Marathon",

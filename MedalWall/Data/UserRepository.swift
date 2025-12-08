@@ -24,7 +24,7 @@ final class UserRepository {
     try context.save()
   }
   
-  func insertRace(_ profile: User) throws {
+  func insertUser(_ profile: User) throws {
     guard let context else { throw AppError.contextNotAttached }
     context.insert(profile)
   }

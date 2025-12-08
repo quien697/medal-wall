@@ -25,7 +25,6 @@ struct ProfileView: View {
               if let uiImage = user.avatar {
                 Image(uiImage: uiImage)
                   .avatar()
-                  .foregroundStyle(.gray)
               } else {
                 Image(systemName: "person.circle.fill")
                   .avatar()

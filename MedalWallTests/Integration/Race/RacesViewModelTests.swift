@@ -6,8 +6,6 @@
 //
 
 import Testing
-import Foundation
-import SwiftData
 @testable import MedalWall
 
 struct RacesViewModelTests {

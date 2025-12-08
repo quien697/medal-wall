@@ -40,6 +40,7 @@
 			membershipExceptions = (
 				Data/RaceRepository.swift,
 				Data/UserRepository.swift,
+				Features/Profile/ViewModels/ProfileEditViewModel.swift,
 				Features/Race/ViewModels/RaceDetailViewModel.swift,
 				Features/Race/ViewModels/RaceEditViewModel.swift,
 				Features/Race/ViewModels/RacesViewModel.swift,
