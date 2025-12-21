@@ -40,7 +40,7 @@ struct RaceDetailCardSection: View {
                       .foregroundStyle(.primary)
                       .padding(.vertical, 7)
                       .padding(.horizontal)
-                      .background(distance.category.color)
+                      .background(distance.category.translucentColor)
                       .clipShape(.rect(cornerRadius: 12))
                   } // ForEach
                 } // HStack

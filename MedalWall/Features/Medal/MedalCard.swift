@@ -21,8 +21,8 @@ struct MedalCard: View {
           .fill(
             LinearGradient(
               colors: [
-                .orange.opacity(0.8),
-                .orange.opacity(0.5)
+                category.color.opacity(0.8),
+                category.color.opacity(0.5)
               ],
               startPoint: .topLeading,
               endPoint: .bottomTrailing
@@ -49,6 +49,7 @@ struct MedalCard: View {
         Text(medal.title)
           .font(.headline)
           .lineLimit(2)
+          .frame(height: 44, alignment: .topLeading)
         
         HStack(spacing: 8) {
           Text(medal.date.formatted(date: .abbreviated, time: .omitted))

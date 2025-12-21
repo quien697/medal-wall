@@ -21,12 +21,16 @@ enum RaceDistanceCategoryGroup: String, CaseIterable {
   nonisolated
   var color: Color {
     switch self {
-    case .fun: return .teal.opacity(0.2)
-    case .mini: return .blue.opacity(0.2)
-    case .half: return .green.opacity(0.2)
-    case .long: return .yellow.opacity(0.2)
-    case .full: return .orange.opacity(0.2)
-    case .ultra: return .red.opacity(0.2)
+    case .fun: return .teal
+    case .mini: return .blue
+    case .half: return .green
+    case .long: return .yellow
+    case .full: return .orange
+    case .ultra: return .red
     }
+  }
+  
+  var translucentColor: Color {
+    color.opacity(0.2)
   }
 }

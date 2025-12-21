@@ -57,6 +57,10 @@ enum RaceDistanceCategory: CustomStringConvertible, Hashable {
   var color: Color {
     group.color
   }
+  
+  var translucentColor: Color {
+    group.translucentColor
+  }
 }
 
 /// Initializes a distance category from a numeric distance value (in kilometers)..
