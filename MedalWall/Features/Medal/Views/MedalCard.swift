@@ -37,7 +37,7 @@ struct MedalCard: View {
             .scaledToFill()
             .frame(width: size * 0.7, height: size * 0.7)
             .clipShape(Circle())
-            .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 2)
+            .shadow(radius: 4)
         } else {
           Image(systemName: "medal.fill")
             .font(.system(size: size * 0.3, weight: .semibold))

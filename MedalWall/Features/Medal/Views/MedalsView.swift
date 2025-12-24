@@ -10,11 +10,16 @@ import SwiftData
 
 struct MedalsView: View {
   @Environment(\.modelContext) private var modelContext
+  @State private var isShowMedalAddView = false
+  
   private let spacing: CGFloat = 10
   private let size: CGFloat = 160
   
   @Query(sort: [SortDescriptor(\Medal.date, order: .reverse)], animation: .default)
   private var medals: [Medal]
+  
+  @Query private var users: [User]
+  private var user: User? { users.first }
   
   var body: some View {
     Group {
@@ -35,7 +40,12 @@ struct MedalsView: View {
         ScrollView {
           LazyVGrid(columns: columns, spacing: spacing) {
             ForEach(medals, id: \.id) { medal in
-              MedalCard(medal: medal, spacing: spacing, size: size)
+              NavigationLink {
+                MedalDetailView()
+              } label: {
+                MedalCard(medal: medal, spacing: spacing, size: size)
+              }
+              .buttonStyle(.plain)
             }
           }
           .padding(spacing)
@@ -45,14 +55,21 @@ struct MedalsView: View {
     .navigationTitle("Your Rewards")
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
-        Button("Add Race", systemImage: "plus") {
-          
+        Button("Add Medal", systemImage: "plus") {
+          isShowMedalAddView = true
         }
       }
       
       ToolbarItem(placement: .topBarTrailing) {
         Button("Filter", systemImage: "ellipsis") {
           
+        }
+      }
+    }
+    .sheet(isPresented: $isShowMedalAddView) {
+      if let user {
+        NavigationStack {
+          MedalAddView(user: user)
         }
       }
     }
