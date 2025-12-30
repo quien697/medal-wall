@@ -16,34 +16,10 @@ struct MedalCard: View {
     let category = RaceDistanceCategory(value: medal.raceCategory.distance)
     
     CardSection(padding: spacing, margin: 0) {
-      ZStack {
-        Hexagon()
-          .fill(
-            LinearGradient(
-              colors: [
-                category.color.opacity(0.8),
-                category.color.opacity(0.5)
-              ],
-              startPoint: .topLeading,
-              endPoint: .bottomTrailing
-            )
-          )
-          .stroke(.black.opacity(0.1), lineWidth: 2)
-          .frame(width: size, height: size)
-        
-        if let uiImage = medal.photo {
-          Image(uiImage: uiImage)
-            .resizable()
-            .scaledToFill()
-            .frame(width: size * 0.7, height: size * 0.7)
-            .clipShape(Circle())
-            .shadow(radius: 4)
-        } else {
-          Image(systemName: "medal.fill")
-            .font(.system(size: size * 0.3, weight: .semibold))
-            .foregroundColor(.white)
-        }
-      } // ZStack
+      MedalBadgeView(
+        photo: medal.photo,
+        color: category.color
+      )
       
       VStack(alignment: .leading, spacing: 10) {
         Text(medal.title)

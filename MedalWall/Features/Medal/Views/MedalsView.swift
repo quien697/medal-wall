@@ -41,7 +41,7 @@ struct MedalsView: View {
           LazyVGrid(columns: columns, spacing: spacing) {
             ForEach(medals, id: \.id) { medal in
               NavigationLink {
-                MedalDetailView()
+                MedalDetailView(medal: medal)
               } label: {
                 MedalCard(medal: medal, spacing: spacing, size: size)
               }

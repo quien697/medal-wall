@@ -21,8 +21,6 @@ struct RaceDetailView: View {
   }
   
   var body: some View {
-    let viewModel = RaceDetailViewModel(race: viewModel.race)
-    
     ScrollView {
       RaceHeroCardSection(race: viewModel.race)
       

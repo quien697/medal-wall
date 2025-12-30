@@ -79,7 +79,6 @@ struct MedalEditView: View {
       }
       
       Section("Race Info") {
-        // Race + Category selection
         Picker(
           "Race",
           selection: Binding(get: {

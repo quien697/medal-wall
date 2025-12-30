@@ -28,4 +28,9 @@ final class MedalRepository {
     guard let context else { throw AppError.contextNotAttached }
     context.insert(medal)
   }
+  
+  func deleteMedal(_ medal: Medal) throws {
+    guard let context else { throw AppError.contextNotAttached }
+    context.delete(medal)
+  }
 }

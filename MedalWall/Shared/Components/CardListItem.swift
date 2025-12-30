@@ -40,3 +40,11 @@ struct CardListItem<Content: View>: View {
     .padding(.vertical, 6)
   }
 }
+
+#Preview(traits: .sampleData) {
+  CardSection() {
+    CardListItem(systemName: "location.fill") {
+      Text("Taipei, Taiwan")
+    }
+  }
+}
