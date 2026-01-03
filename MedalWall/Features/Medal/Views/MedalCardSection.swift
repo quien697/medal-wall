@@ -1,5 +1,5 @@
 //
-//  MedalCard.swift
+//  MedalCardSection.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-12-19.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MedalCard: View {
+struct MedalCardSection: View {
   let medal: Medal
   let spacing: CGFloat
   let size: CGFloat
@@ -16,18 +16,18 @@ struct MedalCard: View {
     let category = RaceDistanceCategory(value: medal.raceCategory.distance)
     
     CardSection(padding: spacing, margin: 0) {
-      MedalBadgeView(
+      MedalBadge(
         photo: medal.photo,
         color: category.color
       )
       
-      VStack(alignment: .leading, spacing: 10) {
+      VStack(alignment: .leading, spacing: spacing) {
         Text(medal.title)
           .font(.headline)
           .lineLimit(2)
           .frame(height: 44, alignment: .topLeading)
         
-        HStack(spacing: 8) {
+        HStack {
           Text(medal.date.formatted(date: .abbreviated, time: .omitted))
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -40,11 +40,13 @@ struct MedalCard: View {
             .bold()
         }
       } // VStack
+      .padding(.horizontal, spacing * 0.5)
+      .padding(.bottom, spacing)
     } // CardSection
   }
 }
 
 #Preview(traits: .sampleData) {
-  MedalCard(medal: Medal.sampleData[1], spacing: 10, size: 160)
-    .frame(width: 180)
+  MedalCardSection(medal: Medal.sampleData[1], spacing: 10, size: 160)
+    .frame(width: 160)
 }

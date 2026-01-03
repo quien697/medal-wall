@@ -11,11 +11,9 @@ struct RaceLastUpdatedCardSection: View {
   let race: Race
   
   var body: some View {
-    CardSection(title: "Last Updated") {
-      CardListItem() {
-        Text(race.updateTime.formatted(date: .abbreviated, time: .standard))
-          .cardTextStyle(color: .secondary, font: .footnote)
-      }
+    CardSection(title: "Last Updated", alignment: .leading) {
+      Text(race.updateTime.formatted(date: .abbreviated, time: .standard))
+        .cardTextStyle(color: .secondary, font: .footnote)
     }
   }
 }

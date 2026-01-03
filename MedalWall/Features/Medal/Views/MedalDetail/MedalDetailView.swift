@@ -27,11 +27,10 @@ struct MedalDetailView: View {
     
     ScrollView {
       CardSection {
-        MedalBadgeView(
+        MedalBadge(
           photo: viewModel.medal.photo,
           color: category.color
         )
-        .frame(maxWidth: .infinity)
         
         Text(viewModel.medal.title)
           .font(.title2)
@@ -42,57 +41,33 @@ struct MedalDetailView: View {
           .foregroundStyle(.secondary)
       } // CardSection
       
-      CardSection(title: "Details") {
-        CardListItem {
-          Text("Date")
-            .font(.callout)
-            .fontWeight(.semibold)
-          
-          Spacer()
-          
-          Text(viewModel.medal.date, format: .dateTime.year().month().day())
-            .font(.callout)
-            .foregroundStyle(.secondary)
-        }
+      CardSection(title: "Details", alignment: .leading, spacing: 10) {
+        CardRow(
+          label: "Date",
+          value: viewModel.medal.date.formatted(date: .abbreviated, time: .omitted)
+        )
         
-        CardListItem {
-          Text("Distance")
-            .font(.callout)
-            .fontWeight(.semibold)
-          
-          Spacer()
-          
-          Text("\(category.description) (\(RaceDistanceType(rawValue: viewModel.medal.raceCategory.type)!.displayName))")
-            .font(.callout)
-            .foregroundStyle(.secondary)
-        }
+        CardRow(
+          label: "Distance",
+          value: "\(category.description) (\(RaceDistanceType(rawValue: viewModel.medal.raceCategory.type)!.displayName))"
+        )
         
-        CardListItem {
-          Text("Result")
-            .font(.callout)
-            .fontWeight(.semibold)
-          
-          Spacer()
-          
-          if let result = viewModel.medal.result {
-            Text(result)
-              .font(.subheadline)
-              .foregroundStyle(.secondary)
-          }
-        }
+        CardRow(
+          label: "Result",
+          value: viewModel.medal.result ?? "-",
+          withBottomLine: false
+        )
       } // CardSection
       
-      CardSection(title: "Notes") {
-        CardListItem {
-          if let note = viewModel.medal.note, !note.isEmpty {
-            Text(note)
-              .font(.body)
-              .foregroundStyle(.primary)
-          } else {
-            Text("No notes")
-              .font(.subheadline)
-              .foregroundStyle(.secondary)
-          }
+      CardSection(title: "Notes", alignment: .leading) {
+        if let note = viewModel.medal.note, !note.isEmpty {
+          Text(note)
+            .font(.body)
+            .foregroundStyle(.primary)
+        } else {
+          Text("No notes")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
         }
       } // CardSection
     } // ScrollView

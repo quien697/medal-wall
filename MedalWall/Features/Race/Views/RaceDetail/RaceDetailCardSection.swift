@@ -13,19 +13,19 @@ struct RaceDetailCardSection: View {
   var body: some View {
     let groupedDistances = race.distances.groupedByType()
     
-    CardSection(title: "Details") {
-      CardListItem(systemName: "clock") {
-        Text(race.date.formatted(date: .abbreviated, time: .omitted))
-          .modifier(TextStyleModifier.Card.listText)
-      }
+    CardSection(title: "Details", alignment: .leading, spacing: 10) {
+      CardRow(
+        icon: "clock",
+        value: race.date.formatted(date: .abbreviated, time: .omitted)
+      )
       
-      CardListItem(systemName: "location.fill") {
-        Text(race.location.formatted)
-          .modifier(TextStyleModifier.Card.listText)
-      }
+      CardRow(
+        icon: "location.fill",
+        value: race.location.formatted
+      )
       
       if race.distances.count != 0 {
-        CardListItem(systemName: "figure.run",alignment: .top) {
+        CardRow(icon: "figure.run") {
           VStack(alignment: .leading) {
             
             ForEach(RaceDistanceType.allCases) { type in
@@ -51,9 +51,8 @@ struct RaceDetailCardSection: View {
       }
       
       if let url = race.url {
-        CardListItem(systemName: "globe") {
+        CardRow(icon: "globe", withBottomLine: false) {
           Link("Visit Website", destination: URL(string: url)!)
-            .modifier(TextStyleModifier.Card.listLink)
             .underline(true, color: .blue.opacity(0.8))
         }
       }

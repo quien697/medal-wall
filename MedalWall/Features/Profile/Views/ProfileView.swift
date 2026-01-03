@@ -20,39 +20,41 @@ struct ProfileView: View {
     Group {
       if let user {
         ScrollView {
-          CardSection {
-            VStack(alignment: .center, spacing: 16) {
-              if let uiImage = user.avatar {
-                Image(uiImage: uiImage)
-                  .avatar()
-              } else {
-                Image(systemName: "person.circle.fill")
-                  .avatar()
-                  .foregroundStyle(.gray)
-              }
-              
-              Text("\(user.firstName), \(user.lastName)")
-                .font(.title)
-              
-              if let bio = user.bio, !bio.isEmpty {
-                Text(bio)
-                  .font(.headline)
-              }
-            } // VStack
-            .frame(maxWidth: .infinity)
-          } // CardSection
-          
-          CardSection(title: "Info") {
-            if let gender = user.genderEnum {
-              CardListItem(systemName: "person.fill") {
-                Text(gender.displayName)
-              }
+          CardSection(spacing: 16) {
+            if let uiImage = user.avatar {
+              Image(uiImage: uiImage)
+                .avatar()
+            } else {
+              Image(systemName: "person.circle.fill")
+                .avatar()
+                .foregroundStyle(.gray)
             }
             
+            Text("\(user.firstName), \(user.lastName)")
+              .font(.title)
+            
+            if let bio = user.bio, !bio.isEmpty {
+              Text(bio)
+                .font(.headline)
+                .foregroundStyle(.secondary)
+            }
+          } // CardSection
+          
+          CardSection(title: "Info", alignment: .leading, spacing: 10) {
+            if let gender = user.genderEnum {
+              CardRow(icon: "person.fill", value: gender.displayName)
+            } else {
+              CardRow(icon: "person.fill", value: "-")
+            }
+          
             if let birthday = user.birthday {
-              CardListItem(systemName: "calendar") {
-                Text("\(birthday.formatted(date: .abbreviated, time: .omitted))")
-              }
+              CardRow(
+                icon: "calendar",
+                value: birthday.formatted(date: .abbreviated, time: .omitted),
+                withBottomLine: false
+              )
+            } else {
+              CardRow(icon: "calendar", value: "-")
             }
           } // CardSection
         } // ScrollView

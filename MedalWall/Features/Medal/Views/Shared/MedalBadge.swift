@@ -1,5 +1,5 @@
 //
-//  MedalBadgeView.swift
+//  MedalBadge.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-12-30.
@@ -7,10 +7,11 @@
 
 import SwiftUI
 
-struct MedalBadgeView: View {
+struct MedalBadge: View {
   private let systemImageName: String = "medal.fill"
-  private let gradientColors: [Color]
   private let strokeColor: Color = .black.opacity(0.1)
+  
+  private let gradientColors: [Color]
   
   let size: CGFloat
   let photo: UIImage?
@@ -59,6 +60,7 @@ struct MedalBadgeView: View {
           .foregroundColor(.white)
       }
     } // ZStack
+    .padding(0)
   }
 }
 
@@ -66,13 +68,13 @@ struct MedalBadgeView: View {
   let size: CGFloat = 160
   
   VStack(spacing: 20) {
-    MedalBadgeView(
+    MedalBadge(
       size: size,
       photo: nil,
       color: .orange
     )
     
-    MedalBadgeView(
+    MedalBadge(
       size: size,
       photo: UIImage(named: "bmo-vancouver-marathon-2022"),
       color: .blue

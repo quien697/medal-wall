@@ -43,7 +43,7 @@ struct MedalsView: View {
               NavigationLink {
                 MedalDetailView(medal: medal)
               } label: {
-                MedalCard(medal: medal, spacing: spacing, size: size)
+                MedalCardSection(medal: medal, spacing: spacing, size: size)
               }
               .buttonStyle(.plain)
             }
