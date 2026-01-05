@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 @Observable
-class MedalEditViewModel {
+final class MedalEditViewModel {
   var title: String = ""
   var date: Date = .now
   var result: String = ""
@@ -48,9 +48,9 @@ class MedalEditViewModel {
   }
 
   var isFormValid: Bool {
-    !title.trimmingCharacters(in: .whitespaces).isEmpty
-//    user != nil &&
-//    selectedRaceCategoryID != nil
+    !title.trimmingCharacters(in: .whitespaces).isEmpty &&
+    (user != nil) &&
+    (selectedRaceCategoryID != nil)
   }
 
   func updatePhoto(with data: Data?) {

@@ -20,8 +20,6 @@ struct MedalEditView: View {
   
   @Query(sort: \Race.date, animation: .default) private var races: [Race]
   
-  private let size: CGFloat = 160
-  
   init(medal: Medal? = nil, user: User? = nil) {
     self._viewModel = State(initialValue: MedalEditViewModel(medal: medal, user: user))
   }
@@ -29,35 +27,8 @@ struct MedalEditView: View {
   var body: some View {
     Form {
       Section("Photo") {
-        ZStack(alignment: .center) {
-          Hexagon()
-            .fill(
-              LinearGradient(
-                colors: [
-                  .orange.opacity(0.8),
-                  .orange.opacity(0.5)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-              )
-            )
-            .stroke(.black.opacity(0.1), lineWidth: 2)
-            .frame(width: size, height: size)
-          
-          if let uiImage = viewModel.photo {
-            Image(uiImage: uiImage)
-              .resizable()
-              .scaledToFill()
-              .frame(width: size * 0.7, height: size * 0.7)
-              .clipShape(Circle())
-              .shadow(radius: 4)
-          } else {
-            Image(systemName: "medal.fill")
-              .font(.system(size: size * 0.3, weight: .semibold))
-              .foregroundColor(.white)
-          }
-        }
-        .frame(maxWidth: .infinity)
+        MedalBadge(photo: viewModel.photo, color: .black)
+          .frame(maxWidth: .infinity)
         
         Button {
           isShowingPhotoDialog = true
@@ -71,13 +42,15 @@ struct MedalEditView: View {
             .clipShape(.rect(cornerRadius: 12))
         }
       } // Section
-      
+
       Section("Medal Info") {
         TextField("Title", text: $viewModel.title)
-        
+
         DatePicker("Date", selection: $viewModel.date, displayedComponents: .date)
-      }
-      
+
+        TimePicker("Result", selection: $viewModel.result)
+      } // Section
+
       Section("Race Info") {
         Picker(
           "Race",
@@ -85,7 +58,7 @@ struct MedalEditView: View {
             viewModel.selectedRaceID ?? races.first?.id
           }, set: { raceId in
             viewModel.selectedRaceID = raceId
-            
+
             if let id = raceId,
                let race = races.first(where: { $0.id == id }),
                let firstCategory = race.categories.first {
@@ -112,14 +85,12 @@ struct MedalEditView: View {
           }
         }
         .pickerStyle(.navigationLink)
-        
-        // Result, will implement later
-      }
+      } // Section
       
       Section("Notes") {
         TextEditor(text: $viewModel.note)
           .frame(minHeight: 100)
-      }
+      } // Section
     }
     .navigationTitle(viewModel.isNewMedal ? "Add Medal" : "Edit Medal")
     .navigationBarTitleDisplayMode(.inline)
@@ -191,6 +162,5 @@ struct MedalEditView: View {
 }
 
 #Preview {
-  // Provide a sample user for preview
   MedalEditView(medal: Medal.sampleData.first!)
 }

@@ -16,8 +16,6 @@ struct MedalDetailView: View {
   @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: MedalDetailViewModel
   
-  private let size: CGFloat = 160
-  
   init(medal: Medal) {
     self._viewModel = State(initialValue: MedalDetailViewModel(medal: medal))
   }
@@ -54,7 +52,7 @@ struct MedalDetailView: View {
         
         CardRow(
           label: "Result",
-          value: viewModel.medal.result ?? "-",
+          value: viewModel.medal.result ?? "-- : -- : --",
           withBottomLine: false
         )
       } // CardSection
@@ -116,6 +114,6 @@ struct MedalDetailView: View {
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   MedalDetailView(medal: Medal.sampleData.first!)
 }

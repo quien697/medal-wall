@@ -59,12 +59,6 @@ struct MedalsView: View {
           isShowMedalAddView = true
         }
       }
-      
-      ToolbarItem(placement: .topBarTrailing) {
-        Button("Filter", systemImage: "ellipsis") {
-          
-        }
-      }
     }
     .sheet(isPresented: $isShowMedalAddView) {
       if let user {

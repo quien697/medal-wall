@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 @Observable
-class RaceEditViewModel {
+final class RaceEditViewModel {
   var name: String = ""
   var photoData: Data? = nil
   var photo: UIImage? = nil

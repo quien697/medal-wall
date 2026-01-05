@@ -64,7 +64,7 @@ struct MedalBadge: View {
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   let size: CGFloat = 160
   
   VStack(spacing: 20) {

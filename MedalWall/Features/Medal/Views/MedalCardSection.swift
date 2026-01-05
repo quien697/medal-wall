@@ -46,7 +46,7 @@ struct MedalCardSection: View {
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   MedalCardSection(medal: Medal.sampleData[1], spacing: 10, size: 160)
     .frame(width: 160)
 }
