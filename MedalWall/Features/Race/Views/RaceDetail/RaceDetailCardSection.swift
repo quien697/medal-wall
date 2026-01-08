@@ -31,7 +31,6 @@ struct RaceDetailCardSection: View {
             ForEach(RaceDistanceType.allCases) { type in
               if let distances = groupedDistances[type], !distances.isEmpty {
                 Text(type.displayName)
-                  .modifier(TextStyleModifier.Card.listText)
                 
                 HStack {
                   ForEach(distances) { distance in

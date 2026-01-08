@@ -13,7 +13,7 @@ struct RaceLastUpdatedCardSection: View {
   var body: some View {
     CardSection(title: "Last Updated", alignment: .leading) {
       Text(race.updateTime.formatted(date: .abbreviated, time: .standard))
-        .cardTextStyle(color: .secondary, font: .footnote)
+        .foregroundStyle(.secondary)
     }
   }
 }
