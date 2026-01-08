@@ -11,8 +11,9 @@ import PhotosUI
 struct ProfileEditForm: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
-  @State private var selectedAvatarItem: PhotosPickerItem?
-  @State private var isDateSet: Bool = false
+  @State private var selectedPhotoItem: PhotosPickerItem?
+  @State private var isShowingPhotosPicker: Bool = false
+  @State private var isShowingPhotoDialog: Bool = false
   @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: ProfileEditViewModel
   
@@ -23,66 +24,36 @@ struct ProfileEditForm: View {
   var body: some View {
     Form {
       Section("Avatar") {
-        ZStack {
-          if let uiImage = viewModel.avatar {
-            Image(uiImage: uiImage)
-              .avatar()
-              .overlay(alignment: .topTrailing) {
-                Button {
-                  selectedAvatarItem = nil
-                  self.viewModel.avatarData = nil
-                  self.viewModel.avatar = nil
-                } label: {
-                  Image(systemName: "xmark")
-                    .font(.system(size: 15))
-                    .padding(8)
-                    .background(.black)
-                    .foregroundStyle(.white)
-                    .clipShape(.circle)
-                    .shadow(radius: 2)
-                }
-                .padding(-10)
-              }
-          } else {
-            Image(systemName: "photo.circle.fill")
-              .avatar()
-              .foregroundStyle(.gray)
-          }
-        }
-        .frame(maxWidth: .infinity)
-        
-        PhotosPicker(
-          selection: $selectedAvatarItem,
-          matching: .images,
-          photoLibrary: .shared()
-        ) {
-          HStack(alignment: .center) {
-            Text("Pcik Photo")
-              .font(.headline)
-              .frame(maxWidth: .infinity)
-              .foregroundStyle(.white)
-              .padding()
-              .background(.primary)
-              .clipShape(.rect(cornerRadius: 12))
-          }
-        }
-        .onChange(of: selectedAvatarItem) { _, newItem in
-          guard let newItem else { return }
-          
-          Task {
-            do {
-              if let data = try await newItem.loadTransferable(type: Data.self),
-                 let image = UIImage(data: data) {
-                viewModel.avatarData = data
-                viewModel.avatar = image
-              } else {
-                errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
-              }
-            } catch {
-              errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
+        AvatarImage(photo: viewModel.avatar)
+          .frame(maxWidth: .infinity)
+          .confirmationDialog(
+            "Edit Photo",
+            isPresented: $isShowingPhotoDialog,
+            titleVisibility: .visible
+          ) {
+            Button("Choose from Library") {
+              isShowingPhotosPicker = true
             }
-          } // Task
-        } // onChange
+            
+            Button("Remove Photo", role: .destructive) {
+              viewModel.clearPhoto()
+              selectedPhotoItem = nil
+            }
+            
+            Button("Cancel", role: .cancel) { isShowingPhotoDialog = false }
+          } // confirmationDialog
+        
+        Button {
+          isShowingPhotoDialog = true
+        } label: {
+          Label("Edit Photo", systemImage: "photo")
+            .font(.headline)
+            .frame(maxWidth: .infinity)
+            .foregroundStyle(.white)
+            .padding()
+            .background(.primary)
+            .clipShape(.rect(cornerRadius: 12))
+        }
       } // Section
       
       Section("User Name") {
@@ -164,6 +135,22 @@ struct ProfileEditForm: View {
         .disabled(!viewModel.isFormValid)
       }
     } // toolbar
+    .photosPicker(isPresented: $isShowingPhotosPicker, selection: $selectedPhotoItem)
+    .onChange(of: selectedPhotoItem) { _, newItem in
+      guard let newItem else { return }
+      
+      Task {
+        do {
+          if let data = try await newItem.loadTransferable(type: Data.self) {
+            viewModel.updatePhoto(with: data)
+          } else {
+            errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
+          }
+        } catch {
+          errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
+        }
+      }
+    } // onChange
     .sheet(item: $errorWrapper, onDismiss: {
       dismiss()
     }) { wrapper in

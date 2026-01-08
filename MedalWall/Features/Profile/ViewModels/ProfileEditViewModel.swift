@@ -52,7 +52,7 @@ class ProfileEditViewModel {
     !userName.lastName.trimmingCharacters(in: .whitespaces).isEmpty
   }
   
-  func updateAvatar(with data: Data?) {
+  func updatePhoto(with data: Data?) {
     self.avatarData = data
     
     if let data {
@@ -62,11 +62,11 @@ class ProfileEditViewModel {
     }
   }
   
-  func clearAvatar() {
+  func clearPhoto() {
     self.avatarData = nil
     self.avatar = nil
   }
-  
+
   func save() throws {
     if let profile {
       profile.firstName = userName.firstName

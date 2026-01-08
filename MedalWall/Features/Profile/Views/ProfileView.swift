@@ -21,14 +21,7 @@ struct ProfileView: View {
       if let user {
         ScrollView {
           CardSection(spacing: 16) {
-            if let uiImage = user.avatar {
-              Image(uiImage: uiImage)
-                .avatar()
-            } else {
-              Image(systemName: "person.circle.fill")
-                .avatar()
-                .foregroundStyle(.gray)
-            }
+            AvatarImage(photo: user.avatar)
             
             Text("\(user.firstName), \(user.lastName)")
               .font(.title)

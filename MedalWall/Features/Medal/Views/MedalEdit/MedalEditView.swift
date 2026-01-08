@@ -13,9 +13,9 @@ struct MedalEditView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
   @State private var selectedPhotoItem: PhotosPickerItem?
-  @State private var errorWrapper: ErrorWrapper?
-  @State private var showPhotosPicker: Bool = false
+  @State private var isShowingPhotosPicker: Bool = false
   @State private var isShowingPhotoDialog: Bool = false
+  @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: MedalEditViewModel
   
   @Query(sort: \Race.date, animation: .default) private var races: [Race]
@@ -29,6 +29,22 @@ struct MedalEditView: View {
       Section("Photo") {
         MedalBadge(photo: viewModel.photo)
           .frame(maxWidth: .infinity)
+          .confirmationDialog(
+            "Edit Photo",
+            isPresented: $isShowingPhotoDialog,
+            titleVisibility: .visible
+          ) {
+            Button("Choose from Library") {
+              isShowingPhotosPicker = true
+            }
+            
+            Button("Remove Photo", role: .destructive) {
+              viewModel.clearPhoto()
+              selectedPhotoItem = nil
+            }
+            
+            Button("Cancel", role: .cancel) { isShowingPhotoDialog = false }
+          } // confirmationDialog
         
         Button {
           isShowingPhotoDialog = true
@@ -114,23 +130,7 @@ struct MedalEditView: View {
     .sheet(item: $errorWrapper) { wrapper in
       ErrorView(errorWrapper: wrapper)
     }
-    .confirmationDialog(
-      "Edit Photo",
-      isPresented: $isShowingPhotoDialog,
-      titleVisibility: .visible
-    ) {
-      Button("Choose from Library") {
-        showPhotosPicker = true
-      }
-      
-      Button("Remove Photo", role: .destructive) {
-        viewModel.clearPhoto()
-        selectedPhotoItem = nil
-      }
-      
-      Button("Cancel", role: .cancel) { isShowingPhotoDialog = false }
-    } // confirmationDialog
-    .photosPicker(isPresented: $showPhotosPicker, selection: $selectedPhotoItem)
+    .photosPicker(isPresented: $isShowingPhotosPicker, selection: $selectedPhotoItem)
     .onChange(of: selectedPhotoItem) { _, newItem in
       guard let newItem else { return }
       
