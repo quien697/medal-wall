@@ -16,16 +16,12 @@ struct MedalCardSection: View {
     let category = RaceDistanceCategory(value: medal.raceCategory.distance)
     
     CardSection(padding: spacing, margin: 0) {
-      MedalBadge(
-        photo: medal.photo,
-        color: category.color
-      )
+      MedalBadge(photo: medal.photo)
       
       VStack(alignment: .leading, spacing: spacing) {
         Text(medal.title)
           .font(.headline)
-          .lineLimit(2)
-          .frame(height: 44, alignment: .topLeading)
+          .lineLimit(1)
         
         HStack {
           Text(medal.date.formatted(date: .abbreviated, time: .omitted))
@@ -38,6 +34,11 @@ struct MedalCardSection: View {
           Text(category.description)
             .font(.caption2)
             .bold()
+            .padding(.horizontal, 6)
+            .padding(.vertical, 4)
+            .background(category.translucentColor)
+            .clipShape(.rect(cornerRadius: 6) )
+            
         }
       } // VStack
       .padding(.horizontal, spacing * 0.5)

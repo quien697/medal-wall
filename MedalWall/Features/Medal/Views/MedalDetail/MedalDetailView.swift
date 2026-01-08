@@ -25,10 +25,7 @@ struct MedalDetailView: View {
     
     ScrollView {
       CardSection {
-        MedalBadge(
-          photo: viewModel.medal.photo,
-          color: category.color
-        )
+        MedalBadge(photo: viewModel.medal.photo)
         
         Text(viewModel.medal.title)
           .font(.title2)

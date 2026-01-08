@@ -27,7 +27,7 @@ struct MedalEditView: View {
   var body: some View {
     Form {
       Section("Photo") {
-        MedalBadge(photo: viewModel.photo, color: .black)
+        MedalBadge(photo: viewModel.photo)
           .frame(maxWidth: .infinity)
         
         Button {

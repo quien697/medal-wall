@@ -9,41 +9,37 @@ import SwiftUI
 
 struct MedalBadge: View {
   private let systemImageName: String = "medal.fill"
-  private let strokeColor: Color = .black.opacity(0.1)
-  
+  private let strokeColor: Color = .black
   private let gradientColors: [Color]
   
   let size: CGFloat
   let photo: UIImage?
-  let color: Color
   
   init(
     size: CGFloat = 160,
     photo: UIImage? = nil,
-    color: Color,
   ) {
     self.size = size
     self.photo = photo
-    self.color = color
     self.gradientColors = [
-      color.opacity(0.8),
-      color.opacity(0.5)
+      strokeColor.opacity(0.8),
+      strokeColor.opacity(0.3)
     ]
   }
   
   var body: some View {
     ZStack {
       Hexagon()
-        .fill(
+        .stroke(
           LinearGradient(
             colors: gradientColors,
             startPoint: .topLeading,
-            endPoint: .bottomTrailing
-          )
+            endPoint: .bottomTrailing),
+          lineWidth: max(1, size * 0.05)
         )
         .overlay(
           Hexagon()
-            .stroke(strokeColor, lineWidth: 2)
+            .stroke(strokeColor.opacity(0.1), lineWidth: 2)
         )
         .frame(width: size, height: size)
       
@@ -57,7 +53,7 @@ struct MedalBadge: View {
       } else {
         Image(systemName: systemImageName)
           .font(.system(size: size * 0.3, weight: .semibold))
-          .foregroundColor(.white)
+          .foregroundColor(.gray)
       }
     } // ZStack
     .padding(0)
@@ -70,14 +66,12 @@ struct MedalBadge: View {
   VStack(spacing: 20) {
     MedalBadge(
       size: size,
-      photo: nil,
-      color: .orange
+      photo: nil
     )
     
     MedalBadge(
       size: size,
-      photo: UIImage(named: "bmo-vancouver-marathon-2022"),
-      color: .blue
+      photo: UIImage(named: "bmo-vancouver-marathon-2022")
     )
   }
 }
