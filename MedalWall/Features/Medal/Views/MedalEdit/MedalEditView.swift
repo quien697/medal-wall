@@ -157,7 +157,7 @@ struct MedalEditView: View {
           viewModel.selectedRaceCategoryID = firstCat.id
         }
       }
-    }
+    } // onAppear
   }
 }
 
