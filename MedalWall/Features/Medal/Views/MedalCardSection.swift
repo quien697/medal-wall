@@ -10,7 +10,6 @@ import SwiftUI
 struct MedalCardSection: View {
   let medal: Medal
   let spacing: CGFloat
-  let size: CGFloat
   
   var body: some View {
     let category = RaceDistanceCategory(value: medal.raceCategory.distance)
@@ -48,6 +47,6 @@ struct MedalCardSection: View {
 }
 
 #Preview {
-  MedalCardSection(medal: Medal.sampleData[1], spacing: 10, size: 160)
+  MedalCardSection(medal: Medal.sampleData[1], spacing: 10)
     .frame(width: 160)
 }

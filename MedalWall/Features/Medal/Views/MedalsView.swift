@@ -13,7 +13,7 @@ struct MedalsView: View {
   @State private var isShowMedalAddView = false
   
   private let spacing: CGFloat = 10
-  private let size: CGFloat = 160
+  private let size: CGFloat = ImageType.medal.size.width
   
   @Query(sort: [SortDescriptor(\Medal.date, order: .reverse)], animation: .default)
   private var medals: [Medal]
@@ -43,7 +43,7 @@ struct MedalsView: View {
               NavigationLink {
                 MedalDetailView(medal: medal)
               } label: {
-                MedalCardSection(medal: medal, spacing: spacing, size: size)
+                MedalCardSection(medal: medal, spacing: spacing)
               }
               .buttonStyle(.plain)
             }
