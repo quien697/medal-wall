@@ -10,14 +10,12 @@ import SwiftData
 
 struct MedalsView: View {
   @Environment(\.modelContext) private var modelContext
-  @State private var isShowMedalAddView = false
-  
+  @State private var isShowingMedalAddView = false
   private let spacing: CGFloat = 10
   private let size: CGFloat = ImageType.medal.size.width
   
   @Query(sort: [SortDescriptor(\Medal.date, order: .reverse)], animation: .default)
   private var medals: [Medal]
-  
   @Query private var users: [User]
   private var user: User? { users.first }
   
@@ -56,11 +54,11 @@ struct MedalsView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Button("Add Medal", systemImage: "plus") {
-          isShowMedalAddView = true
+          isShowingMedalAddView = true
         }
       }
     }
-    .sheet(isPresented: $isShowMedalAddView) {
+    .sheet(isPresented: $isShowingMedalAddView) {
       if let user {
         NavigationStack {
           MedalAddView(user: user)

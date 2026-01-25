@@ -15,6 +15,7 @@ struct MedalEditView: View {
   @State private var selectedPhotoItem: PhotosPickerItem?
   @State private var isShowingPhotosPicker: Bool = false
   @State private var isShowingPhotoDialog: Bool = false
+  @State private var isShowingCropImageView: Bool = false
   @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: MedalEditViewModel
   
@@ -27,7 +28,7 @@ struct MedalEditView: View {
   var body: some View {
     Form {
       Section("Photo") {
-        MedalBadge(photo: viewModel.photo)
+        MedalBadge(photo: viewModel.cropPhoto == nil ? viewModel.photo : viewModel.cropPhoto)
           .frame(maxWidth: .infinity)
           .confirmationDialog(
             "Edit Photo",
@@ -36,6 +37,12 @@ struct MedalEditView: View {
           ) {
             Button("Choose from Library") {
               isShowingPhotosPicker = true
+            }
+            
+            if selectedPhotoItem != nil || viewModel.photo != nil {
+              Button("Crop Photo") {
+                isShowingCropImageView = true
+              }
             }
             
             Button("Remove Photo", role: .destructive) {
@@ -58,15 +65,15 @@ struct MedalEditView: View {
             .clipShape(.rect(cornerRadius: 12))
         }
       } // Section
-
+      
       Section("Medal Info") {
         TextField("Title", text: $viewModel.title)
-
+        
         DatePicker("Date", selection: $viewModel.date, displayedComponents: .date)
-
+        
         TimePicker("Result", selection: $viewModel.result)
       } // Section
-
+      
       Section("Race Info") {
         Picker(
           "Race",
@@ -74,7 +81,7 @@ struct MedalEditView: View {
             viewModel.selectedRaceID ?? races.first?.id
           }, set: { raceId in
             viewModel.selectedRaceID = raceId
-
+            
             if let id = raceId,
                let race = races.first(where: { $0.id == id }),
                let firstCategory = race.categories.first {
@@ -130,6 +137,16 @@ struct MedalEditView: View {
     .sheet(item: $errorWrapper) { wrapper in
       ErrorView(errorWrapper: wrapper)
     }
+    .sheet(isPresented: $isShowingCropImageView) {
+      CropImageView(
+        image: viewModel.photo,
+        type: .medal
+      ) { cropppedImage in
+        if let cropppedImage {
+          viewModel.updateCropPhoto(with: cropppedImage)
+        }
+      }
+    }
     .photosPicker(isPresented: $isShowingPhotosPicker, selection: $selectedPhotoItem)
     .onChange(of: selectedPhotoItem) { _, newItem in
       guard let newItem else { return }
@@ -137,6 +154,7 @@ struct MedalEditView: View {
       Task {
         do {
           if let data = try await newItem.loadTransferable(type: Data.self) {
+            viewModel.clearPhoto()
             viewModel.updatePhoto(with: data)
           } else {
             errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
@@ -152,8 +170,10 @@ struct MedalEditView: View {
         if viewModel.selectedRaceID == nil {
           viewModel.selectedRaceID = races.first?.id
         }
-        if viewModel.selectedRaceCategoryID == nil, let rid = viewModel.selectedRaceID,
-           let race = races.first(where: { $0.id == rid }), let firstCat = race.categories.first {
+        if viewModel.selectedRaceCategoryID == nil,
+           let rid = viewModel.selectedRaceID,
+           let race = races.first(where: { $0.id == rid }),
+           let firstCat = race.categories.first {
           viewModel.selectedRaceCategoryID = firstCat.id
         }
       }

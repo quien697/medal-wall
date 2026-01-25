@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MedalBadge: View {
   private let systemImageName: String = "medal.fill"
+  private let imageType: ImageType = .medal
   private let strokeColor: Color = .black
   private let gradientColors: [Color]
   
@@ -16,11 +17,10 @@ struct MedalBadge: View {
   let photo: UIImage?
   
   init(
-    size: CGFloat = 160,
     photo: UIImage? = nil,
   ) {
-    self.size = size
     self.photo = photo
+    self.size = imageType.size.width
     self.gradientColors = [
       strokeColor.opacity(0.8),
       strokeColor.opacity(0.3)
@@ -46,9 +46,9 @@ struct MedalBadge: View {
       if let uiImage = photo {
         Image(uiImage: uiImage)
           .resizable()
-          .scaledToFill()
+          .aspectRatio(contentMode: imageType.contentMode)
           .frame(width: size * 0.7, height: size * 0.7)
-          .clipShape(Circle())
+          .clipShape(imageType.shape)
           .shadow(radius: 4)
       } else {
         Image(systemName: systemImageName)
@@ -64,13 +64,9 @@ struct MedalBadge: View {
   let size: CGFloat = 160
   
   VStack(spacing: 20) {
-    MedalBadge(
-      size: size,
-      photo: nil
-    )
+    MedalBadge(photo: nil)
     
     MedalBadge(
-      size: size,
       photo: UIImage(named: "bmo-vancouver-marathon-2022")
     )
   }

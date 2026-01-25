@@ -16,6 +16,7 @@ final class Medal {
   var date: Date
   var result: String?
   var photoData: Data?
+  var cropPhotoData: Data?
   var note: String?
   
   @Relationship var user: User
@@ -27,6 +28,7 @@ final class Medal {
     date: Date,
     result: String? = nil,
     photoData: Data? = nil,
+    cropPhotoData: Data? = nil,
     note: String? = nil,
     user: User,
     raceCategory: RaceCategory
@@ -36,6 +38,7 @@ final class Medal {
     self.date = date
     self.result = result
     self.photoData = photoData
+    self.cropPhotoData = cropPhotoData
     self.note = note
     self.user = user
     self.raceCategory = raceCategory
@@ -54,4 +57,11 @@ extension Medal {
     return nil
   }
 
+  var cropPhoto: UIImage? {
+    if let cropPhotoData {
+      return UIImage(data: cropPhotoData)
+    }
+    
+    return nil
+  }
 }

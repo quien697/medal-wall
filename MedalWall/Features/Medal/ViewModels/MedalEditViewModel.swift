@@ -15,6 +15,8 @@ final class MedalEditViewModel {
   var result: String = ""
   var photoData: Data? = nil
   var photo: UIImage? = nil
+  var cropPhotoData: Data? = nil
+  var cropPhoto: UIImage? = nil
   var note: String = ""
   var user: User? = nil
   var selectedRaceID: UUID? = nil
@@ -35,6 +37,8 @@ final class MedalEditViewModel {
       self.result = medal.result ?? ""
       self.photoData = medal.photoData
       self.photo = medal.photo
+      self.cropPhotoData = medal.cropPhotoData
+      self.cropPhoto = medal.cropPhoto
       self.note = medal.note ?? ""
       self.user = medal.user
       self.selectedRaceID = medal.raceCategory.race.id
@@ -62,10 +66,17 @@ final class MedalEditViewModel {
       self.photo = nil
     }
   }
+  
+  func updateCropPhoto(with uiImage: UIImage) {
+    self.cropPhotoData = uiImage.pngData()
+    self.cropPhoto = uiImage
+  }
 
   func clearPhoto() {
     self.photoData = nil
     self.photo = nil
+    self.cropPhotoData = nil
+    self.cropPhoto = nil
   }
 
   func save(in context: ModelContext) throws {
@@ -74,6 +85,7 @@ final class MedalEditViewModel {
       medal.date = date
       medal.result = result.isEmpty ? nil : result
       medal.photoData = photoData
+      medal.cropPhotoData = cropPhotoData
       medal.note = note.isEmpty ? nil : note
 
       if let categoryID = selectedRaceCategoryID {
@@ -93,6 +105,7 @@ final class MedalEditViewModel {
         date: date,
         result: result.isEmpty ? nil : result,
         photoData: photoData,
+        cropPhotoData: cropPhotoData,
         note: note.isEmpty ? nil : note,
         user: user,
         raceCategory: category

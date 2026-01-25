@@ -15,7 +15,7 @@ struct MedalCardSection: View {
     let category = RaceDistanceCategory(value: medal.raceCategory.distance)
     
     CardSection(padding: spacing, margin: 0) {
-      MedalBadge(photo: medal.photo)
+      MedalBadge(photo: medal.cropPhoto == nil ? medal.photo : medal.cropPhoto)
       
       VStack(alignment: .leading, spacing: spacing) {
         Text(medal.title)
@@ -38,7 +38,7 @@ struct MedalCardSection: View {
             .background(category.translucentColor)
             .clipShape(.rect(cornerRadius: 6) )
             
-        }
+        } // HStack
       } // VStack
       .padding(.horizontal, spacing * 0.5)
       .padding(.bottom, spacing)
