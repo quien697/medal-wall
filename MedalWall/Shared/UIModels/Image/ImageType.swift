@@ -22,10 +22,8 @@ enum ImageType {
 extension ImageType {
   var contentMode: ContentMode {
     switch self {
-    case .avatar, .medal:
+    case .avatar, .medal, .raceHero, .raceThumbnail:
       return .fill
-    case .raceThumbnail, .raceHero:
-      return .fit
     }
   }
   
@@ -34,7 +32,7 @@ extension ImageType {
     case .avatar, .medal:
       return AnyShape(Circle())
     case .raceThumbnail, .raceHero:
-      return AnyShape(RoundedRectangle(cornerRadius: 12))
+      return AnyShape(.rect(cornerRadius: 12))
     }
   }
   

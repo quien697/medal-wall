@@ -12,7 +12,7 @@ struct RaceRowView: View {
   
   var body: some View {
     HStack {
-      if let photo = race.photo {
+      if let photo = race.cropPhoto ?? race.photo {
         Image(uiImage: photo)
           .raceThumbnail()
       } else {

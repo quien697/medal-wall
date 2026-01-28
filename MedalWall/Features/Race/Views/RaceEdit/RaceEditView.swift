@@ -14,13 +14,16 @@ enum RaceEditMode { case add, edit }
 struct RaceEditView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
+  
+  @State private var isShowingPhotoPicker: Bool = false
+  @State private var isShowingCropImageView: Bool = false
+  @State private var isShowingAddDistanceView: Bool = false
   @State private var selectedRacePhotoItem: PhotosPickerItem?
   @State private var newRaceDistance = RaceDistance.default
-  @State private var isShowRaceDistanceAddView: Bool = false
-  @State private var errorWrapper: ErrorWrapper?
   @State private var shouldDismiss: Bool = false
+  @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: RaceEditViewModel
-  
+
   init(race: Race?) {
     self._viewModel = State(initialValue: RaceEditViewModel(race: race))
   }
@@ -28,8 +31,18 @@ struct RaceEditView: View {
   var body: some View {
     Form {
       RacePhotoSection(
-        data: $viewModel.photoData,
-        image: $viewModel.photo
+        photo: viewModel.photo,
+        cropPhoto: viewModel.cropPhoto,
+        onChooseFromLibrary: {
+          isShowingPhotoPicker = true
+        },
+        onCrop: {
+          isShowingCropImageView = true
+        },
+        onRemove: {
+          selectedRacePhotoItem = nil
+          viewModel.clearPhoto()
+        }
       )
       
       RaceInfoSection(
@@ -45,7 +58,7 @@ struct RaceEditView: View {
       )
       
       RaceDistanceSection(
-        isPresented: $isShowRaceDistanceAddView,
+        isPresented: $isShowingAddDistanceView,
         distances: viewModel.distances,
         onUpdate: { distance, updatedDistance in
           do {
@@ -91,7 +104,34 @@ struct RaceEditView: View {
         .disabled(!viewModel.isFormValid)
       } // ToolbarItem
     } // toolbar
-    .sheet(isPresented: $isShowRaceDistanceAddView) {
+    .photosPicker(isPresented: $isShowingPhotoPicker, selection: $selectedRacePhotoItem, matching: .images)
+    .onChange(of: selectedRacePhotoItem) { _, newItem in
+      guard let newItem else { return }
+
+      Task {
+        do {
+          if let data = try await newItem.loadTransferable(type: Data.self) {
+            viewModel.clearPhoto()
+            viewModel.updatePhoto(with: data)
+          } else {
+            errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
+          }
+        } catch {
+          errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
+        }
+      } // Task
+    }
+    .sheet(isPresented: $isShowingCropImageView) {
+      CropImageView(
+        image: viewModel.photo,
+        type: .raceHero,
+      ) { cropppedImage in
+        if let cropppedImage {
+          viewModel.updateCropPhoto(with: cropppedImage)
+        }
+      }
+    }
+    .sheet(isPresented: $isShowingAddDistanceView) {
       RaceDistanceAddView(onSave: { newDistance in
         do {
           try viewModel.addDistance(newDistance)
@@ -103,7 +143,6 @@ struct RaceEditView: View {
     .sheet(item: $errorWrapper, onDismiss: {
       if shouldDismiss {
         dismiss()
-        shouldDismiss = false
       }
     }) { wrapper in
       ErrorView(errorWrapper: wrapper)
@@ -111,10 +150,8 @@ struct RaceEditView: View {
   }
 }
 
-#Preview(traits: .sampleData) {
-  @Previewable @Query(sort: \Race.date) var races: [Race]
-  
+#Preview() {
   NavigationStack {
-    RaceEditView(race: races.first!)
+    RaceEditView(race: Race.sampleData.first!)
   }
 }

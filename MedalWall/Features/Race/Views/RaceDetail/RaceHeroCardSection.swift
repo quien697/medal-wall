@@ -13,7 +13,7 @@ struct RaceHeroCardSection: View {
   var body: some View {
     CardSection(spacing: 12) {
       ZStack {
-        if let uiImage = race.photo {
+        if let uiImage = race.cropPhoto ?? race.photo {
           Image(uiImage: uiImage)
             .raceHero()
         } else {

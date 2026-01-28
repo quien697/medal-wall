@@ -13,6 +13,8 @@ final class RaceEditViewModel {
   var name: String = ""
   var photoData: Data? = nil
   var photo: UIImage? = nil
+  var cropPhotoData: Data? = nil
+  var cropPhoto: UIImage? = nil
   var date: Date = .now
   var country: String = ""
   var province: String = ""
@@ -35,6 +37,8 @@ final class RaceEditViewModel {
       self.name = race.name
       self.photoData = race.photoData
       self.photo = race.photo
+      self.cropPhotoData = race.cropPhotoData
+      self.cropPhoto = race.cropPhoto
       self.date = race.date
       self.country = race.location.country
       self.province = race.location.province ?? ""
@@ -67,9 +71,16 @@ final class RaceEditViewModel {
     }
   }
   
+  func updateCropPhoto(with uiImage: UIImage) {
+    self.cropPhotoData = uiImage.pngData()
+    self.cropPhoto = uiImage
+  }
+  
   func clearPhoto() {
     self.photoData = nil
     self.photo = nil
+    self.cropPhotoData = nil
+    self.cropPhoto = nil
   }
   
   func addDistance(_ distance: RaceDistance) throws {
@@ -100,6 +111,7 @@ final class RaceEditViewModel {
     if let race {
       race.name = name
       race.photoData = photoData
+      race.cropPhotoData = cropPhotoData
       race.date = date
       race.country = country
       race.province = province.isEmpty ? nil : province
@@ -116,6 +128,7 @@ final class RaceEditViewModel {
       let newRace = Race(
         name: name,
         photoData: photoData,
+        cropPhotoData: cropPhotoData,
         date: date,
         location: RaceLocation(
           country: country,

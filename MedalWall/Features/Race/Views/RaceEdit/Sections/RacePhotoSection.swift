@@ -9,18 +9,18 @@ import SwiftUI
 import PhotosUI
 
 struct RacePhotoSection: View {
-  @State private var selectedPhotoItem: PhotosPickerItem?
-  @State private var isShowingPhotosPicker: Bool = false
   @State private var isShowingPhotoDialog: Bool = false
-  @State private var errorWrapper: ErrorWrapper?
-  
-  @Binding var data: Data?
-  @Binding var image: UIImage?
-  
+
+  let photo: UIImage?
+  let cropPhoto: UIImage?
+  let onChooseFromLibrary: (() -> Void)
+  let onCrop: (() -> Void)
+  let onRemove: (() -> Void)
+
   var body: some View {
     Section("Race Image") {
       Group {
-        if let uiImage = image {
+        if let uiImage = cropPhoto ?? photo {
           ZStack {
             Image(uiImage: uiImage)
               .raceHero()
@@ -55,18 +55,24 @@ struct RacePhotoSection: View {
         titleVisibility: .visible
       ) {
         Button("Choose from Library") {
-          isShowingPhotosPicker = true
+          onChooseFromLibrary()
         }
-        
+
+        if cropPhoto != nil || photo != nil {
+          Button("Crop Photo") {
+            onCrop()
+          }
+        }
+
         Button("Remove Photo", role: .destructive) {
-          data = nil
-          image = nil
-          selectedPhotoItem = nil
+          onRemove()
         }
-        
-        Button("Cancel", role: .cancel) { isShowingPhotoDialog = false }
+
+        Button("Cancel", role: .cancel) {
+          isShowingPhotoDialog = false
+        }
       } // confirmationDialog
-      
+
       Button {
         isShowingPhotoDialog = true
       } label: {
@@ -76,38 +82,30 @@ struct RacePhotoSection: View {
           .foregroundStyle(.white)
           .padding()
           .background(.primary)
-          .clipShape(.rect(cornerRadius: 12))
+          .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
       }
     } // Section
-    .photosPicker(isPresented: $isShowingPhotosPicker, selection: $selectedPhotoItem)
-    .onChange(of: selectedPhotoItem) { _, newItem in
-      guard let newItem else { return }
-      
-      Task {
-        do {
-          if let data = try await newItem.loadTransferable(type: Data.self),
-             let image = UIImage(data: data) {
-            self.data = data
-            self.image = image
-          } else {
-            errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
-          }
-        } catch {
-          errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
-        }
-      } // Task
-    } // onChange
-    .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
-      ErrorView(errorWrapper: wrapper)
-    }
   }
 }
 
 #Preview {
   let race = Race.sampleData.first!
-  
+
   Form {
-    RacePhotoSection(data: .constant(race.photoData), image: .constant(race.photo))
-    RacePhotoSection(data: .constant(race.photoData), image: .constant(nil))
+    RacePhotoSection(
+      photo: race.photo,
+      cropPhoto: race.cropPhoto,
+      onChooseFromLibrary: { print("onChooseFromLibrary") },
+      onCrop: { print("onCrop") },
+      onRemove: { print("onRemove") }
+    )
+
+    RacePhotoSection(
+      photo: nil,
+      cropPhoto: nil,
+      onChooseFromLibrary: { print("onChooseFromLibrary") },
+      onCrop: { print("onCrop") },
+      onRemove: { print("onRemove") }
+    )
   }
 }

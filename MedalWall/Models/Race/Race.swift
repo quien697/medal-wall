@@ -14,6 +14,7 @@ final class Race {
   @Attribute(.unique) var id: UUID
   var name: String
   var photoData: Data?
+  var cropPhotoData: Data?
   var date: Date
   var country: String
   var province: String?
@@ -31,6 +32,7 @@ final class Race {
     id: UUID = UUID(),
     name: String,
     photoData: Data? = nil,
+    cropPhotoData: Data? = nil,
     date: Date,
     location: RaceLocation,
     sport: Sport = .running,
@@ -42,6 +44,7 @@ final class Race {
     self.id = id
     self.name = name
     self.photoData = photoData
+    self.cropPhotoData = cropPhotoData
     self.date = date
     self.country = location.country
     self.province = location.province
@@ -60,6 +63,14 @@ extension Race {
   var photo: UIImage? {
     if let photoData {
       return UIImage(data: photoData)
+    }
+    
+    return nil
+  }
+  
+  var cropPhoto: UIImage? {
+    if let cropPhotoData {
+      return UIImage(data: cropPhotoData)
     }
     
     return nil
