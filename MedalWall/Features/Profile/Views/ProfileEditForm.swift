@@ -11,9 +11,11 @@ import PhotosUI
 struct ProfileEditForm: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
-  @State private var selectedPhotoItem: PhotosPickerItem?
+  
   @State private var isShowingPhotosPicker: Bool = false
   @State private var isShowingPhotoDialog: Bool = false
+  @State private var isShowingCropImageView: Bool = false
+  @State private var selectedPhotoItem: PhotosPickerItem?
   @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: ProfileEditViewModel
   
@@ -24,7 +26,10 @@ struct ProfileEditForm: View {
   var body: some View {
     Form {
       Section("Avatar") {
-        AvatarImage(photo: viewModel.avatar)
+        AvatarImage(
+          photo: viewModel.avatar,
+          cropPhoto: viewModel.cropAvatar
+        )
           .frame(maxWidth: .infinity)
           .confirmationDialog(
             "Edit Photo",
@@ -33,6 +38,12 @@ struct ProfileEditForm: View {
           ) {
             Button("Choose from Library") {
               isShowingPhotosPicker = true
+            }
+            
+            if selectedPhotoItem != nil || viewModel.avatar != nil {
+              Button("Crop Photo") {
+                isShowingCropImageView = true
+              }
             }
             
             Button("Remove Photo", role: .destructive) {
@@ -142,6 +153,7 @@ struct ProfileEditForm: View {
       Task {
         do {
           if let data = try await newItem.loadTransferable(type: Data.self) {
+            viewModel.clearPhoto()
             viewModel.updatePhoto(with: data)
           } else {
             errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
@@ -151,6 +163,16 @@ struct ProfileEditForm: View {
         }
       }
     } // onChange
+    .sheet(isPresented: $isShowingCropImageView) {
+      CropImageView(
+        image: viewModel.avatar,
+        type: .avatar
+      ) { cropppedImage in
+        if let cropppedImage {
+          viewModel.updateCropPhoto(with: cropppedImage)
+        }
+      }
+    }
     .sheet(item: $errorWrapper, onDismiss: {
       dismiss()
     }) { wrapper in

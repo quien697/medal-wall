@@ -10,9 +10,10 @@ import SwiftUI
 struct AvatarImage: View {
   private let systemImageName: String = "medal.fill"
   let photo: UIImage?
+  let cropPhoto: UIImage?
   
     var body: some View {
-      if let uiImage = photo {
+      if let uiImage = cropPhoto ?? photo {
         Image(uiImage: uiImage)
           .avatar()
       } else {
@@ -24,5 +25,5 @@ struct AvatarImage: View {
 }
 
 #Preview {
-  AvatarImage(photo: UIImage(named: "quien"))
+  AvatarImage(photo: UIImage(named: "quien"), cropPhoto: nil)
 }

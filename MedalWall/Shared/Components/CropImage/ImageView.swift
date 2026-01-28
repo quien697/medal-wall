@@ -92,7 +92,7 @@ struct ImageView: View {
         })
     ) // gesture
     .frame(width: type.size.width, height: type.size.height)
-    .cornerRadius(type == .medal ? type.size.height / 2 : 0)
+    .cornerRadius(type.cornerRadius)
   }
 }
 
