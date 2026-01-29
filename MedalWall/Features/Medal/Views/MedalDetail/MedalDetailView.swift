@@ -25,7 +25,7 @@ struct MedalDetailView: View {
     
     ScrollView {
       CardSection {
-        MedalBadge(photo: viewModel.medal.cropPhoto == nil ? viewModel.medal.photo : viewModel.medal.cropPhoto)
+        MedalBadge(photo: viewModel.medal.cropPhoto ?? viewModel.medal.photo)
         
         Text(viewModel.medal.title)
           .font(.title2)

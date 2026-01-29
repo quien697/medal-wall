@@ -15,6 +15,7 @@ final class User {
   var firstName: String
   var lastName: String
   var avatarData: Data?
+  var cropAvatarData: Data?
   var bio: String?
   var gender: String?
   var birthday: Date?
@@ -27,6 +28,7 @@ final class User {
     id: UUID = UUID(),
     name: UserName,
     avatarData: Data? = nil,
+    cropAvatarData: Data? = nil,
     bio: String? = nil,
     gender: Gender? = nil,
     birthday: Date? = nil,
@@ -37,6 +39,7 @@ final class User {
     self.firstName = name.firstName
     self.lastName = name.lastName
     self.avatarData = avatarData
+    self.cropAvatarData = cropAvatarData
     self.bio = bio
     self.gender = gender?.rawValue
     self.birthday = birthday
@@ -51,6 +54,14 @@ extension User {
   var avatar: UIImage? {
     if let avatarData {
       return UIImage(data: avatarData)
+    }
+    
+    return nil
+  }
+  
+  var cropAvatar: UIImage? {
+    if let cropAvatarData {
+      return UIImage(data: cropAvatarData)
     }
     
     return nil

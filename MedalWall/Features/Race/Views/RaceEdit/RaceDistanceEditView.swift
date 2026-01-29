@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RaceDistanceEditView: View {
   @Environment(\.dismiss) private var dismiss
+  
   @State private var draftDistance: RaceDistance
   @State private var customValue: Double
   

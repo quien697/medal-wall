@@ -9,8 +9,9 @@ import SwiftUI
 
 struct RaceFilterView: View {
   @Environment(\.dismiss) private var dismiss
-  @Binding var filter: RaceFilter
   @State private var draftFilter: RaceFilter
+  
+  @Binding var filter: RaceFilter
   
   init(filter: Binding<RaceFilter>) {
     self._filter = filter

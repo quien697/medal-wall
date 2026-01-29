@@ -28,7 +28,7 @@ struct MedalEditView: View {
   var body: some View {
     Form {
       Section("Photo") {
-        MedalBadge(photo: viewModel.cropPhoto == nil ? viewModel.photo : viewModel.cropPhoto)
+        MedalBadge(photo: viewModel.cropPhoto ?? viewModel.photo)
           .frame(maxWidth: .infinity)
           .confirmationDialog(
             "Edit Photo",
@@ -134,19 +134,6 @@ struct MedalEditView: View {
         .disabled(!viewModel.isFormValid)
       }
     } // toolbar
-    .sheet(item: $errorWrapper) { wrapper in
-      ErrorView(errorWrapper: wrapper)
-    }
-    .sheet(isPresented: $isShowingCropImageView) {
-      CropImageView(
-        image: viewModel.photo,
-        type: .medal
-      ) { cropppedImage in
-        if let cropppedImage {
-          viewModel.updateCropPhoto(with: cropppedImage)
-        }
-      }
-    }
     .photosPicker(isPresented: $isShowingPhotosPicker, selection: $selectedPhotoItem)
     .onChange(of: selectedPhotoItem) { _, newItem in
       guard let newItem else { return }
@@ -164,6 +151,19 @@ struct MedalEditView: View {
         }
       }
     } // onChange
+    .sheet(isPresented: $isShowingCropImageView) {
+      CropImageView(
+        image: viewModel.photo,
+        type: .medal
+      ) { cropppedImage in
+        if let cropppedImage {
+          viewModel.updateCropPhoto(with: cropppedImage)
+        }
+      }
+    }
+    .sheet(item: $errorWrapper) { wrapper in
+      ErrorView(errorWrapper: wrapper)
+    }
     .onAppear {
       // Ensure default race/category selection for new medals
       if viewModel.isNewMedal {

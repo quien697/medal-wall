@@ -10,7 +10,9 @@ import SwiftData
 
 struct MedalsView: View {
   @Environment(\.modelContext) private var modelContext
+  
   @State private var isShowingMedalAddView = false
+  
   private let spacing: CGFloat = 10
   private let size: CGFloat = ImageType.medal.size.width
   

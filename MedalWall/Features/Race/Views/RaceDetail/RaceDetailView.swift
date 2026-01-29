@@ -11,6 +11,7 @@ import SwiftData
 struct RaceDetailView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
+  
   @State private var isShowEditor = false
   @State private var isShowDeleteConfirm = false
   @State private var errorWrapper: ErrorWrapper?
