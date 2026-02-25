@@ -13,9 +13,11 @@ extension Medal {
     
     let taiepiRaceCategory = Race.sampleData[0].categories.first(where: { $0.distance == 42.195 })!
     let taipeiRace = taiepiRaceCategory.race
+    
     let taipeiMedal: Medal = Medal(
       title: "\(taipeiRace.name)",
       date: taipeiRace.date,
+      location: taipeiRace.location.formatted,
       result: "5:08:08",
       photoData: UIImage(named: "taipei-marathon-2020")?.jpegData(compressionQuality: 0.9),
       note: nil,
@@ -28,6 +30,7 @@ extension Medal {
     let vancouverMedal: Medal = Medal(
       title: "\(vancouverRace.name)",
       date: vancouverRace.date,
+      location: vancouverRace.location.formatted,
       result: "4:33:21",
       photoData: UIImage(named: "bmo-vancouver-marathon-2022")?.jpegData(compressionQuality: 0.9),
       note: nil,
@@ -35,7 +38,7 @@ extension Medal {
       raceCategory: vancouverRaceCategory,
     )
     
-    User.defaultUser.medals = [taipeiMedal, vancouverMedal]
+//    User.defaultUser.medals = [taipeiMedal, vancouverMedal]
     
     return [taipeiMedal, vancouverMedal]
   }()

@@ -20,9 +20,9 @@ struct SampleData: PreviewModifier {
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
     let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
     let context = ModelContext(container)
-    context.insert(User.defaultUser)
-    Race.sampleData.forEach { context.insert($0) }
-    Medal.sampleData.forEach { context.insert($0) }
+    context.insert(User.guest)
+//    Race.sampleData.forEach { context.insert($0) }
+//    Medal.sampleData.forEach { context.insert($0) }
     
     return container
   }

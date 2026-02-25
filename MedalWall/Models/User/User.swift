@@ -19,21 +19,21 @@ final class User {
   var bio: String?
   var gender: String?
   var birthday: Date?
-  var unit: String
-  
-  @Relationship(deleteRule: .cascade, inverse: \Medal.user)
-  var medals: [Medal] = []
+  var isGuest: Bool
+  var createdDate: Date
+  var updatedDate: Date
   
   init(
     id: UUID = UUID(),
-    name: UserName,
+    name: UserName = UserName(firstName: "", lastName: ""),
     avatarData: Data? = nil,
     cropAvatarData: Data? = nil,
     bio: String? = nil,
     gender: Gender? = nil,
     birthday: Date? = nil,
-    unit: MeasurementUnit = .km,
-    medals: [Medal] = []
+    isGuest: Bool = false,
+    createdDate: Date = Date(),
+    updatedDate: Date = Date()
   ) {
     self.id = id
     self.firstName = name.firstName
@@ -43,35 +43,8 @@ final class User {
     self.bio = bio
     self.gender = gender?.rawValue
     self.birthday = birthday
-    self.unit = unit.rawValue
-    self.medals = medals
-  }
-}
-
-/// Extends Race with computed values
-/// Will stay here until v2
-extension User {
-  var avatar: UIImage? {
-    if let avatarData {
-      return UIImage(data: avatarData)
-    }
-    
-    return nil
-  }
-  
-  var cropAvatar: UIImage? {
-    if let cropAvatarData {
-      return UIImage(data: cropAvatarData)
-    }
-    
-    return nil
-  }
-  
-  var genderEnum: Gender? {
-    Gender(rawValue: gender ?? "")
-  }
-  
-  var unitEnum: MeasurementUnit {
-    MeasurementUnit(rawValue: unit) ?? .km
+    self.isGuest = isGuest
+    self.createdDate = createdDate
+    self.updatedDate = updatedDate
   }
 }

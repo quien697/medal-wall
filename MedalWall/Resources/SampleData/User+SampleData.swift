@@ -16,4 +16,7 @@ extension User {
     gender: .male,
     birthday: DateComponents(calendar: .current, year: 1989, month: 11, day: 23).date!
   )
+  
+  @MainActor
+  static let guest: User = User()
 }

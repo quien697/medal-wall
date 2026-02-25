@@ -9,8 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct ProfileView: View {
-  @State private var isShowProfileAddView = false
-  @State private var isShowSettingsView = false
+  @State private var isShowingProfileAddView = false
+  @State private var isShowingSettingsView = false
   
   @Query private var users: [User]
   
@@ -26,7 +26,7 @@ struct ProfileView: View {
               cropPhoto: user.cropAvatar
             )
             
-            Text("\(user.firstName), \(user.lastName)")
+            Text("\(user.fullName)")
               .font(.title)
             
             if let bio = user.bio, !bio.isEmpty {
@@ -40,9 +40,9 @@ struct ProfileView: View {
             if let gender = user.genderEnum {
               CardRow(icon: "person.fill", value: gender.displayName)
             } else {
-              CardRow(icon: "person.fill", value: "-")
+              CardRow(icon: "person.fill", value: "Not Set")
             }
-          
+            
             if let birthday = user.birthday {
               CardRow(
                 icon: "calendar",
@@ -50,14 +50,14 @@ struct ProfileView: View {
                 withBottomLine: false
               )
             } else {
-              CardRow(icon: "calendar", value: "-")
+              CardRow(icon: "calendar", value: "Not Set")
             }
           } // CardSection
         } // ScrollView
         .toolbar {
           ToolbarItem(placement: .topBarTrailing) {
             Button("Settings", systemImage: "gearshape.fill") {
-              isShowSettingsView = true
+              isShowingSettingsView = true
             }
           }
         } // toolbar
@@ -66,7 +66,7 @@ struct ProfileView: View {
           Label("No User Found", systemImage: "person.fill")
         } description: {
           Button {
-            isShowProfileAddView = true
+            isShowingProfileAddView = true
           } label: {
             Text("Creating a new user")
               .padding(.top, 10)
@@ -74,12 +74,12 @@ struct ProfileView: View {
         } // ContentUnavailableView
       }
     } // Group
-    .sheet(isPresented: $isShowProfileAddView) {
+    .sheet(isPresented: $isShowingProfileAddView) {
       NavigationStack {
         ProfileAddView()
       }
     }
-    .sheet(isPresented: $isShowSettingsView) {
+    .sheet(isPresented: $isShowingSettingsView) {
       NavigationStack{
         SettingsView()
       }

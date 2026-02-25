@@ -114,15 +114,6 @@ struct ProfileEditForm: View {
           }
         }
       } // Section
-      
-      Section("Other") {
-        Picker("Measurement Unit", selection: $viewModel.unit) {
-          ForEach(MeasurementUnit.allCases, id: \.self) { unit in
-            Text(unit.displayName).tag(unit)
-          }
-        }
-        .pickerStyle(.navigationLink)
-      } // Section
     } // Form
     .toolbar {
       if viewModel.isNewProfile {
@@ -182,5 +173,5 @@ struct ProfileEditForm: View {
 }
 
 #Preview {
-  ProfileEditForm(profile: User.defaultUser)
+  ProfileEditForm(profile: User.guest)
 }

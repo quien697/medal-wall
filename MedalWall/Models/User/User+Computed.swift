@@ -1,0 +1,37 @@
+//
+//  User+Computed.swift
+//  MedalWall
+//
+//  Created by Quien on 2026-02-24.
+//
+
+import UIKit
+
+/// Extends Race with computed values
+extension User {
+  var avatar: UIImage? {
+    if let avatarData {
+      return UIImage(data: avatarData)
+    }
+    
+    return nil
+  }
+  
+  var cropAvatar: UIImage? {
+    if let cropAvatarData {
+      return UIImage(data: cropAvatarData)
+    }
+    
+    return nil
+  }
+  
+  var genderEnum: Gender? {
+    Gender(rawValue: gender ?? "")
+  }
+  
+  var userName: UserName {
+    UserName(firstName: firstName, lastName: lastName)
+  }
+  
+  var fullName: String { userName.fullName }
+}

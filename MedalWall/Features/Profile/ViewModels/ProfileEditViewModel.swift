@@ -19,7 +19,6 @@ class ProfileEditViewModel {
   var gender: Gender? = nil
   var birthday: Date = .now
   var isBirthdaySet: Bool = false
-  var unit: MeasurementUnit = .km
   var isNewProfile: Bool = true
   
   private let repository: UserRepository
@@ -31,7 +30,10 @@ class ProfileEditViewModel {
     
     if let profile {
       self.profile = profile
-      self.userName = UserName(firstName: profile.firstName, lastName: profile.lastName)
+      self.userName = UserName(
+        firstName: profile.firstName,
+        lastName: profile.lastName
+      )
       self.avatarData = profile.avatarData
       self.avatar = profile.avatar
       self.cropAvatarData = profile.cropAvatarData
@@ -42,7 +44,6 @@ class ProfileEditViewModel {
         self.birthday = birthday
         self.isBirthdaySet = true
       }
-      self.unit = profile.unitEnum
       self.isNewProfile = false
     }
   }
@@ -52,8 +53,8 @@ class ProfileEditViewModel {
   }
   
   var isFormValid: Bool {
-    !userName.firstName.trimmingCharacters(in: .whitespaces).isEmpty &&
-    !userName.lastName.trimmingCharacters(in: .whitespaces).isEmpty
+    !userName.trimmedFirstName.isEmpty &&
+    !userName.trimmedLastName.isEmpty
   }
   
   func updatePhoto(with data: Data?) {
@@ -77,17 +78,17 @@ class ProfileEditViewModel {
     self.cropAvatarData = nil
     self.cropAvatar = nil
   }
-
+  
   func save() throws {
     if let profile {
-      profile.firstName = userName.firstName
-      profile.lastName = userName.lastName
+      profile.firstName = userName.trimmedFirstName
+      profile.lastName = userName.trimmedLastName
       profile.avatarData = avatarData
       profile.cropAvatarData = cropAvatarData
       profile.bio = bio
       profile.gender = gender?.rawValue
       profile.birthday = isBirthdaySet ? birthday : nil
-      profile.unit = unit.rawValue
+      profile.updatedDate = Date()
     } else {
       let newProfile = User(
         name: userName,
@@ -96,7 +97,6 @@ class ProfileEditViewModel {
         bio: bio,
         gender: gender,
         birthday: isBirthdaySet ? birthday : nil,
-        unit: unit
       )
       
       try repository.insertUser(newProfile)
