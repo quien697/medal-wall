@@ -22,7 +22,6 @@ struct ProfileEditViewModelTests {
     #expect(vm.bio.isEmpty)
     #expect(vm.gender == nil)
     #expect(vm.isBirthdaySet == false)
-    #expect(vm.unit == .km)
   }
   
   @Test("Init loads existing profile")
@@ -44,7 +43,6 @@ struct ProfileEditViewModelTests {
     #expect(vm.avatarData == avatarData)
     #expect(vm.gender == .male)
     #expect(vm.isBirthdaySet)
-    #expect(vm.unit == .km)
   }
   
   @Test("Form validation works")
@@ -65,7 +63,7 @@ struct ProfileEditViewModelTests {
     #expect(vm.avatarData == nil)
     #expect(vm.avatar == nil)
     
-    vm.updateAvatar(with: data)
+    vm.updatePhoto(with: data)
     
     #expect(vm.avatarData == data)
     #expect(vm.avatar != nil)
@@ -79,7 +77,7 @@ struct ProfileEditViewModelTests {
     #expect(vm.avatarData == nil)
     #expect(vm.avatar == nil)
     
-    vm.updateAvatar(with: invalid)
+    vm.updatePhoto(with: invalid)
     
     #expect(vm.avatarData == invalid)
     #expect(vm.avatar == nil)
@@ -89,12 +87,12 @@ struct ProfileEditViewModelTests {
   func testClearAvatar() throws {
     let vm = ProfileEditViewModel(profile: nil)
     let data = UIImage(named: "quien")?.jpegData(compressionQuality: 0.9)
-    vm.updateAvatar(with: data)
+    vm.updatePhoto(with: data)
     
     #expect(vm.avatarData == data)
     #expect(vm.avatar != nil)
     
-    vm.clearAvatar()
+    vm.clearPhoto()
     
     #expect(vm.avatarData == nil)
     #expect(vm.avatar == nil)

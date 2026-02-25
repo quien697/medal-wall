@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// Extends Race with computed values
+/// Extends User with computed values
 extension User {
   var avatar: UIImage? {
     if let avatarData {
@@ -26,7 +26,9 @@ extension User {
   }
   
   var genderEnum: Gender? {
-    Gender(rawValue: gender ?? "")
+    guard let gender = gender else { return nil }
+    
+    return Gender(rawValue: gender)
   }
   
   var userName: UserName {

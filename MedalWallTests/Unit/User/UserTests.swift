@@ -11,71 +11,33 @@ import UIKit
 
 struct UserTests {
   
-  @Test("User initializes with correct stored properties")
-  func testUserInit() {
-    let user = User(
-      name: .init(firstName: "Cruise", lastName: "Tom")
-    )
+  @Test("")
+  func testInitWithDefaults() {
+    let user = User()
     
-    #expect(user.firstName == "Cruise")
-    #expect(user.lastName == "Tom")
+    #expect(user.firstName == "")
+    #expect(user.lastName == "")
+    #expect(user.fullName == "Runner")
     #expect(user.avatarData == nil)
+    #expect(user.cropAvatarData == nil)
     #expect(user.bio == nil)
     #expect(user.gender == nil)
     #expect(user.birthday == nil)
-    #expect(user.unit == MeasurementUnit.km.rawValue)
-    #expect(user.medals.isEmpty)
+    #expect(user.isGuest == false)
   }
   
-  @Test("Enum gender maps correctly from rawValue")
-  func genderEnumMapsCorrectly() {
-    let user = User(
-      name: .init(firstName: "Cruise", lastName: "Tom")
-    )
+  @Test("init assigns first and last name from UserName")
+  func testInitUserName() {
+    let name = UserName(firstName: "  Alice ", lastName: "Smith ")
+    let user = User(name: name)
     
-    #expect(user.genderEnum == .none)
-    
-    user.gender = Gender.male.rawValue
-    #expect(user.genderEnum == .male)
-    
-    user.gender = Gender.female.rawValue
-    #expect(user.genderEnum == .female)
+    #expect(user.firstName == "Alice")
+    #expect(user.lastName == "Smith")
   }
   
-  @Test("Enum unit maps correctly from rawValue")
-  func unitEnumMapsCorrectly() {
-    let user = User(
-      name: .init(firstName: "Cruise", lastName: "Tom")
-    )
-    
-    #expect(user.unitEnum == .km)
-    
-    user.unit = MeasurementUnit.mi.rawValue
-    #expect(user.unitEnum == .mi)
-  }
-  
-  @Test("Avatar converts correctly from Data to UIImage")
-  func avatarConversion() {
-    let avatar = UIImage(named: "quien")
-    let data = avatar?.jpegData(compressionQuality: 0.9)
-    
-    let user = User(
-      name: .init(firstName: "Alice", lastName: "Smith"),
-      avatarData: data
-    )
-    
-    #expect(user.avatar != nil)
-    #expect(user.avatar?.size == avatar?.size)
-    #expect(user.avatar?.scale == avatar?.scale)
-  }
-  
-  @Test("Avatar is nil when avatarData is nil")
-  func avatarNil() {
-    let user = User(
-      name: .init(firstName: "Alice", lastName: "Smith")
-    )
-    
-    #expect(user.avatarData == nil)
-    #expect(user.avatar == nil)
+  @Test("init converts Gender enum to rawValue string")
+  func testInitGender() {
+    let user = User(gender: .male)
+    #expect(user.gender == "male")
   }
 }

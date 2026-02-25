@@ -36,8 +36,8 @@ final class User {
     updatedDate: Date = Date()
   ) {
     self.id = id
-    self.firstName = name.firstName
-    self.lastName = name.lastName
+    self.firstName = name.trimmedFirstName
+    self.lastName = name.trimmedLastName
     self.avatarData = avatarData
     self.cropAvatarData = cropAvatarData
     self.bio = bio
