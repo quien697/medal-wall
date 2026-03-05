@@ -12,37 +12,35 @@ struct MedalCardSection: View {
   let spacing: CGFloat
   
   var body: some View {
-    let category = RaceDistanceCategory(value: medal.raceCategory.distance)
-    
-    CardSection(padding: spacing, margin: 0) {
-      MedalBadge(photo: medal.cropPhoto == nil ? medal.photo : medal.cropPhoto)
-      
-      VStack(alignment: .leading, spacing: spacing) {
-        Text(medal.title)
-          .font(.headline)
-          .lineLimit(1)
-        
-        HStack {
-          Text(medal.date.formatted(date: .abbreviated, time: .omitted))
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .truncationMode(.tail)
-          
-          Spacer()
-          
-          Text(category.description)
-            .font(.caption2)
-            .bold()
-            .padding(.horizontal, 6)
-            .padding(.vertical, 4)
-            .background(category.translucentColor)
-            .clipShape(.rect(cornerRadius: 6) )
-            
-        } // HStack
-      } // VStack
-      .padding(.horizontal, spacing * 0.5)
-      .padding(.bottom, spacing)
-    } // CardSection
+//    CardSection {
+//      MedalBadge(photo: medal.cropPhoto == nil ? medal.photo : medal.cropPhoto)
+//      
+//      VStack(alignment: .leading, spacing: spacing) {
+//        Text(medal.title)
+//          .font(.headline)
+//          .lineLimit(1)
+//        
+//        HStack {
+//          Text(medal.date.formatted(date: .abbreviated, time: .omitted))
+//            .font(.caption)
+//            .foregroundStyle(.secondary)
+//            .truncationMode(.tail)
+//          
+//          Spacer()
+//          
+//          Text(medal.raceDistanceCategory.description)
+//            .font(.caption2)
+//            .bold()
+//            .padding(.horizontal, 6)
+//            .padding(.vertical, 4)
+//            .background(medal.raceDistanceCategory.translucentColor)
+//            .clipShape(.rect(cornerRadius: 6) )
+//            
+//        } // HStack
+//      } // VStack
+//      .padding(.horizontal, spacing * 0.5)
+//      .padding(.bottom, spacing)
+//    } // CardSection
   }
 }
 

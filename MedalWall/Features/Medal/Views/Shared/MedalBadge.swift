@@ -60,9 +60,7 @@ struct MedalBadge: View {
   }
 }
 
-#Preview {
-  let size: CGFloat = 160
-  
+#Preview {  
   VStack(spacing: 20) {
     MedalBadge(photo: nil)
     

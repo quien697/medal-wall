@@ -41,8 +41,8 @@ final class MedalEditViewModel {
       self.cropPhoto = medal.cropPhoto
       self.note = medal.note ?? ""
       self.user = medal.user
-      self.selectedRaceID = medal.raceCategory.race.id
-      self.selectedRaceCategoryID = medal.raceCategory.id
+//      self.selectedRaceID = medal.raceCategory.race.id
+//      self.selectedRaceCategoryID = medal.raceCategory.id
       self.isNewMedal = false
     }
   }
@@ -88,12 +88,12 @@ final class MedalEditViewModel {
       medal.cropPhotoData = cropPhotoData
       medal.note = note.isEmpty ? nil : note
 
-      if let categoryID = selectedRaceCategoryID {
-        let categories = try context.fetch(FetchDescriptor<RaceCategory>())
-        if let newCategory = categories.first(where: { $0.id == categoryID }) {
-          medal.raceCategory = newCategory
-        }
-      }
+//      if let categoryID = selectedRaceCategoryID {
+//        let categories = try context.fetch(FetchDescriptor<RaceCategory>())
+//        if let newCategory = categories.first(where: { $0.id == categoryID }) {
+//          medal.raceCategory = newCategory
+//        }
+//      }
     } else {
       guard let user = user else { throw AppError.unknown }
       guard let categoryID = selectedRaceCategoryID else { throw AppError.unknown }
@@ -103,6 +103,7 @@ final class MedalEditViewModel {
       let newMedal = Medal(
         title: title,
         date: date,
+        location: category.race.location.formatted,
         result: result.isEmpty ? nil : result,
         photoData: photoData,
         cropPhotoData: cropPhotoData,

@@ -21,50 +21,48 @@ struct MedalDetailView: View {
   }
   
   var body: some View {
-    let category = RaceDistanceCategory(value: viewModel.medal.raceCategory.distance)
-    
     ScrollView {
-      CardSection {
-        MedalBadge(photo: viewModel.medal.cropPhoto ?? viewModel.medal.photo)
-        
-        Text(viewModel.medal.title)
-          .font(.title2)
-          .bold()
-        
-        Text(viewModel.medal.raceCategory.race.location.formatted)
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
-      } // CardSection
+//      CardSection {
+//        MedalBadge(photo: viewModel.medal.cropPhoto ?? viewModel.medal.photo)
+//        
+//        Text(viewModel.medal.title)
+//          .font(.title2)
+//          .bold()
+//        
+//        Text(viewModel.medal.location)
+//          .font(.subheadline)
+//          .foregroundStyle(.secondary)
+//      } // CardSection
       
-      CardSection(title: "Details", alignment: .leading, spacing: 10) {
-        CardRow(
-          label: "Date",
-          value: viewModel.medal.date.formatted(date: .abbreviated, time: .omitted)
-        )
-        
-        CardRow(
-          label: "Distance",
-          value: "\(category.description) (\(RaceDistanceType(rawValue: viewModel.medal.raceCategory.type)!.displayName))"
-        )
-        
-        CardRow(
-          label: "Result",
-          value: viewModel.medal.result ?? "-- : -- : --",
-          withBottomLine: false
-        )
-      } // CardSection
+//      CardSection {
+//        CardRow(
+//          label: "Date",
+//          value: viewModel.medal.date.formatted(date: .abbreviated, time: .omitted)
+//        )
+//        
+//        CardRow(
+//          label: "Distance",
+//          value: "\(viewModel.medal.raceDistanceCategory.description) (\(viewModel.medal.raceDistanceType.displayName))"
+//        )
+//        
+//        CardRow(
+//          label: "Result",
+//          value: viewModel.medal.result ?? "-- : -- : --",
+//          withBottomLine: false
+//        )
+//      } // CardSection
       
-      CardSection(title: "Notes", alignment: .leading) {
-        if let note = viewModel.medal.note, !note.isEmpty {
-          Text(note)
-            .font(.body)
-            .foregroundStyle(.primary)
-        } else {
-          Text("No notes")
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-        }
-      } // CardSection
+//      CardSection(alignment: .leading) {
+//        if let note = viewModel.medal.note, !note.isEmpty {
+//          Text(note)
+//            .font(.body)
+//            .foregroundStyle(.primary)
+//        } else {
+//          Text("No notes")
+//            .font(.subheadline)
+//            .foregroundStyle(.secondary)
+//        }
+//      } // CardSection
     } // ScrollView
     .padding(.horizontal)
     .background(.ultraThinMaterial)
