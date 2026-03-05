@@ -13,28 +13,62 @@ struct AvatarImage: View {
   let cropPhoto: UIImage?
   
   var body: some View {
-    if let uiImage = cropPhoto ?? photo {
-      Image(uiImage: uiImage)
-        .avatar()
-    } else {
+    ZStack {
+      // Outer ring/border
       Circle()
-        .fill(Color(.systemGray5))
+        .fill(
+          LinearGradient(
+            colors: [
+              Color("BadgeGoldPrimary"),
+              Color("BadgeGoldSecondary")
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+          )
+        )
+        .frame(
+          width: ImageType.avatar.size.width * 1.1,
+          height: ImageType.avatar.size.height * 1.1
+        )
+      
+      // Inner circle
+      Circle()
+        .fill(
+          LinearGradient(
+            colors: [
+              Color("BadgeGoldPrimary"),
+              Color("BadgeGoldSecondary")
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+          )
+        )
         .frame(
           width: ImageType.avatar.size.width,
           height: ImageType.avatar.size.height
         )
+        .shadow(
+          color: Color("BadgeGoldPrimary").opacity(0.5),
+          radius: 8,
+          x: 0,
+          y: 10
+        )
         .overlay {
-          Image(systemName: systemImageName)
-            .font(.system(size: 50, weight: .semibold))
-            .foregroundColor(.gray)
+          if let uiImage = cropPhoto ?? photo {
+            Image(uiImage: uiImage)
+              .avatar()
+          } else {
+            Image(systemName: systemImageName)
+              .font(.system(size: 50, weight: .semibold))
+              .foregroundColor(.white)
+          }
         }
     }
   }
 }
 
-
 #Preview {
   AvatarImage(photo: UIImage(named: "quien"), cropPhoto: nil)
-  
+  AvatarImage(photo: UIImage(named: "taipei-marathon-2020"), cropPhoto: nil)
   AvatarImage(photo: nil, cropPhoto: nil)
 }
