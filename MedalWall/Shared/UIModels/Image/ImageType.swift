@@ -9,6 +9,7 @@ import SwiftUI
 
 enum ImageType {
   // Profile
+  case avatarThumbnail
   case avatar
   
   // Race
@@ -22,14 +23,14 @@ enum ImageType {
 extension ImageType {
   var contentMode: ContentMode {
     switch self {
-    case .avatar, .medal, .raceHero, .raceThumbnail:
+    case .avatarThumbnail, .avatar, .medal, .raceHero, .raceThumbnail:
       return .fill
     }
   }
   
   var shape: AnyShape {
     switch self {
-    case .avatar, .medal:
+    case .avatarThumbnail, .avatar, .medal:
       return AnyShape(Circle())
     case .raceThumbnail, .raceHero:
       return AnyShape(.rect(cornerRadius: 12))
@@ -38,7 +39,7 @@ extension ImageType {
   
   var cornerRadius: CGFloat {
      switch self {
-     case .avatar, .medal:
+     case .avatarThumbnail, .avatar, .medal:
        return size.height / 2
      case .raceThumbnail, .raceHero:
        return 0
@@ -47,6 +48,8 @@ extension ImageType {
   
   var size: CGSize {
     switch self {
+    case .avatarThumbnail:
+      return CGSize(width: 60, height: 60)
     case .avatar:
       return CGSize(width: 100, height: 100)
     case .raceThumbnail:
@@ -72,8 +75,8 @@ extension Image {
 
 extension Image {
   
-  func avatar() -> some View {
-    self.styled(as: .avatar)
+  func avatar(type: ImageType) -> some View {
+    self.styled(as: type)
   }
   
   func raceThumbnail() -> some View {

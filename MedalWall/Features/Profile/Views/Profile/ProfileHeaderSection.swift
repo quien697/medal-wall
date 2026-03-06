@@ -26,6 +26,7 @@ struct ProfileHeaderSection: View {
             .font(.title)
             .fontWeight(.bold)
             .lineLimit(1)
+            .minimumScaleFactor(0.5)
           
           if let bio = bio, !bio.isEmpty {
             Text(bio)

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProfileAddView: View {
   var body: some View {
-    ProfileEditForm(profile: nil)
+    ProfileEditView(profile: nil)
   }
 }
 

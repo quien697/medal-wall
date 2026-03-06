@@ -11,6 +11,17 @@ struct AvatarImage: View {
   private let systemImageName: String = "person.fill"
   let photo: UIImage?
   let cropPhoto: UIImage?
+  let imageType: ImageType
+  
+  init(
+    photo: UIImage?,
+    cropPhoto: UIImage?,
+    imageType: ImageType = .avatar
+  ) {
+    self.photo = photo
+    self.cropPhoto = cropPhoto
+    self.imageType = imageType
+  }
   
   var body: some View {
     ZStack {
@@ -27,8 +38,8 @@ struct AvatarImage: View {
           )
         )
         .frame(
-          width: ImageType.avatar.size.width * 1.1,
-          height: ImageType.avatar.size.height * 1.1
+          width: imageType.size.width * 1.1,
+          height: imageType.size.height * 1.1
         )
       
       // Inner circle
@@ -44,8 +55,8 @@ struct AvatarImage: View {
           )
         )
         .frame(
-          width: ImageType.avatar.size.width,
-          height: ImageType.avatar.size.height
+          width: imageType.size.width,
+          height: imageType.size.height
         )
         .shadow(
           color: Color("BadgeGoldPrimary").opacity(0.5),
@@ -56,10 +67,10 @@ struct AvatarImage: View {
         .overlay {
           if let uiImage = cropPhoto ?? photo {
             Image(uiImage: uiImage)
-              .avatar()
+              .avatar(type: imageType)
           } else {
             Image(systemName: systemImageName)
-              .font(.system(size: 50, weight: .semibold))
+              .font(.system(size: imageType.size.width / 2, weight: .semibold))
               .foregroundColor(.white)
           }
         }
@@ -71,4 +82,20 @@ struct AvatarImage: View {
   AvatarImage(photo: UIImage(named: "quien"), cropPhoto: nil)
   AvatarImage(photo: UIImage(named: "taipei-marathon-2020"), cropPhoto: nil)
   AvatarImage(photo: nil, cropPhoto: nil)
+  
+  AvatarImage(
+    photo: UIImage(named: "quien"),
+    cropPhoto: nil,
+    imageType: .avatarThumbnail
+  )
+  AvatarImage(
+    photo: UIImage(named: "taipei-marathon-2020"),
+    cropPhoto: nil,
+    imageType: .avatarThumbnail
+  )
+  AvatarImage(
+    photo: nil,
+    cropPhoto: nil,
+    imageType: .avatarThumbnail
+  )
 }
