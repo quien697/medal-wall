@@ -23,11 +23,7 @@ struct SectionContainer<Content: View>: View {
     VStack(alignment: .leading) {
       if let title {
         Text(title)
-          .font(.headline)
-          .fontWeight(.heavy)
-          .fontDesign(.rounded)
-          .textCase(.uppercase)
-          .foregroundStyle(Color.Text.tertiary)
+          .sectionTitleStyle()
       }
       
       content
