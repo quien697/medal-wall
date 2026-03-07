@@ -53,12 +53,12 @@ struct ProfileView: View {
         } // ContentUnavailableView
       }
     } // Group
-    //    .sheet(isPresented: $isShowingProfileAddView) {
-    //      NavigationStack {
-    //        ProfileAddView()
-    //      }
-    //    }
-    .background(Color.backgroundPrimary)
+    .background(Color.Background.primary)
+    .sheet(isPresented: $isShowingProfileAddView) {
+      NavigationStack {
+        ProfileAddView()
+      }
+    }
     .sheet(isPresented: $isShowingSettingsView) {
       NavigationStack{
         SettingsView()
