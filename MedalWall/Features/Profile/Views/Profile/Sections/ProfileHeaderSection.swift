@@ -43,7 +43,7 @@ struct ProfileHeaderSection: View {
 
 #Preview {
   VStack {
-    ProfileHeaderSection(avatar: UIImage(named: "quien"), cropAvatar: nil, userName: "Tsung-Hsun Liu", bio: "Fike it till make it.")
+    ProfileHeaderSection(avatar: UIImage(named: "quien"), cropAvatar: nil, userName: "Tsung-Hsun Liu", bio: "I am here to cross the finish line.")
     
     ProfileHeaderSection(avatar: nil, cropAvatar: nil, userName: "Tsung-Hsun Liu", bio: "Fike it till make it.")
   }

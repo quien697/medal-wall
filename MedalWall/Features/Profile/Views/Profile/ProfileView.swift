@@ -9,16 +9,13 @@ import SwiftUI
 import SwiftData
 
 struct ProfileView: View {
+  @Environment(UserManager.self) private var userManager
   @State private var isShowingProfileAddView = false
   @State private var isShowingSettingsView = false
   
-  @Query private var users: [User]
-  
-  private var user: User? { users.first }
-  
   var body: some View {
     Group {
-      if let user {
+      if let user = userManager.currentUser {
         ScrollView {
           ProfileHeaderSection(
             avatar: user.avatar,
@@ -68,5 +65,8 @@ struct ProfileView: View {
 }
 
 #Preview(traits: .sampleData) {
+  @Previewable @Environment(\.modelContext) var modelContext
+  
   ProfileView()
+    .environment(UserManager(modelContext: modelContext))
 }

@@ -10,14 +10,12 @@ import SwiftData
 
 struct SettingsView: View {
   @Environment(\.dismiss) private var dismiss
-  
-  @Query private var users: [User]
-  private var user: User? { users.first }
+  @Environment(UserManager.self) private var userManager
   
   var body: some View {
     List {
       Section {
-        if let user = users.first {
+        if let user = userManager.currentUser {
           NavigationLink {
             ProfileEditView(profile: user)
           } label: {
@@ -72,6 +70,9 @@ struct SettingsView: View {
   }
 }
 
-#Preview {
+#Preview(traits: .sampleData) {
+  @Previewable @Environment(\.modelContext) var modelContext
+  
   SettingsView()
+    .environment(UserManager(modelContext: modelContext))
 }
