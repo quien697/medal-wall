@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import UIKit
 import SwiftData
 
 @Model
@@ -15,81 +14,42 @@ final class Race {
   var name: String
   var photoData: Data?
   var cropPhotoData: Data?
-  var date: Date
   var country: String
   var province: String?
   var city: String
   var district: String?
-  var sport: String
-  var type: String
   var url: String?
-  var updateTime: Date
+  var createBy: UUID
+  var createdDate: Date
+  var updatedDate: Date
   
-  @Relationship(deleteRule: .cascade, inverse: \RaceCategory.race)
-  var categories: [RaceCategory] = []
+  @Relationship(deleteRule: .cascade, inverse: \RaceEdition.race)
+  var editions: [RaceEdition] = []
   
   init(
     id: UUID = UUID(),
     name: String,
     photoData: Data? = nil,
     cropPhotoData: Data? = nil,
-    date: Date,
     location: RaceLocation,
-    sport: Sport = .running,
-    type: RaceType = .road,
     url: String? = nil,
-    updateTime: Date = .now,
-    categories: [RaceCategory] = []
+    createBy: UUID,
+    createdDate: Date = .now,
+    updatedDate: Date = .now,
+    editions: [RaceEdition] = []
   ) {
     self.id = id
     self.name = name
     self.photoData = photoData
     self.cropPhotoData = cropPhotoData
-    self.date = date
     self.country = location.country
     self.province = location.province
     self.city = location.city
     self.district = location.district
-    self.sport = sport.rawValue
-    self.type = type.rawValue
     self.url = url
-    self.updateTime = updateTime
-  }
-}
-
-/// Extends Race with computed values
-/// Will stay here until v2
-extension Race {
-  var photo: UIImage? {
-    if let photoData {
-      return UIImage(data: photoData)
-    }
-    
-    return nil
-  }
-  
-  var cropPhoto: UIImage? {
-    if let cropPhotoData {
-      return UIImage(data: cropPhotoData)
-    }
-    
-    return nil
-  }
-  
-  var location: RaceLocation {
-    RaceLocation(
-      country: country,
-      province: province,
-      city: city,
-      district: district
-    )
-  }
-  var distances: [RaceDistance] {
-    categories.map {
-      RaceDistance(
-        category: RaceDistanceCategory(value: $0.distance),
-        type: RaceDistanceType(rawValue: $0.type) ?? .inPerson
-      )
-    }
+    self.createBy = createBy
+    self.createdDate = createdDate
+    self.updatedDate = updatedDate
+    self.editions = editions
   }
 }

@@ -10,7 +10,7 @@ import SwiftData
 
 @Observable
 final class RacesViewModel {
-  private let repository: RaceRepository
+  private var repository: RaceRepository?
   var races: [Race]
   var filter: RaceFilter
   
@@ -23,14 +23,18 @@ final class RacesViewModel {
   init(
     races: [Race],
     filter: RaceFilter,
-    modelContext: ModelContext
   ) {
     self.races = races
     self.filter = filter
-    self.repository = RaceRepository(context: modelContext)
+  }
+  
+  func configure(context: ModelContext) {
+    self.repository = RaceRepository(context: context)
   }
   
   func deleteRace(_ race: Race) throws {
+    guard let repository else { throw AppError.contextNotAttached }
+    
     try repository.deleteRace(race)
     try repository.save()
   }
@@ -50,7 +54,7 @@ final class RacesViewModel {
 //      }()
       
 //      return typeMatch && categoryMatch
-      return false
+      return true
     }
   }
   

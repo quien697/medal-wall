@@ -13,8 +13,9 @@ struct MedalWallApp: App {
   var sharedModelContainer: ModelContainer = {
     let schema = Schema([
       User.self,
-      //      Race.self,
-      //      RaceCategory.self,
+      Race.self,
+      RaceEdition.self,
+      RaceCategory.self,
       //      Medal.self,
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)

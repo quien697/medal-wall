@@ -20,10 +20,10 @@ struct RacesView: View {
   @Query(sort: \Race.name, animation: .default) private var races: [Race]
   
   var body: some View {
-//    let viewModel = RacesViewModel(races: races, filter: filter)
+    let viewModel = RacesViewModel(races: races, filter: filter)
     
     Group {
-      if races.isEmpty {
+      if viewModel.races.isEmpty {
         ContentUnavailableView {
           Label("No Results", systemImage: "magnifyingglass")
         } description: {
@@ -31,24 +31,34 @@ struct RacesView: View {
         }
         .background(Color.Background.primary)
       } else {
-        List(races, selection: $selectedRace) { race in
-          NavigationLink {
-            RaceDetailView(race: race)
-          } label: {
-            RaceRowView(race: race)
-              .swipeActions(edge: .trailing) {
-                Button(role: .destructive) {
-                  selectedRace = race
-                  isShowDeleteConfirm = true
-                } label: {
-                  Label("Delete", systemImage: "trash")
-                }
-              }
+        if viewModel.visibleRaces.isEmpty {
+          ContentUnavailableView {
+            Label("No Results", systemImage: "magnifyingglass")
+          } description: {
+            Text("No rsults found")
           }
+          .background(Color.Background.primary)
+          
+        } else {
+          List(viewModel.visibleRaces, selection: $selectedRace) { race in
+            NavigationLink {
+              RaceDetailView(race: race)
+            } label: {
+              RaceRowView(race: race)
+                .swipeActions(edge: .trailing) {
+                  Button(role: .destructive) {
+                    selectedRace = race
+                    isShowDeleteConfirm = true
+                  } label: {
+                    Label("Delete", systemImage: "trash")
+                  }
+                }
+            }
+          }
+          .scrollContentBackground(.hidden)
+          .background(Color.Background.primary)
+          .animation(.default, value: viewModel.visibleRaces)
         }
-        .scrollContentBackground(.hidden)
-        .background(Color.Background.primary)
-//          .animation(.default, value: viewModel.visibleRaces)
       }
     } // Group
     .background(Color.Background.primary)
@@ -64,16 +74,17 @@ struct RacesView: View {
       
       ToolbarItem(placement: .topBarTrailing) {
         Button("Filter", systemImage: "ellipsis") {
-//          isShowFilterView = true
+          //          isShowFilterView = true
         }
       }
     }
-//    .onAppear {
-//      viewModel.races = races
-//    }
-//    .onChange(of: races) {
-//      viewModel.races = races
-//    }
+    .onAppear {
+      viewModel.configure(context: modelContext)
+      viewModel.races = races
+    }
+    .onChange(of: races) {
+      viewModel.races = races
+    }
     .sheet(isPresented: $isShowAddView) {
       RaceAddView()
     }
@@ -82,21 +93,20 @@ struct RacesView: View {
         RaceFilterView(filter: $filter)
       }
     }
-//    .alert(isPresented: $isShowDeleteConfirm) {
-//      .deleteConfirmation(
-//        name: selectedRace?.name ?? "Race",
-//        onDelete: {
-//          if let race = selectedRace {
-//            do {
-//              try viewModel.attachContext(modelContext)
-//              try viewModel.deleteRace(race)
-//            } catch {
-//              errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
-//            }
-//          }
-//        }
-//      )
-//    } // alert
+    .alert(isPresented: $isShowDeleteConfirm) {
+      .deleteConfirmation(
+        name: selectedRace?.name ?? "Race",
+        onDelete: {
+          if let race = selectedRace {
+            do {
+              try viewModel.deleteRace(race)
+            } catch {
+              errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
+            }
+          }
+        }
+      )
+    } // alert
   }
 }
 

@@ -16,17 +16,17 @@ final class RaceCategory {
   var distance: Double
   var type: String
   
-  @Relationship var race: Race
+  @Relationship var raceEdition: RaceEdition
   
   init(
     id: UUID = UUID(),
     distance: RaceDistance,
-    race: Race
+    raceEdition: RaceEdition
   ) {
     self.id = id
     self.name = distance.category.description
     self.distance = distance.category.value
     self.type = distance.type.rawValue
-    self.race = race
+    self.raceEdition = raceEdition
   }
 }

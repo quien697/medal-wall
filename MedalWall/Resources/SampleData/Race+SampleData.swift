@@ -11,62 +11,142 @@ import UIKit
 extension Race {
   @MainActor
   static let sampleData: [Race] = {
+    let userId = User.defaultUser.id
+    
     let taipei: Race = Race(
       name: "Taipei Marathon",
       photoData: UIImage(named: "taipei-marathon")?.jpegData(compressionQuality: 0.9),
-      date: DateComponents(calendar: .current, year: 2025, month: 12, day: 21).date!,
       location: RaceLocation(
         country: "Taiwan",
         city: "Taipei"
       ),
       url: "https://taipeicitymarathon.com",
-      updateTime: .now,
+      createBy: userId
     )
+    
+    let taipeiDate2019 = DateComponents(calendar: .current, year: 2025, month: 12, day: 21)
+    let taipei2019: RaceEdition = RaceEdition(
+      year: taipeiDate2019.year!,
+      date: taipeiDate2019.date!,
+      photoData: UIImage(named: "taipei-marathon-2019")?.jpegData(compressionQuality: 0.9),
+      createBy: userId,
+      race: taipei,
+      categories: []
+    )
+    
+    let taipeiDate2025 = DateComponents(calendar: .current, year: 2025, month: 12, day: 21)
+    let taipei2025: RaceEdition = RaceEdition(
+      year: taipeiDate2025.year!,
+      date: taipeiDate2025.date!,
+      createBy: userId,
+      race: taipei,
+      categories: []
+    )
+    
+    taipei.editions = [taipei2019, taipei2025]
+    
+    taipei2019.categories = [
+      RaceCategory(
+        distance: RaceDistance(category: .full, type: .inPerson),
+        raceEdition: taipei2019
+      ),
+      RaceCategory(
+        distance: RaceDistance(category: .half, type: .inPerson),
+        raceEdition: taipei2019
+      ),
+    ]
+    
+    taipei2025.categories = [
+      RaceCategory(
+        distance: RaceDistance(category: .full, type: .inPerson),
+        raceEdition: taipei2019
+      ),
+      RaceCategory(
+        distance: RaceDistance(category: .half, type: .inPerson),
+        raceEdition: taipei2019
+      ),
+      RaceCategory(
+        distance: RaceDistance(category: .half, type: .virtual),
+        raceEdition: taipei2019
+      )
+    ]
+    
     let vancouver: Race = Race(
       name: "BMO Vancouver Marathon",
       photoData: UIImage(named: "bmo-vancouver-marathon")?.pngData(),
-      date: DateComponents(calendar: .current, year: 2026, month: 5, day: 3).date!,
       location: RaceLocation(
         country: "Canada",
         province: "BC",
         city: "Vancouver"
       ),
       url: "https://bmovanmarathon.ca/",
-      updateTime: .now,
+      createBy: userId
     )
     
-    taipei.categories = [
+    let vancouverDate2022 = DateComponents(calendar: .current, year: 2022, month: 5, day: 1)
+    let vancouver2022: RaceEdition = RaceEdition(
+      year: vancouverDate2022.year!,
+      date: vancouverDate2022.date!,
+      createBy: userId,
+      race: vancouver,
+      categories: []
+    )
+    
+    let vancouverDate2026 = DateComponents(calendar: .current, year: 2026, month: 5, day: 3)
+    let vancouver2026: RaceEdition = RaceEdition(
+      year: vancouverDate2026.year!,
+      date: vancouverDate2026.date!,
+      createBy: userId,
+      race: vancouver,
+      categories: []
+    )
+    
+    vancouver.editions = [vancouver2022, vancouver2026]
+    
+    vancouver2022.categories = [
       RaceCategory(
         distance: RaceDistance(category: .full, type: .inPerson),
-        race: taipei
+        raceEdition: vancouver2022
       ),
       RaceCategory(
         distance: RaceDistance(category: .half, type: .inPerson),
-        race: taipei
+        raceEdition: vancouver2022
+      ),
+      RaceCategory(
+        distance: RaceDistance(category: .custom(8.0), type: .inPerson),
+        raceEdition: vancouver2022
+      ),
+      RaceCategory(
+        distance: RaceDistance(category: .full, type: .virtual),
+        raceEdition: vancouver2022
       ),
       RaceCategory(
         distance: RaceDistance(category: .half, type: .virtual),
-        race: taipei
+        raceEdition: vancouver2022
+      ),
+      RaceCategory(
+        distance: RaceDistance(category: .custom(8.0), type: .virtual),
+        raceEdition: vancouver2022
+      ),
+      RaceCategory(
+        distance: RaceDistance(category: .`5K`, type: .virtual),
+        raceEdition: vancouver2022
       )
     ]
-    
-    vancouver.categories = [
+
+    vancouver2026.categories = [
       RaceCategory(
         distance: RaceDistance(category: .full, type: .inPerson),
-        race: vancouver
+        raceEdition: vancouver2026
       ),
       RaceCategory(
         distance: RaceDistance(category: .half, type: .inPerson),
-        race: vancouver
+        raceEdition: vancouver2026
       ),
       RaceCategory(
-        distance: RaceDistance(category: .`10K`, type: .inPerson),
-        race: vancouver
-      ),
-      RaceCategory(
-        distance: RaceDistance(category: .`5K`, type: .inPerson),
-        race: vancouver
-      ),
+        distance: RaceDistance(category: .custom(8.0), type: .inPerson),
+        raceEdition: vancouver2026
+      )
     ]
     
     return [taipei, vancouver]
