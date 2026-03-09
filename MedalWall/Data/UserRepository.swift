@@ -15,17 +15,26 @@ final class UserRepository {
     self.context = context
   }
   
-  func attachContext(_ context: ModelContext) {
+  func configure(context: ModelContext) {
     self.context = context
   }
   
   func save() throws {
     guard let context else { throw AppError.contextNotAttached }
+    
     try context.save()
   }
   
-  func insertUser(_ profile: User) throws {
+  func insertUser(_ user: User) throws {
     guard let context else { throw AppError.contextNotAttached }
-    context.insert(profile)
+    
+    context.insert(user)
+  }
+  
+  func getUser() throws -> User? {
+    guard let context else { throw AppError.contextNotAttached }
+    
+    let descriptor = FetchDescriptor<User>()
+    return try context.fetch(descriptor).first
   }
 }

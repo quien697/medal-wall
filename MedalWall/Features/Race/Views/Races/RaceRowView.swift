@@ -23,18 +23,20 @@ struct RaceRowView: View {
       VStack(alignment: .leading) {
         Text(race.name)
           .font(.headline)
+          .foregroundStyle(Color.Text.primary)
         
         Text(race.location.formatted)
           .font(.subheadline)
-          .foregroundStyle(.secondary)
+          .foregroundStyle(Color.Text.secondary)
         
-        Text(race.date.formatted(date: .abbreviated, time: .omitted))
-          .font(.caption)
+        Text("\(race.editions.count) editions")
+          .font(.subheadline)
+          .foregroundStyle(Color.Text.tertiary)
       }
     }
   }
 }
 
-#Preview(traits: .sampleData) {
-  RaceRowView(race: Race.sampleData.first!)
+#Preview {
+    RaceRowView(race: Race.sampleData.first!)
 }

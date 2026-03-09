@@ -11,7 +11,6 @@ import PhotosUI
 struct ProfileEditView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
-  
   @State private var isShowingPhotosPicker: Bool = false
   @State private var isShowingPhotoDialog: Bool = false
   @State private var isShowingCropImageView: Bool = false
@@ -115,6 +114,9 @@ struct ProfileEditView: View {
         }
       } // Section
     } // Form
+    .onAppear {
+      viewModel.configure(context: modelContext)
+    }
     .toolbar {
       if viewModel.isNewProfile {
         ToolbarItem(placement: .cancellationAction) {
@@ -127,7 +129,6 @@ struct ProfileEditView: View {
       ToolbarItem(placement: .topBarTrailing) {
         Button(viewModel.isNewProfile ? "Add" : "Save") {
           do {
-            try viewModel.attachContext(modelContext)
             try viewModel.save()
             dismiss()
           } catch {
@@ -173,5 +174,5 @@ struct ProfileEditView: View {
 }
 
 #Preview {
-  ProfileEditView(profile: User.guest)
+  ProfileEditView(profile: User.defaultUser)
 }

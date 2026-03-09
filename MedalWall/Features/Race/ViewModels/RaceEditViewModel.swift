@@ -15,7 +15,7 @@ final class RaceEditViewModel {
   var photo: UIImage? = nil
   var cropPhotoData: Data? = nil
   var cropPhoto: UIImage? = nil
-  var date: Date = .now
+//  var date: Date = .now
   var country: String = ""
   var province: String = ""
   var city: String = ""
@@ -39,14 +39,14 @@ final class RaceEditViewModel {
       self.photo = race.photo
       self.cropPhotoData = race.cropPhotoData
       self.cropPhoto = race.cropPhoto
-      self.date = race.date
+//      self.date = race.date
       self.country = race.location.country
       self.province = race.location.province ?? ""
       self.city = race.location.city
       self.district = race.location.district ?? ""
       self.url = race.url ?? ""
-      self.updateTime = race.updateTime
-      self.distances = race.distances
+//      self.updateTime = race.updateTime
+//      self.distances = race.distances
       self.isNewRace = false
     }
   }
@@ -112,35 +112,35 @@ final class RaceEditViewModel {
       race.name = name
       race.photoData = photoData
       race.cropPhotoData = cropPhotoData
-      race.date = date
+//      race.date = date
       race.country = country
       race.province = province.isEmpty ? nil : province
       race.city = city
       race.district = district.isEmpty ? nil : district
       race.url = url.isEmpty ? nil : url
-      for category in race.categories {
-        try repository.deleteCategory(category)
-      }
-      race.categories = distances.map {
-        RaceCategory(distance: $0, race: race)
-      }
+//      for category in race.categories {
+//        try repository.deleteCategory(category)
+//      }
+//      race.categories = distances.map {
+//        RaceCategory(distance: $0, race: race)
+//      }
     } else {
       let newRace = Race(
         name: name,
         photoData: photoData,
         cropPhotoData: cropPhotoData,
-        date: date,
+//        date: date,
         location: RaceLocation(
           country: country,
           province: province.isEmpty ? nil : province,
           city: city,
           district: district.isEmpty ? nil : district
         ),
-        url: url.isEmpty ? nil : url,
+        url: url.isEmpty ? nil : url, createBy: UUID(),
       )
-      newRace.categories = distances.map {
-        RaceCategory(distance: $0, race: newRace)
-      }
+//      newRace.categories = distances.map {
+//        RaceCategory(distance: $0, race: newRace)
+//      }
       
       try repository.insertRace(newRace)
     }

@@ -10,18 +10,17 @@ import SwiftData
 
 @Observable
 class UserManager {
-  private let modelContext: ModelContext
+  private let repository: UserRepository
   private(set) var currentUser: User?
   
   init(modelContext: ModelContext) {
-    self.modelContext = modelContext
+    self.repository = UserRepository(context: modelContext)
     loadUser()
   }
   
   /// Loads existing user (created by DefaultDataSeeder)
   private func loadUser() {
-    let descriptor = FetchDescriptor<User>()
-    if let user = try? modelContext.fetch(descriptor).first {
+    if let user = try? repository.getUser() {
       self.currentUser = user
     } else {
       // This should never happen if DefaultDataSeeder works
@@ -32,7 +31,6 @@ class UserManager {
   /// Updates the current user (called from settings/profile edit)
   func updateUser(_ user: User) {
     self.currentUser = user
-    try? modelContext.save()
   }
 }
 

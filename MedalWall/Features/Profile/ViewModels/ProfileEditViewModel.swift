@@ -21,15 +21,13 @@ class ProfileEditViewModel {
   var isBirthdaySet: Bool = false
   var isNewProfile: Bool = true
   
-  private let repository: UserRepository
+  private var repository: UserRepository?
   private(set) var profile: User?
   
-  init(profile: User?, repository: UserRepository = UserRepository()) {
-    self.repository = repository
+  init(profile: User?) {
     self.profile = profile
     
     if let profile {
-      self.profile = profile
       self.userName = UserName(
         firstName: profile.firstName,
         lastName: profile.lastName
@@ -48,8 +46,8 @@ class ProfileEditViewModel {
     }
   }
   
-  func attachContext(_ context: ModelContext) throws {
-    repository.attachContext(context)
+  func configure(context: ModelContext) {
+    self.repository = UserRepository(context: context)
   }
   
   var isFormValid: Bool {
@@ -80,6 +78,8 @@ class ProfileEditViewModel {
   }
   
   func save() throws {
+    guard let repository else { throw AppError.contextNotAttached }
+    
     if let profile {
       profile.firstName = userName.trimmedFirstName
       profile.lastName = userName.trimmedLastName
@@ -96,7 +96,7 @@ class ProfileEditViewModel {
         cropAvatarData: cropAvatarData,
         bio: bio,
         gender: gender,
-        birthday: isBirthdaySet ? birthday : nil,
+        birthday: isBirthdaySet ? birthday : nil
       )
       
       try repository.insertUser(newProfile)

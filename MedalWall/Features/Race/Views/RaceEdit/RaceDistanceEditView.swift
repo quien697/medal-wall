@@ -83,7 +83,7 @@ struct RaceDistanceEditView: View {
   NavigationStack{
     RaceDistanceEditView(
       mode: .add,
-      distance: Race.sampleData[0].distances[0],
+      distance: RaceDistance(category: .half, type: .inPerson),
       onUpdate: { _ in }
     )
   }

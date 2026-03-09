@@ -75,7 +75,7 @@ struct RaceDistanceSection: View {
   Form {
     RaceDistanceSection(
       isPresented: .constant(true),
-      distances: Race.sampleData.first!.distances,
+      distances: [],
       onUpdate: { _, _ in },
       onDelete: { _ in }
     )

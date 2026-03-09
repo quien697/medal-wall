@@ -17,45 +17,41 @@ struct RacesView: View {
   @State private var filter: RaceFilter = .default
   @State private var errorWrapper: ErrorWrapper?
   
-  @Query(sort: \Race.date, animation: .default) private var races: [Race]
+  @Query(sort: \Race.name, animation: .default) private var races: [Race]
   
   var body: some View {
-    let viewModel = RacesViewModel(races: races, filter: filter)
+//    let viewModel = RacesViewModel(races: races, filter: filter)
     
     Group {
-      if viewModel.races.isEmpty {
+      if races.isEmpty {
         ContentUnavailableView {
-          Label("No Race Events", systemImage: "figure.run")
+          Label("No Results", systemImage: "magnifyingglass")
         } description: {
-          Text("There aren't any race events yet.")
+          Text("No rsults found")
         }
+        .background(Color.Background.primary)
       } else {
-        if viewModel.visibleRaces.isEmpty {
-          ContentUnavailableView {
-            Label("No Results", systemImage: "magnifyingglass")
-          } description: {
-            Text("No rsults found")
-          }
-        } else {
-          List(viewModel.visibleRaces, selection: $selectedRace) { race in
-            NavigationLink {
-              RaceDetailView(race: race)
-            } label: {
-              RaceRowView(race: race)
-                .swipeActions(edge: .trailing) {
-                  Button(role: .destructive) {
-                    selectedRace = race
-                    isShowDeleteConfirm = true
-                  } label: {
-                    Label("Delete", systemImage: "trash")
-                  }
+        List(races, selection: $selectedRace) { race in
+          NavigationLink {
+            RaceDetailView(race: race)
+          } label: {
+            RaceRowView(race: race)
+              .swipeActions(edge: .trailing) {
+                Button(role: .destructive) {
+                  selectedRace = race
+                  isShowDeleteConfirm = true
+                } label: {
+                  Label("Delete", systemImage: "trash")
                 }
-            }
+              }
           }
-          .animation(.default, value: viewModel.visibleRaces)
         }
+        .scrollContentBackground(.hidden)
+        .background(Color.Background.primary)
+//          .animation(.default, value: viewModel.visibleRaces)
       }
     } // Group
+    .background(Color.Background.primary)
     .navigationTitle("Races")
     .searchable(text: $filter.searchQuery, prompt: "Find a race event")
     .autocorrectionDisabled()
@@ -68,16 +64,16 @@ struct RacesView: View {
       
       ToolbarItem(placement: .topBarTrailing) {
         Button("Filter", systemImage: "ellipsis") {
-          isShowFilterView = true
+//          isShowFilterView = true
         }
       }
     }
-    .onAppear {
-      viewModel.races = races
-    }
-    .onChange(of: races) {
-      viewModel.races = races
-    }
+//    .onAppear {
+//      viewModel.races = races
+//    }
+//    .onChange(of: races) {
+//      viewModel.races = races
+//    }
     .sheet(isPresented: $isShowAddView) {
       RaceAddView()
     }
@@ -86,21 +82,21 @@ struct RacesView: View {
         RaceFilterView(filter: $filter)
       }
     }
-    .alert(isPresented: $isShowDeleteConfirm) {
-      .deleteConfirmation(
-        name: selectedRace?.name ?? "Race",
-        onDelete: {
-          if let race = selectedRace {
-            do {
-              try viewModel.attachContext(modelContext)
-              try viewModel.deleteRace(race)
-            } catch {
-              errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
-            }
-          }
-        }
-      )
-    } // alert
+//    .alert(isPresented: $isShowDeleteConfirm) {
+//      .deleteConfirmation(
+//        name: selectedRace?.name ?? "Race",
+//        onDelete: {
+//          if let race = selectedRace {
+//            do {
+//              try viewModel.attachContext(modelContext)
+//              try viewModel.deleteRace(race)
+//            } catch {
+//              errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
+//            }
+//          }
+//        }
+//      )
+//    } // alert
   }
 }
 

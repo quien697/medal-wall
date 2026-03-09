@@ -103,7 +103,7 @@ final class MedalEditViewModel {
       let newMedal = Medal(
         title: title,
         date: date,
-        location: category.race.location.formatted,
+        location: "",
         result: result.isEmpty ? nil : result,
         photoData: photoData,
         cropPhotoData: cropPhotoData,

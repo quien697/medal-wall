@@ -23,15 +23,11 @@ final class RacesViewModel {
   init(
     races: [Race],
     filter: RaceFilter,
-    repository: RaceRepository = RaceRepository())
-  {
+    modelContext: ModelContext
+  ) {
     self.races = races
     self.filter = filter
-    self.repository = repository
-  }
-  
-  func attachContext(_ context: ModelContext) throws {
-    repository.attachContext(context)
+    self.repository = RaceRepository(context: modelContext)
   }
   
   func deleteRace(_ race: Race) throws {
@@ -41,19 +37,20 @@ final class RacesViewModel {
   
   private func applyFilter(to races: [Race]) -> [Race] {
     return races.filter { race in
-      let distances = race.distances
+//      let distances = race.distances
+//      
+//      let typeMatch = {
+//        guard !filter.selectedTypes.isEmpty else { return true }
+//        return distances.contains { filter.selectedTypes.contains($0.type) }
+//      }()
+//      
+//      let categoryMatch: Bool = {
+//        guard !filter.selectedCategories.isEmpty else { return true }
+//        return distances.contains { filter.selectedCategories.contains($0.category) }
+//      }()
       
-      let typeMatch = {
-        guard !filter.selectedTypes.isEmpty else { return true }
-        return distances.contains { filter.selectedTypes.contains($0.type) }
-      }()
-      
-      let categoryMatch: Bool = {
-        guard !filter.selectedCategories.isEmpty else { return true }
-        return distances.contains { filter.selectedCategories.contains($0.category) }
-      }()
-      
-      return typeMatch && categoryMatch
+//      return typeMatch && categoryMatch
+      return false
     }
   }
   

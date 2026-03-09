@@ -30,6 +30,7 @@ struct ProfileView: View {
             .padding(.bottom, 10)
         } // ScrollView
         .navigationTitle("Profile")
+        .background(Color.Background.primary)
         .toolbar {
           ToolbarItem(placement: .topBarTrailing) {
             Button("Settings", systemImage: "gearshape.fill") {
@@ -48,9 +49,9 @@ struct ProfileView: View {
               .padding(.top, 10)
           }
         } // ContentUnavailableView
+        .background(Color.Background.primary)
       }
     } // Group
-    .background(Color.Background.primary)
     .sheet(isPresented: $isShowingProfileAddView) {
       NavigationStack {
         ProfileAddView()

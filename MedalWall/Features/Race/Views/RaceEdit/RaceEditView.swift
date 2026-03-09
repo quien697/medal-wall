@@ -45,10 +45,10 @@ struct RaceEditView: View {
         }
       )
       
-      RaceInfoSection(
-        name: $viewModel.name,
-        date: $viewModel.date
-      )
+//      RaceInfoSection(
+//        name: $viewModel.name,
+//        date: $viewModel.date
+//      )
       
       RaceLocationSection(
         country: $viewModel.country,
@@ -72,7 +72,7 @@ struct RaceEditView: View {
         }
       )
       
-      RaceAdditionalSection(url: $viewModel.url)
+//      RaceAdditionalSection(url: $viewModel.url)
     } // Form
     .task {
       do {
