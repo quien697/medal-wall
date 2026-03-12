@@ -1,26 +1,29 @@
 //
-//  SurfaceStyle.swift
+//  TagStyle.swift
 //  MedalWall
 //
-//  Created by Quien on 2026-03-04.
+//  Created by Quien on 2026-03-12.
 //
 
 import SwiftUI
 
-struct SurfaceStyle: ViewModifier {
-  private let radius: CGFloat = 20
+struct TagStyle: ViewModifier {
+  let fgColor: Color
   let bgColor: Color
   let vPadding: CGFloat
   let hPadding: CGFloat
   
   func body(content: Content) -> some View {
     content
+      .font(.subheadline)
+      .fontWeight(.bold)
+      .foregroundStyle(fgColor)
       .padding(.vertical, vPadding)
       .padding(.horizontal, hPadding)
       .background(bgColor)
-      .clipShape(.rect(cornerRadius: radius))
+      .clipShape(.capsule)
       .overlay(
-        RoundedRectangle(cornerRadius: radius)
+        Capsule()
           .stroke(Color.Border.gray, lineWidth: 1)
       )
   }
@@ -28,12 +31,14 @@ struct SurfaceStyle: ViewModifier {
 
 extension View {
   
-  func surfaceStyle(
-    bgColor: Color = Color.Card.Background.primary,
-    vPadding: CGFloat = 15,
-    hPadding: CGFloat = 15
+  func tagStyle(
+    fgColor: Color = Color.Text.secondary,
+    bgColor: Color = Color.Card.Background.tertiary,
+    vPadding: CGFloat = 8,
+    hPadding: CGFloat = 12
   ) -> some View {
-    modifier(SurfaceStyle(
+    modifier(TagStyle(
+      fgColor: fgColor,
       bgColor: bgColor,
       vPadding: vPadding,
       hPadding: hPadding
@@ -42,8 +47,6 @@ extension View {
 }
 
 #Preview {
-  VStack{
-    Text("42km")
-  }
-  .surfaceStyle()
+  Text("test data")
+    .tagStyle()
 }

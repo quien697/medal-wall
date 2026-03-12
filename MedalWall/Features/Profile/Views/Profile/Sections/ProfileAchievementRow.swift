@@ -29,11 +29,7 @@ struct ProfileAchievementRow: View {
         .font(.title2)
     }
     .frame(maxWidth: .infinity)
-    .modifier(SurfaceStyle(
-      background: Color.Card.Background.primary,
-      paddingV: 15,
-      paddingH: 15
-    ))
+    .surfaceStyle()
   }
 }
 

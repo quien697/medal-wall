@@ -42,11 +42,7 @@ struct StatGrid: View {
       Spacer()
     }
     .frame(maxWidth: .infinity)
-    .modifier(SurfaceStyle(
-      background: Color.Card.Background.primary,
-      paddingV: padding,
-      paddingH: padding
-    ))
+    .surfaceStyle()
   }
 }
 
