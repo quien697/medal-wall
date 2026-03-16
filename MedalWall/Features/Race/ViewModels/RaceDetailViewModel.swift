@@ -10,19 +10,20 @@ import SwiftData
 
 @Observable
 final class RaceDetailViewModel {
-  private let repository: RaceRepository
+  private var repository: RaceRepository?
   var race: Race
   
-  init(race: Race, repository: RaceRepository = RaceRepository()) {
+  init(race: Race) {
     self.race = race
-    self.repository = repository
   }
   
-  func attachContext(_ context: ModelContext) throws {
-    repository.attachContext(context)
+  func configure(context: ModelContext) {
+    self.repository = RaceRepository(context: context)
   }
   
   func deleteRace(_ race: Race) throws {
+    guard let repository else { throw AppError.contextNotAttached }
+    
     try repository.deleteRace(race)
     try repository.save()
   }

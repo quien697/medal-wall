@@ -8,36 +8,66 @@
 import SwiftUI
 
 struct RaceHeroCardSection: View {
-  let race: Race
+  let photo: UIImage?
+  let cropPhoto: UIImage?
+  let name: String
+  let location: String
+  let url: String?
   
   var body: some View {
-//    CardSection {
-//      ZStack {
-//        if let uiImage = race.cropPhoto ?? race.photo {
-//          Image(uiImage: uiImage)
-//            .raceHero()
-//        } else {
-//          Image(systemName: "photo.fill")
-//            .raceHero()
-//        }
-//      } // ZStack
-//      .frame(maxWidth: .infinity)
-//      .clipShape(RoundedRectangle(cornerRadius: 12))
-//      
-//      VStack {
-//        Text(race.name)
-//          .font(.headline)
-//          .multilineTextAlignment(.center)
-//        
-//        Text(race.location.formatted)
-//          .font(.subheadline)
-//      } // VStack
-//      .padding(.horizontal, 12)
-//      .padding(.top, 12)
-//    } // CardSection
+    HStack {
+      ZStack(alignment: .leading) {
+        if let uiImage = cropPhoto ?? photo {
+          Image(uiImage: uiImage)
+            .raceHero()
+          
+        } else {
+          Image(systemName: "photo.fill")
+            .raceHero()
+        }
+      } // ZStack
+      .clipShape(RoundedRectangle(cornerRadius: 12))
+      .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+      
+      VStack(alignment: .leading, spacing: 6) {
+        Text(name)
+          .font(.title2)
+          .fontWeight(.bold)
+          .foregroundStyle(Color.Text.primary)
+        
+        Text(location)
+          .font(.subheadline)
+          .foregroundStyle(Color.Text.tertiary)
+        
+        if let url = url, let urlObj = URL(string: url) {
+          Link(url, destination: urlObj)
+            .font(.subheadline)
+            .foregroundStyle(Color.Text.secondary)
+            .underline(true, color: Color.Text.secondary)
+        }
+      } // VStack
+      .frame(maxWidth: .infinity)
+    } // HStack
+    .padding(.vertical, 40)
+    .padding(.horizontal)
+    .frame(maxWidth: .infinity)
+    .background(.thinMaterial)
+    .overlay(alignment: .bottom) {
+      Rectangle()
+        .fill(Color.Border.gray)
+        .frame(height: 1)
+    }
   }
 }
 
 #Preview {
-  RaceHeroCardSection(race: Race.sampleData.first!)
+  let race = Race.sampleData.first!
+  
+  RaceHeroCardSection(
+    photo: race.photo,
+    cropPhoto: race.cropPhoto,
+    name: race.name,
+    location: race.location.formatted,
+    url: race.url
+  )
 }

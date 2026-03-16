@@ -11,7 +11,6 @@ import SwiftData
 struct RaceDetailView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
-  
   @State private var isShowEditor = false
   @State private var isShowDeleteConfirm = false
   @State private var errorWrapper: ErrorWrapper?
@@ -23,16 +22,19 @@ struct RaceDetailView: View {
   
   var body: some View {
     ScrollView {
-      RaceHeroCardSection(race: viewModel.race)
+      RaceHeroCardSection(
+        photo: viewModel.race.photo,
+        cropPhoto: viewModel.race.cropPhoto,
+        name: viewModel.race.name,
+        location: viewModel.race.location.formatted,
+        url: viewModel.race.url
+      )
       
-      RaceDetailCardSection(race: viewModel.race)
-      
-      RaceLastUpdatedCardSection(race: viewModel.race)
+      RaceEditionsCardSection(editions: viewModel.race.editions)
     } // ScrollView
-    .padding(.horizontal)
-    .background(.ultraThinMaterial)
     .navigationTitle(viewModel.race.name)
     .navigationBarTitleDisplayMode(.inline)
+    .background(Color.Background.primary)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu("More Options", systemImage: "ellipsis") {
@@ -57,8 +59,8 @@ struct RaceDetailView: View {
         name: viewModel.race.name,
         onDelete: {
           do {
-            try viewModel.attachContext(modelContext)
-            try viewModel.deleteRace(viewModel.race)
+            //            try viewModel.attachContext(modelContext)
+//            try viewModel.deleteRace(viewModel.race)
             dismiss()
           } catch {
             errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
@@ -77,6 +79,6 @@ struct RaceDetailView: View {
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   RaceDetailView(race: Race.sampleData.first!)
 }

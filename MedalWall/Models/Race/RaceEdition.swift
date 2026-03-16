@@ -47,5 +47,3 @@ final class RaceEdition {
     self.categories = categories
   }
 }
-
-

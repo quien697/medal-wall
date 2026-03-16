@@ -30,10 +30,12 @@ struct RaceDistance: Identifiable, Hashable {
 
 extension Array where Element == RaceDistance {
   
+  nonisolated
   func sortedByDistance() -> [RaceDistance] {
     self.sorted { $0.category.value > $1.category.value }
   }
   
+  nonisolated
   func sortedByTypeAndDistance() -> [RaceDistance] {
     self.sorted {
       if $0.type != $1.type {
@@ -43,6 +45,7 @@ extension Array where Element == RaceDistance {
     }
   }
   
+  nonisolated
   func groupedByType() -> [RaceDistanceType: [RaceDistance]] {
     Dictionary(grouping: self.sortedByDistance()) { $0.type }
   }

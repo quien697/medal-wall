@@ -24,7 +24,7 @@ extension Race {
       createBy: userId
     )
     
-    let taipeiDate2019 = DateComponents(calendar: .current, year: 2025, month: 12, day: 21)
+    let taipeiDate2019 = DateComponents(calendar: .current, year: 2019, month: 12, day: 15)
     let taipei2019: RaceEdition = RaceEdition(
       year: taipeiDate2019.year!,
       date: taipeiDate2019.date!,

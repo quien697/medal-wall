@@ -55,7 +55,7 @@ extension ImageType {
     case .raceThumbnail:
       return CGSize(width: 60, height: 60)
     case .raceHero:
-      return CGSize(width: 240, height: 240)
+      return CGSize(width: 120, height: 120)
     case .medal:
       return CGSize(width: 160, height: 160)
     }

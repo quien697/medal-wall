@@ -28,7 +28,7 @@ struct SectionContainer<Content: View>: View {
       
       content
     }
-    .padding(.horizontal)
+    .padding(.horizontal, 20)
     .padding(.vertical, 10)
     .frame(maxWidth: .infinity, alignment: .leading)
   }
