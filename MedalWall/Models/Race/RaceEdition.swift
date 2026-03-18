@@ -12,7 +12,8 @@ import SwiftData
 final class RaceEdition {
   @Attribute(.unique) var id: UUID
   var year: Int
-  var date: Date
+  var startDate: Date
+  var endDate: Date
   var photoData: Data?
   var cropPhotoData: Data?
   var createBy: UUID
@@ -26,7 +27,8 @@ final class RaceEdition {
   init(
     id: UUID = UUID(),
     year: Int,
-    date: Date,
+    startDate: Date,
+    endDate: Date,
     photoData: Data? = nil,
     cropPhotoData: Data? = nil,
     createBy: UUID,
@@ -37,7 +39,8 @@ final class RaceEdition {
   ) {
     self.id = id
     self.year = year
-    self.date = date
+    self.startDate = startDate
+    self.endDate = endDate
     self.photoData = photoData
     self.cropPhotoData = cropPhotoData
     self.createBy = createBy

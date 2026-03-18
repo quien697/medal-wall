@@ -14,11 +14,22 @@ struct RaceEditionsCardSection: View {
     SectionContainer(title: "Editions") {
       ForEach(editions) { edition in
         VStack(alignment: .leading) {
-          Text(String(edition.year))
-            .font(.title2)
-            .fontWeight(.heavy)
-            .foregroundStyle(Color.Badge.Gold.primary)
-            .padding(.bottom, 5)
+          HStack {
+            Text(String(edition.year))
+              .font(.title2)
+              .fontWeight(.heavy)
+              .foregroundStyle(Color.Badge.Gold.primary)
+              .padding(.bottom, 5)
+            
+            Spacer()
+            
+            let startDate = edition.startDate.formattedMonthDay()
+            let endDate = ", \(edition.endDate.formattedMonthDay())"
+            
+            Text("\(startDate)\(edition.isOneDay ? "" : endDate)")
+              .font(.subheadline)
+              .foregroundStyle(Color.Text.tertiary)
+          }
           
           ForEach(edition.distancesByTypeOrdered, id: \.type) { typeGroup in
             VStack(alignment: .leading, spacing: 10) {

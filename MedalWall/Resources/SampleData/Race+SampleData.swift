@@ -27,17 +27,20 @@ extension Race {
     let taipeiDate2019 = DateComponents(calendar: .current, year: 2019, month: 12, day: 15)
     let taipei2019: RaceEdition = RaceEdition(
       year: taipeiDate2019.year!,
-      date: taipeiDate2019.date!,
+      startDate: taipeiDate2019.date!,
+      endDate: taipeiDate2019.date!,
       photoData: UIImage(named: "taipei-marathon-2019")?.jpegData(compressionQuality: 0.9),
       createBy: userId,
       race: taipei,
       categories: []
     )
     
-    let taipeiDate2025 = DateComponents(calendar: .current, year: 2025, month: 12, day: 21)
+    let taipeiStartDate2025 = DateComponents(calendar: .current, year: 2025, month: 12, day: 20)
+    let taipeiEndDate2025 = DateComponents(calendar: .current, year: 2025, month: 12, day: 21)
     let taipei2025: RaceEdition = RaceEdition(
-      year: taipeiDate2025.year!,
-      date: taipeiDate2025.date!,
+      year: taipeiStartDate2025.year!,
+      startDate: taipeiStartDate2025.date!,
+      endDate: taipeiEndDate2025.date!,
       createBy: userId,
       race: taipei,
       categories: []
@@ -86,7 +89,8 @@ extension Race {
     let vancouverDate2022 = DateComponents(calendar: .current, year: 2022, month: 5, day: 1)
     let vancouver2022: RaceEdition = RaceEdition(
       year: vancouverDate2022.year!,
-      date: vancouverDate2022.date!,
+      startDate: vancouverDate2022.date!,
+      endDate: vancouverDate2022.date!,
       createBy: userId,
       race: vancouver,
       categories: []
@@ -95,7 +99,8 @@ extension Race {
     let vancouverDate2026 = DateComponents(calendar: .current, year: 2026, month: 5, day: 3)
     let vancouver2026: RaceEdition = RaceEdition(
       year: vancouverDate2026.year!,
-      date: vancouverDate2026.date!,
+      startDate: vancouverDate2026.date!,
+      endDate: vancouverDate2026.date!,
       createBy: userId,
       race: vancouver,
       categories: []

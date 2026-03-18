@@ -9,6 +9,7 @@
 enum RaceDistanceType: String, Hashable, CaseIterable, Identifiable {
   case inPerson
   case virtual
+  case wheelChair
   
   var id: String { rawValue }
   
@@ -17,6 +18,7 @@ enum RaceDistanceType: String, Hashable, CaseIterable, Identifiable {
     switch self {
     case .inPerson: return "In-person"
     case .virtual: return "Virtual"
+    case .wheelChair: return "Wheel Chair"
     }
   }
 }

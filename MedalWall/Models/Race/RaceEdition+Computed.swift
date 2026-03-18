@@ -5,8 +5,14 @@
 //  Created by Quien on 2026-03-16.
 //
 
+import Foundation
+
 /// Extends RaceEdition with computed values
 extension RaceEdition {
+  
+  var isOneDay: Bool {
+      Calendar.current.isDate(startDate, inSameDayAs: endDate)
+  }
   
   /// Converts categories to [RaceDistance]
   var distances: [RaceDistance] {
