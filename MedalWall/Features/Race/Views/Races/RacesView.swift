@@ -16,12 +16,15 @@ struct RacesView: View {
   @State private var isShowFilterView = false
   @State private var filter: RaceFilter = .default
   @State private var errorWrapper: ErrorWrapper?
+  @State private var viewModel: RacesViewModel
   
   @Query(sort: \Race.name, animation: .default) private var races: [Race]
   
+  init() {
+    self._viewModel = State(initialValue: RacesViewModel(races: [], filter: .default))
+  }
+  
   var body: some View {
-    let viewModel = RacesViewModel(races: races, filter: filter)
-    
     Group {
       if viewModel.races.isEmpty {
         ContentUnavailableView {
@@ -107,6 +110,9 @@ struct RacesView: View {
         }
       )
     } // alert
+    .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
+      ErrorView(errorWrapper: wrapper)
+    } // sheet
   }
 }
 

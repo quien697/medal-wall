@@ -54,13 +54,15 @@ struct RaceDetailView: View {
         } // Menu
       } // ToolbarItem
     } // toolbar
+    .onAppear {
+      viewModel.configure(context: modelContext)
+    }
     .alert(isPresented: $isShowDeleteConfirm) {
       .deleteConfirmation(
         name: viewModel.race.name,
         onDelete: {
           do {
-            //            try viewModel.attachContext(modelContext)
-//            try viewModel.deleteRace(viewModel.race)
+            try viewModel.deleteRace(viewModel.race)
             dismiss()
           } catch {
             errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
