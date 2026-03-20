@@ -20,7 +20,8 @@ struct RacesView: View {
     RaceListView(
       searchText: viewModel.searchText,
       predicate: viewModel.predicate,
-      sortOrder: viewModel.sortOrder
+      sortOrder: viewModel.sortOrder,
+      applyFilter: viewModel.filteredRaces
     ) { race in
       selectedRace = race
       isShowDeleteConfirm = true
@@ -32,22 +33,50 @@ struct RacesView: View {
       ToolbarItem(placement: .topBarTrailing) {
         Menu {
           Picker("Sort", selection: $viewModel.sortOrder) {
-            Text("Sort by Name")
-              .tag(RaceSort.name.order)
-            
-            Text("Sort by Country")
-              .tag(RaceSort.country.order)
-          }
+            ForEach(RaceSort.allCases, id: \.self) { sort in
+              Text("Sort by \(sort.displayName)")
+                .tag(sort.order)
+            } // ForEach
+          } // Picker
+          
+          Section("Filter by Race Distance") {
+            ForEach(RaceDistanceCategory.standardCases, id: \.self) { category in
+              Button {
+                if viewModel.selectedCategories.contains(category) {
+                  viewModel.selectedCategories.remove(category)
+                } else {
+                  viewModel.selectedCategories.insert(category)
+                }
+              } label: {
+                Label(category.description, systemImage: viewModel.selectedCategories.contains(category) ? "checkmark.square" : "square")
+              } // Button
+            } // ForEach
+          } // Section
+          
+          Section("Filter by Race Type") {
+            ForEach(RaceDistanceType.allCases, id: \.self) { type in
+              Button {
+                if viewModel.selectedTypes.contains(type) {
+                  viewModel.selectedTypes.remove(type)
+                } else {
+                  viewModel.selectedTypes.insert(type)
+                }
+              } label: {
+                Label(type.displayName, systemImage: viewModel.selectedTypes.contains(type) ? "checkmark.square" : "square")
+              } // Button
+            } // ForEach
+          } // Section
         } label: {
           Label("Filter", systemImage: "line.3.horizontal.decrease")
-        }
-      }
+        } // Menu
+        .menuActionDismissBehavior(.disabled)
+      } // ToolbarItem
       
       ToolbarItem(placement: .topBarTrailing) {
         Button("Add Race", systemImage: "plus") {
           isShowAddView = true
         }
-      }
+      } // ToolbarItem
     }
     .onAppear {
       viewModel.configure(context: modelContext)

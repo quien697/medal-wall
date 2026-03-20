@@ -10,6 +10,7 @@ import SwiftData
 
 struct RaceListView: View {
   let searchText: String
+  let applyFilter: ([Race]) -> [Race]
   let onDelete: (Race) -> Void
   
   @Query private var races: [Race]
@@ -18,9 +19,11 @@ struct RaceListView: View {
     searchText: String = "",
     predicate: Predicate<Race>,
     sortOrder: [SortDescriptor<Race>],
+    applyFilter: @escaping ([Race]) -> [Race] = { $0 },
     onDelete: @escaping (Race) -> Void = { _ in }
   ) {
     self.searchText = searchText
+    self.applyFilter = applyFilter
     self.onDelete = onDelete
     
     _races = Query(
@@ -31,20 +34,21 @@ struct RaceListView: View {
   
   var body: some View {
     Group {
-      if races.isEmpty && !searchText.isEmpty {
-        ContentUnavailableView {
-          Label("No Results", systemImage: "magnifyingglass")
-        } description: {
-          Text("No race evnets match '\(searchText)'")
-        }
-      } else if races.isEmpty && searchText.isEmpty {
+      if races.isEmpty && searchText.isEmpty {
         ContentUnavailableView(
           "No Race evnets",
           systemImage: "tray",
           description: Text("Tap the + button to add your first race event!")
         )
+      } else if (races.isEmpty && !searchText.isEmpty) ||
+                (applyFilter(races).isEmpty) {
+        ContentUnavailableView {
+          Label("No Results", systemImage: "magnifyingglass")
+        } description: {
+          Text("No race evnets match '\(searchText)'")
+        }
       } else {
-        List(races) { race in
+        List(applyFilter(races)) { race in
           NavigationLink {
             RaceDetailView(race: race)
           } label: {
