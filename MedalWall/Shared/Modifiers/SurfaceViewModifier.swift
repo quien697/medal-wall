@@ -1,5 +1,5 @@
 //
-//  SurfaceStyle.swift
+//  SurfaceViewModifier.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-03-04.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SurfaceStyle: ViewModifier {
+struct SurfaceViewModifier: ViewModifier {
   private let radius: CGFloat = 20
   let bgColor: Color
   let vPadding: CGFloat
@@ -33,7 +33,7 @@ extension View {
     vPadding: CGFloat = 15,
     hPadding: CGFloat = 15
   ) -> some View {
-    modifier(SurfaceStyle(
+    modifier(SurfaceViewModifier(
       bgColor: bgColor,
       vPadding: vPadding,
       hPadding: hPadding

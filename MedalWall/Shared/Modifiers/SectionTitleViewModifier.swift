@@ -1,5 +1,5 @@
 //
-//  SectionTitleStyle.swift
+//  SectionTitleViewModifier.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-03-06.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SectionTitleStyle: ViewModifier {
+struct SectionTitleViewModifier: ViewModifier {
   
   func body(content: Content) -> some View {
     content
@@ -21,7 +21,7 @@ struct SectionTitleStyle: ViewModifier {
 extension View {
   
   func sectionTitleStyle() -> some View {
-    modifier(SectionTitleStyle())
+    modifier(SectionTitleViewModifier())
   }
 }
 
