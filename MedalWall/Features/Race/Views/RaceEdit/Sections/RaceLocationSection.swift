@@ -15,21 +15,59 @@ struct RaceLocationSection: View {
   @Binding var district: String
   
   var body: some View {
-    Section("Race Location") {
-      TextField("Country", text: $country)
-      TextField("Province (option)", text: $province)
-      TextField("City", text: $city)
-      TextField("District (option)", text: $district)
+    Section("Location") {
+      LabeledContent {
+        TextField("Country", text: $country)
+          .multilineTextAlignment(.trailing)
+      } label: {
+        Text("Country")
+          .fontWeight(.bold)
+          .foregroundStyle(Color.Text.tertiary)
+      }
+      
+      LabeledContent {
+        TextField("Province (optional)", text: $province)
+          .multilineTextAlignment(.trailing)
+      } label: {
+        Text("Province")
+          .fontWeight(.bold)
+          .foregroundStyle(Color.Text.tertiary)
+      }
+      
+      LabeledContent {
+        TextField("City", text: $city)
+          .multilineTextAlignment(.trailing)
+      } label: {
+        Text("City")
+          .fontWeight(.bold)
+          .foregroundStyle(Color.Text.tertiary)
+      }
+      
+      LabeledContent {
+        TextField("District (optional)", text: $district)
+          .multilineTextAlignment(.trailing)
+      } label: {
+        Text("District")
+          .fontWeight(.bold)
+          .foregroundStyle(Color.Text.tertiary)
+      }
     }
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   Form {
     RaceLocationSection(
       country: .constant("Taiwan"),
       province: .constant(""),
       city: .constant("Taipei"),
+      district: .constant("")
+    )
+    
+    RaceLocationSection(
+      country: .constant("Canada"),
+      province: .constant("BC"),
+      city: .constant("Vancouver"),
       district: .constant("")
     )
   }
