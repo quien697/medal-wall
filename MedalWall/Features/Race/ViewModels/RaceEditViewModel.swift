@@ -15,21 +15,20 @@ final class RaceEditViewModel {
   var photo: UIImage? = nil
   var cropPhotoData: Data? = nil
   var cropPhoto: UIImage? = nil
-//  var date: Date = .now
   var country: String = ""
   var province: String = ""
   var city: String = ""
   var district: String = ""
   var url: String = ""
-  var updateTime: Date = .now
+  var updatedDate: Date = .now
+  var editions: [RaceEdition] = []
   var distances: [RaceDistance] = []
   var isNewRace: Bool = true
   
-  private let repository: RaceRepository
+  private var repository: RaceRepository?
   private(set) var race: Race?
   
-  init(race: Race?, repository: RaceRepository = RaceRepository()) {
-    self.repository = repository
+  init(race: Race?) {
     self.race = race
     
     if let race {
@@ -39,20 +38,19 @@ final class RaceEditViewModel {
       self.photo = race.photo
       self.cropPhotoData = race.cropPhotoData
       self.cropPhoto = race.cropPhoto
-//      self.date = race.date
       self.country = race.location.country
       self.province = race.location.province ?? ""
       self.city = race.location.city
       self.district = race.location.district ?? ""
       self.url = race.url ?? ""
-//      self.updateTime = race.updateTime
-//      self.distances = race.distances
+      self.updatedDate = race.updatedDate
+      self.editions = race.editions
       self.isNewRace = false
     }
   }
   
-  func attachContext(_ context: ModelContext) throws {
-    repository.attachContext(context)
+  func configure(context: ModelContext) {
+    self.repository = RaceRepository(context: context)
   }
   
   var isFormValid: Bool {
@@ -83,36 +81,37 @@ final class RaceEditViewModel {
     self.cropPhoto = nil
   }
   
-  func addDistance(_ distance: RaceDistance) throws {
-    if distances.contains(distance) {
-      throw AppError.duplicateDistance
-    } else {
-      distances.append(distance)
-    }
-  }
+//  func addDistance(_ distance: RaceDistance) throws {
+//    if distances.contains(distance) {
+//      throw AppError.duplicateDistance
+//    } else {
+//      distances.append(distance)
+//    }
+//  }
+//  
+//  func updateDistance(old: RaceDistance, with new: RaceDistance) throws {
+//    if distances.contains(new) {
+//      throw AppError.duplicateDistance
+//    } else {
+//      if let index = distances.firstIndex(of: old) {
+//        distances[index] = new
+//      }
+//    }
+//  }
   
-  func updateDistance(old: RaceDistance, with new: RaceDistance) throws {
-    if distances.contains(new) {
-      throw AppError.duplicateDistance
-    } else {
-      if let index = distances.firstIndex(of: old) {
-        distances[index] = new
-      }
-    }
-  }
-  
-  func deleteDistance(_ distance: RaceDistance) {
-    if let index = distances.firstIndex(of: distance) {
-      distances.remove(at: index)
-    }
-  }
+//  func deleteDistance(_ distance: RaceDistance) {
+//    if let index = distances.firstIndex(of: distance) {
+//      distances.remove(at: index)
+//    }
+//  }
   
   func save() throws {
+    guard let repository else { throw AppError.contextNotAttached }
+    
     if let race {
       race.name = name
       race.photoData = photoData
       race.cropPhotoData = cropPhotoData
-//      race.date = date
       race.country = country
       race.province = province.isEmpty ? nil : province
       race.city = city
@@ -129,7 +128,6 @@ final class RaceEditViewModel {
         name: name,
         photoData: photoData,
         cropPhotoData: cropPhotoData,
-//        date: date,
         location: RaceLocation(
           country: country,
           province: province.isEmpty ? nil : province,

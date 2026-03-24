@@ -5,10 +5,26 @@
 //  Created by Quien on 2026-03-16.
 //
 
-import Foundation
+import UIKit
 
 /// Extends RaceEdition with computed values
 extension RaceEdition {
+  
+  var photo: UIImage? {
+    if let photoData {
+      return UIImage(data: photoData)
+    }
+    
+    return nil
+  }
+  
+  var cropPhoto: UIImage? {
+    if let cropPhotoData {
+      return UIImage(data: cropPhotoData)
+    }
+    
+    return nil
+  }
   
   var isOneDay: Bool {
       Calendar.current.isDate(startDate, inSameDayAs: endDate)

@@ -54,6 +54,8 @@ struct RaceEditView: View {
         district: $viewModel.district
       )
       
+      RaceEditionSection(editions: viewModel.editions)
+      
 //      RaceDistanceSection(
 //        isPresented: $isShowingAddDistanceView,
 //        distances: viewModel.distances,
@@ -76,6 +78,8 @@ struct RaceEditView: View {
     }
     .navigationTitle("\(viewModel.isNewRace ? "Add" : "Edit") Race")
     .navigationBarTitleDisplayMode(.inline)
+    .scrollContentBackground(.hidden)
+    .background(Color.Background.primary)
     .toolbar {
       ToolbarItem(placement: .cancellationAction) {
         Button("Cancel") {
