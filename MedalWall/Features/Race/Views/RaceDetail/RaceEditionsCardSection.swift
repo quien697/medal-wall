@@ -31,6 +31,8 @@ struct RaceEditionsCardSection: View {
               .foregroundStyle(Color.Text.tertiary)
           }
           
+          Divider()
+          
           ForEach(edition.distancesByTypeOrdered, id: \.type) { typeGroup in
             VStack(alignment: .leading, spacing: 10) {
               Text(typeGroup.type.displayName)
@@ -40,7 +42,7 @@ struct RaceEditionsCardSection: View {
               FlowLayout(spacing: 10) {
                 ForEach(typeGroup.distances) { distance in
                   Text(distance.category.description)
-                    .tagStyle()
+                    .secondaryButtonStyle()
                 }
               }
               .frame(maxWidth: .infinity, alignment: .leading)

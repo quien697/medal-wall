@@ -67,7 +67,7 @@ struct AvatarImage: View {
         .overlay {
           if let uiImage = cropPhoto ?? photo {
             Image(uiImage: uiImage)
-              .avatar(type: imageType)
+              .styled(as: imageType)
           } else {
             Image(systemName: systemImageName)
               .font(.system(size: imageType.size.width / 2, weight: .semibold))

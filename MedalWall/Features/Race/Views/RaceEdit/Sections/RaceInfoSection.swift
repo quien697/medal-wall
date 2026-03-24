@@ -24,20 +24,10 @@ struct RaceInfoSection: View {
         Group {
           if let uiImage = cropPhoto ?? photo {
             Image(uiImage: uiImage)
-              .raceHero()
+              .styled(as: ImageType.raceHero)
           } else {
             Image(systemName: "photo.fill")
-              .resizable()
-              .scaledToFit()
-              .frame(width: 60)
-              .foregroundStyle(Color.Text.tertiary)
-              .frame(width: ImageType.raceHero.size.width, height: ImageType.raceHero.size.height)
-              .background(Color.Card.Background.tertiary)
-              .clipShape(RoundedRectangle(cornerRadius: 12))
-              .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                  .stroke(Color.Border.gray, style: StrokeStyle(lineWidth: 2, dash: [10, 2]))
-              )
+              .placeholderStyled(as: ImageType.raceHero)
           }
         } // Group
         .confirmationDialog(

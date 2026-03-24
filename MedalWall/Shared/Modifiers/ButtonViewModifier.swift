@@ -108,8 +108,8 @@ extension View {
   func goldOutLineButtonStyle(
     font: Font = .subheadline,
     fontWeight: Font.Weight = .semibold,
-    fgColor: Color = Color.Badge.Gold.secondary,
-    bgColor: Color = Color.Card.Background.secondary,
+    fgColor: Color = Color.Badge.Gold.primary,
+    bgColor: Color = Color.Badge.Gold.primary.opacity(0.1),
     vPadding: CGFloat = 8,
     hPadding: CGFloat = 12
   ) -> some View {

@@ -14,10 +14,10 @@ struct RaceRowView: View {
     HStack {
       if let photo = race.cropPhoto ?? race.photo {
         Image(uiImage: photo)
-          .raceThumbnail()
+          .styled(as: ImageType.raceThumbnail)
       } else {
         Image(systemName: "photo.fill")
-          .raceThumbnail()
+          .placeholderStyled(as: ImageType.raceThumbnail)
       }
       
       VStack(alignment: .leading) {

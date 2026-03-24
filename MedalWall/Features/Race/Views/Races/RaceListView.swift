@@ -40,8 +40,7 @@ struct RaceListView: View {
           systemImage: "tray",
           description: Text("Tap the + button to add your first race event!")
         )
-      } else if (races.isEmpty && !searchText.isEmpty) ||
-                (applyFilter(races).isEmpty) {
+      } else if (races.isEmpty && !searchText.isEmpty) || (applyFilter(races).isEmpty) {
         ContentUnavailableView {
           Label("No Results", systemImage: "magnifyingglass")
         } description: {

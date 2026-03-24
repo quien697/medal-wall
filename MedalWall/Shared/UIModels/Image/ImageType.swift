@@ -71,19 +71,24 @@ extension Image {
       .frame(width: type.size.width, height: type.size.height)
       .clipShape(type.shape)
   }
-}
-
-extension Image {
   
-  func avatar(type: ImageType) -> some View {
-    self.styled(as: type)
-  }
-  
-  func raceThumbnail() -> some View {
-    self.styled(as: .raceThumbnail)
-  }
-  
-  func raceHero() -> some View {
-    self.styled(as: .raceHero)
+  func placeholderStyled(
+    as type: ImageType,
+    foregroundColor: Color = Color.Text.tertiary,
+    backgroundColor: Color = Color.Card.Background.tertiary,
+    borderColor: Color = Color.Border.gray
+  ) -> some View {
+    self
+      .resizable()
+      .scaledToFit()
+      .frame(width: type.size.width / 2)
+      .foregroundStyle(foregroundColor)
+      .frame(width: type.size.width, height: type.size.height)
+      .background(backgroundColor)
+      .clipShape(type.shape)
+      .overlay(
+        type.shape
+          .stroke(borderColor, style: StrokeStyle(lineWidth: 2, dash: [10, 2]))
+      )
   }
 }

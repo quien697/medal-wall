@@ -15,15 +15,15 @@ struct RaceHeroCardSection: View {
   let url: String?
   
   var body: some View {
-    HStack {
+    HStack(alignment: .top, spacing: 15) {
       ZStack(alignment: .leading) {
         if let uiImage = cropPhoto ?? photo {
           Image(uiImage: uiImage)
-            .raceHero()
+            .styled(as: ImageType.raceHero)
           
         } else {
           Image(systemName: "photo.fill")
-            .raceHero()
+            .placeholderStyled(as: ImageType.raceHero)
         }
       } // ZStack
       .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -46,7 +46,8 @@ struct RaceHeroCardSection: View {
             .underline(true, color: Color.Text.secondary)
         }
       } // VStack
-      .frame(maxWidth: .infinity)
+      
+      Spacer()
     } // HStack
     .padding(.vertical, 40)
     .padding(.horizontal)
