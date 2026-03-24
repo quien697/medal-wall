@@ -14,12 +14,12 @@ enum RaceEditMode { case add, edit }
 struct RaceEditView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
-  
   @State private var isShowingPhotoPicker: Bool = false
   @State private var isShowingCropImageView: Bool = false
-  @State private var isShowingAddDistanceView: Bool = false
   @State private var selectedRacePhotoItem: PhotosPickerItem?
-  @State private var newRaceDistance = RaceDistance.default
+//  @State private var isShowingAddDistanceView: Bool = false
+  
+//  @State private var newRaceDistance = RaceDistance.default
   @State private var shouldDismiss: Bool = false
   @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: RaceEditViewModel
@@ -30,7 +30,9 @@ struct RaceEditView: View {
   
   var body: some View {
     Form {
-      RacePhotoSection(
+      RaceInfoSection(
+        name: $viewModel.name,
+        url: $viewModel.url,
         photo: viewModel.photo,
         cropPhoto: viewModel.cropPhoto,
         onChooseFromLibrary: {
@@ -45,11 +47,6 @@ struct RaceEditView: View {
         }
       )
       
-//      RaceInfoSection(
-//        name: $viewModel.name,
-//        date: $viewModel.date
-//      )
-      
       RaceLocationSection(
         country: $viewModel.country,
         province: $viewModel.province,
@@ -57,29 +54,25 @@ struct RaceEditView: View {
         district: $viewModel.district
       )
       
-      RaceDistanceSection(
-        isPresented: $isShowingAddDistanceView,
-        distances: viewModel.distances,
-        onUpdate: { distance, updatedDistance in
-          do {
-            try viewModel.updateDistance(old: distance, with: updatedDistance)
-          } catch {
-            errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
-          }
-        },
-        onDelete: { distance in
-          viewModel.deleteDistance(distance)
-        }
-      )
+//      RaceDistanceSection(
+//        isPresented: $isShowingAddDistanceView,
+//        distances: viewModel.distances,
+//        onUpdate: { distance, updatedDistance in
+//          do {
+//            try viewModel.updateDistance(old: distance, with: updatedDistance)
+//          } catch {
+//            errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
+//          }
+//        },
+//        onDelete: { distance in
+//          viewModel.deleteDistance(distance)
+//        }
+//      )
       
 //      RaceAdditionalSection(url: $viewModel.url)
     } // Form
-    .task {
-      do {
-        try viewModel.attachContext(modelContext)
-      } catch {
-        errorWrapper = ErrorWrapper(error: AppError.contextNotAttached)
-      }
+    .onAppear {
+      viewModel.configure(context: modelContext)
     }
     .navigationTitle("\(viewModel.isNewRace ? "Add" : "Edit") Race")
     .navigationBarTitleDisplayMode(.inline)
@@ -131,15 +124,15 @@ struct RaceEditView: View {
         }
       }
     }
-    .sheet(isPresented: $isShowingAddDistanceView) {
-      RaceDistanceAddView(onSave: { newDistance in
-        do {
-          try viewModel.addDistance(newDistance)
-        } catch {
-          errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
-        }
-      })
-    }
+//    .sheet(isPresented: $isShowingAddDistanceView) {
+//      RaceDistanceAddView(onSave: { newDistance in
+//        do {
+//          try viewModel.addDistance(newDistance)
+//        } catch {
+//          errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
+//        }
+//      })
+//    }
     .sheet(item: $errorWrapper, onDismiss: {
       if shouldDismiss {
         dismiss()
