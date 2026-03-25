@@ -27,7 +27,14 @@ extension RaceEdition {
   }
   
   var isOneDay: Bool {
-      Calendar.current.isDate(startDate, inSameDayAs: endDate)
+    Calendar.current.isDate(startDate, inSameDayAs: endDate)
+  }
+  
+  var dateDisplayLabel: String {
+    let startDate = startDate.formatted(.dateTime.month().day())
+    let endDate = ", \(endDate.formatted(.dateTime.month().day()))"
+    
+    return "\(startDate)\(isOneDay ? "" : endDate)"
   }
   
   /// Converts categories to [RaceDistance]
@@ -37,22 +44,6 @@ extension RaceEdition {
         category: RaceDistanceCategory(value: $0.distance),
         type: RaceDistanceType(rawValue: $0.type) ?? .inPerson
       )
-    }
-  }
-  
-  /// Groups distances by type
-  var distancesGroupedByType: [RaceDistanceType: [RaceDistance]] {
-    distances.groupedByType()
-  }
-  
-  /// Returns distances grouped by type in order
-  var distancesByTypeOrdered: [(type: RaceDistanceType, distances: [RaceDistance])] {
-    let grouped = distancesGroupedByType
-    
-    return RaceDistanceType.allCases.compactMap { type in
-      guard let distances = grouped[type], !distances.isEmpty else { return nil }
-      
-      return (type, distances)
     }
   }
 }

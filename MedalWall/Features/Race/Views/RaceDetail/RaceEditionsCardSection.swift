@@ -26,7 +26,20 @@ struct RaceEditionsCardSection: View {
       } else {
         ForEach(editions) { edition in
           VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 15) {
+            HStack(spacing: 10) {
+              Text(String(edition.year))
+                .font(.title)
+                .fontWeight(.heavy)
+                .foregroundStyle(Color.Badge.Gold.primary)
+              
+              Text(edition.dateDisplayLabel)
+                .font(.subheadline)
+                .foregroundStyle(Color.Text.tertiary)
+              
+              Spacer()
+            }
+            
+            HStack(alignment: .top, spacing: 20) {
               ZStack(alignment: .leading) {
                 if let uiImage = edition.cropPhoto ?? edition.photo {
                   Image(uiImage: uiImage)
@@ -42,47 +55,18 @@ struct RaceEditionsCardSection: View {
                 }
               } // ZStack
               
-              VStack(alignment: .leading) {
-                Text(String(edition.year))
-                  .font(.title2)
-                  .fontWeight(.heavy)
-                  .foregroundStyle(Color.Badge.Gold.primary)
-                
-                let startDate = edition.startDate.formattedMonthDay()
-                let endDate = ", \(edition.endDate.formattedMonthDay())"
-                
-                Text("\(startDate)\(edition.isOneDay ? "" : endDate)")
-                  .font(.subheadline)
-                  .foregroundStyle(Color.Text.tertiary)
-                
-                Spacer()
-              } // VStack
+              FlowLayout(spacing: 10) {
+                ForEach(edition.distances.sorted()) { distance in
+                  Text(distance.displayLabel)
+                    .secondaryButtonStyle(
+                      vPadding: 6,
+                      hPadding: 10,
+                    )
+                }
+              } // FlowLayout
               
               Spacer()
             } // HStack
-            
-            Divider()
-            
-            ForEach(edition.distancesByTypeOrdered, id: \.type) { typeGroup in
-              VStack(alignment: .leading, spacing: 10) {
-                Text(typeGroup.type.displayName)
-                  .font(.headline)
-                  .foregroundStyle(Color.Text.secondary)
-                
-                FlowLayout(spacing: 10) {
-                  ForEach(typeGroup.distances) { distance in
-                    Text(distance.category.description)
-                      .secondaryButtonStyle()
-                  }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-              } // VStack
-              
-              if typeGroup.type != edition.distancesByTypeOrdered.last?.type {
-                Divider()
-                  .padding(.vertical, 5)
-              }
-            } // ForEach
           } // VStack
           .surfaceStyle()
         } // ForEach

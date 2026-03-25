@@ -36,84 +36,52 @@ struct RaceEditionSection: View {
           NavigationLink {
             RaceEditionEditView()
           } label: {
-            HStack {
-              Text("\(edition.year)")
-                .font(.title2)
-                .fontWeight(.heavy)
-                .frame(width: 80, height: 80)
-                .foregroundStyle(Color.Badge.Gold.primary)
-                .background(Color.Card.Background.secondary)
-                .overlay(
-                  RoundedRectangle(cornerRadius: 12)
-                    .stroke(.gray, style: StrokeStyle(lineWidth: 2, dash: [10, 2]))
-                )
-              
-              VStack {
-                Text(edition.startDate.formatted())
-                  .font(.subheadline)
-                
-                VStack {
-                  Text("Distance")
-                  
-                  HStack {
-                    Text("42KM")
-                    Text("42KM")
-                    Text("42KM")
-                    Text("42KM")
-                    
+            HStack(alignment: .top, spacing: 10) {
+              ZStack(alignment: .leading) {
+                if let uiImage = edition.cropPhoto ?? edition.photo {
+                  Image(uiImage: uiImage)
+                    .styled(as: ImageType.raceThumbnail)
+                } else {
+                  if let uiImage = edition.race.cropPhoto ?? edition.race.photo {
+                    Image(uiImage: uiImage)
+                      .styled(as: ImageType.raceThumbnail)
+                  } else {
+                    Image(systemName: "photo.fill")
+                      .placeholderStyled(as: ImageType.raceThumbnail)
                   }
                 }
-              }
+              } // ZStack
+              
+              VStack(alignment: .leading, spacing: 5) {
+                HStack(spacing: 10) {
+                  Text(String(edition.year))
+                    .font(.title2)
+                    .fontWeight(.heavy)
+                    .foregroundStyle(Color.Badge.Gold.primary)
+                  
+                  Text(edition.dateDisplayLabel)
+                    .font(.subheadline)
+                    .foregroundStyle(Color.Text.tertiary)
+                }
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                  HStack {
+                    ForEach(edition.distances.sorted()) { distance in
+                      Text(distance.displayLabel)
+                        .secondaryButtonStyle(
+                          font: .caption,
+                          fgColor: Color.Text.tertiary,
+                          vPadding: 6,
+                          hPadding: 10,
+                        )
+                    }
+                  } // HStack
+                } // ScrollView
+              } // VStack
               
               Spacer()
-            }
-            //            VStack(alignment: .leading) {
-            //              HStack {
-            //                VStack(alignment: .leading, spacing: 0) {
-            //                  Text("\(edition.year)")
-            //                    .font(.title2)
-            //                    .fontWeight(.heavy)
-            //                    .foregroundStyle(Color.Badge.Gold.primary)
-            //                    .padding(.bottom, 5)
-            //
-            //                  Text(edition.startDate.formatted())
-            //                    .font(.subheadline)
-            //                    .foregroundStyle(Color.Text.tertiary)
-            //                }
-            //
-            //                Spacer()
-            //
-            //                Button("Edit") {
-            //
-            //                }
-            //                .goldFillButtonStyle()
-            //              }
-            //              .background(Color.Card.Background.secondary)
-            //
-            //              Divider()
-            //
-            //              ForEach(edition.distancesByTypeOrdered, id: \.type) { typeGroup in
-            //                VStack(alignment: .leading, spacing: 10) {
-            //                  Text(typeGroup.type.displayName)
-            //                    .font(.headline)
-            //                    .foregroundStyle(Color.Text.secondary)
-            //
-            //                  FlowLayout(spacing: 10) {
-            //                    ForEach(typeGroup.distances) { distance in
-            //                      Text(distance.category.description)
-            //                        .secondaryButtonStyle()
-            //                    }
-            //                  }
-            //                  .frame(maxWidth: .infinity, alignment: .leading)
-            //                } // VStack
-            //
-            //                if typeGroup.type != edition.distancesByTypeOrdered.last?.type {
-            //                  Divider()
-            //                    .padding(.vertical, 5)
-            //                }
-            //              } // ForEach
-            //            } // VStack
-          }
+            } // HStack
+          } // NavigationLink
         } // ForEach
         
         Button {

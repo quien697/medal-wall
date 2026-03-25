@@ -134,7 +134,7 @@ extension Race {
         raceEdition: vancouver2022
       ),
       RaceCategory(
-        distance: RaceDistance(category: .`5K`, type: .virtual),
+        distance: RaceDistance(category: .`5KM`, type: .virtual),
         raceEdition: vancouver2022
       )
     ]
