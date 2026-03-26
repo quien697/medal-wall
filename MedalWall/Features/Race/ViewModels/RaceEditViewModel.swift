@@ -81,6 +81,17 @@ final class RaceEditViewModel {
     self.cropPhoto = nil
   }
   
+    func updateEdition(old: RaceEdition, with new: RaceEdition) throws {
+      // Check if there's already an edition in the same year (excluding the old one)
+      if editions.contains(where: { $0.year == new.year && $0 != old }) {
+        throw AppError.duplicateDistance
+      } else {
+        if let index = editions.firstIndex(of: old) {
+          editions[index] = new
+        }
+      }
+    }
+  
 //  func addDistance(_ distance: RaceDistance) throws {
 //    if distances.contains(distance) {
 //      throw AppError.duplicateDistance

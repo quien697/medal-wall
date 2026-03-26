@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RaceEditionSection: View {
   let editions: [RaceEdition]
+  var onUpdate: ((RaceEdition, RaceEdition) -> Void)
   
   var body: some View {
     Section("Editions") {
@@ -34,7 +35,14 @@ struct RaceEditionSection: View {
       } else {
         ForEach(editions, id: \.self) { edition in
           NavigationLink {
-            RaceEditionEditView()
+            RaceEditionEditView(
+              mode: .edit,
+              race: edition.race,
+              edition: edition,
+              onUpdate: { updatedEdition in
+                onUpdate(edition, updatedEdition)
+              }
+            )
           } label: {
             HStack(alignment: .top, spacing: 10) {
               ZStack(alignment: .leading) {
@@ -102,7 +110,7 @@ struct RaceEditionSection: View {
 }
 
 #Preview {
-  RaceEditionSection(editions: Race.sampleData.first!.editions)
+  RaceEditionSection(editions: Race.sampleData.first!.editions, onUpdate: { _, _ in })
   
-  RaceEditionSection(editions: [])
+  RaceEditionSection(editions: [], onUpdate: { _, _ in })
 }

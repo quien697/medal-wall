@@ -56,7 +56,7 @@ struct RaceInfoSection: View {
         
         VStack(alignment: .leading) {
           Text("Race Logo")
-            .font(.title3)
+            .font(.headline)
             .fontWeight(.bold)
           
           Text("(Optional) Used as race logo throughout the app")

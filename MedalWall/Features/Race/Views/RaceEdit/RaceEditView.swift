@@ -54,7 +54,20 @@ struct RaceEditView: View {
         district: $viewModel.district
       )
       
-      RaceEditionSection(editions: viewModel.editions)
+      RaceEditionSection(
+        editions: viewModel.editions,
+        onUpdate: { edition, updatedEdition in
+          do {
+            try viewModel.updateEdition(old: edition, with: updatedEdition)
+          } catch {
+//            errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
+          }
+        },
+        //        onDelete: { distance in
+        //          viewModel.deleteDistance(distance)
+        //        }
+        
+      )
       
 //      RaceDistanceSection(
 //        isPresented: $isShowingAddDistanceView,
@@ -101,7 +114,11 @@ struct RaceEditView: View {
         .disabled(!viewModel.isFormValid)
       } // ToolbarItem
     } // toolbar
-    .photosPicker(isPresented: $isShowingPhotoPicker, selection: $selectedRacePhotoItem, matching: .images)
+    .photosPicker(
+      isPresented: $isShowingPhotoPicker,
+      selection: $selectedRacePhotoItem,
+      matching: .images
+    )
     .onChange(of: selectedRacePhotoItem) { _, newItem in
       guard let newItem else { return }
 
