@@ -1,5 +1,5 @@
 //
-//  RaceHeroCardSection.swift
+//  RaceDetailInfoSection.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-11-11.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RaceHeroCardSection: View {
+struct RaceDetailInfoSection: View {
   let photo: UIImage?
   let cropPhoto: UIImage?
   let name: String
@@ -64,11 +64,13 @@ struct RaceHeroCardSection: View {
 #Preview {
   let race = Race.sampleData.first!
   
-  RaceHeroCardSection(
-    photo: race.photo,
-    cropPhoto: race.cropPhoto,
-    name: race.name,
-    location: race.location.formatted,
-    url: race.url
-  )
+  ScrollView {
+    RaceDetailInfoSection(
+      photo: race.photo,
+      cropPhoto: race.cropPhoto,
+      name: race.name,
+      location: race.location.formatted,
+      url: race.url
+    )
+  }
 }

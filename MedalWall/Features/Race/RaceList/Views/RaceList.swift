@@ -1,5 +1,5 @@
 //
-//  RaceListView.swift
+//  RaceList.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-03-20.
@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct RaceListView: View {
+struct RaceList: View {
   let searchText: String
   let applyFilter: ([Race]) -> [Race]
   let onDelete: (Race) -> Void
@@ -51,7 +51,7 @@ struct RaceListView: View {
           NavigationLink {
             RaceDetailView(race: race)
           } label: {
-            RaceRowView(race: race)
+            RaceRow(race: race)
               .swipeActions(edge: .trailing) {
                 Button(role: .destructive) {
                   onDelete(race)
@@ -68,10 +68,27 @@ struct RaceListView: View {
   }
 }
 
-#Preview(traits: .sampleData) {
-  RaceListView(
+#Preview("Sample", traits: .sampleData) {
+  RaceList(
     searchText: "",
     predicate: #Predicate<Race> { _ in true },
     sortOrder: [SortDescriptor(\Race.name)]
   )
 }
+
+#Preview("Empty") {
+  RaceList(
+    searchText: "",
+    predicate: #Predicate<Race> { _ in true },
+    sortOrder: [SortDescriptor(\Race.name)]
+  )
+}
+
+#Preview("No Search Results") {
+  RaceList(
+    searchText: "XYZ Marathon",
+    predicate: #Predicate<Race> { _ in true },
+    sortOrder: [SortDescriptor(\Race.name)]
+  )
+}
+

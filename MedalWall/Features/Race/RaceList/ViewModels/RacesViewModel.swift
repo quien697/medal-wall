@@ -54,7 +54,6 @@ final class RacesViewModel {
     return result
   }
   
-  
   func configure(context: ModelContext) {
     self.repository = RaceRepository(context: context)
   }

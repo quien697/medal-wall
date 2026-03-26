@@ -35,7 +35,7 @@ struct ContentView: View {
       .tag(Tab.medal)
       
       NavigationStack {
-        RacesView()
+        RaceListView()
       }
       .tabItem {
         Label("Race", systemImage: "figure.run")

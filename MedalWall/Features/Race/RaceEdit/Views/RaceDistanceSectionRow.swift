@@ -26,7 +26,7 @@ struct RaceDistanceSectionRow: View {
         
         Image(systemName: "figure.run")
           .padding(8)
-          .background(distance.category.color)
+//          .background(distance.category.color)
           .clipShape(.circle)
         
         Text(distance.category.description)

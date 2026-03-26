@@ -34,8 +34,8 @@ struct RaceDistanceEditView: View {
         Picker("Distance", selection: $draftDistance.category) {
           Text("Full Marathon").tag(RaceDistanceCategory.full)
           Text("Half Marathon").tag(RaceDistanceCategory.half)
-          Text("10K").tag(RaceDistanceCategory.`10K`)
-          Text("5K").tag(RaceDistanceCategory.`5K`)
+          Text("10K").tag(RaceDistanceCategory.`10KM`)
+          Text("5K").tag(RaceDistanceCategory.`5KM`)
           Text("Custom").tag(RaceDistanceCategory.custom(customValue))
         }
         .pickerStyle(.navigationLink)

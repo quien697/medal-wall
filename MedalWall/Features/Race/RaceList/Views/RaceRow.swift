@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RaceRowView: View {
+struct RaceRow: View {
   let race: Race
   
   var body: some View {
@@ -38,5 +38,7 @@ struct RaceRowView: View {
 }
 
 #Preview {
-    RaceRowView(race: Race.sampleData.first!)
+  List {
+    RaceRow(race: Race.sampleData.first!)
+  }
 }

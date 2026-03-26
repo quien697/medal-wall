@@ -1,5 +1,5 @@
 //
-//  RaceEditionsCardSection.swift
+//  RaceDetailEditionsSection.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-03-16.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RaceEditionsCardSection: View {
+struct RaceDetailEditionsSection: View {
   let editions: [RaceEdition]
   
   var body: some View {
@@ -75,8 +75,16 @@ struct RaceEditionsCardSection: View {
   }
 }
 
-#Preview {
-  RaceEditionsCardSection(editions: Race.sampleData.first!.editions)
-  
-  RaceEditionsCardSection(editions: [])
+#Preview("Sample") {
+  ScrollView {
+    RaceDetailEditionsSection(editions: Race.sampleData.first!.editions)
+  }
 }
+
+#Preview("Empty") {
+  ScrollView {
+    RaceDetailEditionsSection(editions: [])
+  }
+}
+
+

@@ -1,5 +1,5 @@
 //
-//  RacesView.swift
+//  RaceListView.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-10-30.
@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct RacesView: View {
+struct RaceListView: View {
   @Environment(\.modelContext) private var modelContext
   @State private var isShowAddView: Bool = false
   @State private var selectedRace: Race? = nil
@@ -17,7 +17,7 @@ struct RacesView: View {
   @State private var errorWrapper: ErrorWrapper?
   
   var body: some View {
-    RaceListView(
+    RaceList(
       searchText: viewModel.searchText,
       predicate: viewModel.predicate,
       sortOrder: viewModel.sortOrder,
@@ -105,5 +105,5 @@ struct RacesView: View {
 }
 
 #Preview(traits: .sampleData) {
-  RacesView()
+  RaceListView()
 }

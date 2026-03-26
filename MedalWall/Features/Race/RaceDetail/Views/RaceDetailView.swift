@@ -22,7 +22,7 @@ struct RaceDetailView: View {
   
   var body: some View {
     ScrollView {
-      RaceHeroCardSection(
+      RaceDetailInfoSection(
         photo: viewModel.race.photo,
         cropPhoto: viewModel.race.cropPhoto,
         name: viewModel.race.name,
@@ -30,7 +30,7 @@ struct RaceDetailView: View {
         url: viewModel.race.url
       )
       
-      RaceEditionsCardSection(editions: viewModel.race.editions)
+      RaceDetailEditionsSection(editions: viewModel.race.editions)
     } // ScrollView
     .navigationTitle(viewModel.race.name)
     .navigationBarTitleDisplayMode(.inline)
