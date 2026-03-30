@@ -13,6 +13,11 @@ struct RaceEditEditionSection: View {
   let racePhoto: UIImage?
   var onAdd: () -> Void
   var onUpdate: ((DraftRaceEdition, DraftRaceEdition) -> Void)
+  var onDelete: (DraftRaceEdition) -> Void
+  
+  private var sortedEditions: [DraftRaceEdition] {
+    editions.sorted(by: { $0.startDate > $1.startDate })
+  }
   
   var body: some View {
     Section("Editions") {
@@ -36,7 +41,7 @@ struct RaceEditEditionSection: View {
           .padding(.top, 15)
         } // ContentUnavailableView
       } else {
-        ForEach(editions.sorted(by: { $0.startDate > $1.startDate })) { edition in
+        ForEach(sortedEditions) { edition in
           NavigationLink {
             RaceEditionEditView(
               mode: .edit,
@@ -93,6 +98,11 @@ struct RaceEditEditionSection: View {
             } // HStack
           } // NavigationLink
         } // ForEach
+        .onDelete { offsets in
+          for index in offsets {
+            onDelete(sortedEditions[index])
+          }
+        }
         
         Button {
           onAdd()
@@ -121,7 +131,8 @@ struct RaceEditEditionSection: View {
       raceCropPhoto: race.cropPhoto,
       racePhoto: race.photo,
       onAdd: {},
-      onUpdate: { _, _ in }
+      onUpdate: { _, _ in },
+      onDelete: { _ in  }
     )
     
     RaceEditEditionSection(
@@ -129,7 +140,8 @@ struct RaceEditEditionSection: View {
       raceCropPhoto: nil,
       racePhoto: nil,
       onAdd: {},
-      onUpdate: { _, _ in }
+      onUpdate: { _, _ in },
+      onDelete: { _ in  }
     )
   }
 }

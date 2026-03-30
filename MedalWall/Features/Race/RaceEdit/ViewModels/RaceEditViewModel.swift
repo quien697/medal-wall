@@ -97,6 +97,10 @@ final class RaceEditViewModel {
     editions.append(edition)
   }
   
+  func deleteEdition(_ edition: DraftRaceEdition) {
+    editions.removeAll { $0.id == edition.id }
+  }
+  
   /// Applies the draft changes to the model
   /// - Throws: AppError if repository is not configured or save fails
   func save(by userId: UUID) throws {

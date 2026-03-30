@@ -66,6 +66,9 @@ struct RaceEditView: View {
           } catch {
             errorWrapper = ErrorWrapper(error: AppError.duplicateEdition)
           }
+        },
+        onDelete: { edition in
+          viewModel.deleteEdition(edition)
         }
       )
       

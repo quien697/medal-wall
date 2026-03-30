@@ -10,7 +10,6 @@ import PhotosUI
 
 struct RaceEditInfoSection: View {
   @State private var isShowingPhotoDialog: Bool = false
-  
   @Binding var name: String
   @Binding var url: String
   let photo: UIImage?
