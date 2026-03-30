@@ -24,7 +24,7 @@ struct RaceDetailEditionsSection: View {
         }
         .surfaceStyle()
       } else {
-        ForEach(editions) { edition in
+        ForEach(editions.sorted(by: { $0.startDate > $1.startDate })) { edition in
           VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
               Text(String(edition.year))

@@ -45,60 +45,24 @@ struct RaceEditionEditView: View {
         }
       )
       
-      Section("Date") {
-        Toggle(isOn: Binding(
-          get: { viewModel.draftEdition.isOneDay },
-          set: { _ in viewModel.toggleOneDay() }
-        )) {
-          Text("One Day Event")
-            .fontWeight(.bold)
-            .foregroundStyle(Color.Text.tertiary)
+      RaceEditionEditDateSection(
+        isOneDay: viewModel.draftEdition.isOneDay,
+        year: $viewModel.draftEdition.year,
+        startDate: $viewModel.draftEdition.startDate,
+        endDate: $viewModel.draftEdition.endDate,
+        yearDateRange: viewModel.yearDateRange,
+        minEndDate: viewModel.minEndDate,
+        maxEndDate: viewModel.maxEndDate,
+        onToggleOneDay: {
+          viewModel.toggleOneDay()
+        },
+        onUpdateYear: {
+          viewModel.updateYear($0)
+        },
+        onUpdateStartDate: {
+          viewModel.updateStartDate($0)
         }
-        .tint(Color.Badge.Gold.primary)
-        
-        Picker(selection: Binding(
-          get: { viewModel.draftEdition.year },
-          set: { viewModel.updateYear($0) }
-        )) {
-          ForEach((1911...2090).reversed(), id: \.self) { year in
-            Text(String(year))
-              .font(.body)
-              .tag(year)
-          }
-        } label: {
-          Text("Year")
-            .fontWeight(.bold)
-            .foregroundStyle(Color.Text.tertiary)
-        }
-        .tint(Color.Text.primary)
-        
-        DatePicker(
-          selection: Binding(
-            get: { viewModel.draftEdition.startDate },
-            set: { viewModel.updateStartDate($0) }
-          ),
-          in: viewModel.yearDateRange,
-          displayedComponents: [.date]
-        ) {
-          Text("Start Date")
-            .fontWeight(.bold)
-            .foregroundStyle(Color.Text.tertiary)
-        }
-        .tint(Color.Badge.Gold.primary)
-        
-        if !viewModel.draftEdition.isOneDay {
-          DatePicker(
-            selection: $viewModel.draftEdition.endDate,
-            in: viewModel.minEndDate...viewModel.maxEndDate,
-            displayedComponents: [.date]
-          ) {
-            Text("End Date")
-              .fontWeight(.bold)
-              .foregroundStyle(Color.Text.tertiary)
-          }
-          .tint(Color.Badge.Gold.primary)
-        }
-      } // Section
+      )
       
       Section("Distnaces") {
         // distances

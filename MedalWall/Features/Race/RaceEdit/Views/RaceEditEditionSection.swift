@@ -36,7 +36,7 @@ struct RaceEditEditionSection: View {
           .padding(.top, 15)
         } // ContentUnavailableView
       } else {
-        ForEach(editions) { edition in
+        ForEach(editions.sorted(by: { $0.startDate > $1.startDate })) { edition in
           NavigationLink {
             RaceEditionEditView(
               mode: .edit,
