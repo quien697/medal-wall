@@ -20,19 +20,17 @@ final class RaceEditViewModel {
   var city: String = ""
   var district: String = ""
   var url: String = ""
-  var updatedDate: Date = .now
-  var editions: [RaceEdition] = []
-  var distances: [RaceDistance] = []
-  var isNewRace: Bool = true
+  var editions: [DraftRaceEdition] = []
   
+  let mode: RaceEditMode
   private var repository: RaceRepository?
-  private(set) var race: Race?
+  private let race: Race?
   
-  init(race: Race?) {
+  init(mode: RaceEditMode, race: Race?) {
+    self.mode = mode
     self.race = race
     
-    if let race {
-      self.race = race
+    if let race, mode == .edit {
       self.name = race.name
       self.photoData = race.photoData
       self.photo = race.photo
@@ -43,9 +41,7 @@ final class RaceEditViewModel {
       self.city = race.location.city
       self.district = race.location.district ?? ""
       self.url = race.url ?? ""
-      self.updatedDate = race.updatedDate
-      self.editions = race.editions
-      self.isNewRace = false
+      self.editions = race.editions.map { DraftRaceEdition(from: $0) }
     }
   }
   
@@ -54,9 +50,11 @@ final class RaceEditViewModel {
   }
   
   var isFormValid: Bool {
-    !name.trimmingCharacters(in: .whitespaces).isEmpty &&
-    !country.trimmingCharacters(in: .whitespaces).isEmpty &&
-    !city.trimmingCharacters(in: .whitespaces).isEmpty
+    let hasValidName = !name.trimmingCharacters(in: .whitespaces).isEmpty
+    let hasValidCountry = !country.trimmingCharacters(in: .whitespaces).isEmpty
+    let hasValidCity = !city.trimmingCharacters(in: .whitespaces).isEmpty
+    
+    return hasValidName && hasValidCountry && hasValidCity
   }
   
   func updatePhoto(with data: Data?) {
@@ -81,45 +79,31 @@ final class RaceEditViewModel {
     self.cropPhoto = nil
   }
   
-    func updateEdition(old: RaceEdition, with new: RaceEdition) throws {
-      // Check if there's already an edition in the same year (excluding the old one)
-      if editions.contains(where: { $0.year == new.year && $0 != old }) {
-        throw AppError.duplicateDistance
-      } else {
-        if let index = editions.firstIndex(of: old) {
-          editions[index] = new
-        }
-      }
+  var isValidEdition: Bool {
+    return true
+  }
+  
+  func updateEdition(old: DraftRaceEdition, with new: DraftRaceEdition) throws {
+    guard isFormValid else {
+      throw AppError.duplicateEdition
     }
+    
+    if let index = editions.firstIndex(where: { $0.id == old.id }) {
+      editions[index] = new
+    }
+  }
   
-//  func addDistance(_ distance: RaceDistance) throws {
-//    if distances.contains(distance) {
-//      throw AppError.duplicateDistance
-//    } else {
-//      distances.append(distance)
-//    }
-//  }
-//  
-//  func updateDistance(old: RaceDistance, with new: RaceDistance) throws {
-//    if distances.contains(new) {
-//      throw AppError.duplicateDistance
-//    } else {
-//      if let index = distances.firstIndex(of: old) {
-//        distances[index] = new
-//      }
-//    }
-//  }
+  func addEdition(_ edition: DraftRaceEdition) {
+    editions.append(edition)
+  }
   
-//  func deleteDistance(_ distance: RaceDistance) {
-//    if let index = distances.firstIndex(of: distance) {
-//      distances.remove(at: index)
-//    }
-//  }
-  
-  func save() throws {
+  /// Applies the draft changes to the model
+  /// - Throws: AppError if repository is not configured or save fails
+  func save(by userId: UUID) throws {
     guard let repository else { throw AppError.contextNotAttached }
     
-    if let race {
+    if let race = race {
+      // Edit mode: apply draft changes to the existing race
       race.name = name
       race.photoData = photoData
       race.cropPhotoData = cropPhotoData
@@ -128,13 +112,42 @@ final class RaceEditViewModel {
       race.city = city
       race.district = district.isEmpty ? nil : district
       race.url = url.isEmpty ? nil : url
-//      for category in race.categories {
-//        try repository.deleteCategory(category)
-//      }
-//      race.categories = distances.map {
-//        RaceCategory(distance: $0, race: race)
-//      }
+      race.updatedDate = .now
+      
+      let sourceEditionIds = Set(editions.compactMap { $0.sourceEditionId })
+      
+      // Delete editions removed from the draft list
+      for edition in race.editions where !sourceEditionIds.contains(edition.id) {
+        try repository.deleteEdition(edition)
+      }
+      
+      // Update existing editions and add new ones
+      for draftEdition in editions {
+        if let sourceId = draftEdition.sourceEditionId,
+           let edition = race.editions.first(where: { $0.id == sourceId }) {
+          edition.year = draftEdition.year
+          edition.startDate = draftEdition.startDate
+          edition.endDate = draftEdition.endDate
+          edition.photoData = draftEdition.photoData
+          edition.cropPhotoData = draftEdition.cropPhotoData
+          edition.updatedDate = .now
+        } else {
+          let newEdition = RaceEdition(
+            year: draftEdition.year,
+            startDate: draftEdition.startDate,
+            endDate: draftEdition.endDate,
+            photoData: draftEdition.photoData,
+            cropPhotoData: draftEdition.cropPhotoData,
+            createBy: userId,
+            race: race,
+            categories: []
+          )
+          
+          try repository.insertEdition(newEdition, to: race)
+        }
+      }
     } else {
+      // Add mode: create new race
       let newRace = Race(
         name: name,
         photoData: photoData,
@@ -145,13 +158,25 @@ final class RaceEditViewModel {
           city: city,
           district: district.isEmpty ? nil : district
         ),
-        url: url.isEmpty ? nil : url, createBy: UUID(),
+        url: url.isEmpty ? nil : url,
+        createBy: userId
       )
-//      newRace.categories = distances.map {
-//        RaceCategory(distance: $0, race: newRace)
-//      }
-      
       try repository.insertRace(newRace)
+      
+      // Create editions for the new race
+      for edition in editions {
+        let newEdition = RaceEdition(
+          year: edition.year,
+          startDate: edition.startDate,
+          endDate: edition.endDate,
+          photoData: edition.photoData,
+          cropPhotoData: edition.cropPhotoData,
+          createBy: userId,
+          race: newRace,
+          categories: []
+        )
+        try repository.insertEdition(newEdition, to: newRace)
+      }
     }
     
     try repository.save()

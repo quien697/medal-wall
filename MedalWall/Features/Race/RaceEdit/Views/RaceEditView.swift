@@ -12,25 +12,24 @@ import SwiftData
 enum RaceEditMode { case add, edit }
 
 struct RaceEditView: View {
+  @Environment(UserManager.self) private var userManager
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
   @State private var isShowingPhotoPicker: Bool = false
   @State private var isShowingCropImageView: Bool = false
   @State private var selectedRacePhotoItem: PhotosPickerItem?
-//  @State private var isShowingAddDistanceView: Bool = false
-  
-//  @State private var newRaceDistance = RaceDistance.default
   @State private var shouldDismiss: Bool = false
+  @State private var isShowingAddEdition: Bool = false
   @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: RaceEditViewModel
-
-  init(race: Race?) {
-    self._viewModel = State(initialValue: RaceEditViewModel(race: race))
+  
+  init(mode: RaceEditMode, race: Race?) {
+    self._viewModel = State(initialValue: RaceEditViewModel(mode: mode, race: race))
   }
   
   var body: some View {
     Form {
-      RaceInfoSection(
+      RaceEditInfoSection(
         name: $viewModel.name,
         url: $viewModel.url,
         photo: viewModel.photo,
@@ -47,49 +46,50 @@ struct RaceEditView: View {
         }
       )
       
-      RaceLocationSection(
+      RaceEditLocationSection(
         country: $viewModel.country,
         province: $viewModel.province,
         city: $viewModel.city,
         district: $viewModel.district
       )
       
-      RaceEditionSection(
+      RaceEditEditionSection(
         editions: viewModel.editions,
-        onUpdate: { edition, updatedEdition in
-          do {
-            try viewModel.updateEdition(old: edition, with: updatedEdition)
-          } catch {
-//            errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
-          }
+        raceCropPhoto: viewModel.cropPhoto,
+        racePhoto: viewModel.photo,
+        onAdd: {
+          isShowingAddEdition = true
         },
-        //        onDelete: { distance in
-        //          viewModel.deleteDistance(distance)
-        //        }
-        
+        onUpdate: { originalEdition, updatedEdition in
+          do {
+            try viewModel.updateEdition(old: originalEdition, with: updatedEdition)
+          } catch {
+            errorWrapper = ErrorWrapper(error: AppError.duplicateEdition)
+          }
+        }
       )
       
-//      RaceDistanceSection(
-//        isPresented: $isShowingAddDistanceView,
-//        distances: viewModel.distances,
-//        onUpdate: { distance, updatedDistance in
-//          do {
-//            try viewModel.updateDistance(old: distance, with: updatedDistance)
-//          } catch {
-//            errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
-//          }
-//        },
-//        onDelete: { distance in
-//          viewModel.deleteDistance(distance)
-//        }
-//      )
+      //      RaceDistanceSection(
+      //        isPresented: $isShowingAddDistanceView,
+      //        distances: viewModel.distances,
+      //        onUpdate: { distance, updatedDistance in
+      //          do {
+      //            try viewModel.updateDistance(old: distance, with: updatedDistance)
+      //          } catch {
+      //            errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
+      //          }
+      //        },
+      //        onDelete: { distance in
+      //          viewModel.deleteDistance(distance)
+      //        }
+      //      )
       
-//      RaceAdditionalSection(url: $viewModel.url)
+      //      RaceAdditionalSection(url: $viewModel.url)
     } // Form
     .onAppear {
       viewModel.configure(context: modelContext)
     }
-    .navigationTitle("\(viewModel.isNewRace ? "Add" : "Edit") Race")
+    .navigationTitle("\(viewModel.mode == .add ? "Add" : "Edit") Race")
     .navigationBarTitleDisplayMode(.inline)
     .scrollContentBackground(.hidden)
     .background(Color.Background.primary)
@@ -101,11 +101,14 @@ struct RaceEditView: View {
       } // ToolbarItem
       
       ToolbarItem(placement: .confirmationAction) {
-        Button(viewModel.isNewRace ? "Add" : "Save") {
-          
+        Button(viewModel.mode == .add ? "Add" : "Save") {
           do {
-            try viewModel.save()
-            dismiss()
+            if let userId = userManager.currentUserID {
+              try viewModel.save(by: userId)
+              dismiss()
+            } else {
+              errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
+            }
           } catch {
             shouldDismiss = true
             errorWrapper = ErrorWrapper(error: AppError.raceSaveFailed)
@@ -121,7 +124,7 @@ struct RaceEditView: View {
     )
     .onChange(of: selectedRacePhotoItem) { _, newItem in
       guard let newItem else { return }
-
+      
       Task {
         do {
           if let data = try await newItem.loadTransferable(type: Data.self) {
@@ -135,6 +138,11 @@ struct RaceEditView: View {
         }
       } // Task
     }
+    .navigationDestination(isPresented: $isShowingAddEdition) {
+      RaceEditionAddView { newEdition in
+        viewModel.addEdition(newEdition)
+      }
+    }
     .sheet(isPresented: $isShowingCropImageView) {
       CropImageView(
         image: viewModel.photo,
@@ -145,15 +153,15 @@ struct RaceEditView: View {
         }
       }
     }
-//    .sheet(isPresented: $isShowingAddDistanceView) {
-//      RaceDistanceAddView(onSave: { newDistance in
-//        do {
-//          try viewModel.addDistance(newDistance)
-//        } catch {
-//          errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
-//        }
-//      })
-//    }
+    //    .sheet(isPresented: $isShowingAddDistanceView) {
+    //      RaceDistanceAddView(onSave: { newDistance in
+    //        do {
+    //          try viewModel.addDistance(newDistance)
+    //        } catch {
+    //          errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
+    //        }
+    //      })
+    //    }
     .sheet(item: $errorWrapper, onDismiss: {
       if shouldDismiss {
         dismiss()
@@ -164,8 +172,20 @@ struct RaceEditView: View {
   }
 }
 
-#Preview() {
+#Preview("Add mode") {
+  @Previewable @Environment(\.modelContext) var modelContext
+  
   NavigationStack {
-    RaceEditView(race: Race.sampleData.first!)
+    RaceEditView(mode: .add, race: Race.sampleData.first!)
   }
+  .environment(UserManager(modelContext: modelContext))
+}
+
+#Preview("Edit mode") {
+  @Previewable @Environment(\.modelContext) var modelContext
+  
+  NavigationStack {
+    RaceEditView(mode: .edit, race: Race.sampleData.first!)
+  }
+  .environment(UserManager(modelContext: modelContext))
 }

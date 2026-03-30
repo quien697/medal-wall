@@ -1,5 +1,5 @@
 //
-//  RaceLocationSection.swift
+//  RaceEditLocationSection.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-11-11.
@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct RaceLocationSection: View {
+struct RaceEditLocationSection: View {
   @Binding var country: String
   @Binding var province: String
   @Binding var city: String
@@ -51,20 +51,20 @@ struct RaceLocationSection: View {
           .fontWeight(.bold)
           .foregroundStyle(Color.Text.tertiary)
       }
-    }
+    } // Section
   }
 }
 
 #Preview {
   Form {
-    RaceLocationSection(
+    RaceEditLocationSection(
       country: .constant("Taiwan"),
       province: .constant(""),
       city: .constant("Taipei"),
       district: .constant("")
     )
     
-    RaceLocationSection(
+    RaceEditLocationSection(
       country: .constant("Canada"),
       province: .constant("BC"),
       city: .constant("Vancouver"),

@@ -11,7 +11,7 @@ import SwiftData
 struct RaceAddView: View {
   var body: some View {
     NavigationStack {
-      RaceEditView(race: nil)
+      RaceEditView(mode: .add, race: nil)
     }
   }
 }

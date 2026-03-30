@@ -1,5 +1,5 @@
 //
-//  RaceEditionSection.swift
+//  RaceEditEditionSection.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-03-24.
@@ -7,9 +7,12 @@
 
 import SwiftUI
 
-struct RaceEditionSection: View {
-  let editions: [RaceEdition]
-  var onUpdate: ((RaceEdition, RaceEdition) -> Void)
+struct RaceEditEditionSection: View {
+  let editions: [DraftRaceEdition]
+  let raceCropPhoto: UIImage?
+  let racePhoto: UIImage?
+  var onAdd: () -> Void
+  var onUpdate: ((DraftRaceEdition, DraftRaceEdition) -> Void)
   
   var body: some View {
     Section("Editions") {
@@ -20,7 +23,7 @@ struct RaceEditionSection: View {
             .foregroundStyle(Color.Text.tertiary)
           
           Button {
-            
+            onAdd()
           } label: {
             Label("Add Edition", systemImage: "plus")
               .labelStyle(.titleAndIcon)
@@ -33,13 +36,12 @@ struct RaceEditionSection: View {
           .padding(.top, 15)
         } // ContentUnavailableView
       } else {
-        ForEach(editions, id: \.self) { edition in
+        ForEach(editions) { edition in
           NavigationLink {
             RaceEditionEditView(
               mode: .edit,
-              race: edition.race,
               edition: edition,
-              onUpdate: { updatedEdition in
+              onAction: { updatedEdition in
                 onUpdate(edition, updatedEdition)
               }
             )
@@ -50,7 +52,7 @@ struct RaceEditionSection: View {
                   Image(uiImage: uiImage)
                     .styled(as: ImageType.raceThumbnail)
                 } else {
-                  if let uiImage = edition.race.cropPhoto ?? edition.race.photo {
+                  if let uiImage = raceCropPhoto ?? racePhoto {
                     Image(uiImage: uiImage)
                       .styled(as: ImageType.raceThumbnail)
                   } else {
@@ -93,7 +95,7 @@ struct RaceEditionSection: View {
         } // ForEach
         
         Button {
-          
+          onAdd()
         } label: {
           Label("Add Another Edition", systemImage: "plus")
             .labelStyle(.titleAndIcon)
@@ -109,8 +111,25 @@ struct RaceEditionSection: View {
   }
 }
 
-#Preview {
-  RaceEditionSection(editions: Race.sampleData.first!.editions, onUpdate: { _, _ in })
+#Preview(traits: .sampleData) {
+  let race = Race.sampleData.first!
+  let drafts = race.editions.map { DraftRaceEdition(from: $0) }
   
-  RaceEditionSection(editions: [], onUpdate: { _, _ in })
+  Form {
+    RaceEditEditionSection(
+      editions: drafts,
+      raceCropPhoto: race.cropPhoto,
+      racePhoto: race.photo,
+      onAdd: {},
+      onUpdate: { _, _ in }
+    )
+    
+    RaceEditEditionSection(
+      editions: [],
+      raceCropPhoto: nil,
+      racePhoto: nil,
+      onAdd: {},
+      onUpdate: { _, _ in }
+    )
+  }
 }

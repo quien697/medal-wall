@@ -14,7 +14,11 @@ enum AppError: LocalizedError, Identifiable {
   case raceDeleteFailed
   case userSaveFailed
   
+  // User Manager
+  case userLoadFailed
+  
   // Validation Errors
+  case duplicateEdition
   case duplicateDistance
   
   // Media Errors
@@ -36,6 +40,10 @@ enum AppError: LocalizedError, Identifiable {
       "Race Delete Failed"
     case .userSaveFailed:
       "User Save Failed"
+    case .userLoadFailed:
+      "User Load Failed"
+    case .duplicateEdition:
+      "Duplicate Edition"
     case .duplicateDistance:
       "Duplicate Distance"
     case .photoLoadFailed:
@@ -57,6 +65,10 @@ enum AppError: LocalizedError, Identifiable {
       "We couldn't delete this race event. Please try again."
     case .userSaveFailed:
       "We couldn't save your user information."
+    case .userLoadFailed:
+      "We couldn't load your user profile."
+    case .duplicateEdition:
+      "An edition with the same year already exists."
     case .duplicateDistance:
       "This distance already exists."
     case .photoLoadFailed:
@@ -74,6 +86,10 @@ enum AppError: LocalizedError, Identifiable {
       "Please restart the app. If the problem continues, contact support."
     case .raceSaveFailed, .raceDeleteFailed, .userSaveFailed:
       "Please try it again."
+    case .userLoadFailed:
+      "Please restart the app. If the problem continues, you may need to reinstall."
+    case .duplicateEdition:
+      "Please choose a different year or edit the existing edition."
     case .duplicateDistance:
       "Please try selecting a different distance or type."
     case .photoLoadFailed:

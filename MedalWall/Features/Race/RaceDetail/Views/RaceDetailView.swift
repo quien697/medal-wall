@@ -72,7 +72,7 @@ struct RaceDetailView: View {
     }
     .sheet(isPresented: $isShowEditor) {
       NavigationStack {
-        RaceEditView(race: viewModel.race)
+        RaceEditView(mode: .edit, race: viewModel.race)
       }
     } // sheet
     .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in

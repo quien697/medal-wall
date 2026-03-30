@@ -12,85 +12,42 @@ import SwiftData
 enum RaceEditionEditMode { case add, edit }
 
 struct RaceEditionEditView: View {
-  @Environment(\.modelContext) private var modelContext
-  @Environment(UserManager.self) private var userManager
   @Environment(\.dismiss) private var dismiss
-  @State private var isShowingPhotoDialog: Bool = false
   @State private var isShowingPhotoPicker: Bool = false
   @State private var isShowingCropImageView: Bool = false
   @State private var selectedPhotoItem: PhotosPickerItem?
   @State private var viewModel: RaceEditionEditViewModel
-  let onUpdate: (RaceEdition) -> Void
+  let onAction: (DraftRaceEdition) -> Void
   
   init(
     mode: RaceEditionEditMode,
-    race: Race,
-    edition: RaceEdition?,
-    onUpdate: @escaping (RaceEdition) -> Void
+    edition: DraftRaceEdition?,
+    onAction: @escaping (DraftRaceEdition) -> Void
   ) {
-    self.onUpdate = onUpdate
-    self._viewModel = State(initialValue: RaceEditionEditViewModel(mode: mode, race: race, edition: edition))
+    self.onAction = onAction
+    self._viewModel = State(initialValue: RaceEditionEditViewModel(mode: mode, edition: edition))
   }
   
   var body: some View {
     Form {
-      Section("Logo") {
-        HStack(spacing: 15) {
-          Group {
-            if let uiImage = viewModel.cropPhoto ?? viewModel.photo {
-              Image(uiImage: uiImage)
-                .styled(as: .raceThumbnail)
-            } else {
-              Image(systemName: "camera.fill")
-                .placeholderStyled(as: .raceThumbnail)
-            }
-          } // Group
-          .confirmationDialog(
-            "Edit Photo",
-            isPresented: $isShowingPhotoDialog,
-            titleVisibility: .visible
-          ) {
-            Button("Choose from Library") {
-              isShowingPhotoPicker = true
-            }
-            
-            if viewModel.cropPhoto != nil || viewModel.photo != nil {
-              Button("Crop Photo") {
-                isShowingCropImageView = true
-              }
-            }
-            
-            Button("Remove Photo", role: .destructive) {
-              selectedPhotoItem = nil
-              viewModel.clearPhoto()
-            }
-            
-            Button("Cancel", role: .cancel) {
-              isShowingPhotoDialog = false
-            }
-          } // confirmationDialog
-          
-          VStack(alignment: .leading, spacing: 5) {
-            Text("Logo")
-              .font(.headline)
-            
-            Text("(Optional) Leave empty to use race logo")
-              .font(.caption)
-              .foregroundStyle(Color.Text.tertiary)
-          } // VStack
-          
-          Spacer()
-          
-          Button("\(viewModel.photo == nil && viewModel.cropPhoto == nil ? "Add" : "Edit")") {
-            isShowingPhotoDialog = true
-          }
-          .goldFillButtonStyle()
-        } // HStack
-      } // Section
+      RaceEditionEditLogoSection(
+        photo: viewModel.draftEdition.photo,
+        cropPhoto: viewModel.draftEdition.cropPhoto,
+        onChooseFromLibrary: {
+          isShowingPhotoPicker = true
+        },
+        onCrop: {
+          isShowingCropImageView = true
+        },
+        onRemove: {
+          selectedPhotoItem = nil
+          viewModel.clearPhoto()
+        }
+      )
       
       Section("Date") {
         Toggle(isOn: Binding(
-          get: { viewModel.isOneDay },
+          get: { viewModel.draftEdition.isOneDay },
           set: { _ in viewModel.toggleOneDay() }
         )) {
           Text("One Day Event")
@@ -100,7 +57,7 @@ struct RaceEditionEditView: View {
         .tint(Color.Badge.Gold.primary)
         
         Picker(selection: Binding(
-          get: { viewModel.year },
+          get: { viewModel.draftEdition.year },
           set: { viewModel.updateYear($0) }
         )) {
           ForEach((1911...2090).reversed(), id: \.self) { year in
@@ -117,7 +74,7 @@ struct RaceEditionEditView: View {
         
         DatePicker(
           selection: Binding(
-            get: { viewModel.startDate },
+            get: { viewModel.draftEdition.startDate },
             set: { viewModel.updateStartDate($0) }
           ),
           in: viewModel.yearDateRange,
@@ -129,9 +86,9 @@ struct RaceEditionEditView: View {
         }
         .tint(Color.Badge.Gold.primary)
         
-        if !viewModel.isOneDay {
+        if !viewModel.draftEdition.isOneDay {
           DatePicker(
-            selection: $viewModel.endDate,
+            selection: $viewModel.draftEdition.endDate,
             in: viewModel.minEndDate...viewModel.maxEndDate,
             displayedComponents: [.date]
           ) {
@@ -151,14 +108,9 @@ struct RaceEditionEditView: View {
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
-        Button("Update") {
-          if let userId = userManager.currentUserID {
-            let updatedEdition = viewModel.onSave(by: userId)
-            onUpdate(updatedEdition)
-            dismiss()
-          } else {
-            // handle error
-          }
+        Button(viewModel.mode == .add ? "Add" : "Update") {
+          onAction(viewModel.draftEdition)
+          dismiss()
         }
         .disabled(!viewModel.isFormValid)
       }
@@ -170,23 +122,23 @@ struct RaceEditionEditView: View {
     )
     .onChange(of: selectedPhotoItem) { _, newItem in
       guard let newItem else { return }
-
+      
       Task {
         do {
           if let data = try await newItem.loadTransferable(type: Data.self) {
             viewModel.clearPhoto()
             viewModel.updatePhoto(with: data)
           } else {
-//            errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
+            //            errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
           }
         } catch {
-//          errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
+          //          errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
         }
       } // Task
     }
     .sheet(isPresented: $isShowingCropImageView) {
       CropImageView(
-        image: viewModel.photo,
+        image: viewModel.draftEdition.photo,
         type: .raceHero,
       ) { cropppedImage in
         if let cropppedImage {
@@ -240,20 +192,18 @@ struct RaceEditionEditView: View {
   NavigationStack {
     RaceEditionEditView(
       mode: .add,
-      race: Race.sampleData.first!,
       edition: nil,
-      onUpdate: { _ in }
+      onAction: { _ in }
     )
   }
 }
 
-#Preview("Edit Mode") {
+#Preview("Edit Mode", traits: .sampleData) {
   NavigationStack {
     RaceEditionEditView(
       mode: .edit,
-      race: Race.sampleData.first!,
-      edition: Race.sampleData.first!.editions.first!,
-      onUpdate: { _ in }
+      edition: DraftRaceEdition(from: Race.sampleData.first!.editions.first!),
+      onAction: { _ in }
     )
   }
 }

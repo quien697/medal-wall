@@ -1,17 +1,15 @@
 //
-//  RaceInfoSection.swift
+//  RaceEditionEditLogoSection.swift
 //  MedalWall
 //
-//  Created by Quien on 2025-11-26.
+//  Created by Quien on 2026-03-27.
 //
 
 import SwiftUI
 import PhotosUI
 
-struct RaceInfoSection: View {
+struct RaceEditionEditLogoSection: View {
   @State private var isShowingPhotoDialog: Bool = false
-  @Binding var name: String
-  @Binding var url: String
   let photo: UIImage?
   let cropPhoto: UIImage?
   let onChooseFromLibrary: (() -> Void)
@@ -19,15 +17,15 @@ struct RaceInfoSection: View {
   let onRemove: (() -> Void)
   
   var body: some View {
-    Section("Info") {
-      HStack {
+    Section("Logo") {
+      HStack(spacing: 15) {
         Group {
           if let uiImage = cropPhoto ?? photo {
             Image(uiImage: uiImage)
-              .styled(as: ImageType.raceHero)
+              .styled(as: .raceThumbnail)
           } else {
-            Image(systemName: "photo.fill")
-              .placeholderStyled(as: ImageType.raceHero)
+            Image(systemName: "camera.fill")
+              .placeholderStyled(as: .raceThumbnail)
           }
         } // Group
         .confirmationDialog(
@@ -54,63 +52,39 @@ struct RaceInfoSection: View {
           }
         } // confirmationDialog
         
-        VStack(alignment: .leading) {
-          Text("Race Logo")
+        VStack(alignment: .leading, spacing: 5) {
+          Text("Logo")
             .font(.headline)
-            .fontWeight(.bold)
           
-          Text("(Optional) Used as race logo throughout the app")
-            .font(.subheadline)
+          Text("(Optional) Leave empty to use race logo")
+            .font(.caption)
             .foregroundStyle(Color.Text.tertiary)
-          
-          Spacer()
-          
-          Button("\(photo == nil && cropPhoto == nil ? "Add" : "Edit")") {
-            isShowingPhotoDialog = true
-          }
-          .goldFillButtonStyle()
+        } // VStack
+        
+        Spacer()
+        
+        Button("\(photo == nil && cropPhoto == nil ? "Add" : "Edit")") {
+          isShowingPhotoDialog = true
         }
-        .padding(.leading, 10)
-      }
-      
-      LabeledContent {
-        TextField("Name", text: $name)
-          .multilineTextAlignment(.trailing)
-      } label: {
-        Text("Name")
-          .fontWeight(.bold)
-          .foregroundStyle(Color.Text.tertiary)
-      }
-      
-      LabeledContent {
-        TextField("WebSite (optional)", text: $url)
-          .multilineTextAlignment(.trailing)
-      } label: {
-        Text("WebSite")
-          .fontWeight(.bold)
-          .foregroundStyle(Color.Text.tertiary)
-      }
+        .goldFillButtonStyle()
+      } // HStack
     } // Section
   }
 }
 
 #Preview {
-  let race = Race.sampleData.first!
+  let edition = Race.sampleData.first!.editions.first!
   
   Form {
-    RaceInfoSection(
-      name: .constant(race.name),
-      url: .constant(race.url ?? ""),
-      photo: race.photo,
-      cropPhoto: race.cropPhoto,
+    RaceEditionEditLogoSection(
+      photo: edition.photo,
+      cropPhoto: edition.cropPhoto,
       onChooseFromLibrary: { print("onChooseFromLibrary") },
       onCrop: { print("onCrop") },
       onRemove: { print("onRemove") }
     )
     
-    RaceInfoSection(
-      name: .constant(race.name),
-      url: .constant(""),
+    RaceEditionEditLogoSection(
       photo: nil,
       cropPhoto: nil,
       onChooseFromLibrary: { print("onChooseFromLibrary") },

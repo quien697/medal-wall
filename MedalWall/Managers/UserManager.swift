@@ -22,9 +22,6 @@ class UserManager {
   private func loadUser() {
     if let user = try? repository.getUser() {
       self.currentUser = user
-    } else {
-      // This should never happen if DefaultDataSeeder works
-      fatalError("No user found. DefaultDataSeeder may have failed.")
     }
   }
   
