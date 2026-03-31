@@ -10,6 +10,8 @@ import SwiftData
 
 @Observable
 final class RaceEditionEditViewModel {
+  let minYear: Int = 1911
+  let maxYear: Int = 2060
   var draftEdition: DraftRaceEdition
   let mode: RaceEditionEditMode
   
@@ -19,8 +21,8 @@ final class RaceEditionEditViewModel {
   }
   
   var isFormValid: Bool {
-    draftEdition.year >= 1911 &&
-    draftEdition.year <= 2090 &&
+    draftEdition.year >= minYear &&
+    draftEdition.year <= maxYear &&
     draftEdition.startDate <= draftEdition.endDate
   }
   

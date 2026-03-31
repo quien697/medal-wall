@@ -52,6 +52,8 @@ struct RaceEditionEditView: View {
         year: $viewModel.draftEdition.year,
         startDate: $viewModel.draftEdition.startDate,
         endDate: $viewModel.draftEdition.endDate,
+        minYear: viewModel.minYear,
+        maxYear: viewModel.maxYear,
         yearDateRange: viewModel.yearDateRange,
         minEndDate: viewModel.minEndDate,
         maxEndDate: viewModel.maxEndDate,

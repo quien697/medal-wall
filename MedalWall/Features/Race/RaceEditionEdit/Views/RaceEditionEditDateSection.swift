@@ -12,6 +12,8 @@ struct RaceEditionEditDateSection: View {
   @Binding var year: Int
   @Binding var startDate: Date
   @Binding var endDate: Date
+  let minYear: Int
+  let maxYear: Int
   let yearDateRange: ClosedRange<Date>
   let minEndDate: Date
   let maxEndDate: Date
@@ -35,7 +37,7 @@ struct RaceEditionEditDateSection: View {
         get: { year },
         set: { onUpdateYear($0) }
       )) {
-        ForEach((1911...2090).reversed(), id: \.self) { year in
+        ForEach((minYear...maxYear).reversed(), id: \.self) { year in
           Text(String(year))
             .font(.body)
             .tag(year)
@@ -84,6 +86,8 @@ struct RaceEditionEditDateSection: View {
       year: .constant(2026),
       startDate: .constant(Date()),
       endDate: .constant(Date()),
+      minYear: 1911,
+      maxYear: 2060,
       yearDateRange: Date()...Date(),
       minEndDate: Date(),
       maxEndDate: Date(),
@@ -97,6 +101,8 @@ struct RaceEditionEditDateSection: View {
       year: .constant(2026),
       startDate: .constant(Date()),
       endDate: .constant(Date()),
+      minYear: 1911,
+      maxYear: 2060,
       yearDateRange: Date()...Date(),
       minEndDate: Date(),
       maxEndDate: Date(),
