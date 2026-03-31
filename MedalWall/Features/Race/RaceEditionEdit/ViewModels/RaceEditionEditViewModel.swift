@@ -86,4 +86,16 @@ final class RaceEditionEditViewModel {
       }
     }
   }
+  
+  func addDistance(_ distance: RaceDistance) throws {
+    guard !draftEdition.distances.contains(distance) else {
+      throw AppError.duplicateDistance
+    }
+    
+    draftEdition.distances.append(distance)
+  }
+  
+  func removeDistance(_ distance: RaceDistance) {
+    draftEdition.distances.removeAll { $0 == distance }
+  }
 }

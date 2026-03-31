@@ -15,7 +15,9 @@ struct RaceEditionEditView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var isShowingPhotoPicker: Bool = false
   @State private var isShowingCropImageView: Bool = false
+  @State private var isShowingAddDistanceSheet: Bool = false
   @State private var selectedPhotoItem: PhotosPickerItem?
+  @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: RaceEditionEditViewModel
   let onAction: (DraftRaceEdition) -> Void
   
@@ -64,9 +66,15 @@ struct RaceEditionEditView: View {
         }
       )
       
-      Section("Distnaces") {
-        // distances
-      }
+      RaceEditionEditDistanceSection(
+        distances: viewModel.draftEdition.distances,
+        onRemove: {
+          viewModel.removeDistance($0)
+        },
+        onAdd: {
+          isShowingAddDistanceSheet = true
+        }
+      )
     } // Form
     .navigationTitle("\(viewModel.mode == .add ? "Add" : "Edit") Edition")
     .navigationBarTitleDisplayMode(.inline)
@@ -93,10 +101,10 @@ struct RaceEditionEditView: View {
             viewModel.clearPhoto()
             viewModel.updatePhoto(with: data)
           } else {
-            //            errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
+            errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
           }
         } catch {
-          //          errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
+          errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
         }
       } // Task
     }
@@ -110,45 +118,19 @@ struct RaceEditionEditView: View {
         }
       }
     }
-    
-    //    .sheet(isPresented: $isShowingAddDistanceSheet) {
-    //      NavigationStack {
-    //        RaceDistanceEditView(
-    //          mode: .add,
-    //          distance: .default,
-    //          onUpdate: { newDistance in
-    //            do {
-    //              try viewModel.addDistance(newDistance)
-    //            } catch {
-    //              errorWrapper = ErrorWrapper(
-    //                error: error,
-    //                guidance: "This distance already exists for this edition."
-    //              )
-    //            }
-    //          }
-    //        )
-    //      }
-    //      .presentationDetents([.medium])
-    //    }
-    //    .sheet(item: $editingDistance) { distance in
-    //      NavigationStack {
-    //        RaceDistanceEditView(
-    //          mode: .edit,
-    //          distance: distance,
-    //          onUpdate: { updatedDistance in
-    //            do {
-    //              try viewModel.updateDistance(old: distance, with: updatedDistance)
-    //            } catch {
-    //              errorWrapper = ErrorWrapper(
-    //                error: error,
-    //                guidance: "This distance already exists for this edition."
-    //              )
-    //            }
-    //          }
-    //        )
-    //      }
-    //      .presentationDetents([.medium])
-    //    }
+    .sheet(isPresented: $isShowingAddDistanceSheet) {
+      RaceDistanceAddView { newDistance in
+        do {
+          try viewModel.addDistance(newDistance)
+        } catch {
+          errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
+        }
+      }
+      .presentationDetents([.medium])
+    }
+    .sheet(item: $errorWrapper) { wrapper in
+      ErrorView(errorWrapper: wrapper)
+    }
   }
 }
 

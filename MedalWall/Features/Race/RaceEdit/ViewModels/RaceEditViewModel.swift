@@ -101,58 +101,82 @@ final class RaceEditViewModel {
     editions.removeAll { $0.id == edition.id }
   }
   
+  /// Syncs categories on an existing edition by diffing against draft distances.
+  /// Only deletes removed categories and inserts new ones.
+  /// Syncs editions on an existing race by diffing against drafts.
+  /// Deletes removed editions, updates existing ones, and adds new ones.
+  private func syncEditions(on race: Race, with drafts: [DraftRaceEdition], by userId: UUID) throws {
+    guard let repository else { throw AppError.contextNotAttached }
+    
+    let sourceEditionIds = Set(drafts.compactMap { $0.sourceEditionId })
+    
+    // Delete editions removed from the draft list
+    for edition in race.editions where !sourceEditionIds.contains(edition.id) {
+      try repository.deleteEdition(edition)
+    }
+    
+    // Update existing editions and add new ones
+    for draft in drafts {
+      if let sourceId = draft.sourceEditionId,
+         let edition = race.editions.first(where: { $0.id == sourceId }) {
+        edition.year = draft.year
+        edition.startDate = draft.startDate
+        edition.endDate = draft.endDate
+        edition.photoData = draft.photoData
+        edition.cropPhotoData = draft.cropPhotoData
+        edition.updatedDate = .now
+        
+        try syncCategories(on: edition, with: draft.distances)
+      } else {
+        let newEdition = RaceEdition(
+          year: draft.year,
+          startDate: draft.startDate,
+          endDate: draft.endDate,
+          photoData: draft.photoData,
+          cropPhotoData: draft.cropPhotoData,
+          createBy: userId,
+          race: race,
+          categories: []
+        )
+        
+        try syncCategories(on: newEdition, with: draft.distances)
+        try repository.insertEdition(newEdition, to: race)
+      }
+    }
+  }
+  
+  /// Syncs categories on an edition by diffing against draft distances.
+  /// Only deletes removed categories and inserts new ones.
+  private func syncCategories(on edition: RaceEdition, with draftDistances: [RaceDistance]) throws {
+    guard let repository else { throw AppError.contextNotAttached }
+    
+    // Delete categories no longer in draft
+    for category in edition.categories {
+      let distance = RaceDistance(
+        category: RaceDistanceCategory(value: category.distance),
+        type: RaceDistanceType(rawValue: category.type) ?? .inPerson
+      )
+      if !draftDistances.contains(distance) {
+        try repository.deleteCategory(category)
+      }
+    }
+    
+    // Add new distances as categories
+    for distance in draftDistances where !edition.distances.contains(distance) {
+      let category = RaceCategory(distance: distance, raceEdition: edition)
+      try repository.insertCategory(category, to: edition)
+    }
+  }
+  
   /// Applies the draft changes to the model
   /// - Throws: AppError if repository is not configured or save fails
   func save(by userId: UUID) throws {
     guard let repository else { throw AppError.contextNotAttached }
     
-    if let race = race {
-      // Edit mode: apply draft changes to the existing race
-      race.name = name
-      race.photoData = photoData
-      race.cropPhotoData = cropPhotoData
-      race.country = country
-      race.province = province.isEmpty ? nil : province
-      race.city = city
-      race.district = district.isEmpty ? nil : district
-      race.url = url.isEmpty ? nil : url
-      race.updatedDate = .now
-      
-      let sourceEditionIds = Set(editions.compactMap { $0.sourceEditionId })
-      
-      // Delete editions removed from the draft list
-      for edition in race.editions where !sourceEditionIds.contains(edition.id) {
-        try repository.deleteEdition(edition)
-      }
-      
-      // Update existing editions and add new ones
-      for draftEdition in editions {
-        if let sourceId = draftEdition.sourceEditionId,
-           let edition = race.editions.first(where: { $0.id == sourceId }) {
-          edition.year = draftEdition.year
-          edition.startDate = draftEdition.startDate
-          edition.endDate = draftEdition.endDate
-          edition.photoData = draftEdition.photoData
-          edition.cropPhotoData = draftEdition.cropPhotoData
-          edition.updatedDate = .now
-        } else {
-          let newEdition = RaceEdition(
-            year: draftEdition.year,
-            startDate: draftEdition.startDate,
-            endDate: draftEdition.endDate,
-            photoData: draftEdition.photoData,
-            cropPhotoData: draftEdition.cropPhotoData,
-            createBy: userId,
-            race: race,
-            categories: []
-          )
-          
-          try repository.insertEdition(newEdition, to: race)
-        }
-      }
+    let race = if let race = self.race {
+      race
     } else {
-      // Add mode: create new race
-      let newRace = Race(
+      Race(
         name: name,
         photoData: photoData,
         cropPhotoData: cropPhotoData,
@@ -165,24 +189,23 @@ final class RaceEditViewModel {
         url: url.isEmpty ? nil : url,
         createBy: userId
       )
-      try repository.insertRace(newRace)
-      
-      // Create editions for the new race
-      for edition in editions {
-        let newEdition = RaceEdition(
-          year: edition.year,
-          startDate: edition.startDate,
-          endDate: edition.endDate,
-          photoData: edition.photoData,
-          cropPhotoData: edition.cropPhotoData,
-          createBy: userId,
-          race: newRace,
-          categories: []
-        )
-        try repository.insertEdition(newEdition, to: newRace)
-      }
     }
     
+    if self.race == nil {
+      try repository.insertRace(race)
+    } else {
+      race.name = name
+      race.photoData = photoData
+      race.cropPhotoData = cropPhotoData
+      race.country = country
+      race.province = province
+      race.city = city
+      race.district = district
+      race.url = url.isEmpty ? nil : url
+      race.updatedDate = .now
+    }
+    
+    try syncEditions(on: race, with: editions, by: userId)
     try repository.save()
   }
 }

@@ -76,3 +76,33 @@ struct RaceEditionEditDateSection: View {
     } // Section
   }
 }
+
+#Preview {
+  Form {
+    RaceEditionEditDateSection(
+      isOneDay: true,
+      year: .constant(2026),
+      startDate: .constant(Date()),
+      endDate: .constant(Date()),
+      yearDateRange: Date()...Date(),
+      minEndDate: Date(),
+      maxEndDate: Date(),
+      onToggleOneDay: {},
+      onUpdateYear: { _ in },
+      onUpdateStartDate: { _ in }
+    )
+    
+    RaceEditionEditDateSection(
+      isOneDay: false,
+      year: .constant(2026),
+      startDate: .constant(Date()),
+      endDate: .constant(Date()),
+      yearDateRange: Date()...Date(),
+      minEndDate: Date(),
+      maxEndDate: Date(),
+      onToggleOneDay: {},
+      onUpdateYear: { _ in },
+      onUpdateStartDate: { _ in }
+    )
+  }
+}

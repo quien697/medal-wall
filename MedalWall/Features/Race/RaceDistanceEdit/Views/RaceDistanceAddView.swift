@@ -16,13 +16,13 @@ struct RaceDistanceAddView: View {
       RaceDistanceEditView(
         mode: .add,
         distance: .default,
-        onUpdate: onSave
+        onAction: onSave
       )
     }
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   NavigationStack{
     RaceDistanceAddView(onSave: { _ in print("onSave") })
   }
