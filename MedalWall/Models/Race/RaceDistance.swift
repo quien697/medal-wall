@@ -45,27 +45,3 @@ struct RaceDistance: Identifiable, Hashable, Comparable {
     return lhs.category.value > rhs.category.value
   }
 }
-
-// MARK: - Array Extensions
-extension Array where Element == RaceDistance {
-  
-  /// Groups distances by type, sorted by type order
-  /// - Returns: Array of tuples with type and its distances
-  var groupedByType: [(type: RaceDistanceType, distances: [RaceDistance])] {
-    return Dictionary(grouping: self.sorted()) { $0.type }
-      .sorted { $0.key.sortOrder < $1.key.sortOrder }
-      .map { (type: $0.key, distances: $0.value) }
-  }
-  
-  /// All unique distance categories, sorted largest to smallest
-  var uniqueCategories: [RaceDistanceCategory] {
-    return Set(self.map(\.category))
-      .sorted { $0.value > $1.value }
-  }
-  
-  /// All unique types, sorted by sort order
-  var uniqueTypes: [RaceDistanceType] {
-    return Set(self.map(\.type))
-      .sorted { $0.sortOrder < $1.sortOrder }
-  }
-}

@@ -34,7 +34,7 @@ final class MedalEditViewModel {
     if let medal {
       self.title = medal.title
       self.date = medal.date
-      self.result = medal.result ?? ""
+//      self.result = medal.result ?? ""
       self.photoData = medal.photoData
       self.photo = medal.photo
       self.cropPhotoData = medal.cropPhotoData
@@ -83,7 +83,7 @@ final class MedalEditViewModel {
     if let medal {
       medal.title = title
       medal.date = date
-      medal.result = result.isEmpty ? nil : result
+//      medal.result = result.isEmpty ? nil : result
       medal.photoData = photoData
       medal.cropPhotoData = cropPhotoData
       medal.note = note.isEmpty ? nil : note
@@ -100,19 +100,19 @@ final class MedalEditViewModel {
       let categories = try context.fetch(FetchDescriptor<RaceCategory>())
       guard let category = categories.first(where: { $0.id == categoryID }) else { throw AppError.unknown }
       
-      let newMedal = Medal(
-        title: title,
-        date: date,
-        location: "",
-        result: result.isEmpty ? nil : result,
-        photoData: photoData,
-        cropPhotoData: cropPhotoData,
-        note: note.isEmpty ? nil : note,
-        user: user,
-        raceCategory: category
-      )
-
-      context.insert(newMedal)
+//      let newMedal = Medal(
+//        title: title,
+//        date: date,
+//        location: "",
+////        result: result.isEmpty ? nil : result,
+//        photoData: photoData,
+//        cropPhotoData: cropPhotoData,
+//        note: note.isEmpty ? nil : note,
+//        user: user,
+//        raceCategory: category
+//      )
+//
+//      context.insert(newMedal)
     }
 
     try context.save()
