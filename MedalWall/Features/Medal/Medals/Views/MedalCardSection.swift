@@ -9,43 +9,38 @@ import SwiftUI
 
 struct MedalCardSection: View {
   let medal: Medal
-  let spacing: CGFloat
   
   var body: some View {
     VStack {
       MedalImage(photo: medal.cropPhoto == nil ? medal.photo : medal.cropPhoto)
       
-      VStack(alignment: .leading, spacing: spacing) {
+      VStack(alignment: .leading) {
+        Text(medal.raceDistanceCategory.description)
+          .font(.caption2)
+          .fontWeight(.bold)
+          .foregroundStyle(Color.Text.tertiary)
+        
         Text(medal.title)
           .font(.headline)
-          .lineLimit(1)
+          .foregroundStyle(Color.Text.primary)
+//          .lineLimit(1)
         
-        HStack {
-          Text(medal.date.formatted(date: .abbreviated, time: .omitted))
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .truncationMode(.tail)
-          
-          Spacer()
-          
-          Text(medal.raceDistanceCategory.description)
-            .font(.caption2)
-            .bold()
-            .padding(.horizontal, 6)
-            .padding(.vertical, 4)
-            .background(.blue)
-            .clipShape(.rect(cornerRadius: 6) )
-            
-        } // HStack
+        Text("05:11:39")
+          .font(.subheadline)
+          .fontWeight(.heavy)
+          .foregroundStyle(Color.Badge.Gold.primary)
+        
+        Text(medal.date.formatted(date: .abbreviated, time: .omitted))
+          .font(.caption)
+          .foregroundStyle(.secondary)
+          .truncationMode(.tail)
       } // VStack
-      .padding(.horizontal, spacing * 0.5)
-      .padding(.bottom, spacing)
-    } // CardSection
+    } // VStack
     .surfaceStyle()
   }
 }
 
 #Preview {
-  MedalCardSection(medal: Medal.sampleData[1], spacing: 10)
+  MedalCardSection(medal: Medal.sampleData[1])
     .frame(width: 160)
 }

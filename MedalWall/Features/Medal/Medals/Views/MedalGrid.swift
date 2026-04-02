@@ -17,13 +17,11 @@ struct MedalGrid: View {
   var body: some View {
     Group {
       if medals.isEmpty {
-        ZStack {
-          ContentUnavailableView {
-            Label("No Medals", systemImage: "medal")
-          } description: {
-            Text("You haven't added any medals yet.")
-          }
-        }
+        ContentUnavailableView(
+          "No Medals",
+          systemImage: "tray",
+          description: Text("Tap the + button to add your first medal!")
+        )
       } else {
         let columns = Array(
           repeating: GridItem(.flexible(minimum: size + 20), spacing: spacing),
@@ -36,7 +34,7 @@ struct MedalGrid: View {
               NavigationLink {
                 MedalDetailView(medal: medal)
               } label: {
-                MedalCardSection(medal: medal, spacing: spacing)
+                MedalCardSection(medal: medal)
               }
               .buttonStyle(.plain)
             }

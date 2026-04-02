@@ -24,7 +24,7 @@ struct MedalImage: View {
   var body: some View {
     ZStack {
       Hexagon()
-        .stroke(
+        .strokeBorder(
           LinearGradient(
             stops: [
               .init(color: Color.Badge.Gold.secondary, location: 0.0),
@@ -43,7 +43,7 @@ struct MedalImage: View {
         )
         .overlay(
           Hexagon()
-            .stroke(
+            .strokeBorder(
               Color.Badge.Gold.secondary.opacity(0.2),
               lineWidth: 1
             )
@@ -60,7 +60,7 @@ struct MedalImage: View {
         Image(uiImage: uiImage)
           .resizable()
           .aspectRatio(contentMode: imageType.contentMode)
-          .frame(width: size * 0.78, height: size * 0.78)
+          .frame(width: size * 0.72, height: size * 0.72)
           .clipShape(imageType.shape)
           .shadow(
             radius: 6,
