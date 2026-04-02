@@ -16,14 +16,15 @@ struct SampleData: PreviewModifier {
       Race.self,
       RaceEdition.self,
       RaceCategory.self,
-//      Medal.self,
+      Medal.self,
+      EventPhoto.self
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
     let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
     let context = ModelContext(container)
     context.insert(User.defaultUser)
     Race.sampleData.forEach { context.insert($0) }
-//    Medal.sampleData.forEach { context.insert($0) }
+    Medal.sampleData.forEach { context.insert($0) }
     try context.save()
     
     return container

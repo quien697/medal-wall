@@ -7,8 +7,8 @@
 
 import UIKit
 
-/// Extends User with computed values
-extension EventPhotos {
+/// Extends EventPhoto with computed values
+extension EventPhoto {
   
   var image: UIImage? {
     UIImage(data: imageData)

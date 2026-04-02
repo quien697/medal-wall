@@ -1,5 +1,5 @@
 //
-//  EventPhotos.swift
+//  EventPhoto.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-04-01.
@@ -10,7 +10,7 @@ import UIKit
 import SwiftData
 
 @Model
-final class EventPhotos {
+final class EventPhoto {
   @Attribute(.unique) var id: UUID
   var imageData: Data
   var caption: String?

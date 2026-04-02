@@ -7,10 +7,9 @@
 
 import UIKit
 
+/// Extends Medal with computed values
 extension Medal {
 
-  // MARK: - Media
-  
   var photo: UIImage? {
     photoData.flatMap { UIImage(data: $0) }
   }
@@ -18,15 +17,11 @@ extension Medal {
   var cropPhoto: UIImage? {
     cropPhotoData.flatMap { UIImage(data: $0) }
   }
-  
-  // MARK: - Location
-  
+ 
   var location: RaceLocation {
     RaceLocation(country: country, province: province, city: city, district: district)
   }
 
-  // MARK: - Race category
-  
   var raceDistanceCategory: RaceDistanceCategory {
     RaceDistanceCategory(value: raceDistance)
   }

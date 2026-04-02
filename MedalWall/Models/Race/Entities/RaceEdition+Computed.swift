@@ -37,7 +37,6 @@ extension RaceEdition {
     return "\(startDate)\(isOneDay ? "" : endDate)"
   }
   
-  /// Converts categories to [RaceDistance]
   var distances: [RaceDistance] {
     categories.map {
       RaceDistance(

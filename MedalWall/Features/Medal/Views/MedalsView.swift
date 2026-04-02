@@ -11,7 +11,7 @@ import SwiftData
 struct MedalsView: View {
   @Environment(\.modelContext) private var modelContext
   
-  @State private var isShowingMedalAddView = false
+//  @State private var isShowingMedalAddView = false
   
   private let spacing: CGFloat = 10
   private let size: CGFloat = ImageType.medal.size.width
@@ -56,17 +56,17 @@ struct MedalsView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Button("Add Medal", systemImage: "plus") {
-          isShowingMedalAddView = true
+//          isShowingMedalAddView = true
         }
       }
     }
-    .sheet(isPresented: $isShowingMedalAddView) {
-      if let user {
-        NavigationStack {
-          MedalAddView(user: user)
-        }
-      }
-    }
+//    .sheet(isPresented: $isShowingMedalAddView) {
+//      if let user {
+//        NavigationStack {
+//          MedalAddView(user: user)
+//        }
+//      }
+//    }
   }
 }
 

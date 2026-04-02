@@ -7,7 +7,7 @@
 
 import UIKit
 
-/// Extends User with computed values
+/// Extends Race with computed values
 extension Race {
   var photo: UIImage? {
     if let photoData {

@@ -35,6 +35,16 @@ extension Race {
       categories: []
     )
     
+    let taipeiDate2020 = DateComponents(calendar: .current, year: 2020, month: 12, day: 20)
+    let taipei2020: RaceEdition = RaceEdition(
+      year: taipeiDate2020.year!,
+      startDate: taipeiDate2020.date!,
+      endDate: taipeiDate2020.date!,
+      createBy: userId,
+      race: taipei,
+      categories: []
+    )
+    
     let taipeiStartDate2025 = DateComponents(calendar: .current, year: 2025, month: 12, day: 20)
     let taipeiEndDate2025 = DateComponents(calendar: .current, year: 2025, month: 12, day: 21)
     let taipei2025: RaceEdition = RaceEdition(
@@ -46,7 +56,7 @@ extension Race {
       categories: []
     )
     
-    taipei.editions = [taipei2019, taipei2025]
+    taipei.editions = [taipei2019, taipei2020, taipei2025]
     
     taipei2019.categories = [
       RaceCategory(
@@ -56,6 +66,17 @@ extension Race {
       RaceCategory(
         distance: RaceDistance(category: .half, type: .inPerson),
         raceEdition: taipei2019
+      ),
+    ]
+    
+    taipei2020.categories = [
+      RaceCategory(
+        distance: RaceDistance(category: .full, type: .inPerson),
+        raceEdition: taipei2020
+      ),
+      RaceCategory(
+        distance: RaceDistance(category: .half, type: .inPerson),
+        raceEdition: taipei2020
       ),
     ]
     
