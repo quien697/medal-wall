@@ -45,7 +45,7 @@
 				Features/Race/RaceDetail/ViewModels/RaceDetailViewModel.swift,
 				Features/Race/RaceEdit/ViewModels/RaceEditViewModel.swift,
 				Features/Race/RaceEditionEdit/ViewModels/RaceEditionEditViewModel.swift,
-				Features/Race/RaceList/ViewModels/RaceListViewModel.swift,
+				Features/Race/Races/ViewModels/RaceListViewModel.swift,
 				"Models/Medal/Entities/EventPhotos+Computed.swift",
 				Models/Medal/Entities/Medal.swift,
 				"Models/Medal/Entities/Medal+Computed.swift",
