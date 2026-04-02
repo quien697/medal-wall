@@ -1,25 +1,18 @@
 //
-//  MedalsView.swift
+//  MedalGrid.swift
 //  MedalWall
 //
-//  Created by Quien on 2025-10-30.
+//  Created by Quien on 2026-04-02.
 //
 
 import SwiftUI
 import SwiftData
 
-struct MedalsView: View {
-  @Environment(\.modelContext) private var modelContext
-  
-//  @State private var isShowingMedalAddView = false
-  
-  private let spacing: CGFloat = 10
+struct MedalGrid: View {
   private let size: CGFloat = ImageType.medal.size.width
+  private let spacing: CGFloat = 10
   
-  @Query(sort: [SortDescriptor(\Medal.date, order: .reverse)], animation: .default)
-  private var medals: [Medal]
-  @Query private var users: [User]
-  private var user: User? { users.first }
+  @Query private var medals: [Medal]
   
   var body: some View {
     Group {
@@ -52,24 +45,9 @@ struct MedalsView: View {
         } // ScrollView
       }
     } // Group
-    .navigationTitle("Your Rewards")
-    .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Button("Add Medal", systemImage: "plus") {
-//          isShowingMedalAddView = true
-        }
-      }
-    }
-//    .sheet(isPresented: $isShowingMedalAddView) {
-//      if let user {
-//        NavigationStack {
-//          MedalAddView(user: user)
-//        }
-//      }
-//    }
   }
 }
 
-#Preview(traits: .sampleData) {
-  MedalsView()
+#Preview {
+  MedalGrid()
 }

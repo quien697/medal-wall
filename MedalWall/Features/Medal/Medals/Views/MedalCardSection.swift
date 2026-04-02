@@ -13,7 +13,7 @@ struct MedalCardSection: View {
   
   var body: some View {
     VStack {
-      MedalBadge(photo: medal.cropPhoto == nil ? medal.photo : medal.cropPhoto)
+      MedalImage(photo: medal.cropPhoto == nil ? medal.photo : medal.cropPhoto)
       
       VStack(alignment: .leading, spacing: spacing) {
         Text(medal.title)
