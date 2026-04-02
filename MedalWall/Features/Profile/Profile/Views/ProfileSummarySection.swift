@@ -17,17 +17,17 @@ struct ProfileSummarySection: View {
   var body: some View {
     SectionContainer {
       LazyVGrid(columns: columns, spacing: 20) {
-        StatGrid(title: "32", subTitle: "Races")
+        StatGridItem(title: "32", subTitle: "Races")
         
-        StatGrid(title: "12", subTitle: "Medals", titleColor: Color.Badge.Gold.primary)
+        StatGridItem(title: "12", subTitle: "Medals", titleColor: Color.Badge.Gold.primary)
         
-        StatGrid(title: "847km", subTitle: "Total")
+        StatGridItem(title: "847km", subTitle: "Total")
         
-        StatGrid(title: "12", subTitle: "Finisher")
+        StatGridItem(title: "12", subTitle: "Finisher")
         
-        StatGrid(title: "9:99:99", subTitle: "Best Full", titleColor: Color.Badge.Gold.primary)
+        StatGridItem(title: "9:99:99", subTitle: "Best Full", titleColor: Color.Badge.Gold.primary)
         
-        StatGrid(title: "2:00:19", subTitle: "Best Half")
+        StatGridItem(title: "2:00:19", subTitle: "Best Half")
       }
     }
   }
