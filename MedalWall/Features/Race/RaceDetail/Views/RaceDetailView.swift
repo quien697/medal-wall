@@ -22,9 +22,8 @@ struct RaceDetailView: View {
   
   var body: some View {
     ScrollView {
-      RaceDetailInfoSection(
-        photo: viewModel.race.photo,
-        cropPhoto: viewModel.race.cropPhoto,
+      RaceDetailHeroSection(
+        photo: viewModel.race.cropPhoto ?? viewModel.race.photo,
         name: viewModel.race.name,
         location: viewModel.race.location.formatted,
         url: viewModel.race.url

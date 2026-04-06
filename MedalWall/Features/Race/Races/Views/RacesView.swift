@@ -13,7 +13,7 @@ struct RacesView: View {
   @State private var isShowAddView: Bool = false
   @State private var selectedRace: Race? = nil
   @State private var isShowDeleteConfirm = false
-  @State private var viewModel: RaceListViewModel = RaceListViewModel()
+  @State private var viewModel: RacesViewModel = RacesViewModel()
   @State private var errorWrapper: ErrorWrapper?
   
   var body: some View {

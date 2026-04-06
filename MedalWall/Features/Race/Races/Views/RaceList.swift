@@ -51,7 +51,12 @@ struct RaceList: View {
           NavigationLink {
             RaceDetailView(race: race)
           } label: {
-            RaceRow(race: race)
+            RaceRow(
+              photo: race.cropPhoto ?? race.photo,
+              name: race.name,
+              location: race.location.formatted,
+              editionCount: race.editions.count
+            )
               .swipeActions(edge: .trailing) {
                 Button(role: .destructive) {
                   onDelete(race)

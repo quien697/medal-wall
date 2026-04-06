@@ -1,5 +1,5 @@
 //
-//  RaceListViewModel.swift
+//  RacesViewModel.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-11-21.
@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 @Observable
-final class RaceListViewModel {
+final class RacesViewModel {
   private var repository: RaceRepository?
   // Search
   var searchText: String = ""

@@ -8,11 +8,14 @@
 import SwiftUI
 
 struct RaceRow: View {
-  let race: Race
+  let photo: UIImage?
+  let name: String
+  let location: String
+  let editionCount: Int
   
   var body: some View {
     HStack {
-      if let photo = race.cropPhoto ?? race.photo {
+      if let photo {
         Image(uiImage: photo)
           .styled(as: ImageType.raceThumbnail)
       } else {
@@ -21,15 +24,15 @@ struct RaceRow: View {
       }
       
       VStack(alignment: .leading) {
-        Text(race.name)
+        Text(name)
           .font(.headline)
           .foregroundStyle(Color.Text.primary)
         
-        Text(race.location.formatted)
+        Text(location)
           .font(.subheadline)
           .foregroundStyle(Color.Text.secondary)
         
-        Text("\(race.editions.count) editions")
+        Text("\(editionCount) editions")
           .font(.subheadline)
           .foregroundStyle(Color.Text.tertiary)
       }
@@ -38,7 +41,14 @@ struct RaceRow: View {
 }
 
 #Preview {
+  let race = Race.sampleData.first!
+  
   List {
-    RaceRow(race: Race.sampleData.first!)
+    RaceRow(
+      photo: race.cropPhoto ?? race.photo,
+      name: race.name,
+      location: race.location.formatted,
+      editionCount: race.editions.count
+    )
   }
 }
