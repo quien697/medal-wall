@@ -10,9 +10,14 @@ import SwiftData
 
 struct MedalsView: View {
   @Environment(\.modelContext) private var modelContext
+  @State private var viewModel = MedalsViewModel()
+  @State private var errorWrapper: ErrorWrapper?
 
   var body: some View {
-    MedalGrid()
+    MedalGrid(
+      columnCount: viewModel.columnCount,
+      spacing: viewModel.spacing
+    )
     .navigationTitle("Your Rewards")
     .background(Color.Background.primary)
     .toolbar {

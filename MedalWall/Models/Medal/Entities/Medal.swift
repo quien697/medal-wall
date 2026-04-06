@@ -11,7 +11,7 @@ import SwiftData
 @Model
 final class Medal {
   @Attribute(.unique) var id: UUID
-  var title: String
+  var name: String
   var date: Date
   var bibNumber: String
   var photoData: Data?
@@ -39,7 +39,7 @@ final class Medal {
 
   init(
     id: UUID = UUID(),
-    title: String,
+    name: String,
     date: Date,
     bibNumber: String,
     photoData: Data? = nil,
@@ -60,7 +60,7 @@ final class Medal {
     eventPhotos: [EventPhoto] = []
   ) {
     self.id = id
-    self.title = title
+    self.name = name
     self.date = date
     self.bibNumber = bibNumber
     self.photoData = photoData

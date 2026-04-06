@@ -10,19 +10,20 @@ import SwiftData
 
 @Observable
 final class MedalDetailViewModel {
-  private let repository: MedalRepository
+  private var repository: MedalRepository?
   var medal: Medal
 
-  init(medal: Medal, repository: MedalRepository = MedalRepository()) {
+  init(medal: Medal) {
     self.medal = medal
-    self.repository = repository
   }
 
-  func attachContext(_ context: ModelContext) throws {
-    repository.attachContext(context)
+  func configure(context: ModelContext) {
+    self.repository = MedalRepository(context: context)
   }
-
+  
   func deleteMedal(_ medal: Medal) throws {
+    guard let repository else { throw AppError.contextNotAttached }
+    
     try repository.deleteMedal(medal)
     try repository.save()
   }

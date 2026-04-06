@@ -9,8 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct MedalGrid: View {
-  private let size: CGFloat = ImageType.medal.size.width
-  private let spacing: CGFloat = 10
+  let columnCount: Int
+  let spacing: CGFloat
   
   @Query private var medals: [Medal]
   
@@ -24,9 +24,23 @@ struct MedalGrid: View {
         )
       } else {
         let columns = Array(
-          repeating: GridItem(.flexible(minimum: size + 20), spacing: spacing),
-          count: 2
+          repeating: GridItem(.flexible(), spacing: spacing),
+          count: columnCount
         )
+        
+//        ScrollView(.horizontal) {
+//          HStack(spacing: 10) {
+//            StatGridItem(title: "12", subTitle: "Total")
+//              .frame(width: 80, height: 80)
+//            
+//            StatGridItem(title: "5", subTitle: "Full")
+//              .frame(width: 80, height: 80)
+//            
+//            StatGridItem(title: "4", subTitle: "Half")
+//              .frame(width: 80, height: 80)
+//          }
+//          .padding()
+//        }
         
         ScrollView {
           LazyVGrid(columns: columns, spacing: spacing) {
@@ -34,12 +48,18 @@ struct MedalGrid: View {
               NavigationLink {
                 MedalDetailView(medal: medal)
               } label: {
-                MedalCardSection(medal: medal)
+                MedalGridItem(
+                  photo: medal.cropPhoto ?? medal.photo,
+                  distanceCategory: medal.raceDistanceCategory.description,
+                  title: medal.name,
+                  finishTime: medal.finishTime?.formattedHMS ?? "-",
+                  date: medal.date.formattedMonthDayYear()
+                )
               }
               .buttonStyle(.plain)
             }
-          }
-          .padding(spacing)
+          } // LazyVGrid
+          .padding(.horizontal)
         } // ScrollView
       }
     } // Group
@@ -47,5 +67,8 @@ struct MedalGrid: View {
 }
 
 #Preview {
-  MedalGrid()
+  MedalGrid(
+    columnCount: 2,
+    spacing: 10
+  )
 }

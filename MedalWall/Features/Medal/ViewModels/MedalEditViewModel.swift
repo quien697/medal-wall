@@ -10,7 +10,7 @@ import SwiftData
 
 @Observable
 final class MedalEditViewModel {
-  var title: String = ""
+  var name: String = ""
   var date: Date = .now
   var result: String = ""
   var photoData: Data? = nil
@@ -32,7 +32,7 @@ final class MedalEditViewModel {
     self.repository = repository
 
     if let medal {
-      self.title = medal.title
+      self.name = medal.name
       self.date = medal.date
 //      self.result = medal.result ?? ""
       self.photoData = medal.photoData
@@ -52,7 +52,7 @@ final class MedalEditViewModel {
   }
 
   var isFormValid: Bool {
-    !title.trimmingCharacters(in: .whitespaces).isEmpty &&
+    !name.trimmingCharacters(in: .whitespaces).isEmpty &&
     (user != nil) &&
     (selectedRaceCategoryID != nil)
   }
@@ -81,7 +81,7 @@ final class MedalEditViewModel {
 
   func save(in context: ModelContext) throws {
     if let medal {
-      medal.title = title
+      medal.name = name
       medal.date = date
 //      medal.result = result.isEmpty ? nil : result
       medal.photoData = photoData
