@@ -53,8 +53,8 @@ struct MedalDetailHeroSection: View {
   MedalDetailHeroSection(
     photo: medal.cropPhoto ?? medal.photo,
     name: medal.name,
-    raceDistance: medal.raceDistanceCategory.description,
-    raceDistanceType: medal.raceDistanceType.displayName,
+    raceDistance: medal.distance.category.description,
+    raceDistanceType: medal.distance.type.displayName,
     location: medal.location.formatted,
     date: medal.date.formattedMonthDayYear(),
     bib: medal.bibNumber

@@ -21,26 +21,25 @@ extension Medal {
   var location: RaceLocation {
     RaceLocation(country: country, province: province, city: city, district: district)
   }
-
-  var raceDistanceCategory: RaceDistanceCategory {
-    RaceDistanceCategory(value: raceDistance)
-  }
-
-  var raceDistanceType: RaceDistanceType {
-    RaceDistanceType(rawValue: raceType) ?? .inPerson
+  
+  var distance: RaceDistance {
+    RaceDistance(
+      category: RaceDistanceCategory(value: raceDistance),
+      type: RaceDistanceType(rawValue: raceDistanceType) ?? .inPerson
+    )
   }
 
   // MARK: - Result
-  
-//  var divisionEnum: Division? {
-//    guard let division else { return nil }
-//    return Division(rawValue: division)
-//  }
 
   /// Average pace in minutes per kilometre
   var averagePace: Double? {
     guard let finishTime, raceDistance > 0 else { return nil }
     
     return (finishTime / 60) / raceDistance
+  }
+  
+  var divisionEnum: Division? {
+    guard let division else { return nil }
+    return Division(rawValue: division)
   }
 }

@@ -29,8 +29,8 @@ struct MedalDetailView: View {
       MedalDetailHeroSection(
         photo: viewModel.medal.cropPhoto ?? viewModel.medal.photo,
         name: viewModel.medal.name,
-        raceDistance: viewModel.medal.raceDistanceCategory.description,
-        raceDistanceType: viewModel.medal.raceDistanceType.displayName,
+        raceDistance: viewModel.medal.distance.category.description,
+        raceDistanceType: viewModel.medal.distance.type.displayName,
         location: viewModel.medal.location.formatted,
         date: viewModel.medal.date.formattedMonthDayYear(),
         bib: viewModel.medal.bibNumber
@@ -43,7 +43,7 @@ struct MedalDetailView: View {
       averagePace: viewModel.averagePaceText,
       overallPlacement: viewModel.overallPlacementText,
       totalParticipants: viewModel.totalParticipantsText,
-      division: viewModel.medal.division ?? "--",
+      division: viewModel.divisionText,
       divisionPlacement: viewModel.divisionPlacementText,
       divisionTotal: viewModel.divisionTotalText,
       genderPlacement: viewModel.genderPlacementText,
@@ -54,7 +54,9 @@ struct MedalDetailView: View {
         MedalDetailNoteSection(note: note)
       }
       
-      eventPhotosSection
+//      MedalDetailEventPhotosSection(photots: viewModel.medal.eventPhotos)
+      
+//      MedalDetailTagsSection()
     }
     .navigationTitle(viewModel.medal.name)
     .navigationBarTitleDisplayMode(.inline)
@@ -97,55 +99,6 @@ struct MedalDetailView: View {
 //    .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
 //      ErrorView(errorWrapper: wrapper)
 //    }
-  }
-
-  // MARK: - Event Photos
-
-  private var eventPhotosSection: some View {
-    SectionContainer(title: "Event Photos") {
-      ScrollView(.horizontal, showsIndicators: false) {
-        HStack(spacing: 12) {
-          if viewModel.medal.eventPhotos.isEmpty {
-            ForEach(1...4, id: \.self) { index in
-              placeholderEventPhoto(index: index)
-            }
-          } else {
-            ForEach(
-              viewModel.medal.eventPhotos.sorted(by: { $0.sortOrder < $1.sortOrder }),
-              id: \.id
-            ) { photo in
-              if let image = photo.image {
-                Image(uiImage: image)
-                  .resizable()
-                  .aspectRatio(contentMode: .fill)
-                  .frame(width: 140, height: 110)
-                  .clipShape(RoundedRectangle(cornerRadius: 12))
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  private func placeholderEventPhoto(index: Int) -> some View {
-    RoundedRectangle(cornerRadius: 12)
-      .fill(Color.Card.Background.secondary)
-      .frame(width: 140, height: 110)
-      .overlay(
-        VStack(spacing: 6) {
-          Image(systemName: "photo")
-            .font(.system(size: 26))
-            .foregroundStyle(Color.Text.tertiary)
-          Text("Photo \(index)")
-            .font(.caption)
-            .foregroundStyle(Color.Text.tertiary)
-        }
-      )
-      .overlay(
-        RoundedRectangle(cornerRadius: 12)
-          .stroke(Color.Border.gray, lineWidth: 1)
-      )
   }
 }
 

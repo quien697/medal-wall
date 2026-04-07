@@ -9,6 +9,8 @@ import SwiftUI
 
 @Observable
 final class MedalsViewModel {
+  // MARK: - Properties
+  
   let gridSpacing: CGFloat = 10
   
   // MARK: - Computed
@@ -18,10 +20,6 @@ final class MedalsViewModel {
      count: 2
    )
   }
-  
-  // Search
-  var searchText: String = ""
-//  let surfacePadding: CGFloat = 15
   
   /// Calculate medal image size that fits within the grid item's content area.
   /// Hexagon width = size * 0.9, so size = contentWidth / 0.9.

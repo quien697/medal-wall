@@ -59,7 +59,7 @@ extension Medal {
       bibNumber: "00001",
       photoData: UIImage(named: "taipei-marathon-medal-2025")?.jpegData(compressionQuality: 0.9),
       location: taipeiRace.location,
-      raceDistance: taiepiRaceEdition2025.distances[1], // in-person 21km
+      raceDistance: taiepiRaceEdition2025.distances[2], // in-person 21km
       finishTime: 2 * 3600 + 02 * 60 + 52, // 2:02:52
       user: user
     )

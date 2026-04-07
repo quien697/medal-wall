@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MedalGridItem: View {
   let photo: UIImage?
-  let distanceCategory: String
+  let distance: String
   let title: String
   let finishTime: String
   let date: String
@@ -19,7 +19,7 @@ struct MedalGridItem: View {
       MedalImage(photo: photo)
       
       VStack(alignment: .leading, spacing: 2) {
-        Text(distanceCategory)
+        Text("\(distance)")
           .font(.caption2)
           .fontWeight(.bold)
           .foregroundStyle(Color.Text.tertiary)
@@ -50,7 +50,7 @@ struct MedalGridItem: View {
   
   MedalGridItem(
     photo: medal.cropPhoto ?? medal.photo,
-    distanceCategory: medal.raceDistanceCategory.description,
+    distance: medal.distance.displayLabel,
     title: medal.name,
     finishTime: medal.finishTime?.formattedHMS ?? "-",
     date: medal.date.formattedMonthDayYear()

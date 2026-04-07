@@ -18,4 +18,11 @@ enum Gender: String, CaseIterable {
     case .female: return "Female"
     }
   }
+  
+  var shortName: String {
+    switch self {
+    case .male: return "M"
+    case .female: return "F"
+    }
+  }
 }

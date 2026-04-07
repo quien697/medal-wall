@@ -18,7 +18,7 @@ struct Division: Hashable, Sendable {
   }
   
   var displayName: String {
-    "\(gender.displayName) \(ageGroup.displayName)"
+    "\(gender.shortName) \(ageGroup.displayName)"
   }
 
   init(gender: Gender, ageGroup: AgeGroup) {
@@ -27,15 +27,18 @@ struct Division: Hashable, Sendable {
   }
 
   /// Reconstructs a `Division` from its persisted raw value.
-  /// Splits on the last `|` so custom gender labels containing `|` are preserved.
-//  init?(rawValue: String) {
-//    guard let separatorIndex = rawValue.lastIndex(of: " ") else { return nil }
-//    let genderRaw = String(rawValue[rawValue.startIndex..<separatorIndex])
-//    let ageGroupRaw = String(rawValue[rawValue.index(after: separatorIndex)...])
-//    guard let gender = Gender(rawValue: genderRaw),
-//          let ageGroup = AgeGroup(rawValue: ageGroupRaw)
-//    else { return nil }
-//    self.gender = gender
-//    self.ageGroup = ageGroup
-//  }
+  /// Splits on the last space, e.g. `"male from30to34"` → `.male` + `.from30to34`.
+  nonisolated
+  init?(rawValue: String) {
+    guard let separatorIndex = rawValue.lastIndex(of: " ") else { return nil }
+    
+    let genderRaw = String(rawValue[rawValue.startIndex..<separatorIndex])
+    let ageGroupRaw = String(rawValue[rawValue.index(after: separatorIndex)...])
+    guard let gender = Gender(rawValue: genderRaw),
+          let ageGroup = AgeGroup(rawValue: ageGroupRaw)
+    else { return nil }
+    
+    self.gender = gender
+    self.ageGroup = ageGroup
+  }
 }

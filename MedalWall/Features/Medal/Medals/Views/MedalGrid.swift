@@ -45,7 +45,7 @@ struct MedalGrid: View {
               } label: {
                 MedalGridItem(
                   photo: medal.cropPhoto ?? medal.photo,
-                  distanceCategory: medal.raceDistanceCategory.description,
+                  distance: medal.distance.displayLabel,
                   title: medal.name,
                   finishTime: medal.finishTime?.formattedHMS ?? "-",
                   date: medal.date.formattedMonthDayYear()

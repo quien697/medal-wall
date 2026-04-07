@@ -53,6 +53,11 @@ final class MedalDetailViewModel {
     guard let total = medal.totalParticipants else { return "" }
     return "of \(total)"
   }
+  
+  var divisionText: String {
+    guard let division = medal.divisionEnum else { return "--" }
+    return division.displayName
+  }
 
   var divisionPlacementText: String {
     guard let placement = medal.divisionPlacement else { return "--" }

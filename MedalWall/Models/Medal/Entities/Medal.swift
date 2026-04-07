@@ -21,7 +21,7 @@ final class Medal {
   var city: String
   var district: String?
   var raceDistance: Double
-  var raceType: String
+  var raceDistanceType: String
   var finishTime: TimeInterval?
   var overallPlacement: Int?
   var totalParticipants: Int?
@@ -70,7 +70,7 @@ final class Medal {
     self.city = location.city
     self.district = location.district
     self.raceDistance = raceDistance.category.value
-    self.raceType = raceDistance.type.rawValue
+    self.raceDistanceType = raceDistance.type.rawValue
     self.finishTime = finishTime
     self.overallPlacement = overallPlacement
     self.totalParticipants = totalParticipants
