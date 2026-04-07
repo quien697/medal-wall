@@ -38,7 +38,7 @@ extension Medal {
 //  }
 
   /// Average pace in minutes per kilometre
-  var avgPace: Double? {
+  var averagePace: Double? {
     guard let finishTime, raceDistance > 0 else { return nil }
     
     return (finishTime / 60) / raceDistance

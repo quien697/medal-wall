@@ -9,57 +9,21 @@ import SwiftUI
 import SwiftData
 
 struct MedalDetailView: View {
+  // MARK: - Environment
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
+  // MARK: - State
   @State private var isShowEditor = false
   @State private var isShowDeleteConfirm = false
   @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: MedalDetailViewModel
-
+  
+  // MARK: - Init
   init(medal: Medal) {
     self._viewModel = State(initialValue: MedalDetailViewModel(medal: medal))
   }
 
-  // MARK: - Computed
-
-  private var resultColumns: [GridItem] {
-    [
-      GridItem(.flexible(minimum: 80), spacing: 12),
-      GridItem(.flexible(minimum: 80), spacing: 12),
-    ]
-  }
-
-  private var formattedPace: String {
-    guard let pace = viewModel.medal.avgPace else { return "--'--\"" }
-    let minutes = Int(pace)
-    let seconds = Int((pace - Double(minutes)) * 60)
-    return String(format: "%d'%02d\"/km", minutes, seconds)
-  }
-
-  private var overallPlacementText: String {
-    guard let placement = viewModel.medal.overallPlacement,
-          let total = viewModel.medal.totalParticipants else { return "--" }
-    return "\(placement)/\(total)"
-  }
-
-  private var divisionPlacementText: String {
-    guard let placement = viewModel.medal.divisionPlacement,
-          let total = viewModel.medal.divisionTotal else { return "--" }
-    return "\(placement)/\(total)"
-  }
-
-  private var genderPlacementText: String {
-    guard let placement = viewModel.medal.genderPlacement,
-          let total = viewModel.medal.genderTotal else { return "--" }
-    return "\(placement)/\(total)"
-  }
-
-  private var hasResult: Bool {
-    viewModel.medal.finishTime != nil || viewModel.medal.overallPlacement != nil
-  }
-
   // MARK: - Body
-
   var body: some View {
     ScrollView {
       MedalDetailHeroSection(
@@ -72,16 +36,25 @@ struct MedalDetailView: View {
         bib: viewModel.medal.bibNumber
       )
 
-
-      if hasResult {
-        resultSection
-      }
-
-      eventPhotosSection
+     MedalDetailStatsSection(
+      columns: viewModel.gridColumns,
+      spacing: viewModel.gridSpacing,
+      finishTime: viewModel.finishTimeText,
+      averagePace: viewModel.averagePaceText,
+      overallPlacement: viewModel.overallPlacementText,
+      totalParticipants: viewModel.totalParticipantsText,
+      division: viewModel.medal.division ?? "--",
+      divisionPlacement: viewModel.divisionPlacementText,
+      divisionTotal: viewModel.divisionTotalText,
+      genderPlacement: viewModel.genderPlacementText,
+      genderTotal: viewModel.genderTotalText
+     )
 
       if let note = viewModel.medal.note, !note.isEmpty {
-        notesSection(note: note)
+        MedalDetailNoteSection(note: note)
       }
+      
+      eventPhotosSection
     }
     .navigationTitle(viewModel.medal.name)
     .navigationBarTitleDisplayMode(.inline)
@@ -124,41 +97,6 @@ struct MedalDetailView: View {
 //    .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
 //      ErrorView(errorWrapper: wrapper)
 //    }
-  }
-
-  // MARK: - Result
-
-  private var resultSection: some View {
-    SectionContainer(title: "Result") {
-      LazyVGrid(columns: resultColumns, spacing: 12) {
-        if let finishTime = viewModel.medal.finishTime {
-          StatGridItem(
-            title: finishTime.formattedHMS,
-            subTitle: "Finish Time",
-            titleColor: Color.Badge.Gold.primary
-          )
-        }
-
-        if viewModel.medal.overallPlacement != nil {
-          StatGridItem(title: overallPlacementText, subTitle: "Overall")
-        }
-
-        if viewModel.medal.avgPace != nil {
-          StatGridItem(title: formattedPace, subTitle: "Avg Pace")
-        }
-
-        if viewModel.medal.divisionPlacement != nil {
-          StatGridItem(
-            title: divisionPlacementText,
-            subTitle: viewModel.medal.division ?? "Division"
-          )
-        }
-
-        if viewModel.medal.genderPlacement != nil {
-          StatGridItem(title: genderPlacementText, subTitle: "Gender")
-        }
-      }
-    }
   }
 
   // MARK: - Event Photos
@@ -208,18 +146,6 @@ struct MedalDetailView: View {
         RoundedRectangle(cornerRadius: 12)
           .stroke(Color.Border.gray, lineWidth: 1)
       )
-  }
-
-  // MARK: - Notes
-
-  private func notesSection(note: String) -> some View {
-    SectionContainer(title: "Notes") {
-      Text(note)
-        .font(.body)
-        .foregroundStyle(Color.Text.primary)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .surfaceStyle()
-    }
   }
 }
 

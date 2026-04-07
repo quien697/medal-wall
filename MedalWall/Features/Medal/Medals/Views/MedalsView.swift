@@ -15,8 +15,8 @@ struct MedalsView: View {
 
   var body: some View {
     MedalGrid(
-      columnCount: viewModel.columnCount,
-      spacing: viewModel.spacing
+      columns: viewModel.gridColumns,
+      spacing: viewModel.gridSpacing
     )
     .navigationTitle("Your Rewards")
     .background(Color.Background.primary)

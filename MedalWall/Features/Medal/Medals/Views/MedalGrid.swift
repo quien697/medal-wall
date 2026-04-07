@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct MedalGrid: View {
-  let columnCount: Int
+  let columns: [GridItem]
   let spacing: CGFloat
   
   @Query private var medals: [Medal]
@@ -23,11 +23,6 @@ struct MedalGrid: View {
           description: Text("Tap the + button to add your first medal!")
         )
       } else {
-        let columns = Array(
-          repeating: GridItem(.flexible(), spacing: spacing),
-          count: columnCount
-        )
-        
 //        ScrollView(.horizontal) {
 //          HStack(spacing: 10) {
 //            StatGridItem(title: "12", subTitle: "Total")
@@ -68,7 +63,7 @@ struct MedalGrid: View {
 
 #Preview {
   MedalGrid(
-    columnCount: 2,
+    columns: [GridItem](repeating: GridItem(.flexible(minimum: 80), spacing: 10), count: 2),
     spacing: 10
   )
 }

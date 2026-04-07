@@ -9,8 +9,15 @@ import SwiftUI
 
 @Observable
 final class MedalsViewModel {
-  let columnCount: Int = 2
-  let spacing: CGFloat = 10
+  let gridSpacing: CGFloat = 10
+  
+  // MARK: - Computed
+  var gridColumns: [GridItem] {
+    [GridItem](
+     repeating: GridItem(.flexible(minimum: 80), spacing: gridSpacing),
+     count: 2
+   )
+  }
   
   // Search
   var searchText: String = ""

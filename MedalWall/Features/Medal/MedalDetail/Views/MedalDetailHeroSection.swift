@@ -15,7 +15,8 @@ struct MedalDetailHeroSection: View {
   let location: String
   let date: String
   let bib: String
-  
+
+  // MARK: - Body
   var body: some View {
     DetailHeroSection {
       MedalImage(photo: photo)
@@ -39,10 +40,10 @@ struct MedalDetailHeroSection: View {
         Label(location, systemImage: "mappin.and.ellipse")
         Label(date, systemImage: "calendar")
         Label("Bib \(bib)", systemImage: "number")
-      }
+      } // VStack
       .font(.caption)
       .foregroundStyle(Color.Text.secondary)
-    }
+    } // DetailHeroSection
   }
 }
 
