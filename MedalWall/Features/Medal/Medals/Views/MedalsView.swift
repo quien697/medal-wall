@@ -15,7 +15,10 @@ struct MedalsView: View {
   @State private var viewModel: MedalsViewModel = MedalsViewModel()
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingAddMedal = false
-  
+  // MARK: - Namespace
+  @Namespace private var namespace
+  private let addMedal: String = "addMedal"
+  // MARK: - Query
   @Query private var medals: [Medal]
   
   // MARK: - Body
@@ -38,7 +41,8 @@ struct MedalsView: View {
           MedalGridSection(
             medals: medals,
             columns: viewModel.gridColumns,
-            spacing: viewModel.gridSpacing
+            spacing: viewModel.gridSpacing,
+            namespace: namespace
           )
         } // ScrollView
         .scrollIndicators(.hidden)
@@ -52,14 +56,19 @@ struct MedalsView: View {
           }
           
           ToolbarItem(placement: .topBarTrailing) {
-            Button("Add Medal", systemImage: "plus") {
+            Button {
               isPresentingAddMedal = true
+            } label: {
+              Image(systemName: "plus")
             }
+            .matchedTransitionSource(id: addMedal, in: namespace)
+            .tint(Color.Badge.Gold.primary)
             .buttonStyle(.glassProminent)
           }
         } // toolbar
         .sheet(isPresented: $isPresentingAddMedal) {
-          //      MedalAddView(user: user)
+          AddMedalView()
+            .navigationTransition(.zoom(sourceID: addMedal, in: namespace))
         }
       }
     } // NavigationStack
