@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// A view modifier that applies a surface appearance
 struct SurfaceViewModifier: ViewModifier {
   private let radius: CGFloat = 20
   let bgColor: Color
@@ -30,8 +31,8 @@ extension View {
   
   func surfaceStyle(
     bgColor: Color = Color.Card.Background.primary,
-    vPadding: CGFloat = 15,
-    hPadding: CGFloat = 15
+    vPadding: CGFloat = 16,
+    hPadding: CGFloat = 16
   ) -> some View {
     modifier(SurfaceViewModifier(
       bgColor: bgColor,
@@ -44,6 +45,6 @@ extension View {
 #Preview {
   VStack{
     Text("42km")
+      .surfaceStyle()
   }
-  .surfaceStyle()
 }

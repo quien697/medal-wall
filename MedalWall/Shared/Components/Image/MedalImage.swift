@@ -73,16 +73,17 @@ struct MedalImage: View {
           .foregroundColor(Color.Badge.Gold.primary)
       }
     } // ZStack
-    .padding(0)
   }
 }
 
 #Preview {
   VStack(spacing: 20) {
     MedalImage(photo: nil)
+      .background(Color.Background.primary)
     
     MedalImage(
       photo: UIImage(named: "bmo-vancouver-marathon-2022")
     )
+    .background(Color.Background.primary)
   }
 }

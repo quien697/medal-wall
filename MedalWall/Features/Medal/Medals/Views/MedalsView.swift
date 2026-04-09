@@ -9,31 +9,60 @@ import SwiftUI
 import SwiftData
 
 struct MedalsView: View {
+  // MARK: - Environment
   @Environment(\.modelContext) private var modelContext
-  @State private var viewModel = MedalsViewModel()
+  // MARK: - State
+  @State private var viewModel: MedalsViewModel = MedalsViewModel()
   @State private var errorWrapper: ErrorWrapper?
-
+  @State private var isPresentingAddMedal = false
+  
+  @Query private var medals: [Medal]
+  
+  // MARK: - Body
   var body: some View {
-    MedalGrid(
-      columns: viewModel.gridColumns,
-      spacing: viewModel.gridSpacing
-    )
-    .navigationTitle("Your Rewards")
-    .background(Color.Background.primary)
-    .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Button("Add Medal", systemImage: "plus") {
-//          isShowingMedalAddView = true
+    NavigationStack {
+      if medals.isEmpty {
+        ContentUnavailableView(
+          "No Medals",
+          systemImage: "tray",
+          description: Text("Tap the + button to add your first medal!")
+        )
+      } else {
+        ScrollView {
+          MedalStatsSection(
+            totalCount: viewModel.totalCount(medals),
+            fullCount: viewModel.fullCount(medals),
+            halfCount: viewModel.halfCount(medals)
+          )
+          
+          MedalGridSection(
+            medals: medals,
+            columns: viewModel.gridColumns,
+            spacing: viewModel.gridSpacing
+          )
+        } // ScrollView
+        .scrollIndicators(.hidden)
+        .navigationTitle("Your Rewards")
+        .background(Color.Background.primary)
+        .toolbarTitleDisplayMode(.inlineLarge)
+        .toolbarRole(.editor)
+        .toolbar {
+          ToolbarItem(placement: .title) {
+            ExpandedNavigationTitle(title: "Your Rewards")
+          }
+          
+          ToolbarItem(placement: .topBarTrailing) {
+            Button("Add Medal", systemImage: "plus") {
+              isPresentingAddMedal = true
+            }
+            .buttonStyle(.glassProminent)
+          }
+        } // toolbar
+        .sheet(isPresented: $isPresentingAddMedal) {
+          //      MedalAddView(user: user)
         }
       }
-    }
-//    .sheet(isPresented: $isShowingMedalAddView) {
-//      if let user {
-//        NavigationStack {
-//          MedalAddView(user: user)
-//        }
-//      }
-//    }
+    } // NavigationStack
   }
 }
 

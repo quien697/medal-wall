@@ -1,5 +1,5 @@
 //
-//  MedalGridItem.swift
+//  MedalCard.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-12-19.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MedalGridItem: View {
+struct MedalCard: View {
   let photo: UIImage?
   let distance: String
   let title: String
@@ -48,7 +48,7 @@ struct MedalGridItem: View {
 #Preview {
   let medal = Medal.sampleData[1]
   
-  MedalGridItem(
+  MedalCard(
     photo: medal.cropPhoto ?? medal.photo,
     distance: medal.distance.displayLabel,
     title: medal.name,
