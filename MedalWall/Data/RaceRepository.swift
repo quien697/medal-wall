@@ -21,7 +21,6 @@ final class RaceRepository {
   
   func save() throws {
     guard let context else { throw AppError.contextNotAttached }
-    
     try context.save()
   }
   
@@ -29,13 +28,11 @@ final class RaceRepository {
   
   func insertRace(_ race: Race) throws {
     guard let context else { throw AppError.contextNotAttached }
-    
     context.insert(race)
   }
   
   func deleteRace(_ race: Race) throws {
     guard let context else { throw AppError.contextNotAttached }
-    
     context.delete(race)
   }
   
@@ -43,14 +40,12 @@ final class RaceRepository {
   
   func insertEdition(_ edition: RaceEdition, to race: Race) throws {
     guard let context else { throw AppError.contextNotAttached }
-    
     context.insert(edition)
     race.editions.append(edition)
   }
   
   func deleteEdition(_ edition: RaceEdition) throws {
     guard let context else { throw AppError.contextNotAttached }
-    
     context.delete(edition)
   }
   
@@ -58,14 +53,12 @@ final class RaceRepository {
   
   func insertCategory(_ category: RaceCategory, to edition: RaceEdition) throws {
     guard let context else { throw AppError.contextNotAttached }
-    
     context.insert(category)
     edition.categories.append(category)
   }
   
   func deleteCategory(_ category: RaceCategory) throws {
     guard let context else { throw AppError.contextNotAttached }
-    
     context.delete(category)
   }
 }

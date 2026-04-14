@@ -15,7 +15,7 @@ final class MedalRepository {
     self.context = context
   }
   
-  func attachContext(_ context: ModelContext) {
+  func configure(context: ModelContext) {
     self.context = context
   }
   

@@ -20,7 +20,7 @@ struct ContentView: View {
         MedalsView()
       }
       
-      Tab("Rac", systemImage: "figure.run") {
+      Tab("Race", systemImage: "figure.run") {
         NavigationStack {
           RacesView()
         }

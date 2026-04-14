@@ -23,11 +23,12 @@ final class RaceEditViewModel {
   var editions: [DraftRaceEdition] = []
   
   let mode: RaceEditMode
-  private var repository: RaceRepository?
+  private var repository: RaceRepository
   private let race: Race?
   
   init(mode: RaceEditMode, race: Race?) {
     self.mode = mode
+    self.repository = RaceRepository()
     self.race = race
     
     if let race, mode == .edit {
@@ -46,7 +47,7 @@ final class RaceEditViewModel {
   }
   
   func configure(context: ModelContext) {
-    self.repository = RaceRepository(context: context)
+    repository.configure(context: context)
   }
   
   var isFormValid: Bool {
@@ -106,8 +107,6 @@ final class RaceEditViewModel {
   /// Syncs editions on an existing race by diffing against drafts.
   /// Deletes removed editions, updates existing ones, and adds new ones.
   private func syncEditions(on race: Race, with drafts: [DraftRaceEdition], by userId: UUID) throws {
-    guard let repository else { throw AppError.contextNotAttached }
-    
     let sourceEditionIds = Set(drafts.compactMap { $0.sourceEditionId })
     
     // Delete editions removed from the draft list
@@ -148,8 +147,6 @@ final class RaceEditViewModel {
   /// Syncs categories on an edition by diffing against draft distances.
   /// Only deletes removed categories and inserts new ones.
   private func syncCategories(on edition: RaceEdition, with draftDistances: [RaceDistance]) throws {
-    guard let repository else { throw AppError.contextNotAttached }
-    
     // Delete categories no longer in draft
     for category in edition.categories {
       let distance = RaceDistance(
@@ -171,8 +168,6 @@ final class RaceEditViewModel {
   /// Applies the draft changes to the model
   /// - Throws: AppError if repository is not configured or save fails
   func save(by userId: UUID) throws {
-    guard let repository else { throw AppError.contextNotAttached }
-    
     let race = if let race = self.race {
       race
     } else {
