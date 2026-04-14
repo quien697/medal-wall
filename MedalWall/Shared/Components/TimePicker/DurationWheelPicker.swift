@@ -14,8 +14,6 @@ struct DurationWheelPicker: View {
   
   var body: some View {
     VStack(alignment: .center, spacing: 0) {
-      Text(title)
-      
       Picker(title, selection: $value) {
         ForEach(range, id: \.self) { value in
           Text("\(value)")
@@ -26,6 +24,8 @@ struct DurationWheelPicker: View {
       .pickerStyle(.wheel)
       .frame(height: 120)
       .clipped()
+      
+      Text(title)
     }
     .frame(minWidth: 60)
   }

@@ -7,58 +7,98 @@
 
 import SwiftUI
 
-struct TimePicker: View {
-  @Binding var value: TimeInterval?
+struct TimePicker<Label: View>: View {
+  // MARK: - State
   @State private var draftDuration: DurationHMS
   @State private var isShowingPickerView: Bool = false
-  
-  private var label: String
-  
+  // MARK: - Properties
+  private var label: Label
+  private var title: String
+  private var fontColor: Color
+  private var fontWeight: Font.Weight
+  @Binding var value: TimeInterval?
+
+  // MARK: - Init
   init(
-    _ label: String = "Time",
+    _ title: String = "Select Time",
+    fontColor: Color? = nil,
+    fontWeight: Font.Weight? = nil,
     selection value: Binding<TimeInterval?>
-  ) {
-    self.label = label
+  ) where Label == Text {
+    self.title = title
+    self.fontColor = fontColor ?? .primary
+    self.fontWeight = fontWeight ?? .regular
+    self.label = Text(title)
     self._value = value
     self._draftDuration = State(initialValue: value.wrappedValue.map { DurationHMS(timeInterval: $0) } ?? DurationHMS())
   }
-  
+
+  // MARK: - Custom label init
+  init(
+    _ title: String = "Select Time",
+    fontColor: Color? = nil,
+    fontWeight: Font.Weight? = nil,
+    selection value: Binding<TimeInterval?>,
+    @ViewBuilder label: () -> Label
+  ) {
+    self.title = title
+    self.fontColor = fontColor ?? .primary
+    self.fontWeight = fontWeight ?? .regular
+    self.label = label()
+    self._value = value
+    self._draftDuration = State(initialValue: value.wrappedValue.map { DurationHMS(timeInterval: $0) } ?? DurationHMS())
+  }
+
+  // MARK: - Body
   var body: some View {
     HStack {
-      Text(label)
-        .font(.callout)
-        .foregroundColor(.primary)
-      
+      label
+
       Spacer()
-      
+
       Button {
         draftDuration = value.map { DurationHMS(timeInterval: $0) } ?? DurationHMS()
         isShowingPickerView = true
       } label: {
-        Text(draftDuration.stringValue)
+        Text((value.map { DurationHMS(timeInterval: $0) } ?? DurationHMS()).displayString)
+          .fontWeight(fontWeight)
+          .foregroundStyle(fontColor)
       }
       .buttonStyle(.bordered)
     } // HStack
     .sheet(isPresented: $isShowingPickerView) {
       NavigationStack {
         VStack {
+          Text(draftDuration.formattedString)
+            .font(.title)
+            .fontWeight(.bold)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical)
+            .foregroundStyle(fontColor)
+            .background(fontColor.opacity(0.1))
+            .clipShape(.rect(cornerRadius: 20))
+            .overlay(
+              RoundedRectangle(cornerRadius: 20)
+                .stroke(fontColor.opacity(0.3), lineWidth: 1)
+            )
+            .padding()
+
           DurationWheelPickerView(duration: $draftDuration)
-            .padding(.top)
-          
+
           Spacer()
-          
-          Button(role: .destructive) {
+
+          Divider()
+
+          Button {
             value = nil
             draftDuration = DurationHMS()
-            isShowingPickerView = false
           } label: {
             Text("Clear")
+              .tint(.red)
           }
-          .buttonStyle(.glassProminent)
-          .padding(.horizontal)
-          .padding(.bottom)
+          .padding(.vertical, 8)
         } // VStack
-        .navigationTitle("Select Time")
+        .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
           ToolbarItem(placement: .cancellationAction) {
@@ -66,12 +106,13 @@ struct TimePicker: View {
               isShowingPickerView = false
             }
           }
-          
+
           ToolbarItem(placement: .confirmationAction) {
             Button(role: .confirm) {
               value = draftDuration.isEmpty ? nil : draftDuration.timeInterval
               isShowingPickerView = false
             }
+            .tint(fontColor)
           }
         } // toolbar
         .presentationDetents([.medium])
@@ -83,8 +124,14 @@ struct TimePicker: View {
 #Preview {
   NavigationStack {
     Form {
-      TimePicker("Result", selection: .constant(TimeInterval(3 * 3600 + 20 * 60 + 44)))
-      TimePicker("Empty", selection: .constant(nil))
+      // String init
+      TimePicker("Finish Time", selection: .constant(TimeInterval(3 * 3600 + 20 * 60 + 44)))
+
+      // Custom label init
+      TimePicker("Finish Time", selection: .constant(nil)) {
+        Text("Finish Time")
+          .fromLabelStyle()
+      }
     }
     .navigationTitle("TimePicker Preview")
   }

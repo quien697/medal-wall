@@ -12,7 +12,15 @@ struct EditMedalResultSection: View {
   
   var body: some View {
     Section("Result") {
-      TimePicker("Finish Time", selection: $finishTime)
+      TimePicker(
+        "Finish Time",
+        fontColor: Color.Badge.Gold.primary,
+        fontWeight: .bold,
+        selection: $finishTime
+      ) {
+        Text("Finish Time")
+          .fromLabelStyle()
+      }
     }
   }
 }

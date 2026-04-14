@@ -33,13 +33,14 @@ struct DurationHMS: Equatable {
     return hours == 0 && minutes == 0 && seconds == 0
   }
   
-  /// Formate value from DurationHMS to String
-  var stringValue: String {
-    if isEmpty {
-      return "-- : -- : --"
-    } else {
-      return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-    }
+  /// Always renders digits — used inside the wheel picker (e.g. `00 : 00 : 00`)
+  var formattedString: String {
+    String(format: "%02d : %02d : %02d", hours, minutes, seconds)
+  }
+
+  /// Renders a placeholder when empty — used in the button label (e.g. `-- : -- : --`)
+  var displayString: String {
+    isEmpty ? "-- : -- : --" : formattedString
   }
   
   /// Parse value from String to DurationHMS
