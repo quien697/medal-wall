@@ -20,7 +20,6 @@ struct MedalDetailStatsSection: View {
   let genderPlacement: String
   let genderTotal: String
 
-  // MARK: - Body
   var body: some View {
     SectionContainer(title: "Stats") {
       LazyVGrid(columns: columns, spacing: spacing) {

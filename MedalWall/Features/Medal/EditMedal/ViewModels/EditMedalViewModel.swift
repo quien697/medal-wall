@@ -1,0 +1,171 @@
+//
+//  EditMedalViewModel.swift
+//  MedalWall
+//
+//  Created by Quien on 2025-12-21.
+//
+
+import SwiftUI
+import SwiftData
+
+enum EditMedalMode { case add, edit }
+
+@Observable
+final class EditMedalViewModel {
+  var name: String = ""
+  var date: Date = .now
+  var bibNumber: String = ""
+  var photoData: Data? = nil
+  var photo: UIImage? = nil
+  var cropPhotoData: Data? = nil
+  var cropPhoto: UIImage? = nil
+  var country: String = ""
+  var province: String = ""
+  var city: String = ""
+  var district: String = ""
+  var distance: RaceDistance = .default
+  var customDistanceValue: Double = 0 {
+    didSet {
+      if case .custom = distance.category {
+        distance.category = .custom(customDistanceValue)
+      }
+    }
+  }
+  var finishTime: TimeInterval? = nil
+  var overallPlacement: Int? = nil
+  var totalParticipants: Int? = nil
+  var division: Division? = nil
+  var divisionPlacement: Int? = nil
+  var divisionTotal: Int? = nil
+  var genderPlacement: Int? = nil
+  var genderTotal: Int? = nil
+  var note: String = ""
+  var tags: [String] = [] // implemented later
+  // eventPhotos: to be implemented later
+  
+  let mode: EditMedalMode
+  private var repository: MedalRepository
+  private let medal: Medal?
+  
+  init(mode: EditMedalMode, medal: Medal? = nil) {
+    self.mode = mode
+    self.repository = MedalRepository()
+    self.medal = medal
+    
+    if let medal, mode == .edit {
+      self.name = medal.name
+      self.date = medal.date
+      self.bibNumber = medal.bibNumber
+      self.photoData = medal.photoData
+      self.photo = medal.photo
+      self.cropPhotoData = medal.cropPhotoData
+      self.cropPhoto = medal.cropPhoto
+      self.country = medal.location.country
+      self.province = medal.location.province ?? ""
+      self.city = medal.location.city
+      self.district = medal.location.district ?? ""
+      self.distance = medal.distance
+      if case .custom(let value) = medal.distance.category {
+        self.customDistanceValue = value
+      }
+      self.finishTime = medal.finishTime
+      self.overallPlacement = medal.overallPlacement
+      self.totalParticipants = medal.totalParticipants
+      self.division = medal.divisionEnum
+      self.divisionPlacement = medal.divisionPlacement
+      self.divisionTotal = medal.divisionTotal
+      self.genderPlacement = medal.genderPlacement
+      self.genderTotal = medal.genderTotal
+      self.note = medal.note ?? ""
+      self.tags = medal.tags
+    }
+  }
+  
+  func configure(context: ModelContext) {
+    repository.configure(context: context)
+  }
+  
+  var isFormValid: Bool {
+    let customDistanceValid: Bool = {
+      if case .custom(let value) = distance.category { return value > 0 }
+      return true
+    }()
+    
+    return customDistanceValid &&
+    !name.trimmingCharacters(in: .whitespaces).isEmpty &&
+    !country.trimmingCharacters(in: .whitespaces).isEmpty &&
+    !city.trimmingCharacters(in: .whitespaces).isEmpty
+  }
+  
+  func updatePhoto(with data: Data?) {
+    self.photoData = data
+    self.photo = data.flatMap { UIImage(data: $0) }
+  }
+  
+  func updateCropPhoto(with uiImage: UIImage) {
+    self.cropPhotoData = uiImage.pngData()
+    self.cropPhoto = uiImage
+  }
+  
+  func clearPhoto() {
+    self.photoData = nil
+    self.photo = nil
+    self.cropPhotoData = nil
+    self.cropPhoto = nil
+  }
+  
+  func save(by user: User) throws {
+    if let medal, mode == .edit {
+      medal.name = name
+      medal.date = date
+      medal.bibNumber = bibNumber
+      medal.photoData = photoData
+      medal.cropPhotoData = cropPhotoData
+      medal.country = country
+      medal.province = province.isEmpty ? nil : province
+      medal.city = city
+      medal.district = district.isEmpty ? nil : district
+      medal.raceDistance = distance.category.value
+      medal.raceDistanceType = distance.type.rawValue
+      medal.finishTime = finishTime
+      medal.overallPlacement = overallPlacement
+      medal.totalParticipants = totalParticipants
+      medal.division = division?.rawValue
+      medal.divisionPlacement = divisionPlacement
+      medal.divisionTotal = divisionTotal
+      medal.genderPlacement = genderPlacement
+      medal.genderTotal = genderTotal
+      medal.note = note.isEmpty ? nil : note
+      medal.tags = tags
+    } else {  
+      let newMedal = Medal(
+        name: name,
+        date: date,
+        bibNumber: bibNumber,
+        photoData: photoData,
+        cropPhotoData: cropPhotoData,
+        location: RaceLocation(
+          country: country,
+          province: province.isEmpty ? nil : province,
+          city: city,
+          district: district.isEmpty ? nil : district
+        ),
+        raceDistance: distance,
+        finishTime: finishTime,
+        overallPlacement: overallPlacement,
+        totalParticipants: totalParticipants,
+        division: division,
+        divisionPlacement: divisionPlacement,
+        divisionTotal: divisionTotal,
+        genderPlacement: genderPlacement,
+        genderTotal: genderTotal,
+        note: note.isEmpty ? nil : note,
+        tags: tags,
+        user: user
+      )
+      try repository.insertMedal(newMedal)
+    }
+    
+    try repository.save()
+  }
+}

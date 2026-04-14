@@ -13,16 +13,16 @@ struct MedalDetailView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
   // MARK: - State
-  @State private var isShowEditor = false
-  @State private var isShowDeleteConfirm = false
-  @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: MedalDetailViewModel
+  @State private var errorWrapper: ErrorWrapper?
+  @State private var isPresentingEditMedal = false
+  @State private var isPresentingDeleteMedalConfirm = false
   
   // MARK: - Init
   init(medal: Medal) {
     self._viewModel = State(initialValue: MedalDetailViewModel(medal: medal))
   }
-
+  
   // MARK: - Body
   var body: some View {
     ScrollView {
@@ -35,28 +35,28 @@ struct MedalDetailView: View {
         date: viewModel.medal.date.formattedMonthDayYear(),
         bib: viewModel.medal.bibNumber
       )
-
-     MedalDetailStatsSection(
-      columns: viewModel.gridColumns,
-      spacing: viewModel.gridSpacing,
-      finishTime: viewModel.finishTimeText,
-      averagePace: viewModel.averagePaceText,
-      overallPlacement: viewModel.overallPlacementText,
-      totalParticipants: viewModel.totalParticipantsText,
-      division: viewModel.divisionText,
-      divisionPlacement: viewModel.divisionPlacementText,
-      divisionTotal: viewModel.divisionTotalText,
-      genderPlacement: viewModel.genderPlacementText,
-      genderTotal: viewModel.genderTotalText
-     )
-
+      
+      MedalDetailStatsSection(
+        columns: viewModel.gridColumns,
+        spacing: viewModel.gridSpacing,
+        finishTime: viewModel.finishTimeText,
+        averagePace: viewModel.averagePaceText,
+        overallPlacement: viewModel.overallPlacementText,
+        totalParticipants: viewModel.totalParticipantsText,
+        division: viewModel.divisionText,
+        divisionPlacement: viewModel.divisionPlacementText,
+        divisionTotal: viewModel.divisionTotalText,
+        genderPlacement: viewModel.genderPlacementText,
+        genderTotal: viewModel.genderTotalText
+      )
+      
       if let note = viewModel.medal.note, !note.isEmpty {
         MedalDetailNoteSection(note: note)
       }
       
-//      MedalDetailEventPhotosSection(photots: viewModel.medal.eventPhotos)
+      //      MedalDetailEventPhotosSection(photots: viewModel.medal.eventPhotos)
       
-//      MedalDetailTagsSection()
+      //      MedalDetailTagsSection()
     }
     .navigationTitle(viewModel.medal.name)
     .navigationBarTitleDisplayMode(.inline)
@@ -65,40 +65,45 @@ struct MedalDetailView: View {
       ToolbarItem(placement: .topBarTrailing) {
         Menu("More Options", systemImage: "ellipsis") {
           Button {
-            isShowEditor = true
+            isPresentingEditMedal = true
           } label: {
             Label("Edit Medal", systemImage: "square.and.pencil")
           }
-
+          
           Divider()
-
+          
           Button(role: .destructive) {
-            isShowDeleteConfirm = true
+            isPresentingDeleteMedalConfirm = true
           } label: {
             Label("Delete Medal", systemImage: "trash")
           }
         }
       }
     }
-//    .alert(isPresented: $isShowDeleteConfirm) {
-//      .deleteConfirmation(name: viewModel.medal.title, onDelete: {
-//        do {
-//          try viewModel.configure(context: modelContext)
-//          try viewModel.deleteMedal(viewModel.medal)
-//          dismiss()
-//        } catch {
-//          errorWrapper = ErrorWrapper(error: AppError.unknown)
-//        }
-//      })
-//    }
-//    .sheet(isPresented: $isShowEditor) {
-//      NavigationStack {
-//        MedalEditView(medal: viewModel.medal)
-//      }
-//    }
-//    .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
-//      ErrorView(errorWrapper: wrapper)
-//    }
+    .onAppear {
+      viewModel.configure(context: modelContext)
+    }
+    .alert(isPresented: $isPresentingDeleteMedalConfirm) {
+      .deleteConfirmation(
+        name: viewModel.medal.name,
+        onDelete: {
+          do {
+            try viewModel.deleteMedal(viewModel.medal)
+            dismiss()
+          } catch {
+            errorWrapper = ErrorWrapper(error: AppError.unknown)
+          }
+        }
+      )
+    }
+    .sheet(isPresented: $isPresentingEditMedal) {
+      NavigationStack {
+        EditMedalView(mode: .edit, medal: viewModel.medal)
+      }
+    }
+    .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
+      ErrorView(errorWrapper: wrapper)
+    }
   }
 }
 

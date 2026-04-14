@@ -10,7 +10,6 @@ import SwiftUI
 struct MedalDetailNoteSection: View {
   let note: String
 
-  // MARK: - Body
   var body: some View {
     SectionContainer(title: "Notes") {
       Text(note)

@@ -16,7 +16,6 @@ struct MedalDetailHeroSection: View {
   let date: String
   let bib: String
 
-  // MARK: - Body
   var body: some View {
     DetailHeroSection {
       MedalImage(photo: photo)

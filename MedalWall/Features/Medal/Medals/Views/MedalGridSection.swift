@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct MedalGridSection: View {
   let medals: [Medal]
