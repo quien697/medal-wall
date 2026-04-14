@@ -8,22 +8,19 @@
 import SwiftUI
 
 struct TimePicker: View {
-  @Binding var value: String
+  @Binding var value: TimeInterval?
   @State private var draftDuration: DurationHMS
   @State private var isShowingPickerView: Bool = false
   
   private var label: String
-  private var isShowingClearButton: Bool
   
   init(
     _ label: String = "Time",
-    selection value: Binding<String>,
-    isShowingClearButton: Bool = true
-  ){
+    selection value: Binding<TimeInterval?>
+  ) {
     self.label = label
-    self.isShowingClearButton = isShowingClearButton
     self._value = value
-    self._draftDuration = State(initialValue: DurationHMS.parse(value.wrappedValue) ?? DurationHMS())
+    self._draftDuration = State(initialValue: value.wrappedValue.map { DurationHMS(timeInterval: $0) } ?? DurationHMS())
   }
   
   var body: some View {
@@ -33,22 +30,9 @@ struct TimePicker: View {
         .foregroundColor(.primary)
       
       Spacer()
-
-      if isShowingClearButton && !value.isEmpty && !draftDuration.isEmpty {
-        Button(action: {
-          value = ""
-          draftDuration = DurationHMS()
-        }) {
-          Image(systemName: "xmark.circle.fill")
-            .imageScale(.large)
-            .foregroundStyle(.secondary)
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(.isButton)
-      }
       
       Button {
-        draftDuration = DurationHMS.parse(value) ?? DurationHMS()
+        draftDuration = value.map { DurationHMS(timeInterval: $0) } ?? DurationHMS()
         isShowingPickerView = true
       } label: {
         Text(draftDuration.stringValue)
@@ -60,34 +44,32 @@ struct TimePicker: View {
         VStack {
           DurationWheelPickerView(duration: $draftDuration)
             .padding(.top)
-
+          
           Spacer()
-
-          if isShowingClearButton {
-            Button(role: .destructive) {
-              value = ""
-              draftDuration = DurationHMS()
-              isShowingPickerView = false
-            } label: {
-              Text("Clear")
-            }
-            .buttonStyle(.borderedProminent)
-            .padding(.horizontal)
-            .padding(.bottom)
+          
+          Button(role: .destructive) {
+            value = nil
+            draftDuration = DurationHMS()
+            isShowingPickerView = false
+          } label: {
+            Text("Clear")
           }
+          .buttonStyle(.glassProminent)
+          .padding(.horizontal)
+          .padding(.bottom)
         } // VStack
         .navigationTitle("Select Time")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
           ToolbarItem(placement: .cancellationAction) {
-            Button("Cancel") {
+            Button(role: .cancel) {
               isShowingPickerView = false
             }
           }
-
+          
           ToolbarItem(placement: .confirmationAction) {
-            Button("Done") {
-              value = draftDuration.stringValue
+            Button(role: .confirm) {
+              value = draftDuration.isEmpty ? nil : draftDuration.timeInterval
               isShowingPickerView = false
             }
           }
@@ -101,8 +83,8 @@ struct TimePicker: View {
 #Preview {
   NavigationStack {
     Form {
-      TimePicker("Result", selection: .constant("03:20:44"))
-      TimePicker("Empty", selection: .constant(""))
+      TimePicker("Result", selection: .constant(TimeInterval(3 * 3600 + 20 * 60 + 44)))
+      TimePicker("Empty", selection: .constant(nil))
     }
     .navigationTitle("TimePicker Preview")
   }

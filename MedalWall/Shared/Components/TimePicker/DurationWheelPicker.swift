@@ -11,11 +11,11 @@ struct DurationWheelPicker: View {
   let title: String
   @Binding var value: Int
   let range: ClosedRange<Int>
-
+  
   var body: some View {
     VStack(alignment: .center, spacing: 0) {
       Text(title)
-
+      
       Picker(title, selection: $value) {
         ForEach(range, id: \.self) { value in
           Text("\(value)")

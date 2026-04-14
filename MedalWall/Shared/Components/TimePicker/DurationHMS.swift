@@ -18,6 +18,17 @@ struct DurationHMS: Equatable {
     self.seconds = min(max(0, seconds), 59)
   }
   
+  init(timeInterval: TimeInterval) {
+    let total = Int(timeInterval)
+    self.hours = total / 3600
+    self.minutes = (total % 3600) / 60
+    self.seconds = total % 60
+  }
+  
+  var timeInterval: TimeInterval {
+    TimeInterval(hours * 3600 + minutes * 60 + seconds)
+  }
+  
   var isEmpty: Bool {
     return hours == 0 && minutes == 0 && seconds == 0
   }
