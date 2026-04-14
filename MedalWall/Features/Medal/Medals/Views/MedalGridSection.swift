@@ -24,7 +24,7 @@ struct MedalGridSection: View {
             MedalCard(
               photo: medal.cropPhoto ?? medal.photo,
               distance: medal.distance.displayLabel,
-              title: medal.name,
+              name: medal.name,
               finishTime: medal.finishTime?.formattedHMS ?? "-",
               date: medal.date.formattedMonthDayYear()
             )

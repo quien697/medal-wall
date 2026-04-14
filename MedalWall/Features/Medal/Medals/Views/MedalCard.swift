@@ -10,7 +10,7 @@ import SwiftUI
 struct MedalCard: View {
   let photo: UIImage?
   let distance: String
-  let title: String
+  let name: String
   let finishTime: String
   let date: String
   
@@ -24,9 +24,11 @@ struct MedalCard: View {
           .fontWeight(.bold)
           .foregroundStyle(Color.Text.tertiary)
         
-        Text(title)
+        Text(name)
           .font(.headline)
           .foregroundStyle(Color.Text.primary)
+          .lineLimit(2)
+          .frame(minHeight: 44, alignment: .topLeading)
         
         Text(finishTime)
           .font(.subheadline)
@@ -51,7 +53,7 @@ struct MedalCard: View {
   MedalCard(
     photo: medal.cropPhoto ?? medal.photo,
     distance: medal.distance.displayLabel,
-    title: medal.name,
+    name: medal.name,
     finishTime: medal.finishTime?.formattedHMS ?? "-",
     date: medal.date.formattedMonthDayYear()
   )
