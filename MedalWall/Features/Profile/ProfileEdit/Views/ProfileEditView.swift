@@ -63,7 +63,7 @@ struct ProfileEditView: View {
             .foregroundStyle(.white)
             .padding()
             .background(.primary)
-            .clipShape(.rect(cornerRadius: 12))
+            .clipShape(.rect(cornerRadius: 16))
         }
       } // Section
       
@@ -103,7 +103,7 @@ struct ProfileEditView: View {
                 .padding(.vertical, 6)
                 .background(.blue)
                 .foregroundStyle(.white)
-                .clipShape(.rect(cornerRadius: 12))
+                .clipShape(.rect(cornerRadius: 16))
             }
           }
         }

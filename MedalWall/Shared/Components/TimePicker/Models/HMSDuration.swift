@@ -1,5 +1,5 @@
 //
-//  DurationHMS.swift
+//  HMSDuration.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-01-04.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct DurationHMS: Equatable {
+struct HMSDuration: Equatable {
   var hours: Int
   var minutes: Int
   var seconds: Int
@@ -17,12 +17,18 @@ struct DurationHMS: Equatable {
     self.minutes = min(max(0, minutes), 59)
     self.seconds = min(max(0, seconds), 59)
   }
-  
-  init(timeInterval: TimeInterval) {
-    let total = Int(timeInterval)
-    self.hours = total / 3600
-    self.minutes = (total % 3600) / 60
-    self.seconds = total % 60
+
+  init(_ timeInterval: TimeInterval?) {
+    if let timeInterval {
+      let total = Int(timeInterval)
+      self.hours = total / 3600
+      self.minutes = (total % 3600) / 60
+      self.seconds = total % 60
+    } else {
+      self.hours = 0
+      self.minutes = 0
+      self.seconds = 0
+    }
   }
   
   var timeInterval: TimeInterval {
@@ -44,7 +50,7 @@ struct DurationHMS: Equatable {
   }
   
   /// Parse value from String to DurationHMS
-  static func parse(_ string: String) -> DurationHMS? {
+  static func parse(_ string: String) -> HMSDuration? {
     let parts = string.split(separator: ":")
     guard
       parts.count == 3,
@@ -57,6 +63,6 @@ struct DurationHMS: Equatable {
       return nil
     }
     
-    return DurationHMS(hours: h, minutes: m, seconds: s)
+    return HMSDuration(hours: h, minutes: m, seconds: s)
   }
 }

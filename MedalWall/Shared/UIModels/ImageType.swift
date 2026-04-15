@@ -34,7 +34,7 @@ extension ImageType {
     case .avatarThumbnail, .avatar, .medal:
       return AnyShape(Circle())
     case .raceThumbnail, .raceHero:
-      return AnyShape(.rect(cornerRadius: 12))
+      return AnyShape(.rect(cornerRadius: 16))
     }
   }
   

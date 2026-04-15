@@ -1,5 +1,5 @@
 //
-//  DurationWheelPicker.swift
+//  WheelUnitPicker.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-01-04.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct DurationWheelPicker: View {
+struct WheelUnitPicker: View {
   let title: String
   @Binding var value: Int
   let range: ClosedRange<Int>
@@ -32,16 +32,16 @@ struct DurationWheelPicker: View {
 }
 
 #Preview {
-  let duration: DurationHMS = DurationHMS()
+  let duration: HMSDuration = HMSDuration()
   
   HStack {
-    DurationWheelPicker(
+    WheelUnitPicker(
       title: "Hour",
       value: .constant(duration.hours),
       range: 0...24
     )
     
-    DurationWheelPicker(
+    WheelUnitPicker(
       title: "Min",
       value: .constant(duration.minutes),
       range: 0...60
