@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AddMedalView: View {
   var body: some View {
-    EditMedalView(mode: .add, medal: nil)
+    EditMedalView(mode: .add)
   }
 }
 

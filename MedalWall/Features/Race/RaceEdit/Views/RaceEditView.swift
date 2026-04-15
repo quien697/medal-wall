@@ -9,8 +9,6 @@ import SwiftUI
 import PhotosUI
 import SwiftData
 
-enum RaceEditMode { case add, edit }
-
 struct RaceEditView: View {
   @Environment(UserManager.self) private var userManager
   @Environment(\.modelContext) private var modelContext
@@ -23,7 +21,7 @@ struct RaceEditView: View {
   @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: RaceEditViewModel
   
-  init(mode: RaceEditMode, race: Race?) {
+  init(mode: ItemEditMode, race: Race?) {
     self._viewModel = State(initialValue: RaceEditViewModel(mode: mode, race: race))
   }
   

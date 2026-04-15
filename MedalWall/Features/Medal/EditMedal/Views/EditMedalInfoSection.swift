@@ -11,9 +11,8 @@ struct EditMedalInfoSection: View {
   @Binding var name: String
   @Binding var date: Date
   @Binding var bib: String
-  @Binding var distanceCategory: RaceDistanceCategory
-  @Binding var distanceType: RaceDistanceType
-  @Binding var customDistanceValue: Double
+  let distance: String
+  var onEditDistance: () -> Void
   
   var body: some View {
     Section("Info") {
@@ -41,36 +40,19 @@ struct EditMedalInfoSection: View {
           .fromLabelStyle()
       }
       
-      Picker(selection: $distanceCategory) {
-        ForEach(RaceDistanceCategory.standardCases, id: \.self) { category in
-          Text(category.description).tag(category)
-        }
-        Text("Custom").tag(RaceDistanceCategory.custom(customDistanceValue))
-      } label: {
+      HStack {
         Text("Distance")
           .fromLabelStyle()
-      }
-      
-      if case .custom = distanceCategory {
-        TextField(
-          "Custom distance (km)",
-          value: $customDistanceValue,
-          format: .number
-        )
-        .multilineTextAlignment(.trailing)
-        .keyboardType(.decimalPad)
-        .onChange(of: customDistanceValue) { _, newValue in
-          distanceCategory = .custom(newValue)
+        
+        Spacer()
+        
+        Button {
+          onEditDistance()
+        } label: {
+          Text(distance)
+            .foregroundStyle(Color.Text.primary)
         }
-      }
-      
-      Picker(selection: $distanceType) {
-        ForEach(RaceDistanceType.allCases) { type in
-          Text(type.displayName).tag(type)
-        }
-      } label: {
-        Text("Distance Type")
-          .fromLabelStyle()
+        .buttonStyle(.bordered)
       }
     } // Section
   }
@@ -84,9 +66,8 @@ struct EditMedalInfoSection: View {
       name: .constant(medal.name),
       date: .constant(medal.date),
       bib: .constant(medal.bibNumber),
-      distanceCategory: .constant(medal.distance.category),
-      distanceType: .constant(medal.distance.type),
-      customDistanceValue: .constant(0)
+      distance: medal.distance.displayLabel,
+      onEditDistance: { print("onEditDistance") }
     )
   }
 }

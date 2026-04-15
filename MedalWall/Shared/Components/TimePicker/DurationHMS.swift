@@ -37,7 +37,7 @@ struct DurationHMS: Equatable {
   var formattedString: String {
     String(format: "%02d : %02d : %02d", hours, minutes, seconds)
   }
-
+  
   /// Renders a placeholder when empty — used in the button label (e.g. `-- : -- : --`)
   var displayString: String {
     isEmpty ? "-- : -- : --" : formattedString

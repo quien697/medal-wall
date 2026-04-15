@@ -8,8 +8,6 @@
 import SwiftUI
 import SwiftData
 
-enum EditMedalMode { case add, edit }
-
 @Observable
 final class EditMedalViewModel {
   var name: String = ""
@@ -24,13 +22,6 @@ final class EditMedalViewModel {
   var city: String = ""
   var district: String = ""
   var distance: RaceDistance = .default
-  var customDistanceValue: Double = 0 {
-    didSet {
-      if case .custom = distance.category {
-        distance.category = .custom(customDistanceValue)
-      }
-    }
-  }
   var finishTime: TimeInterval? = nil
   var overallPlacement: Int? = nil
   var totalParticipants: Int? = nil
@@ -43,11 +34,11 @@ final class EditMedalViewModel {
   var tags: [String] = [] // implemented later
   // eventPhotos: to be implemented later
   
-  let mode: EditMedalMode
+  let mode: ItemEditMode
   private var repository: MedalRepository
   private let medal: Medal?
   
-  init(mode: EditMedalMode, medal: Medal? = nil) {
+  init(mode: ItemEditMode, medal: Medal? = nil) {
     self.mode = mode
     self.repository = MedalRepository()
     self.medal = medal
@@ -65,9 +56,6 @@ final class EditMedalViewModel {
       self.city = medal.location.city
       self.district = medal.location.district ?? ""
       self.distance = medal.distance
-      if case .custom(let value) = medal.distance.category {
-        self.customDistanceValue = value
-      }
       self.finishTime = medal.finishTime
       self.overallPlacement = medal.overallPlacement
       self.totalParticipants = medal.totalParticipants
@@ -114,6 +102,16 @@ final class EditMedalViewModel {
     self.cropPhoto = nil
   }
   
+  //  func autoFill(from selection: RaceEditionSelection) {
+  //    name = "\(selection.race.name) \(selection.edition.year)"
+  //    date = selection.edition.startDate
+  //    distance = selection.distance
+  //    country = selection.race.country
+  //    province = selection.race.province ?? ""
+  //    city = selection.race.city
+  //    district = selection.race.district ?? ""
+  //  }
+  
   func save(by user: User) throws {
     if let medal, mode == .edit {
       medal.name = name
@@ -137,7 +135,7 @@ final class EditMedalViewModel {
       medal.genderTotal = genderTotal
       medal.note = note.isEmpty ? nil : note
       medal.tags = tags
-    } else {  
+    } else {
       let newMedal = Medal(
         name: name,
         date: date,

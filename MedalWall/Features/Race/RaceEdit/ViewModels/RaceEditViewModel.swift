@@ -22,11 +22,11 @@ final class RaceEditViewModel {
   var url: String = ""
   var editions: [DraftRaceEdition] = []
   
-  let mode: RaceEditMode
+  let mode: ItemEditMode
   private var repository: RaceRepository
   private let race: Race?
   
-  init(mode: RaceEditMode, race: Race?) {
+  init(mode: ItemEditMode, race: Race?) {
     self.mode = mode
     self.repository = RaceRepository()
     self.race = race

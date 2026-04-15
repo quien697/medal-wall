@@ -18,6 +18,7 @@ enum ImageType {
   
   // Medal
   case medal
+//  case event
 }
 
 extension ImageType {

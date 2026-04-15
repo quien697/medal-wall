@@ -16,6 +16,7 @@ struct EditMedalHero: View {
   let onCrop: () -> Void
   let onRemove: () -> Void
   
+  // MARK: - Body
   var body: some View {
     Button {
       isPresentingConfirmation = true

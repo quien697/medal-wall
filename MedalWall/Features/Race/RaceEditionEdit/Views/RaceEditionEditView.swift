@@ -9,8 +9,6 @@ import SwiftUI
 import PhotosUI
 import SwiftData
 
-enum RaceEditionEditMode { case add, edit }
-
 struct RaceEditionEditView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var isShowingPhotoPicker: Bool = false
@@ -22,7 +20,7 @@ struct RaceEditionEditView: View {
   let onAction: (DraftRaceEdition) -> Void
   
   init(
-    mode: RaceEditionEditMode,
+    mode: ItemEditMode,
     edition: DraftRaceEdition?,
     onAction: @escaping (DraftRaceEdition) -> Void
   ) {
@@ -121,7 +119,7 @@ struct RaceEditionEditView: View {
       }
     }
     .sheet(isPresented: $isShowingAddDistanceSheet) {
-      RaceDistanceAddView { newDistance in
+      DistanceAddView { newDistance in
         do {
           try viewModel.addDistance(newDistance)
         } catch {

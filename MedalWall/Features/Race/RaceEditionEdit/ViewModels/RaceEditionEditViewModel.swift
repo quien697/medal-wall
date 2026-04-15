@@ -13,9 +13,9 @@ final class RaceEditionEditViewModel {
   let minYear: Int = 1911
   let maxYear: Int = 2060
   var draftEdition: DraftRaceEdition
-  let mode: RaceEditionEditMode
+  let mode: ItemEditMode
   
-  init(mode: RaceEditionEditMode, edition: DraftRaceEdition?) {
+  init(mode: ItemEditMode, edition: DraftRaceEdition?) {
     self.mode = mode
     self.draftEdition = edition ?? DraftRaceEdition()
   }

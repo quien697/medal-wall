@@ -97,9 +97,7 @@ struct MedalDetailView: View {
       )
     }
     .sheet(isPresented: $isPresentingEditMedal) {
-      NavigationStack {
-        EditMedalView(mode: .edit, medal: viewModel.medal)
-      }
+      EditMedalView(mode: .edit, medal: viewModel.medal)
     }
     .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
       ErrorView(errorWrapper: wrapper)

@@ -25,7 +25,7 @@ struct MedalDetailStatsGridItem: View {
     self.subHeadLine = subHeadLine
     self.headLineColor = headLineColor
   }
-
+  
   // MARK: - Body
   var body: some View {
     VStack(alignment: .leading, spacing: 5) {

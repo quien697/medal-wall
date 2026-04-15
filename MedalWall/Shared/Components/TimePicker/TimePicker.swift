@@ -17,7 +17,7 @@ struct TimePicker<Label: View>: View {
   private var fontColor: Color
   private var fontWeight: Font.Weight
   @Binding var value: TimeInterval?
-
+  
   // MARK: - Init
   init(
     _ title: String = "Select Time",
@@ -32,7 +32,7 @@ struct TimePicker<Label: View>: View {
     self._value = value
     self._draftDuration = State(initialValue: value.wrappedValue.map { DurationHMS(timeInterval: $0) } ?? DurationHMS())
   }
-
+  
   // MARK: - Custom label init
   init(
     _ title: String = "Select Time",
@@ -48,14 +48,14 @@ struct TimePicker<Label: View>: View {
     self._value = value
     self._draftDuration = State(initialValue: value.wrappedValue.map { DurationHMS(timeInterval: $0) } ?? DurationHMS())
   }
-
+  
   // MARK: - Body
   var body: some View {
     HStack {
       label
-
+      
       Spacer()
-
+      
       Button {
         draftDuration = value.map { DurationHMS(timeInterval: $0) } ?? DurationHMS()
         isShowingPickerView = true
@@ -82,13 +82,13 @@ struct TimePicker<Label: View>: View {
                 .stroke(fontColor.opacity(0.3), lineWidth: 1)
             )
             .padding()
-
+          
           DurationWheelPickerView(duration: $draftDuration)
-
+          
           Spacer()
-
+          
           Divider()
-
+          
           Button {
             value = nil
             draftDuration = DurationHMS()
@@ -106,7 +106,7 @@ struct TimePicker<Label: View>: View {
               isShowingPickerView = false
             }
           }
-
+          
           ToolbarItem(placement: .confirmationAction) {
             Button(role: .confirm) {
               value = draftDuration.isEmpty ? nil : draftDuration.timeInterval
@@ -126,7 +126,7 @@ struct TimePicker<Label: View>: View {
     Form {
       // String init
       TimePicker("Finish Time", selection: .constant(TimeInterval(3 * 3600 + 20 * 60 + 44)))
-
+      
       // Custom label init
       TimePicker("Finish Time", selection: .constant(nil)) {
         Text("Finish Time")

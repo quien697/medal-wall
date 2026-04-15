@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MedalDetailNoteSection: View {
   let note: String
-
+  
   var body: some View {
     SectionContainer(title: "Notes") {
       Text(note)
