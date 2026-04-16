@@ -18,13 +18,13 @@ struct EditMedalPlacementSection: View {
   
   var body: some View {
     Section("Placement (Optional)") {
-      FormPlacementRow(
+      EditMedalPlacementRow(
         label: "Overall",
         placement: $overallPlacement,
         total: $totalParticipants
       )
       
-      FormPlacementRow(
+      EditMedalPlacementRow(
         label: "Gender",
         placement: $genderPlacement,
         total: $genderTotal
@@ -60,7 +60,7 @@ struct EditMedalPlacementSection: View {
       }
       
       if division != nil {
-        FormPlacementRow(
+        EditMedalPlacementRow(
           label: "Division",
           placement: $divisionPlacement,
           total: $divisionTotal

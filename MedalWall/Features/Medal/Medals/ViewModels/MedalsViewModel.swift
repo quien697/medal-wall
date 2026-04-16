@@ -34,13 +34,4 @@ final class MedalsViewModel {
   func halfCount(_ medals: [Medal]) -> Int {
     medals.filter { $0.distance.category == .half }.count
   }
-  
-  /// Calculate medal image size that fits within the grid item's content area.
-  /// Hexagon width = size * 0.9, so size = contentWidth / 0.9.
-  /// Capped at the default medal size for larger screens.
-  //  func imageSize(for availableWidth: CGFloat) -> CGFloat {
-  //    let itemWidth = (availableWidth - spacing * CGFloat(columnCount + 1)) / CGFloat(columnCount)
-  //    let contentWidth = itemWidth - surfacePadding * 2
-  //    return min(ImageType.medal.size.width, contentWidth / 0.9)
-  //  }
 }

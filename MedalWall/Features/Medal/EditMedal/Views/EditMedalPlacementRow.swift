@@ -1,5 +1,5 @@
 //
-//  FormPlacementRow.swift
+//  EditMedalPlacementRow.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-04-14.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FormPlacementRow: View {
+struct EditMedalPlacementRow: View {
   let label: String
   @Binding var placement: Int?
   @Binding var total: Int?
@@ -37,13 +37,13 @@ struct FormPlacementRow: View {
 
 #Preview {
   Form {
-    FormPlacementRow(
+    EditMedalPlacementRow(
       label: "Overall",
       placement: .constant(nil),
       total: .constant(nil)
     )
     
-    FormPlacementRow(
+    EditMedalPlacementRow(
       label: "Overall",
       placement: .constant(1928),
       total: .constant(5232)

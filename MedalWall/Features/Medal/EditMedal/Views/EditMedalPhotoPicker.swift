@@ -1,5 +1,5 @@
 //
-//  EditMedalHero.swift
+//  EditMedalPhotoPicker.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-04-13.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct EditMedalHero: View {
+struct EditMedalPhotoPicker: View {
   // MARK: - State
   @State private var isPresentingConfirmation: Bool = false
   // MARK: - Properties
@@ -60,7 +60,7 @@ struct EditMedalHero: View {
 }
 
 #Preview {
-  EditMedalHero(
+  EditMedalPhotoPicker(
     photo: nil,
     onChooseFromLibrary: { print("onChooseFromLibrary") },
     onCrop: { print("onCrop") },

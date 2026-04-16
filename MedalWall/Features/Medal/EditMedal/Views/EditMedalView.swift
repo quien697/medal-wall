@@ -22,7 +22,7 @@ struct EditMedalView: View {
   @State private var isPresentingDistancePicker: Bool = false
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var shouldDismiss: Bool = false
-  //  @State private var isShowingPickEditionSheet: Bool = false
+  @State private var isPresentingRaceEntryPicker: Bool = false
   
   init(mode: ItemEditMode, medal: Medal? = nil) {
     self._viewModel = State(initialValue: EditMedalViewModel(mode: mode, medal: medal))
@@ -31,7 +31,7 @@ struct EditMedalView: View {
   var body: some View {
     NavigationStack {
       VStack {
-        EditMedalHero(
+        EditMedalPhotoPicker(
           photo: viewModel.cropPhoto ?? viewModel.photo,
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
@@ -45,11 +45,13 @@ struct EditMedalView: View {
           }
         )
         
-        //        EditMedalAutoFillSection {
-        //          isShowingPickEditionSheet = true
-        //        }
+        EditMedalAutoFillSection {
+          isPresentingRaceEntryPicker = true
+        }
         
         Form {
+          EditMedalResultSection(finishTime: $viewModel.finishTime)
+          
           EditMedalInfoSection(
             name: $viewModel.name,
             date: $viewModel.date,
@@ -59,8 +61,6 @@ struct EditMedalView: View {
               isPresentingDistancePicker = true
             }
           )
-          
-          EditMedalResultSection(finishTime: $viewModel.finishTime)
           
           EditMedalLocationSection(
             country: $viewModel.country,
@@ -156,11 +156,11 @@ struct EditMedalView: View {
         )
         .presentationDetents([.medium])
       }
-      //      .sheet(isPresented: $isShowingPickEditionSheet) {
-      //        PickEditionDistanceSheet { selection in
-      //          viewModel.autoFill(from: selection)
-      //        }
-      //      }
+      .sheet(isPresented: $isPresentingRaceEntryPicker) {
+        RaceEntryPicker { selection in
+          viewModel.autoFill(from: selection)
+        }
+      }
       .sheet(item: $errorWrapper, onDismiss: {
         if shouldDismiss {
           dismiss()

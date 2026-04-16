@@ -102,15 +102,15 @@ final class EditMedalViewModel {
     self.cropPhoto = nil
   }
   
-  //  func autoFill(from selection: RaceEditionSelection) {
-  //    name = "\(selection.race.name) \(selection.edition.year)"
-  //    date = selection.edition.startDate
-  //    distance = selection.distance
-  //    country = selection.race.country
-  //    province = selection.race.province ?? ""
-  //    city = selection.race.city
-  //    district = selection.race.district ?? ""
-  //  }
+  func autoFill(from selection: RaceEntry) {
+    name = "\(selection.race.name) \(selection.edition.year)"
+    date = selection.edition.startDate
+    distance = selection.distance
+    country = selection.race.country
+    province = selection.race.province ?? ""
+    city = selection.race.city
+    district = selection.race.district ?? ""
+  }
   
   func save(by user: User) throws {
     if let medal, mode == .edit {
