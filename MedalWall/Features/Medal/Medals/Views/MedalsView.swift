@@ -25,11 +25,7 @@ struct MedalsView: View {
   var body: some View {
     NavigationStack {
       if medals.isEmpty {
-        ContentUnavailableView(
-          "No Medals",
-          systemImage: "tray",
-          description: Text("Tap the + button to add your first medal!")
-        )
+        MedalEmptyView()
       } else {
         ScrollView {
           MedalStatsSection(

@@ -33,7 +33,7 @@ final class MedalDetailViewModel {
   }
   
   var finishTimeText: String {
-    guard let finishTime = medal.finishTime else { return "--:--:--" }
+    guard let finishTime = medal.finishTime else { return "-- : -- : --" }
     return finishTime.formattedHMS
   }
   

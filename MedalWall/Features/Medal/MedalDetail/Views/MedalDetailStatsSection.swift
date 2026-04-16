@@ -82,8 +82,8 @@ struct MedalDetailStatsSection: View {
     MedalDetailStatsSection(
       columns: [GridItem](repeating: GridItem(.flexible(minimum: 80), spacing: 10), count: 2),
       spacing: 10,
-      finishTime: "5:10:10",
-      averagePace: "5:31 / km",
+      finishTime: "-- : -- : --",
+      averagePace: "--'-- \"",
       overallPlacement: "--",
       totalParticipants: "",
       division: "--",

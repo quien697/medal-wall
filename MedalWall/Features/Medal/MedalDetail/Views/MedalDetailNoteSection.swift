@@ -16,6 +16,7 @@ struct MedalDetailNoteSection: View {
         .font(.body)
         .foregroundStyle(Color.Text.primary)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .lineLimit(3...)
         .surfaceStyle()
     } // SectionContainer
   }

@@ -44,5 +44,5 @@ struct MedalStatsSection: View {
     fullCount: 5,
     halfCount: 4
   )
-    .background(Color.Background.primary)
+  .background(Color.Background.primary)
 }
