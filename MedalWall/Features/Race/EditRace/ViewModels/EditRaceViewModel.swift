@@ -1,5 +1,5 @@
 //
-//  RaceEditViewModel.swift
+//  EditRaceViewModel.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-11-02.
@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 @Observable
-final class RaceEditViewModel {
+final class EditRaceViewModel {
   var name: String = ""
   var photoData: Data? = nil
   var photo: UIImage? = nil

@@ -1,5 +1,5 @@
 //
-//  RaceEditLocationSection.swift
+//  EditRaceLocationSection.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-11-11.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RaceEditLocationSection: View {
+struct EditRaceLocationSection: View {
   @Binding var country: String
   @Binding var province: String
   @Binding var city: String
@@ -16,39 +16,35 @@ struct RaceEditLocationSection: View {
   var body: some View {
     Section("Location") {
       LabeledContent {
-        TextField("Country", text: $country)
+        TextField("e.g. Taiwan", text: $country)
           .multilineTextAlignment(.trailing)
       } label: {
         Text("Country")
-          .fontWeight(.bold)
-          .foregroundStyle(Color.Text.tertiary)
+          .fromLabelStyle()
       }
       
       LabeledContent {
-        TextField("Province (optional)", text: $province)
+        TextField("Optional", text: $province)
           .multilineTextAlignment(.trailing)
       } label: {
         Text("Province")
-          .fontWeight(.bold)
-          .foregroundStyle(Color.Text.tertiary)
+          .fromLabelStyle()
       }
       
       LabeledContent {
-        TextField("City", text: $city)
+        TextField("e.g. Taipei", text: $city)
           .multilineTextAlignment(.trailing)
       } label: {
         Text("City")
-          .fontWeight(.bold)
-          .foregroundStyle(Color.Text.tertiary)
+          .fromLabelStyle()
       }
       
       LabeledContent {
-        TextField("District (optional)", text: $district)
+        TextField("Optional", text: $district)
           .multilineTextAlignment(.trailing)
       } label: {
         Text("District")
-          .fontWeight(.bold)
-          .foregroundStyle(Color.Text.tertiary)
+          .fromLabelStyle()
       }
     } // Section
   }
@@ -56,14 +52,14 @@ struct RaceEditLocationSection: View {
 
 #Preview {
   Form {
-    RaceEditLocationSection(
+    EditRaceLocationSection(
       country: .constant("Taiwan"),
       province: .constant(""),
       city: .constant("Taipei"),
       district: .constant("")
     )
     
-    RaceEditLocationSection(
+    EditRaceLocationSection(
       country: .constant("Canada"),
       province: .constant("BC"),
       city: .constant("Vancouver"),

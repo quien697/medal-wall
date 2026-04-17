@@ -9,19 +9,23 @@ import SwiftUI
 import SwiftData
 
 struct RaceDetailView: View {
+  // MARK: - Environment
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
-  @State private var isShowEditor = false
-  @State private var isShowDeleteConfirm = false
-  @State private var errorWrapper: ErrorWrapper?
+  // MARK: - State
   @State private var viewModel: RaceDetailViewModel
+  @State private var errorWrapper: ErrorWrapper?
+  @State private var isPresentingEditRace = false
+  @State private var isPresentingDeleteRaceConfirm = false
   
+  // MARK: - Init
   init(race: Race) {
     self._viewModel = State(initialValue: RaceDetailViewModel(race: race))
   }
   
+  // MARK: - Body
   var body: some View {
-    ScrollView {
+    VStack {
       RaceDetailHeroSection(
         photo: viewModel.race.cropPhoto ?? viewModel.race.photo,
         name: viewModel.race.name,
@@ -29,16 +33,16 @@ struct RaceDetailView: View {
         url: viewModel.race.url
       )
       
-      RaceDetailEditionsSection(editions: viewModel.race.editions)
-    } // ScrollView
-    .navigationTitle(viewModel.race.name)
-    .navigationBarTitleDisplayMode(.inline)
+      ScrollView {
+        RaceDetailEditionsSection(editions: viewModel.race.editions)
+      }
+    } // VStack
     .background(Color.Background.primary)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu("More Options", systemImage: "ellipsis") {
           Button {
-            isShowEditor = true
+            isPresentingEditRace = true
           } label: {
             Label("Edit Race", systemImage: "square.and.pencil")
           }
@@ -46,7 +50,7 @@ struct RaceDetailView: View {
           Divider()
           
           Button(role: .destructive) {
-            isShowDeleteConfirm = true
+            isPresentingDeleteRaceConfirm = true
           } label: {
             Label("Delete Race", systemImage: "trash")
           }
@@ -56,7 +60,7 @@ struct RaceDetailView: View {
     .onAppear {
       viewModel.configure(context: modelContext)
     }
-    .alert(isPresented: $isShowDeleteConfirm) {
+    .alert(isPresented: $isPresentingDeleteRaceConfirm) {
       .deleteConfirmation(
         name: viewModel.race.name,
         onDelete: {
@@ -69,9 +73,9 @@ struct RaceDetailView: View {
         }
       )
     }
-    .sheet(isPresented: $isShowEditor) {
+    .sheet(isPresented: $isPresentingEditRace) {
       NavigationStack {
-        RaceEditView(mode: .edit, race: viewModel.race)
+        EditRaceView(mode: .edit, race: viewModel.race)
       }
     } // sheet
     .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
@@ -81,5 +85,7 @@ struct RaceDetailView: View {
 }
 
 #Preview {
-  RaceDetailView(race: Race.sampleData.first!)
+  NavigationStack {
+    RaceDetailView(race: Race.sampleData.first!)
+  }
 }

@@ -1,5 +1,5 @@
 //
-//  RaceEditionAddView.swift
+//  AddRaceEditionView.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-03-30.
@@ -7,18 +7,17 @@
 
 import SwiftUI
 
-struct RaceEditionAddView: View {
+struct AddRaceEditionView: View {
   let onAction: (DraftRaceEdition) -> Void
   
   var body: some View {
-    RaceEditionEditView(
+    EditRaceEditionView(
       mode: .add,
-      edition: nil,
       onAction: onAction
     )
   }
 }
 
 #Preview {
-  RaceEditionAddView(onAction: { _ in })
+  AddRaceEditionView(onAction: { _ in })
 }

@@ -1,5 +1,5 @@
 //
-//  DistanceAddView.swift
+//  AddDistanceView.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-04-15.
@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-struct DistanceAddView: View {
+struct AddDistanceView: View {
   let onSave: (RaceDistance) -> Void
   
   var body: some View {
-    DistanceEditView(
+    EditDistanceView(
       mode: .add,
       distance: .default,
       onAction: onSave
@@ -20,5 +20,5 @@ struct DistanceAddView: View {
 }
 
 #Preview {
-  DistanceAddView(onSave: { _ in print("onSave") })
+  AddDistanceView(onSave: { _ in print("onSave") })
 }

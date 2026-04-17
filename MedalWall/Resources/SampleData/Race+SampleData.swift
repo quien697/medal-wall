@@ -20,7 +20,7 @@ extension Race {
         country: "Taiwan",
         city: "Taipei"
       ),
-      url: "https://taipeicitymarathon.com",
+      url: "taipeicitymarathon.com",
       createBy: userId
     )
     
@@ -103,7 +103,7 @@ extension Race {
         province: "BC",
         city: "Vancouver"
       ),
-      url: "https://bmovanmarathon.ca/",
+      url: "bmovanmarathon.ca/",
       createBy: userId
     )
     

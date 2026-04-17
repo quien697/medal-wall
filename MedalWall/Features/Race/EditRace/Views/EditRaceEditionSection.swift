@@ -1,5 +1,5 @@
 //
-//  RaceEditEditionSection.swift
+//  EditRaceEditionSection.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-03-24.
@@ -7,13 +7,15 @@
 
 import SwiftUI
 
-struct RaceEditEditionSection: View {
+struct EditRaceEditionSection: View {
   let editions: [DraftRaceEdition]
   let raceCropPhoto: UIImage?
   let racePhoto: UIImage?
-  var onAdd: () -> Void
-  var onUpdate: ((DraftRaceEdition, DraftRaceEdition) -> Void)
-  var onDelete: (DraftRaceEdition) -> Void
+  let namespace: Namespace.ID
+  let transitionID: String
+  let onAdd: () -> Void
+  let onUpdate: ((DraftRaceEdition, DraftRaceEdition) -> Void)
+  let onDelete: (DraftRaceEdition) -> Void
   
   private var sortedEditions: [DraftRaceEdition] {
     editions.sorted(by: { $0.startDate > $1.startDate })
@@ -32,18 +34,20 @@ struct RaceEditEditionSection: View {
           } label: {
             Label("Add Edition", systemImage: "plus")
               .labelStyle(.titleAndIcon)
+              .goldOutLineButtonStyle(
+                fontWeight: .heavy,
+                vPadding: 12,
+                hPadding: 20
+              )
           }
-          .goldOutLineButtonStyle(
-            fontWeight: .heavy,
-            vPadding: 12,
-            hPadding: 20
-          )
+          .buttonStyle(.plain)
           .padding(.top, 15)
+          .matchedTransitionSource(id: transitionID, in: namespace)
         } // ContentUnavailableView
       } else {
         ForEach(sortedEditions) { edition in
           NavigationLink {
-            RaceEditionEditView(
+            EditRaceEditionView(
               mode: .edit,
               edition: edition,
               onAction: { updatedEdition in
@@ -106,36 +110,43 @@ struct RaceEditEditionSection: View {
         } label: {
           Label("Add Another Edition", systemImage: "plus")
             .labelStyle(.titleAndIcon)
+            .goldOutLineButtonStyle(
+              fontWeight: .heavy,
+              vPadding: 12,
+              hPadding: 20
+            )
         }
-        .goldOutLineButtonStyle(
-          fontWeight: .heavy,
-          vPadding: 12,
-          hPadding: 20
-        )
+        .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
+        .matchedTransitionSource(id: transitionID, in: namespace)
       }
     } // Section
   }
 }
 
 #Preview(traits: .sampleData) {
+  @Previewable @Namespace var namespace
   let race = Race.sampleData.first!
   let drafts = race.editions.map { DraftRaceEdition(from: $0) }
   
   Form {
-    RaceEditEditionSection(
+    EditRaceEditionSection(
       editions: drafts,
       raceCropPhoto: race.cropPhoto,
       racePhoto: race.photo,
+      namespace: namespace,
+      transitionID: "transitionID",
       onAdd: {},
       onUpdate: { _, _ in },
       onDelete: { _ in  }
     )
     
-    RaceEditEditionSection(
+    EditRaceEditionSection(
       editions: [],
       raceCropPhoto: nil,
       racePhoto: nil,
+      namespace: namespace,
+      transitionID: "transitionID",
       onAdd: {},
       onUpdate: { _, _ in },
       onDelete: { _ in  }

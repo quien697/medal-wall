@@ -1,54 +1,50 @@
 //
-//  EditMedalPhotoPicker.swift
+//  EditPhotoPicker.swift
 //  MedalWall
 //
-//  Created by Quien on 2026-04-13.
+//  Created by Quien on 2026-04-17.
 //
 
 import SwiftUI
 
-struct EditMedalPhotoPicker: View {
+struct EditPhotoPicker<Preview: View>: View {
   // MARK: - State
   @State private var isPresentingConfirmation: Bool = false
   // MARK: - Properties
   let photo: UIImage?
+  let hint: String
+  @ViewBuilder let photoView: () -> Preview
   let onChooseFromLibrary: () -> Void
   let onCrop: () -> Void
   let onRemove: () -> Void
-  
+
   // MARK: - Body
   var body: some View {
     Button {
       isPresentingConfirmation = true
     } label: {
       VStack(spacing: 8) {
-        MedalImage(photo: photo)
+        photoView()
           .confirmationDialog(
             "Edit Photo",
             isPresented: $isPresentingConfirmation,
             titleVisibility: .visible
           ) {
-            Button("Choose from Library") {
-              onChooseFromLibrary()
-            }
-            
+            Button("Choose from Library") { onChooseFromLibrary() }
+
             if photo != nil {
-              Button("Crop Photo") {
-                onCrop()
-              }
-              
-              Button("Remove Photo", role: .destructive) {
-                onRemove()
-              }
+              Button("Crop Photo") { onCrop() }
+              Button("Remove Photo", role: .destructive) { onRemove() }
             }
           } // confirmationDialog
-        
-        Text("Tap to \(photo == nil ? "add a new" : "update the") medal photo")
+
+        Text(hint)
           .font(.subheadline)
+          .multilineTextAlignment(.center)
           .foregroundStyle(Color.Text.tertiary)
       } // VStack
       .frame(maxWidth: .infinity)
-      .padding(.bottom, 16)
+      .padding(.vertical)
       .background(Color.Card.Background.secondary)
       .overlay(alignment: .bottom) {
         Rectangle()
@@ -58,13 +54,4 @@ struct EditMedalPhotoPicker: View {
     } // Button
     .buttonStyle(.plain)
   }
-}
-
-#Preview {
-  EditMedalPhotoPicker(
-    photo: nil,
-    onChooseFromLibrary: { print("onChooseFromLibrary") },
-    onCrop: { print("onCrop") },
-    onRemove: { print("onRemove") }
-  )
 }

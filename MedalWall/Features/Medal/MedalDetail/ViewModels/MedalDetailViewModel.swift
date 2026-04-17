@@ -81,12 +81,10 @@ final class MedalDetailViewModel {
   
   // MARK: - Functions
   
-  /// Attaches a SwiftData model context to enable repository operations.
   func configure(context: ModelContext) {
     self.repository = MedalRepository(context: context)
   }
   
-  /// Deletes the given medal from the repository and saves the context.
   func deleteMedal(_ medal: Medal) throws {
     guard let repository else { throw AppError.contextNotAttached }
     try repository.deleteMedal(medal)

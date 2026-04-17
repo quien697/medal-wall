@@ -35,17 +35,9 @@ struct RaceList: View {
   var body: some View {
     Group {
       if races.isEmpty && searchText.isEmpty {
-        ContentUnavailableView(
-          "No Race evnets",
-          systemImage: "tray",
-          description: Text("Tap the + button to add your first race event!")
-        )
+        RaceEmptyView()
       } else if (races.isEmpty && !searchText.isEmpty) || (applyFilter(races).isEmpty) {
-        ContentUnavailableView {
-          Label("No Results", systemImage: "magnifyingglass")
-        } description: {
-          Text("No race evnets match '\(searchText)'")
-        }
+        RaceNoResultView(searchText: searchText)
       } else {
         List(applyFilter(races)) { race in
           NavigationLink {
@@ -57,19 +49,18 @@ struct RaceList: View {
               location: race.location.formatted,
               editionCount: race.editions.count
             )
-              .swipeActions(edge: .trailing) {
-                Button(role: .destructive) {
-                  onDelete(race)
-                } label: {
-                  Label("Delete", systemImage: "trash")
-                }
+            .swipeActions(edge: .trailing) {
+              Button(role: .destructive) {
+                onDelete(race)
+              } label: {
+                Label("Delete", systemImage: "trash")
               }
+            }
           }
         }
         .scrollContentBackground(.hidden)
       }
-    }
-    .background(Color.Background.primary)
+    } // Group
   }
 }
 

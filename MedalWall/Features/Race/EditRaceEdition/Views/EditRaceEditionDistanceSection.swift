@@ -1,5 +1,5 @@
 //
-//  RaceEditionEditDistanceSection.swift
+//  EditRaceEditionDistanceSection.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-03-31.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RaceEditionEditDistanceSection: View {
+struct EditRaceEditionDistanceSection: View {
   let distances: [RaceDistance]
   var onRemove: (RaceDistance) -> Void
   var onAdd: () -> Void
@@ -19,13 +19,15 @@ struct RaceEditionEditDistanceSection: View {
           HStack(spacing: 6) {
             Text(distance.displayLabel)
             
-            Image(systemName: "xmark")
-              .font(.caption2)
-              .fontWeight(.semibold)
-              .foregroundStyle(Color.Text.tertiary)
-              .onTapGesture {
-                onRemove(distance)
-              }
+            Button {
+              onRemove(distance)
+            } label: {
+              Image(systemName: "xmark")
+                .font(.caption2)
+                .fontWeight(.semibold)
+                .foregroundStyle(Color.Text.tertiary)
+            }
+            .buttonStyle(.plain)
           }
           .secondaryButtonStyle(
             vPadding: 6,
@@ -39,6 +41,7 @@ struct RaceEditionEditDistanceSection: View {
           Image(systemName: "plus")
             .goldOutLineButtonStyle()
         }
+        .buttonStyle(.plain)
       } // FlowLayout
     }
   }
@@ -48,13 +51,13 @@ struct RaceEditionEditDistanceSection: View {
   let distances = Race.sampleData.first!.editions.first!.distances
   
   Form {
-    RaceEditionEditDistanceSection(
+    EditRaceEditionDistanceSection(
       distances: distances,
       onRemove: { _ in },
       onAdd: {}
     )
     
-    RaceEditionEditDistanceSection(
+    EditRaceEditionDistanceSection(
       distances: [],
       onRemove: { _ in },
       onAdd: {}

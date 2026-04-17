@@ -1,5 +1,5 @@
 //
-//  RaceEditionEditViewModel.swift
+//  EditRaceEditionViewModel.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-03-26.
@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 @Observable
-final class RaceEditionEditViewModel {
+final class EditRaceEditionViewModel {
   let minYear: Int = 1911
   let maxYear: Int = 2060
   var draftEdition: DraftRaceEdition

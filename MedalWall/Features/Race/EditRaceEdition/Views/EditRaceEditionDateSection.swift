@@ -1,5 +1,5 @@
 //
-//  RaceEditionEditDateSection.swift
+//  EditRaceEditionDateSection.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-03-30.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RaceEditionEditDateSection: View {
+struct EditRaceEditionDateSection: View {
   let isOneDay: Bool
   @Binding var year: Int
   @Binding var startDate: Date
@@ -28,8 +28,7 @@ struct RaceEditionEditDateSection: View {
         set: { _ in onToggleOneDay() }
       )) {
         Text("One Day Event")
-          .fontWeight(.bold)
-          .foregroundStyle(Color.Text.tertiary)
+          .fromLabelStyle()
       }
 
       Picker(selection: Binding(
@@ -43,10 +42,8 @@ struct RaceEditionEditDateSection: View {
         }
       } label: {
         Text("Year")
-          .fontWeight(.bold)
-          .foregroundStyle(Color.Text.tertiary)
+          .fromLabelStyle()
       }
-      .tint(Color.Text.primary)
       
       DatePicker(
         selection: Binding(
@@ -57,8 +54,7 @@ struct RaceEditionEditDateSection: View {
         displayedComponents: [.date]
       ) {
         Text("Start Date")
-          .fontWeight(.bold)
-          .foregroundStyle(Color.Text.tertiary)
+          .fromLabelStyle()
       }
 
       if !isOneDay {
@@ -68,8 +64,7 @@ struct RaceEditionEditDateSection: View {
           displayedComponents: [.date]
         ) {
           Text("End Date")
-            .fontWeight(.bold)
-            .foregroundStyle(Color.Text.tertiary)
+            .fromLabelStyle()
         }
       }
     } // Section
@@ -78,7 +73,7 @@ struct RaceEditionEditDateSection: View {
 
 #Preview {
   Form {
-    RaceEditionEditDateSection(
+    EditRaceEditionDateSection(
       isOneDay: true,
       year: .constant(2026),
       startDate: .constant(Date()),
@@ -93,7 +88,7 @@ struct RaceEditionEditDateSection: View {
       onUpdateStartDate: { _ in }
     )
     
-    RaceEditionEditDateSection(
+    EditRaceEditionDateSection(
       isOneDay: false,
       year: .constant(2026),
       startDate: .constant(Date()),

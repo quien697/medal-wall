@@ -33,7 +33,7 @@ struct RaceRow: View {
           .font(.subheadline)
           .foregroundStyle(Color.Text.tertiary)
       }
-    }
+    } // HStack
   }
 }
 

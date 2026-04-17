@@ -1,5 +1,5 @@
 //
-//  RaceEditionEditLogoSection.swift
+//  EditRaceEditionPhotoSection.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-03-27.
@@ -8,8 +8,8 @@
 import SwiftUI
 import PhotosUI
 
-struct RaceEditionEditLogoSection: View {
-  @State private var isShowingPhotoDialog: Bool = false
+struct EditRaceEditionPhotoSection: View {
+  @State private var isPresentingPhotoDialog: Bool = false
   let photo: UIImage?
   let cropPhoto: UIImage?
   let onChooseFromLibrary: (() -> Void)
@@ -25,7 +25,7 @@ struct RaceEditionEditLogoSection: View {
         )
         .confirmationDialog(
           "Edit Photo",
-          isPresented: $isShowingPhotoDialog,
+          isPresented: $isPresentingPhotoDialog,
           titleVisibility: .visible
         ) {
           Button("Choose from Library") {
@@ -43,7 +43,7 @@ struct RaceEditionEditLogoSection: View {
           }
           
           Button("Cancel", role: .cancel) {
-            isShowingPhotoDialog = false
+            isPresentingPhotoDialog = false
           }
         } // confirmationDialog
         
@@ -52,14 +52,13 @@ struct RaceEditionEditLogoSection: View {
             .font(.headline)
           
           Text("(Optional) Leave empty to use race logo")
-            .font(.caption)
-            .foregroundStyle(Color.Text.tertiary)
+            .fromLabelStyle()
         } // VStack
         
         Spacer()
         
-        Button("\(photo == nil && cropPhoto == nil ? "Add" : "Edit")") {
-          isShowingPhotoDialog = true
+        Button("\(photo == nil && cropPhoto == nil ? "New" : "Edit")") {
+          isPresentingPhotoDialog = true
         }
         .goldFillButtonStyle()
       } // HStack
@@ -71,7 +70,7 @@ struct RaceEditionEditLogoSection: View {
   let edition = Race.sampleData.first!.editions.first!
   
   Form {
-    RaceEditionEditLogoSection(
+    EditRaceEditionPhotoSection(
       photo: edition.photo,
       cropPhoto: edition.cropPhoto,
       onChooseFromLibrary: { print("onChooseFromLibrary") },
@@ -79,7 +78,7 @@ struct RaceEditionEditLogoSection: View {
       onRemove: { print("onRemove") }
     )
     
-    RaceEditionEditLogoSection(
+    EditRaceEditionPhotoSection(
       photo: nil,
       cropPhoto: nil,
       onChooseFromLibrary: { print("onChooseFromLibrary") },

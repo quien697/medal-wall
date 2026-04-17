@@ -1,33 +1,37 @@
 //
-//  EditMedalView.swift
+//  EditRaceView.swift
 //  MedalWall
 //
-//  Created by Quien on 2026-04-09.
+//  Created by Quien on 2025-10-30.
 //
 
 import SwiftUI
 import PhotosUI
 import SwiftData
 
-struct EditMedalView: View {
+struct EditRaceView: View {
   // MARK: - Environment
   @Environment(UserManager.self) private var userManager
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
   // MARK: - State
-  @State private var viewModel: EditMedalViewModel
+  @State private var viewModel: EditRaceViewModel
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingPhotoPicker: Bool = false
   @State private var isPresentingCropImageView: Bool = false
-  @State private var isPresentingDistancePicker: Bool = false
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var shouldDismiss: Bool = false
-  @State private var isPresentingRaceEntryPicker: Bool = false
+  @State private var isPresentingAddEdition: Bool = false
+  // MARK: - Namespace
+  @Namespace private var namespace
+  private let addEdition: String = "addEdition"
   
-  init(mode: ItemEditMode, medal: Medal? = nil) {
-    self._viewModel = State(initialValue: EditMedalViewModel(mode: mode, medal: medal))
+  // MARK: - Init
+  init(mode: ItemEditMode, race: Race? = nil) {
+    self._viewModel = State(initialValue: EditRaceViewModel(mode: mode, race: race))
   }
   
+  // MARK: - Body
   var body: some View {
     NavigationStack {
       VStack {
@@ -35,9 +39,9 @@ struct EditMedalView: View {
         
         EditPhotoPicker(
           photo: photo,
-          hint: "Tap to \(photo == nil ? "add a new" : "update the") medal photo",
+          hint: "Tap to \(photo == nil ? "add a new" : "update the") race photo",
           photoView: {
-            MedalImage(photo: photo)
+            RaceImage(photo: photo, imageType: .raceHero)
           },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
@@ -51,75 +55,72 @@ struct EditMedalView: View {
           }
         )
         
-        EditMedalAutoFillSection {
-          isPresentingRaceEntryPicker = true
-        }
-        
         Form {
-          EditMedalResultSection(finishTime: $viewModel.finishTime)
-          
-          EditMedalInfoSection(
+          EditRaceInfoSection(
             name: $viewModel.name,
-            date: $viewModel.date,
-            bib: $viewModel.bibNumber,
-            distance: viewModel.distance.displayLabel,
-            onEditDistance: {
-              isPresentingDistancePicker = true
-            }
+            url: $viewModel.url
           )
           
-          EditMedalLocationSection(
+          EditRaceLocationSection(
             country: $viewModel.country,
             province: $viewModel.province,
             city: $viewModel.city,
             district: $viewModel.district
           )
           
-          EditMedalPlacementSection(
-            overallPlacement: $viewModel.overallPlacement,
-            totalParticipants: $viewModel.totalParticipants,
-            genderPlacement: $viewModel.genderPlacement,
-            genderTotal: $viewModel.genderTotal,
-            division: $viewModel.division,
-            divisionPlacement: $viewModel.divisionPlacement,
-            divisionTotal: $viewModel.divisionTotal
+          EditRaceEditionSection(
+            editions: viewModel.editions,
+            raceCropPhoto: viewModel.cropPhoto,
+            racePhoto: viewModel.photo,
+            namespace: namespace,
+            transitionID: addEdition,
+            onAdd: {
+              isPresentingAddEdition = true
+            },
+            onUpdate: { originalEdition, updatedEdition in
+              do {
+                try viewModel.updateEdition(old: originalEdition, with: updatedEdition)
+              } catch {
+                errorWrapper = ErrorWrapper(error: AppError.duplicateEdition)
+              }
+            },
+            onDelete: { edition in
+              viewModel.deleteEdition(edition)
+            }
           )
-          
-          EditMedalNoteSection(note: $viewModel.note)
         } // Form
       } // VStack
-      .navigationTitle("\(viewModel.mode == .add ? "New" : "Edit") Medal")
+      .onAppear {
+        viewModel.configure(context: modelContext)
+      }
+      .navigationTitle("\(viewModel.mode.displayName) Race")
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
       .background(Color.Background.primary)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button(role: .close) {
+          Button(role: .cancel) {
             dismiss()
           }
         } // ToolbarItem
         
         ToolbarItem(placement: .confirmationAction) {
           Button(role: .confirm) {
-            guard let user = userManager.currentUser else {
-              errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
-              return
-            }
-            
             do {
-              try viewModel.save(by: user)
-              dismiss()
+              if let userId = userManager.currentUserID {
+                try viewModel.save(by: userId)
+                dismiss()
+              } else {
+                errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
+              }
             } catch {
               shouldDismiss = true
-              errorWrapper = ErrorWrapper(error: AppError.unknown)
+              errorWrapper = ErrorWrapper(error: AppError.raceSaveFailed)
             }
           }
           .disabled(!viewModel.isFormValid)
         } // ToolbarItem
       } // toolbar
-      .onAppear {
-        viewModel.configure(context: modelContext)
-      }
       .photosPicker(
         isPresented: $isPresentingPhotoPicker,
         selection: $selectedPhoto,
@@ -139,31 +140,22 @@ struct EditMedalView: View {
           } catch {
             errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
           }
+        } // Task
+      }
+      .navigationDestination(isPresented: $isPresentingAddEdition) {
+        AddRaceEditionView { newEdition in
+          viewModel.addEdition(newEdition)
         }
+        .navigationTransition(.zoom(sourceID: addEdition, in: namespace))
       }
       .sheet(isPresented: $isPresentingCropImageView) {
         CropImageView(
           image: viewModel.photo,
-          type: .medal,
-        ) { croppedImage in
-          if let croppedImage {
-            viewModel.updateCropPhoto(with: croppedImage)
+          type: .raceHero,
+        ) { cropppedImage in
+          if let cropppedImage {
+            viewModel.updateCropPhoto(with: cropppedImage)
           }
-        }
-      }
-      .sheet(isPresented: $isPresentingDistancePicker) {
-        EditDistanceView(
-          mode: .edit,
-          distance: viewModel.distance,
-          onAction: { newDistance in
-            viewModel.distance = newDistance
-          }
-        )
-        .presentationDetents([.medium])
-      }
-      .sheet(isPresented: $isPresentingRaceEntryPicker) {
-        RaceEntryPicker { selection in
-          viewModel.autoFill(from: selection)
         }
       }
       .sheet(item: $errorWrapper, onDismiss: {
@@ -181,7 +173,7 @@ struct EditMedalView: View {
   @Previewable @Environment(\.modelContext) var modelContext
   
   NavigationStack {
-    EditMedalView(mode: .add)
+    EditRaceView(mode: .add, race: Race.sampleData.first!)
   }
   .environment(UserManager(modelContext: modelContext))
 }
@@ -190,7 +182,7 @@ struct EditMedalView: View {
   @Previewable @Environment(\.modelContext) var modelContext
   
   NavigationStack {
-    EditMedalView(mode: .edit, medal: Medal.sampleData.first!)
+    EditRaceView(mode: .edit, race: Race.sampleData.first!)
   }
   .environment(UserManager(modelContext: modelContext))
 }

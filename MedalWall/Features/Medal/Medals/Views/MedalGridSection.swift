@@ -11,7 +11,7 @@ struct MedalGridSection: View {
   let medals: [Medal]
   let columns: [GridItem]
   let spacing: CGFloat
-  var namespace: Namespace.ID
+  let namespace: Namespace.ID
   
   var body: some View {
     SectionContainer {

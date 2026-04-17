@@ -1,5 +1,5 @@
 //
-//  DistanceEditView.swift
+//  EditDistanceView.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-11-08.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct DistanceEditView: View {
+struct EditDistanceView: View {
   // MARK: - Environment
   @Environment(\.dismiss) private var dismiss
   // MARK: - State
@@ -84,7 +84,7 @@ struct DistanceEditView: View {
 }
 
 #Preview {
-  DistanceEditView(
+  EditDistanceView(
     mode: .add,
     distance: RaceDistance(category: .half, type: .inPerson),
     onAction: { _ in }

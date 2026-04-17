@@ -21,9 +21,7 @@ struct ContentView: View {
       }
       
       Tab("Race", systemImage: "figure.run") {
-        NavigationStack {
-          RacesView()
-        }
+        RacesView()
       }
     }
   }
