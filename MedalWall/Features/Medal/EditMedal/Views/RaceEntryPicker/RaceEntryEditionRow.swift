@@ -18,7 +18,7 @@ struct RaceEntryEditionRow: View {
         Text("\(edition.year)")
           .font(.headline)
           .fontWeight(.heavy)
-          .foregroundStyle(Color.Badge.Gold.primary)
+          .foregroundStyle(Color.Gold.primary)
         
         Text(edition.dateDisplayLabel)
           .font(.subheadline)

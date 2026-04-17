@@ -64,7 +64,7 @@ struct MedalDetailStatsGridItem: View {
     MedalDetailStatsGridItem(
       title: "Finish Time",
       headline: "5:10:10",
-      headLineColor: Color.Badge.Gold.primary
+      headLineColor: Color.Gold.primary
     )
     
     MedalDetailStatsGridItem(
@@ -76,7 +76,7 @@ struct MedalDetailStatsGridItem: View {
       title: "Overall",
       headline: "4000",
       subHeadLine: "of 7000",
-      headLineColor: Color.Badge.Gold.primary
+      headLineColor: Color.Gold.primary
     )
     
     MedalDetailStatsGridItem(

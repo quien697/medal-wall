@@ -14,7 +14,7 @@ struct EditMedalResultSection: View {
     Section("Result") {
       TimePicker(
         "Finish Time",
-        fontColor: Color.Badge.Gold.primary,
+        fontColor: Color.Gold.primary,
         fontWeight: .bold,
         selection: $finishTime
       ) {

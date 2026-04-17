@@ -58,7 +58,6 @@ struct MedalsView: View {
               Image(systemName: "plus")
             }
             .matchedTransitionSource(id: addMedal, in: namespace)
-            .tint(Color.Badge.Gold.primary)
             .buttonStyle(.glassProminent)
           }
         } // toolbar

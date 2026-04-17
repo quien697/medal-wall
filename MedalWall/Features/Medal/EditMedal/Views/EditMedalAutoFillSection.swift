@@ -34,8 +34,8 @@ struct EditMedalAutoFillSection: View {
       }
       .frame(maxWidth: .infinity)
       .surfaceStyle(
-        bgColor: Color.Badge.Gold.primary.opacity(0.1),
-        borderColor: Color.Badge.Gold.primary.opacity(0.3)
+        bgColor: Color.Gold.primary.opacity(0.1),
+        borderColor: Color.Gold.primary.opacity(0.3)
       )
     }
   }

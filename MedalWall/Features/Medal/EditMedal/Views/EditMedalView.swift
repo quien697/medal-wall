@@ -108,7 +108,6 @@ struct EditMedalView: View {
               errorWrapper = ErrorWrapper(error: AppError.unknown)
             }
           }
-          .tint(Color.Badge.Gold.primary)
           .disabled(!viewModel.isFormValid)
         } // ToolbarItem
       } // toolbar

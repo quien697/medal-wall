@@ -91,7 +91,7 @@ extension View {
     font: Font = .subheadline,
     fontWeight: Font.Weight = .semibold,
     fgColor: Color = Color.Text.primary,
-    bgColor: Color = Color.Badge.Gold.primary,
+    bgColor: Color = Color.Gold.primary,
     vPadding: CGFloat = 8,
     hPadding: CGFloat = 12
   ) -> some View {
@@ -108,8 +108,8 @@ extension View {
   func goldOutLineButtonStyle(
     font: Font = .subheadline,
     fontWeight: Font.Weight = .semibold,
-    fgColor: Color = Color.Badge.Gold.primary,
-    bgColor: Color = Color.Badge.Gold.primary.opacity(0.1),
+    fgColor: Color = Color.Gold.primary,
+    bgColor: Color = Color.Gold.primary.opacity(0.1),
     vPadding: CGFloat = 8,
     hPadding: CGFloat = 12
   ) -> some View {

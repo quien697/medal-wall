@@ -56,6 +56,7 @@ struct EditMedalPhotoPicker: View {
           .frame(height: 1)
       }
     } // Button
+    .buttonStyle(.plain)
   }
 }
 

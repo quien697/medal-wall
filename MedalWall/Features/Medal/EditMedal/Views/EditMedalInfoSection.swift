@@ -30,8 +30,7 @@ struct EditMedalInfoSection: View {
           Text("Date")
             .fromLabelStyle()
         }
-        .tint(Color.Badge.Gold.primary)
-      
+
       LabeledContent {
         TextField("e.g. 4291 (Optional)", text: $bib)
           .multilineTextAlignment(.trailing)

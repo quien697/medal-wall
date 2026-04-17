@@ -13,7 +13,7 @@ extension Color {
   }
   
   struct Border {
-    static let gray = Color(.black).opacity(0.1)
+    static let gray = Color("BorderGray")
   }
   
   struct Card {
@@ -30,18 +30,8 @@ extension Color {
     static let tertiary  = Color("TextTertiary")
   }
   
-  struct Badge {
-    struct Gold {
-      static let primary   = Color("BadgeGoldPrimary")
-      static let secondary = Color("BadgeGoldSecondary")
-    }
-    struct Silver {
-      static let primary   = Color("BadgeSilverPrimary")
-      static let secondary = Color("BadgeSilverSecondary")
-    }
-    struct Bronze {
-      static let primary   = Color("BadgeBronzePrimary")
-      static let secondary = Color("BadgeBronzeSecondary")
-    }
+  struct Gold {
+    static let primary   = Color.accentColor
+    static let secondary = Color("GoldSecondary")
   }
 }

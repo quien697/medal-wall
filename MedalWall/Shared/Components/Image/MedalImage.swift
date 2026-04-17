@@ -27,11 +27,11 @@ struct MedalImage: View {
         .strokeBorder(
           LinearGradient(
             stops: [
-              .init(color: Color.Badge.Gold.secondary, location: 0.0),
-              .init(color: Color.Badge.Gold.primary, location: 0.35),
-              .init(color: Color.Badge.Gold.secondary, location: 0.5),
-              .init(color: Color.Badge.Gold.primary, location: 0.75),
-              .init(color: Color.Badge.Gold.secondary.opacity(0.8), location: 1.0),
+              .init(color: Color.Gold.secondary, location: 0.0),
+              .init(color: Color.Gold.primary, location: 0.35),
+              .init(color: Color.Gold.secondary, location: 0.5),
+              .init(color: Color.Gold.primary, location: 0.75),
+              .init(color: Color.Gold.secondary.opacity(0.8), location: 1.0),
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -44,12 +44,12 @@ struct MedalImage: View {
         .overlay(
           Hexagon()
             .strokeBorder(
-              Color.Badge.Gold.secondary.opacity(0.2),
+              Color.Gold.secondary.opacity(0.2),
               lineWidth: 1
             )
         )
         .shadow(
-          color: Color.Badge.Gold.primary.opacity(0.25),
+          color: Color.Gold.primary.opacity(0.25),
           radius: 3,
           x: 0,
           y: 2
@@ -70,7 +70,7 @@ struct MedalImage: View {
       } else {
         Image(systemName: systemImageName)
           .font(.system(size: size * 0.3, weight: .semibold))
-          .foregroundColor(Color.Badge.Gold.primary)
+          .foregroundColor(Color.Gold.primary)
       }
     } // ZStack
   }

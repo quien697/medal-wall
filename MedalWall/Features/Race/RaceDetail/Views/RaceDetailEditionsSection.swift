@@ -30,7 +30,7 @@ struct RaceDetailEditionsSection: View {
               Text(String(edition.year))
                 .font(.title)
                 .fontWeight(.heavy)
-                .foregroundStyle(Color.Badge.Gold.primary)
+                .foregroundStyle(Color.Gold.primary)
               
               Text(edition.dateDisplayLabel)
                 .font(.subheadline)

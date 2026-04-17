@@ -15,7 +15,7 @@ struct RaceEntrySubTitle: View {
       if let selection {
         Text(selection.selectionLabel)
           .font(.subheadline)
-          .foregroundStyle(Color.Badge.Gold.primary)
+          .foregroundStyle(Color.Gold.primary)
           .fontWeight(.semibold)
           .frame(maxWidth: .infinity, alignment: .leading)
       } else {

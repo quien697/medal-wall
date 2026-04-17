@@ -30,8 +30,8 @@ struct AvatarImage: View {
         .fill(
           LinearGradient(
             colors: [
-              Color.Badge.Gold.primary,
-              Color.Badge.Gold.secondary
+              Color.Gold.primary,
+              Color.Gold.secondary
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -47,8 +47,8 @@ struct AvatarImage: View {
         .fill(
           LinearGradient(
             colors: [
-              Color.Badge.Gold.primary,
-              Color.Badge.Gold.secondary
+              Color.Gold.primary,
+              Color.Gold.secondary
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -59,7 +59,7 @@ struct AvatarImage: View {
           height: imageType.size.height
         )
         .shadow(
-          color: Color.Badge.Gold.primary.opacity(0.5),
+          color: Color.Gold.primary.opacity(0.5),
           radius: 8,
           x: 0,
           y: 10

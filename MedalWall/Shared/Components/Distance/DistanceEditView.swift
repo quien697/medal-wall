@@ -77,7 +77,6 @@ struct DistanceEditView: View {
             onAction(draftDistance)
             dismiss()
           }
-          .tint(Color.Badge.Gold.primary)
         }
       } // toolbar
     } // NavigationStack

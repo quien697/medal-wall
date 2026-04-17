@@ -33,7 +33,7 @@ struct MedalCard: View {
         Text(finishTime)
           .font(.subheadline)
           .fontWeight(.heavy)
-          .foregroundStyle(Color.Badge.Gold.primary)
+          .foregroundStyle(Color.Gold.primary)
         
         Text(date)
           .font(.caption)

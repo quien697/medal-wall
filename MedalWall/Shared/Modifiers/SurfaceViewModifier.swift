@@ -23,6 +23,7 @@ struct SurfaceViewModifier: ViewModifier {
       .clipShape(.rect(cornerRadius: radius))
       .overlay(
         RoundedRectangle(cornerRadius: radius)
+          .inset(by: 0.5)
           .stroke(borderColor, lineWidth: 1)
       )
   }

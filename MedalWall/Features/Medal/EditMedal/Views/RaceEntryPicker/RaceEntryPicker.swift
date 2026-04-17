@@ -46,7 +46,6 @@ struct RaceEntryPicker: View {
               onSelect(selection)
               dismiss()
             }
-            .tint(Color.Badge.Gold.primary)
           }
         }
       } // toolbar

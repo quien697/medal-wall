@@ -31,8 +31,7 @@ struct RaceEditionEditDateSection: View {
           .fontWeight(.bold)
           .foregroundStyle(Color.Text.tertiary)
       }
-      .tint(Color.Badge.Gold.primary)
-      
+
       Picker(selection: Binding(
         get: { year },
         set: { onUpdateYear($0) }
@@ -61,8 +60,7 @@ struct RaceEditionEditDateSection: View {
           .fontWeight(.bold)
           .foregroundStyle(Color.Text.tertiary)
       }
-      .tint(Color.Badge.Gold.primary)
-      
+
       if !isOneDay {
         DatePicker(
           selection: $endDate,
@@ -73,7 +71,6 @@ struct RaceEditionEditDateSection: View {
             .fontWeight(.bold)
             .foregroundStyle(Color.Text.tertiary)
         }
-        .tint(Color.Badge.Gold.primary)
       }
     } // Section
   }
