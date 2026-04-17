@@ -59,7 +59,7 @@ struct MedalImage: View {
       if let uiImage = photo {
         Image(uiImage: uiImage)
           .resizable()
-          .aspectRatio(contentMode: imageType.contentMode)
+          .scaledToFill()
           .frame(width: size * 0.72, height: size * 0.72)
           .clipShape(imageType.shape)
           .shadow(

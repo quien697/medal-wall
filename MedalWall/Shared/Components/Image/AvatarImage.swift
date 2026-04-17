@@ -80,7 +80,7 @@ struct AvatarImage: View {
 
 #Preview {
   AvatarImage(photo: UIImage(named: "quien"), cropPhoto: nil)
-  AvatarImage(photo: UIImage(named: "taipei-marathon-2020"), cropPhoto: nil)
+  AvatarImage(photo: UIImage(named: "taipei-marathon-medal-2019"), cropPhoto: nil)
   AvatarImage(photo: nil, cropPhoto: nil)
   
   AvatarImage(
@@ -89,7 +89,7 @@ struct AvatarImage: View {
     imageType: .avatarThumbnail
   )
   AvatarImage(
-    photo: UIImage(named: "taipei-marathon-2020"),
+    photo: UIImage(named: "taipei-marathon-medal-2019"),
     cropPhoto: nil,
     imageType: .avatarThumbnail
   )

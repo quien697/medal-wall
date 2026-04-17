@@ -24,7 +24,7 @@ struct ImageView: View {
       if let image {
         Image(uiImage: image)
           .resizable()
-          .aspectRatio(contentMode: type.contentMode)
+          .scaledToFill()
           .overlay {
             GeometryReader { overlayGeo in
               let rect = overlayGeo.frame(in: .named(CROPVIEW))

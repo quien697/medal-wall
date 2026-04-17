@@ -19,15 +19,10 @@ struct RaceEditionEditLogoSection: View {
   var body: some View {
     Section("Logo") {
       HStack(spacing: 15) {
-        Group {
-          if let uiImage = cropPhoto ?? photo {
-            Image(uiImage: uiImage)
-              .styled(as: .raceThumbnail)
-          } else {
-            Image(systemName: "camera.fill")
-              .placeholderStyled(as: .raceThumbnail)
-          }
-        } // Group
+        RaceImage(
+          photo: cropPhoto ?? photo,
+          imageType: .raceThumbnail
+        )
         .confirmationDialog(
           "Edit Photo",
           isPresented: $isShowingPhotoDialog,

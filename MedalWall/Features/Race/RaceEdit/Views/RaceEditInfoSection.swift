@@ -21,15 +21,10 @@ struct RaceEditInfoSection: View {
   var body: some View {
     Section("Info") {
       HStack {
-        Group {
-          if let uiImage = cropPhoto ?? photo {
-            Image(uiImage: uiImage)
-              .styled(as: ImageType.raceHero)
-          } else {
-            Image(systemName: "photo.fill")
-              .placeholderStyled(as: ImageType.raceHero)
-          }
-        } // Group
+        RaceImage(
+          photo: cropPhoto ?? photo,
+          imageType: .raceHero
+        )
         .confirmationDialog(
           "Edit Photo",
           isPresented: $isShowingPhotoDialog,

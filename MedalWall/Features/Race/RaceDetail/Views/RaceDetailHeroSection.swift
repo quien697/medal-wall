@@ -15,18 +15,10 @@ struct RaceDetailHeroSection: View {
   
   var body: some View {
     DetailHeroSection {
-      ZStack(alignment: .leading) {
-        if let photo {
-          Image(uiImage: photo)
-            .styled(as: ImageType.raceHero)
-          
-        } else {
-          Image(systemName: "photo.fill")
-            .placeholderStyled(as: ImageType.raceHero)
-        }
-      } // ZStack
-      .clipShape(RoundedRectangle(cornerRadius: 16))
-      .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+      RaceImage(
+        photo: photo,
+        imageType: .raceHero
+      )
     } infoContent: {
       Text(name)
         .font(.title2)

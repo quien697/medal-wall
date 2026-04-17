@@ -15,13 +15,10 @@ struct RaceRow: View {
   
   var body: some View {
     HStack {
-      if let photo {
-        Image(uiImage: photo)
-          .styled(as: ImageType.raceThumbnail)
-      } else {
-        Image(systemName: "photo.fill")
-          .placeholderStyled(as: ImageType.raceThumbnail)
-      }
+      RaceImage(
+        photo: photo,
+        imageType: .raceThumbnail
+      )
       
       VStack(alignment: .leading) {
         Text(name)

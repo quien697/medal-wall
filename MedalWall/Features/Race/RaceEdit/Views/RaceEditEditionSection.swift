@@ -57,13 +57,10 @@ struct RaceEditEditionSection: View {
                   Image(uiImage: uiImage)
                     .styled(as: ImageType.raceThumbnail)
                 } else {
-                  if let uiImage = raceCropPhoto ?? racePhoto {
-                    Image(uiImage: uiImage)
-                      .styled(as: ImageType.raceThumbnail)
-                  } else {
-                    Image(systemName: "photo.fill")
-                      .placeholderStyled(as: ImageType.raceThumbnail)
-                  }
+                  RaceImage(
+                    photo: raceCropPhoto ?? racePhoto,
+                    imageType: .raceThumbnail
+                  )
                 }
               } // ZStack
               

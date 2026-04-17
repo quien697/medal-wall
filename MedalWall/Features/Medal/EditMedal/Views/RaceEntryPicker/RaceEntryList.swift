@@ -15,13 +15,10 @@ struct RaceEntryList: View {
     List(races) { race in
       VStack(alignment: .leading) {
         HStack(alignment: .top) {
-          if let photo = race.photo {
-            Image(uiImage: photo)
-              .styled(as: ImageType.raceThumbnail)
-          } else {
-            Image(systemName: "photo.fill")
-              .placeholderStyled(as: ImageType.raceThumbnail)
-          }
+          RaceImage(
+            photo: race.photo,
+            imageType: .raceThumbnail
+          )
           
           VStack(alignment: .leading) {
             Text(race.name)
