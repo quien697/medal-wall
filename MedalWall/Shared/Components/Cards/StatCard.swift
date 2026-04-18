@@ -11,8 +11,6 @@ struct StatCard: View {
   let title: String
   let subTitle: String
   let titleColor: Color
-  let width: CGFloat
-  let height: CGFloat
   let vPadding: CGFloat
   let hPadding: CGFloat
   
@@ -20,16 +18,12 @@ struct StatCard: View {
     title: String,
     subTitle: String,
     titleColor: Color? = nil,
-    width: CGFloat? = nil,
-    height: CGFloat? = nil,
     vPadding: CGFloat? = nil,
     hPadding: CGFloat? = nil
   ) {
     self.title = title
     self.subTitle = subTitle
     self.titleColor = titleColor ?? Color.Text.primary
-    self.width = width ?? .nan
-    self.height = height ?? .nan
     self.vPadding = vPadding ?? 16
     self.hPadding = hPadding ?? 16
   }
@@ -40,13 +34,15 @@ struct StatCard: View {
         .font(.largeTitle)
         .fontWeight(.heavy)
         .foregroundStyle(titleColor)
+        .lineLimit(1)
+        .minimumScaleFactor(0.5)
       
       Text(subTitle)
         .font(.subheadline)
         .foregroundStyle(Color.Text.tertiary)
         .lineLimit(1)
     }
-    .frame(maxWidth: .infinity)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
     .surfaceStyle(
       vPadding: vPadding,
       hPadding: hPadding
@@ -59,15 +55,12 @@ struct StatCard: View {
     StatCard(
       title: "32",
       subTitle: "Races",
-      width: 80,
-      height: 60,
       vPadding: 10
     )
     
     StatCard(
       title: "12",
       subTitle: "Total",
-      width: 80,
       vPadding: 0
     )
   }
