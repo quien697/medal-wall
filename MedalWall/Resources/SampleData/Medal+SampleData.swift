@@ -30,6 +30,7 @@ extension Medal {
       genderPlacement: 5539,
       genderTotal: 6081,
       note: "The weather was good, not too much up hill and down hill.",
+      tags: ["Taipei", "台北", "Full Marathon", "全馬"],
       user: user
     )
     

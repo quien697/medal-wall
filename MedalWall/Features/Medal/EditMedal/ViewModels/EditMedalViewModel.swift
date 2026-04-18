@@ -31,7 +31,7 @@ final class EditMedalViewModel {
   var genderPlacement: Int? = nil
   var genderTotal: Int? = nil
   var note: String = ""
-  var tags: [String] = [] // implemented later
+  var tags: [String] = []
   var draftEventPhotos: [DraftEventPhoto] = []
   
   let mode: ItemEditMode

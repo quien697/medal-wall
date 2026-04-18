@@ -27,7 +27,6 @@ struct EditMedalView: View {
   // Event photos picker
   @State private var isPresentingEventPhotosPicker: Bool = false
   @State private var selectedEventPhotos: [PhotosPickerItem] = []
-
   
   init(mode: ItemEditMode, medal: Medal? = nil) {
     self._viewModel = State(initialValue: EditMedalViewModel(mode: mode, medal: medal))
@@ -73,16 +72,6 @@ struct EditMedalView: View {
             }
           )
           
-          EditMedalEventPhotosSection(
-            photos: viewModel.draftEventPhotos,
-            onChooseFromLibrary: {
-              isPresentingEventPhotosPicker = true
-            },
-            onRemove: {
-              viewModel.removeEventPhoto(id: $0)
-            }
-          )
-          
           EditMedalLocationSection(
             country: $viewModel.country,
             province: $viewModel.province,
@@ -101,6 +90,18 @@ struct EditMedalView: View {
           )
           
           EditMedalNoteSection(note: $viewModel.note)
+          
+          EditMedalEventPhotosSection(
+            photos: viewModel.draftEventPhotos,
+            onChooseFromLibrary: {
+              isPresentingEventPhotosPicker = true
+            },
+            onRemove: {
+              viewModel.removeEventPhoto(id: $0)
+            }
+          )
+          
+          EditMedalTagsSection(tags: $viewModel.tags)
         } // Form
       } // VStack
       .navigationTitle("\(viewModel.mode == .add ? "New" : "Edit") Medal")
@@ -150,7 +151,6 @@ struct EditMedalView: View {
           } else {
             errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
           }
-
         }
       }
       .photosPicker(
@@ -216,16 +216,7 @@ struct EditMedalView: View {
   }
 }
 
-#Preview("Add mode") {
-  @Previewable @Environment(\.modelContext) var modelContext
-  
-  NavigationStack {
-    EditMedalView(mode: .add)
-  }
-  .environment(UserManager(modelContext: modelContext))
-}
-
-#Preview("Edit mode") {
+#Preview {
   @Previewable @Environment(\.modelContext) var modelContext
   
   NavigationStack {
