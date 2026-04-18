@@ -12,8 +12,8 @@ struct EditMedalNoteSection: View {
   
   var body: some View {
     Section("Notes") {
-      TextField("Note", text: $note, axis: .vertical)
-        .lineLimit(3...)
+      TextEditor(text: $note)
+        .frame(minHeight: 100)
     } // Section
   }
 }

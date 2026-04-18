@@ -1,5 +1,5 @@
 //
-//  ProfileAddView.swift
+//  AddProfileView.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-12-06.
@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-struct ProfileAddView: View {
+struct AddProfileView: View {
   var body: some View {
-    ProfileEditView(profile: nil)
+    EditProfileView(mode: .add)
   }
 }
 
 #Preview {
-  ProfileAddView()
+  AddProfileView()
 }

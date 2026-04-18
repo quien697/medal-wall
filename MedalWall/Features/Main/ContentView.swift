@@ -11,9 +11,7 @@ struct ContentView: View {
   var body: some View {
     TabView {
       Tab("You", systemImage: "person.crop.circle") {
-        NavigationStack {
-          ProfileView()
-        }
+        ProfileView()
       }
       
       Tab("Medal", systemImage: "medal") {

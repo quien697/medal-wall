@@ -19,12 +19,13 @@ class ProfileEditViewModel {
   var gender: Gender? = nil
   var birthday: Date = .now
   var isBirthdaySet: Bool = false
-  var isNewProfile: Bool = true
   
+  let mode: ItemEditMode
   private var repository: UserRepository?
-  private(set) var profile: User?
+  private let profile: User?
   
-  init(profile: User?) {
+  init(mode: ItemEditMode, profile: User?) {
+    self.mode = mode
     self.profile = profile
     
     if let profile {
@@ -42,17 +43,18 @@ class ProfileEditViewModel {
         self.birthday = birthday
         self.isBirthdaySet = true
       }
-      self.isNewProfile = false
     }
-  }
-  
-  func configure(context: ModelContext) {
-    self.repository = UserRepository(context: context)
   }
   
   var isFormValid: Bool {
     !userName.trimmedFirstName.isEmpty &&
     !userName.trimmedLastName.isEmpty
+  }
+  
+  // MARK: - Functions
+  
+  func configure(context: ModelContext) {
+    self.repository = UserRepository(context: context)
   }
   
   func updatePhoto(with data: Data?) {
