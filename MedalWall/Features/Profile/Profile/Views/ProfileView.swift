@@ -9,9 +9,14 @@ import SwiftUI
 import SwiftData
 
 struct ProfileView: View {
+  // MARK: - Environment
   @Environment(UserManager.self) private var userManager
+  // MARK: - State
+  @State private var viewModel = ProfileViewModel()
   @State private var isShowingProfileAddView = false
   @State private var isShowingSettingsView = false
+  // MARK: - Query
+  @Query private var medals: [Medal]
   
   var body: some View {
     Group {
@@ -24,9 +29,13 @@ struct ProfileView: View {
             bio: user.bio
           )
           
-          ProfileSummarySection()
+          ProfileSummarySection(
+            totalMedals: viewModel.totalMedals(medals),
+            bestFullTime: viewModel.bestFullTime(medals),
+            bestHalfTime: viewModel.bestHalfTime(medals)
+          )
           
-          ProfileAchievementsSection()
+          //          ProfileAchievementsSection()
             .padding(.bottom, 10)
         } // ScrollView
         .navigationTitle("Profile")

@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct ProfileSummarySection: View {
-  let columns = [
+  let totalMedals: Int
+  let bestFullTime: String
+  let bestHalfTime: String
+  
+  private let columns = [
     GridItem(.flexible(minimum: 80), spacing: 15),
     GridItem(.flexible(minimum: 80), spacing: 15),
     GridItem(.flexible(minimum: 80), spacing: 15),
@@ -17,23 +21,33 @@ struct ProfileSummarySection: View {
   var body: some View {
     SectionContainer {
       LazyVGrid(columns: columns, spacing: 20) {
-        StatGridItem(title: "32", subTitle: "Races")
+        StatGridItem(
+          title: "\(totalMedals)",
+          subTitle: "Medals",
+          titleColor: Color.Gold.primary
+        )
         
-        StatGridItem(title: "12", subTitle: "Medals", titleColor: Color.Gold.primary)
+        StatGridItem(
+          title: bestFullTime,
+          subTitle: "Best Full",
+          titleColor: Color.Gold.primary
+        )
         
-        StatGridItem(title: "847km", subTitle: "Total")
-        
-        StatGridItem(title: "12", subTitle: "Finisher")
-        
-        StatGridItem(title: "9:99:99", subTitle: "Best Full", titleColor: Color.Gold.primary)
-        
-        StatGridItem(title: "2:00:19", subTitle: "Best Half")
+        StatGridItem(
+          title: bestHalfTime,
+          subTitle: "Best Half",
+          titleColor: Color.Gold.primary
+        )
       }
     }
   }
 }
 
-#Preview {
-  ProfileSummarySection()
-    .background(Color.Card.Background.tertiary)
+#Preview(traits: .sampleData) {
+  
+  ProfileSummarySection(
+    totalMedals: 5,
+    bestFullTime: "05:12:20",
+    bestHalfTime: "02:02:19"
+  )
 }
