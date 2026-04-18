@@ -8,40 +8,42 @@
 import SwiftUI
 
 struct MedalDetailEventPhotosSection: View {
-  let photots: [EventPhoto]
+  @State private var isPresentingPhotoViewer = false
+  @State private var selectedPhotoIndex = 0
   
+  let photos: [EventPhoto]
+
   var body: some View {
     SectionContainer(title: "Event Photos") {
       ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 12) {
-          if photots.isEmpty {
-            ForEach(1...4, id: \.self) { index in
-              Image(systemName: "photo.fill")
-                .placeholderStyled(as: ImageType.raceHero)
+          ForEach(Array(photos.sorted { $0.sortOrder < $1.sortOrder }.enumerated()), id: \.element.id) { index, photo in
+            if let image = photo.image {
+              Image(uiImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 140, height: 110)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .onTapGesture {
+                  selectedPhotoIndex = index
+                  isPresentingPhotoViewer = true
+                }
             }
-          } else {
-            //            ForEach(
-            //              viewModel.medal.eventPhotos.sorted(by: { $0.sortOrder < $1.sortOrder }),
-            //              id: \.id
-            //            ) { photo in
-            //              if let image = photo.image {
-            //                Image(uiImage: image)
-            //                  .resizable()
-            //                  .aspectRatio(contentMode: .fill)
-            //                  .frame(width: 140, height: 110)
-            //                  .clipShape(RoundedRectangle(cornerRadius: 12))
-            //              }
-            //            }
-          }
-        }
-      }
+          } // ForEach
+        } // HStack
+      } // ScrollView
+    } // SectionContainer
+    .fullScreenCover(isPresented: $isPresentingPhotoViewer) {
+      PhotoViewer(
+        photos: photos.compactMap { $0.image },
+        selectedIndex: $selectedPhotoIndex
+      )
     }
-    
   }
 }
 
 #Preview {
   ScrollView {
-    MedalDetailEventPhotosSection(photots: [])
+    MedalDetailEventPhotosSection(photos: [])
   }
 }

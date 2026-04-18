@@ -32,7 +32,7 @@ final class EditMedalViewModel {
   var genderTotal: Int? = nil
   var note: String = ""
   var tags: [String] = [] // implemented later
-  // eventPhotos: to be implemented later
+  var draftEventPhotos: [DraftEventPhoto] = []
   
   let mode: ItemEditMode
   private var repository: MedalRepository
@@ -66,11 +66,10 @@ final class EditMedalViewModel {
       self.genderTotal = medal.genderTotal
       self.note = medal.note ?? ""
       self.tags = medal.tags
+      self.draftEventPhotos = medal.eventPhotos
+        .sorted { $0.sortOrder < $1.sortOrder }
+        .map { DraftEventPhoto(data: $0.imageData) }
     }
-  }
-  
-  func configure(context: ModelContext) {
-    repository.configure(context: context)
   }
   
   var isFormValid: Bool {
@@ -83,6 +82,12 @@ final class EditMedalViewModel {
     !name.trimmingCharacters(in: .whitespaces).isEmpty &&
     !country.trimmingCharacters(in: .whitespaces).isEmpty &&
     !city.trimmingCharacters(in: .whitespaces).isEmpty
+  }
+  
+  // MARK: - Functions
+  
+  func configure(context: ModelContext) {
+    repository.configure(context: context)
   }
   
   func updatePhoto(with data: Data?) {
@@ -100,6 +105,14 @@ final class EditMedalViewModel {
     self.photo = nil
     self.cropPhotoData = nil
     self.cropPhoto = nil
+  }
+  
+  func addEventPhotos(_ dataList: [Data]) {
+    draftEventPhotos.append(contentsOf: dataList.map { DraftEventPhoto(data: $0) })
+  }
+  
+  func removeEventPhoto(id: UUID) {
+    draftEventPhotos.removeAll { $0.id == id }
   }
   
   func autoFill(from selection: RaceEntry) {
@@ -135,6 +148,14 @@ final class EditMedalViewModel {
       medal.genderTotal = genderTotal
       medal.note = note.isEmpty ? nil : note
       medal.tags = tags
+      
+      for photo in medal.eventPhotos {
+        try repository.deleteEventPhoto(photo)
+      }
+      
+      for (index, draft) in draftEventPhotos.enumerated() {
+        try repository.insertEventPhoto(EventPhoto(imageData: draft.data, sortOrder: index, medal: medal))
+      }
     } else {
       let newMedal = Medal(
         name: name,
@@ -161,7 +182,12 @@ final class EditMedalViewModel {
         tags: tags,
         user: user
       )
+      
       try repository.insertMedal(newMedal)
+      
+      for (index, draft) in draftEventPhotos.enumerated() {
+        try repository.insertEventPhoto(EventPhoto(imageData: draft.data, sortOrder: index, medal: newMedal))
+      }
     }
     
     try repository.save()

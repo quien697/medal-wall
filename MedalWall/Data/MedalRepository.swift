@@ -33,4 +33,14 @@ final class MedalRepository {
     guard let context else { throw AppError.contextNotAttached }
     context.delete(medal)
   }
+
+  func insertEventPhoto(_ photo: EventPhoto) throws {
+    guard let context else { throw AppError.contextNotAttached }
+    context.insert(photo)
+  }
+
+  func deleteEventPhoto(_ photo: EventPhoto) throws {
+    guard let context else { throw AppError.contextNotAttached }
+    context.delete(photo)
+  }
 }

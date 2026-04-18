@@ -109,15 +109,11 @@ struct EditRaceEditionView: View {
         guard let newItem else { return }
         
         Task {
-          do {
-            if let data = try await newItem.loadTransferable(type: Data.self) {
-              viewModel.clearPhoto()
-              viewModel.updatePhoto(with: data)
-            } else {
-              errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
-            }
-          } catch {
-            errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
+          if let data = try await newItem.loadTransferable(type: Data.self) {
+            viewModel.clearPhoto()
+            viewModel.updatePhoto(with: data)
+          } else {
+            errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
           }
         } // Task
       }

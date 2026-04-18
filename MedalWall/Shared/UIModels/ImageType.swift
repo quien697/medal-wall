@@ -18,6 +18,8 @@ enum ImageType {
   
   // Medal
   case medal
+  case eventThumbnail
+  case event
 }
 
 extension ImageType {
@@ -25,7 +27,7 @@ extension ImageType {
     switch self {
     case .avatarThumbnail, .avatar, .medal:
       return AnyShape(Circle())
-    case .raceThumbnail, .raceHero:
+    case .raceThumbnail, .raceHero, .eventThumbnail, .event:
       return AnyShape(.rect(cornerRadius: 16))
     }
   }
@@ -34,18 +36,20 @@ extension ImageType {
     switch self {
     case .avatarThumbnail, .avatar, .medal:
       return size.height / 2
-    case .raceThumbnail, .raceHero:
+    case .raceThumbnail, .raceHero, .eventThumbnail, .event:
       return 16
     }
   }
   
   var size: CGSize {
     switch self {
-    case .avatarThumbnail: return CGSize(width: 60, height: 60)
-    case .avatar:          return CGSize(width: 100, height: 100)
-    case .raceThumbnail:   return CGSize(width: 60, height: 60)
-    case .raceHero:        return CGSize(width: 100, height: 100)
-    case .medal:           return CGSize(width: 160, height: 160)
+    case .avatarThumbnail:  return CGSize(width: 60,  height: 60)
+    case .avatar:           return CGSize(width: 100, height: 100)
+    case .raceThumbnail:    return CGSize(width: 60,  height: 60)
+    case .raceHero:         return CGSize(width: 100, height: 100)
+    case .medal:            return CGSize(width: 160, height: 160)
+    case .eventThumbnail:   return CGSize(width: 100, height: 80)
+    case .event:            return CGSize(width: 140, height: 110)
     }
   }
 }
@@ -69,7 +73,7 @@ extension Image {
     self
       .resizable()
       .scaledToFit()
-      .frame(width: type.size.width / 2)
+      .frame(width: type.size.width * 0.4)
       .foregroundStyle(fgColor)
       .frame(width: type.size.width, height: type.size.height)
       .background(bgColor)

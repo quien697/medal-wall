@@ -17,12 +17,17 @@ struct EditMedalView: View {
   // MARK: - State
   @State private var viewModel: EditMedalViewModel
   @State private var errorWrapper: ErrorWrapper?
-  @State private var isPresentingPhotoPicker: Bool = false
-  @State private var isPresentingCropImageView: Bool = false
   @State private var isPresentingDistancePicker: Bool = false
-  @State private var selectedPhoto: PhotosPickerItem?
-  @State private var shouldDismiss: Bool = false
+  @State private var isPresentingCropImageView: Bool = false
   @State private var isPresentingRaceEntryPicker: Bool = false
+  @State private var shouldDismiss: Bool = false
+  // Medal photo picker
+  @State private var isPresentingPhotoPicker: Bool = false
+  @State private var selectedPhoto: PhotosPickerItem?
+  // Event photos picker
+  @State private var isPresentingEventPhotosPicker: Bool = false
+  @State private var selectedEventPhotos: [PhotosPickerItem] = []
+
   
   init(mode: ItemEditMode, medal: Medal? = nil) {
     self._viewModel = State(initialValue: EditMedalViewModel(mode: mode, medal: medal))
@@ -65,6 +70,16 @@ struct EditMedalView: View {
             distance: viewModel.distance.displayLabel,
             onEditDistance: {
               isPresentingDistancePicker = true
+            }
+          )
+          
+          EditMedalEventPhotosSection(
+            photos: viewModel.draftEventPhotos,
+            onChooseFromLibrary: {
+              isPresentingEventPhotosPicker = true
+            },
+            onRemove: {
+              viewModel.removeEventPhoto(id: $0)
             }
           )
           
@@ -129,16 +144,40 @@ struct EditMedalView: View {
         guard let newItem else { return }
         
         Task {
-          do {
-            if let data = try await newItem.loadTransferable(type: Data.self) {
-              viewModel.clearPhoto()
-              viewModel.updatePhoto(with: data)
+          if let data = try await newItem.loadTransferable(type: Data.self) {
+            viewModel.clearPhoto()
+            viewModel.updatePhoto(with: data)
+          } else {
+            errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
+          }
+
+        }
+      }
+      .photosPicker(
+        isPresented: $isPresentingEventPhotosPicker,
+        selection: $selectedEventPhotos,
+        maxSelectionCount: 10,
+        matching: .images
+      )
+      .onChange(of: selectedEventPhotos) { _, newItems in
+        guard !newItems.isEmpty else { return }
+        
+        Task {
+          var dataList: [Data] = []
+          
+          for item in newItems {
+            if let data = try? await item.loadTransferable(type: Data.self) {
+              dataList.append(data)
             } else {
               errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
             }
-          } catch {
-            errorWrapper = ErrorWrapper(error: AppError.photoLoadFailed)
           }
+          
+          if !dataList.isEmpty {
+            viewModel.addEventPhotos(dataList)
+          }
+          
+          selectedEventPhotos = []
         }
       }
       .sheet(isPresented: $isPresentingCropImageView) {

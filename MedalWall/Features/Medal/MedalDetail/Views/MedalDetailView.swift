@@ -54,8 +54,10 @@ struct MedalDetailView: View {
         MedalDetailNoteSection(note: note)
       }
       
-      //      MedalDetailEventPhotosSection(photots: viewModel.medal.eventPhotos)
-      
+      if !viewModel.medal.eventPhotos.isEmpty {
+        MedalDetailEventPhotosSection(photos: viewModel.medal.eventPhotos)
+      }
+
       //      MedalDetailTagsSection()
     }
     .navigationTitle(viewModel.medal.name)
