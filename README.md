@@ -1,21 +1,17 @@
 # Medal Wall
 
+![iOS](https://img.shields.io/badge/iOS-26-blue.svg) ![Swift](https://img.shields.io/badge/Swift-6-orange.svg) ![SwiftUI](https://img.shields.io/badge/SwiftUI-brightgreen.svg) ![Xcode](https://img.shields.io/badge/Xcode-26.2-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+
 It is a personal archive for every race I have completed.
 
 
 
 ## 📝 Overview
 
-**Medal Wall** is an iOS app for archiving race events and results. It allows users to manage races, track medals, and view detailed information for each event and achievement.
-
-
-
-## ✨ Features
-
-- Add and manage race events
-- Store race results including medals, notes, and outcomes
-- Race list and detail views
-- Medal list and detail views
+1. An iOS app for archiving race events and results.
+2. Allows users to manage races, track medals, and view detailed information for each event and achievement.
+3. Built with SwiftUI and SwiftData for local data persistence.
+4. Follows MVVM architecture for clean separation of concerns.
 
 
 
@@ -32,21 +28,9 @@ It is a personal archive for every race I have completed.
 ## 🔧 Development Tools
 
 - Xcode 26.2
-- icons: [SF Symbols](https://developer.apple.com/sf-symbols/)
+- Icons: [SF Symbols](https://developer.apple.com/sf-symbols/)
 - Version control: GitHub / Git
 - AI tools: [ChatGPT](https://chatgpt.com/), [GitHub Copilot](https://github.com/features/copilot), [AI image generators](https://deepai.org/machine-learning-model/text2img)
-
-
-
-## 🧱 Architecture
-
-**MVVM (Model-View-ViewModel)** architecture drives this app:
-
-- Models – Data structures for Medals, Races, Profile, etc.
-- **ViewModels** – Business logic and state management
-- **Views** – SwiftUI views, structured by feature
-- **Repositories / Data** – Handle data storage and retrieval
-- **Shared** – Reusable components, UIModels, extensions, and helpers
 
 
 
@@ -81,33 +65,6 @@ MedalWall/
 
 
 
-## 🗺 Roadmap
-
-### v1 (Current)
-
-- Core race and medal management
-- Race list and detail views
-- Medal list and detail views
-- Search and filter races and medals
-- Local data persistence using SwiftData
-
-### v2 (Planned)
-
-- Profile dashboard with auto-calculated race and medal statistics
-- Achievements system with badges and progress-based milestones
-- Settings & customization including data sync, export, and appearance options
-
-
-
-### v3 (Future Ideas)
-
-- Calendar integration and race reminders
-- Map-based visualization of completed races
-- Cloud sync and cross-device backup
-- Sharing and widgets
-
-
-
 ## 👨‍💻 Author
 
 **Tsung-Hsun Liu**  
@@ -118,4 +75,4 @@ MedalWall/
 
 ## 📄 License
 
-MIT License © 2025 Tsung-Hsun Liu
+MIT License © 2026 Tsung-Hsun Liu
