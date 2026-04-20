@@ -95,7 +95,7 @@ struct RacesView: View {
           .matchedTransitionSource(id: addRace, in: namespace)
           .buttonStyle(.glassProminent)
         } // ToolbarItem
-      }
+      } // toolbar
       .onAppear {
         viewModel.configure(context: modelContext)
       }

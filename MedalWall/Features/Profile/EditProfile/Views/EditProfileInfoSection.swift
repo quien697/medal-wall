@@ -52,7 +52,7 @@ struct EditProfileInfoSection: View {
             } label: {
               Image(systemName: "xmark.circle.fill")
             }
-            .tint(.red)
+            .foregroundStyle(.red)
             .buttonStyle(.plain)
             
             DatePicker("", selection: $birthday, displayedComponents: .date)
@@ -62,7 +62,7 @@ struct EditProfileInfoSection: View {
           Button("Not Set") {
             isBirthdaySet = true
           }
-          .tint(Color.Text.primary)
+          .foregroundStyle(Color.Text.primary)
           .buttonStyle(.bordered)
         }
       } label: {

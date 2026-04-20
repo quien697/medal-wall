@@ -10,6 +10,7 @@ import SwiftData
 
 @main
 struct MedalWallApp: App {
+  @AppStorage("appTheme") private var appTheme: AppTheme = .system
   @State private var userManager: UserManager?
   
   var sharedModelContainer: ModelContainer = {
@@ -44,6 +45,7 @@ struct MedalWallApp: App {
         }
       } // Group
       .environment(userManager)
+      .preferredColorScheme(appTheme.colorScheme)
       .task {
         guard userManager == nil else { return }
         

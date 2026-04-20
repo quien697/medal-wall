@@ -14,10 +14,6 @@ struct ProfileView: View {
   // MARK: - State
   @State private var viewModel = ProfileViewModel()
   @State private var isPresentingEditProfile = false
-  @State private var isPresentingSettingsView = false
-  // MARK: - Namespace
-  @Namespace private var namespace
-  private let settings: String = "settings"
   // MARK: - Query
   @Query private var medals: [Medal]
   
@@ -51,15 +47,14 @@ struct ProfileView: View {
             ToolbarItem(placement: .title) {
               ExpandedNavigationTitle(title: "Profile")
             }
-
-//            ToolbarItem(placement: .topBarTrailing) {
-//              Button {
-//                isPresentingSettingsView = true
-//              } label: {
-//                Image(systemName: "gearshape")
-//              }
-//              .matchedTransitionSource(id: settings, in: namespace)
-//            }
+            
+            ToolbarItem(placement: .topBarTrailing) {
+              NavigationLink {
+                SettingsView()
+              } label: {
+                Image(systemName: "gearshape")
+              }
+            }
             
             ToolbarItem(placement: .topBarTrailing) {
               Menu {
@@ -84,10 +79,7 @@ struct ProfileView: View {
           NoProfileView()
         }
       }
-      .sheet(isPresented: $isPresentingSettingsView) {
-        SettingsView()
-          .navigationTransition(.zoom(sourceID: settings, in: namespace))
-      }
+
     } // NavigationStack
   }
 }

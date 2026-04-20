@@ -41,7 +41,8 @@ struct TimePickerSheet: View {
           value = nil
           draftDuration = HMSDuration()
         } label: {
-          Text("Clear").tint(.red)
+          Text("Clear")
+            .foregroundStyle(.red)
         }
         .padding(.vertical, 8)
       } // VStack
@@ -56,7 +57,7 @@ struct TimePickerSheet: View {
             value = draftDuration.isEmpty ? nil : draftDuration.timeInterval
             isPresenting = false
           }
-          .tint(fontColor)
+          .foregroundStyle(fontColor)
         }
       } // toolbar
       .presentationDetents([.medium])
