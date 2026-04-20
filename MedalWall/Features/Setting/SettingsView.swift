@@ -10,41 +10,41 @@ import SwiftData
 
 struct SettingsView: View {
   @Environment(\.dismiss) private var dismiss
-  @Environment(UserManager.self) private var userManager
+  //  @Environment(UserManager.self) private var userManager
   
   var body: some View {
     NavigationStack {
       List {
-        Section {
-          if let user = userManager.currentUser {
-            NavigationLink {
-              EditProfileView(mode: .edit, profile: user)
-            } label: {
-              HStack {
-                AvatarImage(
-                  photo: user.avatar,
-                  cropPhoto: user.cropAvatar,
-                  imageType: .avatarThumbnail
-                )
-                
-                VStack(alignment: .leading) {
-                  Text(user.fullName)
-                    .fontWeight(.bold)
-                  
-                  Text("@zxcvbn")
-                    .foregroundStyle(Color.Text.tertiary)
-                }
-              }
-            }
-          } else {
-            ContentUnavailableView {
-              Text("No User Found")
-            }
-          }
-        } header: {
-          Text("Account")
-            .sectionTitleStyle()
-        }
+        //        Section {
+        //          if let user = userManager.currentUser {
+        //            NavigationLink {
+        //              EditProfileView(mode: .edit, profile: user)
+        //            } label: {
+        //              HStack {
+        //                AvatarImage(
+        //                  photo: user.avatar,
+        //                  cropPhoto: user.cropAvatar,
+        //                  imageType: .avatarThumbnail
+        //                )
+        //
+        //                VStack(alignment: .leading) {
+        //                  Text(user.fullName)
+        //                    .fontWeight(.bold)
+        //
+        //                  Text("@zxcvbn")
+        //                    .foregroundStyle(Color.Text.tertiary)
+        //                }
+        //              }
+        //            }
+        //          } else {
+        //            ContentUnavailableView {
+        //              Text("No User Found")
+        //            }
+        //          }
+        //        } header: {
+        //          Text("Account")
+        //            .sectionTitleStyle()
+        //        }
         
         Section {
           NavigationLink("Units of Measure") { }
@@ -74,8 +74,8 @@ struct SettingsView: View {
 }
 
 #Preview(traits: .sampleData) {
-  @Previewable @Environment(\.modelContext) var modelContext
+  //  @Previewable @Environment(\.modelContext) var modelContext
   
   SettingsView()
-    .environment(UserManager(modelContext: modelContext))
+  //    .environment(UserManager(modelContext: modelContext))
 }

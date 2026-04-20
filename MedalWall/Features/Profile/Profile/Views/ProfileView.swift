@@ -13,7 +13,7 @@ struct ProfileView: View {
   @Environment(UserManager.self) private var userManager
   // MARK: - State
   @State private var viewModel = ProfileViewModel()
-  @State private var isPresentingAddProfile = false
+  @State private var isPresentingEditProfile = false
   @State private var isPresentingSettingsView = false
   // MARK: - Namespace
   @Namespace private var namespace
@@ -51,33 +51,38 @@ struct ProfileView: View {
             ToolbarItem(placement: .title) {
               ExpandedNavigationTitle(title: "Profile")
             }
+
+//            ToolbarItem(placement: .topBarTrailing) {
+//              Button {
+//                isPresentingSettingsView = true
+//              } label: {
+//                Image(systemName: "gearshape")
+//              }
+//              .matchedTransitionSource(id: settings, in: namespace)
+//            }
             
             ToolbarItem(placement: .topBarTrailing) {
-              Button {
-                isPresentingSettingsView = true
+              Menu {
+                Button {
+                  isPresentingEditProfile = true
+                } label: {
+                  Label("Edit Profile", systemImage: "square.and.pencil")
+                }
               } label: {
-                Image(systemName: "gearshape.fill")
+                Image(systemName: "ellipsis")
               }
-              .buttonStyle(.glassProminent)
-              .matchedTransitionSource(id: settings, in: namespace)
             }
           } // toolbar
         } else {
-          ContentUnavailableView {
-            Label("No User Found", systemImage: "person.fill")
-          } description: {
-            Button {
-              isPresentingAddProfile = true
-            } label: {
-              Text("Creating a new user")
-                .padding(.top, 10)
-            }
-          } // ContentUnavailableView
-          .background(Color.Background.primary)
+          NoProfileView()
         }
       } // VStack
-      .sheet(isPresented: $isPresentingAddProfile) {
-        AddProfileView()
+      .sheet(isPresented: $isPresentingEditProfile) {
+        if let user = userManager.currentUser {
+          EditProfileView(mode: .edit, profile: user)
+        } else {
+          NoProfileView()
+        }
       }
       .sheet(isPresented: $isPresentingSettingsView) {
         SettingsView()

@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct MedalWallApp: App {
+  @State private var userManager: UserManager?
+  
   var sharedModelContainer: ModelContainer = {
     let schema = Schema([
       User.self,
@@ -22,38 +24,33 @@ struct MedalWallApp: App {
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
     
     do {
-      let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
-      let context = ModelContext(container)
-      try DefaultDataSeeder.seed(in: context)
-      
-      return container
+      return try ModelContainer(for: schema, configurations: [modelConfiguration])
     } catch {
       fatalError("Could not create ModelContainer: \(error)")
     }
   }()
   
-  @State private var userManager: UserManager?
-  
   var body: some Scene {
     WindowGroup {
       Group {
         if let userManager {
-          ContentView()
-            .environment(userManager)
-        } else {
-          VStack(spacing: 20) {
-            ProgressView()
-            Text("Loading...")
+          if userManager.currentUser != nil {
+            ContentView()
+          } else {
+            LoginView()
           }
+        } else {
+          LoadingView(text: "Loading...")
         }
-      }
-      .onAppear {
+      } // Group
+      .environment(userManager)
+      .task {
         guard userManager == nil else { return }
         
         let context = ModelContext(sharedModelContainer)
         userManager = UserManager(modelContext: context)
       }
-    }
+    } // WindowGroup
     .modelContainer(sharedModelContainer)
   }
 }

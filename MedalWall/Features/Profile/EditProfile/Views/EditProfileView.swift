@@ -68,6 +68,12 @@ struct EditProfileView: View {
         viewModel.configure(context: modelContext)
       }
       .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          Button(role: .close) {
+            dismiss()
+          }
+        }
+        
         ToolbarItem(placement: .confirmationAction) {
           Button(role: .confirm) {
             do {
@@ -117,5 +123,5 @@ struct EditProfileView: View {
 }
 
 #Preview {
-  EditProfileView(mode: .edit, profile: User.defaultUser)
+  EditProfileView(mode: .edit, profile: User.guest)
 }

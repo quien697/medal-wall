@@ -28,7 +28,7 @@ struct EditProfileInfoSection: View {
         TextField("Last Name", text: $lastName)
           .multilineTextAlignment(.trailing)
       } label: {
-        Text("First Name")
+        Text("Last Name")
           .fromLabelStyle()
       }
       

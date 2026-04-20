@@ -11,14 +11,15 @@ import SwiftData
 @Observable
 class UserManager {
   private let repository: UserRepository
+  private let context: ModelContext
   private(set) var currentUser: User?
   
   init(modelContext: ModelContext) {
+    self.context = modelContext
     self.repository = UserRepository(context: modelContext)
     loadUser()
   }
   
-  /// Loads existing user (created by DefaultDataSeeder)
   private func loadUser() {
     if let user = try? repository.getUser() {
       self.currentUser = user
@@ -28,6 +29,13 @@ class UserManager {
   /// Updates the current user (called from settings/profile edit)
   func updateUser(_ user: User) {
     self.currentUser = user
+  }
+  
+  /// Seeds guest user and sample data, then loads the user
+  func startAsGuest() throws {
+    try DefaultDataSeeder.seed(in: context)
+    
+    loadUser()
   }
 }
 

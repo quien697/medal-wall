@@ -11,7 +11,7 @@ import UIKit
 extension Race {
   @MainActor
   static let sampleData: [Race] = {
-    let userId = User.defaultUser.id
+    let userId = User.guest.id
     
     let taipei: Race = Race(
       name: "Taipei Marathon",
