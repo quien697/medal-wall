@@ -41,7 +41,7 @@ final class EditRaceViewModel {
       self.province = race.location.province ?? ""
       self.city = race.location.city
       self.district = race.location.district ?? ""
-      self.url = race.url ?? ""
+      self.url = race.fullURL ?? ""
       self.editions = race.editions.map { DraftRaceEdition(from: $0) }
     }
   }
