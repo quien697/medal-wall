@@ -9,6 +9,7 @@ import SwiftUI
 
 struct StatCard: View {
   let title: String
+  let titleFont: Font
   let subTitle: String
   let titleColor: Color
   let vPadding: CGFloat
@@ -16,12 +17,14 @@ struct StatCard: View {
   
   init(
     title: String,
+    titleFont: Font? = nil,
     subTitle: String,
     titleColor: Color? = nil,
     vPadding: CGFloat? = nil,
     hPadding: CGFloat? = nil
   ) {
     self.title = title
+    self.titleFont = titleFont ?? .largeTitle
     self.subTitle = subTitle
     self.titleColor = titleColor ?? Color.Text.primary
     self.vPadding = vPadding ?? 16
@@ -31,16 +34,17 @@ struct StatCard: View {
   var body: some View {
     VStack {
       Text(title)
-        .font(.largeTitle)
+        .font(titleFont)
         .fontWeight(.heavy)
         .foregroundStyle(titleColor)
         .lineLimit(1)
         .minimumScaleFactor(0.5)
       
       Text(subTitle)
-        .font(.subheadline)
+        .font(.caption)
         .foregroundStyle(Color.Text.tertiary)
         .lineLimit(1)
+        .minimumScaleFactor(0.5)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .surfaceStyle(
@@ -51,18 +55,45 @@ struct StatCard: View {
 }
 
 #Preview {
-  HStack(spacing: 16) {
+  let threeColumns = [
+    GridItem(.flexible(minimum: 80), spacing: 8),
+    GridItem(.flexible(minimum: 80), spacing: 8),
+    GridItem(.flexible(minimum: 80), spacing: 8),
+  ]
+  
+  let twoColumns = [
+    GridItem(.flexible(minimum: 160), spacing: 8),
+    GridItem(.flexible(minimum: 160), spacing: 8),
+  ]
+  
+  LazyVGrid(columns: threeColumns, spacing: 8) {
     StatCard(
       title: "32",
-      subTitle: "Races",
-      vPadding: 10
+      subTitle: "Medals",
     )
     
     StatCard(
       title: "12",
-      subTitle: "Total",
-      vPadding: 0
+      subTitle: "Full",
+    )
+    
+    StatCard(
+      title: "4",
+      subTitle: "Half",
     )
   }
-  .background(Color.Background.primary)
+  
+  LazyVGrid(columns: twoColumns, spacing: 8) {
+    StatCard(
+      title: "03:30:10",
+      titleFont: .title,
+      subTitle: "Best Full"
+    )
+    
+    StatCard(
+      title: "--:--:--",
+      titleFont: .title,
+      subTitle: "Best Half",
+    )
+  }
 }
