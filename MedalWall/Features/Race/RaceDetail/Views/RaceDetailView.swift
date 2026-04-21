@@ -30,7 +30,7 @@ struct RaceDetailView: View {
         photo: viewModel.race.cropPhoto ?? viewModel.race.photo,
         name: viewModel.race.name,
         location: viewModel.race.location.formatted,
-        url: viewModel.race.url
+        url: viewModel.race.fullURL
       )
       
       ScrollView {

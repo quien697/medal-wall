@@ -33,4 +33,12 @@ extension Race {
       district: district
     )
   }
+  
+  var fullURL: String? {
+    if let url {
+      return  url.hasPrefix("http://") || url.hasPrefix("https://") ? url : "https://\(url)"
+    }
+    
+    return nil
+  }
 }
