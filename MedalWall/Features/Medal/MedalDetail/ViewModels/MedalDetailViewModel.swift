@@ -11,7 +11,8 @@ import SwiftData
 @Observable
 final class MedalDetailViewModel {
   // MARK: - Properties
-  
+  private let emptyWithDash: String = "-"
+  private let emptyString: String = ""
   let gridSpacing: CGFloat = 10
   
   private var repository: MedalRepository?
@@ -33,7 +34,7 @@ final class MedalDetailViewModel {
   }
   
   var finishTimeText: String {
-    guard let finishTime = medal.finishTime else { return "-- : -- : --" }
+    guard let finishTime = medal.finishTime else { return emptyWithDash }
     return finishTime.formattedHMS
   }
   
@@ -45,37 +46,37 @@ final class MedalDetailViewModel {
   }
   
   var overallPlacementText: String {
-    guard let placement = medal.overallPlacement else { return "--" }
+    guard let placement = medal.overallPlacement else { return emptyWithDash }
     return "\(placement)"
   }
   
   var totalParticipantsText: String {
-    guard let total = medal.totalParticipants else { return "" }
+    guard let total = medal.totalParticipants else { return emptyString }
     return "of \(total)"
   }
   
   var divisionText: String {
-    guard let division = medal.divisionEnum else { return "--" }
+    guard let division = medal.divisionEnum else { return emptyWithDash }
     return division.displayName
   }
   
   var divisionPlacementText: String {
-    guard let placement = medal.divisionPlacement else { return "--" }
+    guard let placement = medal.divisionPlacement else { return emptyWithDash }
     return "\(placement)"
   }
   
   var divisionTotalText: String {
-    guard let total = medal.divisionTotal else { return "" }
+    guard let total = medal.divisionTotal else { return emptyString }
     return "of \(total)"
   }
   
   var genderPlacementText: String {
-    guard let placement = medal.genderPlacement else { return "--" }
+    guard let placement = medal.genderPlacement else { return emptyWithDash }
     return "\(placement)"
   }
   
   var genderTotalText: String {
-    guard let total = medal.genderTotal else { return "" }
+    guard let total = medal.genderTotal else { return emptyString }
     return "of \(total)"
   }
   
