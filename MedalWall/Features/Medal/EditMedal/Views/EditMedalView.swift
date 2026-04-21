@@ -34,7 +34,7 @@ struct EditMedalView: View {
   
   var body: some View {
     NavigationStack {
-      VStack {
+      Form {
         let photo = viewModel.cropPhoto ?? viewModel.photo
         
         EditPhotoPicker(
@@ -54,56 +54,56 @@ struct EditMedalView: View {
             viewModel.clearPhoto()
           }
         )
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
         
         EditMedalAutoFillSection {
           isPresentingRaceEntryPicker = true
         }
         
-        Form {
-          EditMedalResultSection(finishTime: $viewModel.finishTime)
-          
-          EditMedalInfoSection(
-            name: $viewModel.name,
-            date: $viewModel.date,
-            bib: $viewModel.bibNumber,
-            distance: viewModel.distance.displayLabel,
-            onEditDistance: {
-              isPresentingDistancePicker = true
-            }
-          )
-          
-          EditMedalLocationSection(
-            country: $viewModel.country,
-            province: $viewModel.province,
-            city: $viewModel.city,
-            district: $viewModel.district
-          )
-          
-          EditMedalPlacementSection(
-            overallPlacement: $viewModel.overallPlacement,
-            totalParticipants: $viewModel.totalParticipants,
-            genderPlacement: $viewModel.genderPlacement,
-            genderTotal: $viewModel.genderTotal,
-            division: $viewModel.division,
-            divisionPlacement: $viewModel.divisionPlacement,
-            divisionTotal: $viewModel.divisionTotal
-          )
-          
-          EditMedalNoteSection(note: $viewModel.note)
-          
-          EditMedalEventPhotosSection(
-            photos: viewModel.draftEventPhotos,
-            onChooseFromLibrary: {
-              isPresentingEventPhotosPicker = true
-            },
-            onRemove: {
-              viewModel.removeEventPhoto(id: $0)
-            }
-          )
-          
-          EditMedalTagsSection(tags: $viewModel.tags)
-        } // Form
-      } // VStack
+        EditMedalResultSection(finishTime: $viewModel.finishTime)
+        
+        EditMedalInfoSection(
+          name: $viewModel.name,
+          date: $viewModel.date,
+          bib: $viewModel.bibNumber,
+          distance: viewModel.distance.displayLabel,
+          onEditDistance: {
+            isPresentingDistancePicker = true
+          }
+        )
+        
+        EditMedalLocationSection(
+          country: $viewModel.country,
+          province: $viewModel.province,
+          city: $viewModel.city,
+          district: $viewModel.district
+        )
+        
+        EditMedalPlacementSection(
+          overallPlacement: $viewModel.overallPlacement,
+          totalParticipants: $viewModel.totalParticipants,
+          genderPlacement: $viewModel.genderPlacement,
+          genderTotal: $viewModel.genderTotal,
+          division: $viewModel.division,
+          divisionPlacement: $viewModel.divisionPlacement,
+          divisionTotal: $viewModel.divisionTotal
+        )
+        
+        EditMedalNoteSection(note: $viewModel.note)
+        
+        EditMedalEventPhotosSection(
+          photos: viewModel.draftEventPhotos,
+          onChooseFromLibrary: {
+            isPresentingEventPhotosPicker = true
+          },
+          onRemove: {
+            viewModel.removeEventPhoto(id: $0)
+          }
+        )
+        
+        EditMedalTagsSection(tags: $viewModel.tags)
+      } // Form
       .navigationTitle("\(viewModel.mode == .add ? "New" : "Edit") Medal")
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
