@@ -34,7 +34,7 @@ struct EditRaceView: View {
   // MARK: - Body
   var body: some View {
     NavigationStack {
-      VStack {
+      Form {
         let photo = viewModel.cropPhoto ?? viewModel.photo
         
         EditPhotoPicker(
@@ -54,42 +54,42 @@ struct EditRaceView: View {
             viewModel.clearPhoto()
           }
         )
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
         
-        Form {
-          EditRaceInfoSection(
-            name: $viewModel.name,
-            url: $viewModel.url
-          )
-          
-          EditRaceLocationSection(
-            country: $viewModel.country,
-            province: $viewModel.province,
-            city: $viewModel.city,
-            district: $viewModel.district
-          )
-          
-          EditRaceEditionSection(
-            editions: viewModel.editions,
-            raceCropPhoto: viewModel.cropPhoto,
-            racePhoto: viewModel.photo,
-            namespace: namespace,
-            transitionID: addEdition,
-            onAdd: {
-              isPresentingAddEdition = true
-            },
-            onUpdate: { originalEdition, updatedEdition in
-              do {
-                try viewModel.updateEdition(old: originalEdition, with: updatedEdition)
-              } catch {
-                errorWrapper = ErrorWrapper(error: AppError.duplicateEdition)
-              }
-            },
-            onDelete: { edition in
-              viewModel.deleteEdition(edition)
+        EditRaceInfoSection(
+          name: $viewModel.name,
+          url: $viewModel.url
+        )
+        
+        EditRaceLocationSection(
+          country: $viewModel.country,
+          province: $viewModel.province,
+          city: $viewModel.city,
+          district: $viewModel.district
+        )
+        
+        EditRaceEditionSection(
+          editions: viewModel.editions,
+          raceCropPhoto: viewModel.cropPhoto,
+          racePhoto: viewModel.photo,
+          namespace: namespace,
+          transitionID: addEdition,
+          onAdd: {
+            isPresentingAddEdition = true
+          },
+          onUpdate: { originalEdition, updatedEdition in
+            do {
+              try viewModel.updateEdition(old: originalEdition, with: updatedEdition)
+            } catch {
+              errorWrapper = ErrorWrapper(error: AppError.duplicateEdition)
             }
-          )
-        } // Form
-      } // VStack
+          },
+          onDelete: { edition in
+            viewModel.deleteEdition(edition)
+          }
+        )
+      } // Form
       .onAppear {
         viewModel.configure(context: modelContext)
       }

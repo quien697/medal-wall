@@ -34,9 +34,11 @@ struct MedalDetailStatsGridItem: View {
         .fontWeight(.bold)
         .textCase(.uppercase)
         .foregroundStyle(Color.Text.secondary)
+        .lineLimit(1)
+        .minimumScaleFactor(0.5)
       
       Text(headline)
-        .font(.title)
+        .font(.title2)
         .fontWeight(.bold)
         .foregroundStyle(headLineColor ?? Color.Text.primary)
         .lineLimit(1)
@@ -47,6 +49,7 @@ struct MedalDetailStatsGridItem: View {
           .font(.caption)
           .foregroundStyle(Color.Text.secondary)
           .lineLimit(1)
+          .minimumScaleFactor(0.5)
       }
     } // VStack
     .frame(maxWidth: .infinity, alignment: .leading)
