@@ -44,13 +44,6 @@ struct EditPhotoPicker<Preview: View>: View {
           .foregroundStyle(Color.Text.tertiary)
       } // VStack
       .frame(maxWidth: .infinity)
-      .padding(.vertical)
-      .background(Color.Card.Background.secondary)
-      .overlay(alignment: .bottom) {
-        Rectangle()
-          .fill(Color.Border.gray)
-          .frame(height: 1)
-      }
     } // Button
     .buttonStyle(.plain)
   }
