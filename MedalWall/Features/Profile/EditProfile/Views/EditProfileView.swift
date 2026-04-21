@@ -20,16 +20,16 @@ struct EditProfileView: View {
   @State private var isPresentingCropImageView: Bool = false
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var shouldDismiss: Bool = false
-
+  
   init(mode: ItemEditMode, profile: User? = nil) {
     self._viewModel = State(initialValue: ProfileEditViewModel(mode: mode, profile: profile))
   }
-
+  
   var body: some View {
     NavigationStack {
-      VStack {
+      Form {
         let photo = viewModel.cropAvatar ?? viewModel.avatar
-
+        
         EditPhotoPicker(
           photo: photo,
           hint: "Tap to \(photo == nil ? "add a" : "update your") profile photo",
@@ -47,19 +47,20 @@ struct EditProfileView: View {
             viewModel.clearPhoto()
           }
         )
-
-        Form {
-          EditProfileInfoSection(
-            firstName: $viewModel.userName.firstName,
-            lastName: $viewModel.userName.lastName,
-            gender: $viewModel.gender,
-            birthday: $viewModel.birthday,
-            isBirthdaySet: $viewModel.isBirthdaySet
-          )
-
-          EditProfileBioSection(bio: $viewModel.bio)
-        } // Form
-      } // VStack
+        
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
+        
+        EditProfileInfoSection(
+          firstName: $viewModel.userName.firstName,
+          lastName: $viewModel.userName.lastName,
+          gender: $viewModel.gender,
+          birthday: $viewModel.birthday,
+          isBirthdaySet: $viewModel.isBirthdaySet
+        )
+        
+        EditProfileBioSection(bio: $viewModel.bio)
+      } // Form
       .navigationTitle("\(viewModel.mode.displayName) Profile")
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)

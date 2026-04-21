@@ -11,7 +11,7 @@ struct EditMedalAutoFillSection: View {
   let onAction: () -> Void
   
   var body: some View {
-    SectionContainer {
+    Section {
       HStack {
         VStack(alignment: .leading) {
           Text("Fill from race event")
@@ -30,14 +30,11 @@ struct EditMedalAutoFillSection: View {
         } label: {
           Text("Select")
         }
+        .buttonStyle(.plain)
         .goldFillButtonStyle()
-      }
-      .frame(maxWidth: .infinity)
-      .surfaceStyle(
-        bgColor: Color.Gold.primary.opacity(0.1),
-        borderColor: Color.Gold.primary.opacity(0.3)
-      )
-    }
+      } // HStack
+    } // Section
+    .listRowBackground(Color.Gold.primary.opacity(0.1))
   }
 }
 
