@@ -147,7 +147,7 @@ struct EditRaceView: View {
       .sheet(isPresented: $isPresentingCropImageView) {
         CropImageView(
           image: viewModel.photo,
-          type: .raceHero,
+          cropShape: .square
         ) { cropppedImage in
           if let cropppedImage {
             viewModel.updateCropPhoto(with: cropppedImage)

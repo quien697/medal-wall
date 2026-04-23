@@ -107,7 +107,7 @@ struct EditProfileView: View {
       .sheet(isPresented: $isPresentingCropImageView) {
         CropImageView(
           image: viewModel.avatar,
-          type: .avatar
+          cropShape: .circle
         ) { croppedImage in
           if let croppedImage {
             viewModel.updateCropPhoto(with: croppedImage)

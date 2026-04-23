@@ -183,7 +183,7 @@ struct EditMedalView: View {
       .sheet(isPresented: $isPresentingCropImageView) {
         CropImageView(
           image: viewModel.photo,
-          type: .medal,
+          cropShape: .circle
         ) { croppedImage in
           if let croppedImage {
             viewModel.updateCropPhoto(with: croppedImage)
