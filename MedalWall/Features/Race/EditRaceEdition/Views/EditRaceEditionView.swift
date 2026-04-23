@@ -120,7 +120,7 @@ struct EditRaceEditionView: View {
       .sheet(isPresented: $isPresentingCropImageView) {
         CropImageView(
           image: viewModel.draftEdition.photo,
-          type: .raceHero,
+          cropShape: .square
         ) { cropppedImage in
           if let cropppedImage {
             viewModel.updateCropPhoto(with: cropppedImage)
