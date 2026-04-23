@@ -41,7 +41,7 @@
 				Data/MedalRepository.swift,
 				Data/RaceRepository.swift,
 				Data/UserRepository.swift,
-				Features/Profile/EditProfile/ViewModels/ProfileEditViewModel.swift,
+				Features/Profile/EditProfile/ViewModels/EditProfileViewModel.swift,
 				Features/Race/EditRace/ViewModels/EditRaceViewModel.swift,
 				Features/Race/EditRaceEdition/ViewModels/EditRaceEditionViewModel.swift,
 				Features/Race/RaceDetail/ViewModels/RaceDetailViewModel.swift,
