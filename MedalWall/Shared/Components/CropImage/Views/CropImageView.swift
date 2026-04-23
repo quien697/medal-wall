@@ -26,15 +26,10 @@ struct CropImageView: View {
       GeometryReader { geo in
         let side = min(geo.size.width * 0.75, 400)
         let cropSize = CGSize(width: side, height: side)
+        let containerSize = geo.size
         
         VStack {
           Spacer()
-          
-          Text("Move and Scale")
-            .font(.headline)
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
           
           ZStack {
             if let uiImage = image {
@@ -44,6 +39,7 @@ struct CropImageView: View {
                 .scaleEffect(scale)
                 .offset(offset)
                 .gesture(
+                  // Drag
                   DragGesture()
                     .onChanged { value in
                       offset = CGSize(
@@ -52,17 +48,36 @@ struct CropImageView: View {
                       )
                     }
                     .onEnded { _ in
+                      let clamped = clampOffset(
+                        offset,
+                        scale: scale,
+                        cropSize: cropSize,
+                        containerSize: containerSize
+                      )
+                      withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        offset = clamped
+                      }
                       lastOffset = offset
                     }
                 )
                 .gesture(
+                  // Zoom
                   MagnificationGesture()
                     .onChanged { value in
                       scale = value + lastScale
                     }
                     .onEnded { _ in
-                      lastScale = scale - 1
-                      lastOffset = offset
+                      let rendered = renderedImageSize(containerSize: containerSize)
+                      // Minimum scale: the smaller side of the image just touches the crop hole edge.
+                      let minScale = max(cropSize.width / rendered.width, cropSize.height / rendered.height)
+                      let clampedScale = max(minScale, scale)
+                      let clampedOffset = clampOffset(offset, scale: clampedScale, cropSize: cropSize, containerSize: containerSize)
+                      withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        scale = clampedScale
+                        offset = clampedOffset
+                      }
+                      lastScale = clampedScale - 1
+                      lastOffset = clampedOffset
                     }
                 )
             }
@@ -78,11 +93,11 @@ struct CropImageView: View {
           } // ZStack
           .frame(width: geo.size.width, height: geo.size.height)
           .clipped()
+          
+          Spacer()
         } // VStack
-        .frame(width: geo.size.width, height: geo.size.height)
         .navigationTitle("Crop your photo")
         .navigationBarTitleDisplayMode(.inline)
-        .background(.black)
         .toolbar {
           ToolbarItem(placement: .cancellationAction) {
             Button(role: .close) {
@@ -91,7 +106,7 @@ struct CropImageView: View {
           } // ToolbarItem
           ToolbarItem(placement: .confirmationAction) {
             Button(role: .confirm) {
-              onCrop(cropImage(cropSize: cropSize, containerSize: geo.size))
+              onCrop(cropImage(cropSize: cropSize, containerSize: containerSize))
               dismiss()
             }
           } // ToolbarItem
@@ -101,6 +116,38 @@ struct CropImageView: View {
   }
   
   // MARK: - Private functions
+  
+  // The size scaledToFill renders the image at inside containerSize.
+  // scaledToFill picks the axis whose scale factor is larger, so one dimension
+  // matches the container and the other overflows — this overflow is what the
+  // user drags/zooms to reposition.
+  private func renderedImageSize(containerSize: CGSize) -> CGSize {
+    guard let uiImage = image else { return containerSize }
+    
+    let imageRatio = uiImage.size.width / uiImage.size.height
+    let containerRatio = containerSize.width / containerSize.height
+    if imageRatio > containerRatio {
+      // Landscape relative to container — constrained by height
+      return CGSize(width: containerSize.height * imageRatio, height: containerSize.height)
+    } else {
+      // Portrait relative to container — constrained by width
+      return CGSize(width: containerSize.width, height: containerSize.width / imageRatio)
+    }
+  }
+  
+  // Returns the offset clamped so the image never exposes empty space inside the crop hole.
+  // Uses the actual scaledToFill rendered size, not containerSize, because a landscape image
+  // renders wider than the container and must be allowed to shift further horizontally.
+  // maxOffset = (renderedSize * scale - cropSize) / 2
+  private func clampOffset(_ offset: CGSize, scale: CGFloat, cropSize: CGSize, containerSize: CGSize) -> CGSize {
+    let rendered = renderedImageSize(containerSize: containerSize)
+    let maxX = (rendered.width * scale - cropSize.width) / 2
+    let maxY = (rendered.height * scale - cropSize.height) / 2
+    return CGSize(
+      width: min(maxX, max(-maxX, offset.width)),
+      height: min(maxY, max(-maxY, offset.height))
+    )
+  }
   
   private func cropImage(cropSize: CGSize, containerSize: CGSize) -> UIImage? {
     guard let uiImage = image else { return nil }
