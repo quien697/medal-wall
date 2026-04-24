@@ -20,6 +20,7 @@ struct EditRaceView: View {
   @State private var isPresentingPhotoPicker: Bool = false
   @State private var isPresentingCropImageView: Bool = false
   @State private var selectedPhoto: PhotosPickerItem?
+  @State private var rawPickedImage: UIImage?
   @State private var shouldDismiss: Bool = false
   @State private var isPresentingAddEdition: Bool = false
   // MARK: - Namespace
@@ -35,22 +36,18 @@ struct EditRaceView: View {
   var body: some View {
     NavigationStack {
       Form {
-        let photo = viewModel.cropPhoto ?? viewModel.photo
-        
         EditPhotoPicker(
-          photo: photo,
-          hint: "Tap to \(photo == nil ? "add a new" : "update the") race photo",
+          photo: viewModel.photo,
+          hint: "Tap to \(viewModel.photo == nil ? "add a new" : "update the") race photo",
           photoView: {
-            RaceImage(photo: photo, imageType: .raceHero)
+            RaceImage(photo: viewModel.photo, imageType: .raceHero)
           },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
           },
-          onCrop: {
-            isPresentingCropImageView = true
-          },
           onRemove: {
             selectedPhoto = nil
+            rawPickedImage = nil
             viewModel.clearPhoto()
           }
         )
@@ -71,7 +68,6 @@ struct EditRaceView: View {
         
         EditRaceEditionSection(
           editions: viewModel.editions,
-          raceCropPhoto: viewModel.cropPhoto,
           racePhoto: viewModel.photo,
           namespace: namespace,
           transitionID: addEdition,
@@ -128,15 +124,15 @@ struct EditRaceView: View {
       )
       .onChange(of: selectedPhoto) { _, newItem in
         guard let newItem else { return }
-        
         Task {
-          if let data = try await newItem.loadTransferable(type: Data.self) {
-            viewModel.clearPhoto()
-            viewModel.updatePhoto(with: data)
+          if let data = try? await newItem.loadTransferable(type: Data.self),
+             let uiImage = UIImage(data: data) {
+            rawPickedImage = uiImage
+            isPresentingCropImageView = true
           } else {
             errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
           }
-        } // Task
+        }
       }
       .navigationDestination(isPresented: $isPresentingAddEdition) {
         AddRaceEditionView { newEdition in
@@ -144,13 +140,16 @@ struct EditRaceView: View {
         }
         .navigationTransition(.zoom(sourceID: addEdition, in: namespace))
       }
-      .sheet(isPresented: $isPresentingCropImageView) {
+      .sheet(isPresented: $isPresentingCropImageView, onDismiss: {
+        selectedPhoto = nil
+        rawPickedImage = nil
+      }) {
         CropImageView(
-          image: viewModel.photo,
+          image: rawPickedImage,
           cropShape: .square
-        ) { cropppedImage in
-          if let cropppedImage {
-            viewModel.updateCropPhoto(with: cropppedImage)
+        ) { croppedImage in
+          if let croppedImage {
+            viewModel.updatePhoto(with: croppedImage)
           }
         }
       }

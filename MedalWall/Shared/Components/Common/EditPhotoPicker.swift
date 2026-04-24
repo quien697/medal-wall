@@ -15,7 +15,6 @@ struct EditPhotoPicker<Preview: View>: View {
   let hint: String
   @ViewBuilder let photoView: () -> Preview
   let onChooseFromLibrary: () -> Void
-  let onCrop: (() -> Void)
   let onRemove: () -> Void
   
   // MARK: - Body

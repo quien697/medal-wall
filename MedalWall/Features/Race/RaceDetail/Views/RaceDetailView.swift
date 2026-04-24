@@ -27,7 +27,7 @@ struct RaceDetailView: View {
   var body: some View {
     VStack {
       RaceDetailHeroSection(
-        photo: viewModel.race.cropPhoto ?? viewModel.race.photo,
+        photo: viewModel.race.photo,
         name: viewModel.race.name,
         location: viewModel.race.location.formatted,
         url: viewModel.race.fullURL

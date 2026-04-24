@@ -50,7 +50,7 @@ struct MedalDetailHeroSection: View {
   let medal = Medal.sampleData.first!
   
   MedalDetailHeroSection(
-    photo: medal.cropPhoto ?? medal.photo,
+    photo: medal.photo,
     name: medal.name,
     raceDistance: medal.distance.category.description,
     raceDistanceType: medal.distance.type.displayName,

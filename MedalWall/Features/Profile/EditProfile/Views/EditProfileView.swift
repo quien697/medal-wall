@@ -38,7 +38,6 @@ struct EditProfileView: View {
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
           },
-          onCrop: {},
           onRemove: {
             selectedPhoto = nil
             rawPickedImage = nil
