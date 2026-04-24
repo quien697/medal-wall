@@ -9,7 +9,6 @@ import SwiftUI
 
 struct EditRaceEditionSection: View {
   let editions: [DraftRaceEdition]
-  let raceCropPhoto: UIImage?
   let racePhoto: UIImage?
   let namespace: Namespace.ID
   let transitionID: String
@@ -57,12 +56,12 @@ struct EditRaceEditionSection: View {
           } label: {
             HStack(alignment: .top, spacing: 10) {
               ZStack(alignment: .leading) {
-                if let uiImage = edition.cropPhoto ?? edition.photo {
+                if let uiImage = edition.photo {
                   Image(uiImage: uiImage)
                     .styled(as: ImageType.raceThumbnail)
                 } else {
                   RaceImage(
-                    photo: raceCropPhoto ?? racePhoto,
+                    photo: racePhoto,
                     imageType: .raceThumbnail
                   )
                 }
@@ -132,7 +131,6 @@ struct EditRaceEditionSection: View {
   Form {
     EditRaceEditionSection(
       editions: drafts,
-      raceCropPhoto: race.cropPhoto,
       racePhoto: race.photo,
       namespace: namespace,
       transitionID: "transitionID",
@@ -143,7 +141,6 @@ struct EditRaceEditionSection: View {
     
     EditRaceEditionSection(
       editions: [],
-      raceCropPhoto: nil,
       racePhoto: nil,
       namespace: namespace,
       transitionID: "transitionID",

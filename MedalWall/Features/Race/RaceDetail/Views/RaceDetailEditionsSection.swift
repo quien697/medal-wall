@@ -41,17 +41,12 @@ struct RaceDetailEditionsSection: View {
             
             HStack(alignment: .top, spacing: 20) {
               ZStack(alignment: .leading) {
-                if let uiImage = edition.cropPhoto ?? edition.photo {
+                if let uiImage = edition.photo ?? edition.race.photo {
                   Image(uiImage: uiImage)
                     .styled(as: ImageType.raceThumbnail)
                 } else {
-                  if let uiImage = edition.race.cropPhoto ?? edition.race.photo {
-                    Image(uiImage: uiImage)
-                      .styled(as: ImageType.raceThumbnail)
-                  } else {
-                    Image(systemName: "photo.fill")
-                      .placeholderStyled(as: ImageType.raceThumbnail)
-                  }
+                  Image(systemName: "photo.fill")
+                    .placeholderStyled(as: ImageType.raceThumbnail)
                 }
               } // ZStack
               

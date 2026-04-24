@@ -15,7 +15,6 @@ final class RaceEdition {
   var startDate: Date
   var endDate: Date
   var photoData: Data?
-  var cropPhotoData: Data?
   var createBy: UUID
   var createdDate: Date
   var updatedDate: Date
@@ -30,7 +29,6 @@ final class RaceEdition {
     startDate: Date,
     endDate: Date,
     photoData: Data? = nil,
-    cropPhotoData: Data? = nil,
     createBy: UUID,
     createdDate: Date = .now,
     updatedDate: Date = .now,
@@ -42,7 +40,6 @@ final class RaceEdition {
     self.startDate = startDate
     self.endDate = endDate
     self.photoData = photoData
-    self.cropPhotoData = cropPhotoData
     self.createBy = createBy
     self.createdDate = createdDate
     self.updatedDate = updatedDate

@@ -18,14 +18,6 @@ extension RaceEdition {
     return nil
   }
   
-  var cropPhoto: UIImage? {
-    if let cropPhotoData {
-      return UIImage(data: cropPhotoData)
-    }
-    
-    return nil
-  }
-  
   var isOneDay: Bool {
     Calendar.current.isDate(startDate, inSameDayAs: endDate)
   }

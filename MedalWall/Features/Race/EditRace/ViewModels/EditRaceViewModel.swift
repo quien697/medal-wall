@@ -13,8 +13,6 @@ final class EditRaceViewModel {
   var name: String = ""
   var photoData: Data? = nil
   var photo: UIImage? = nil
-  var cropPhotoData: Data? = nil
-  var cropPhoto: UIImage? = nil
   var country: String = ""
   var province: String = ""
   var city: String = ""
@@ -35,8 +33,6 @@ final class EditRaceViewModel {
       self.name = race.name
       self.photoData = race.photoData
       self.photo = race.photo
-      self.cropPhotoData = race.cropPhotoData
-      self.cropPhoto = race.cropPhoto
       self.country = race.location.country
       self.province = race.location.province ?? ""
       self.city = race.location.city
@@ -58,26 +54,14 @@ final class EditRaceViewModel {
     return hasValidName && hasValidCountry && hasValidCity
   }
   
-  func updatePhoto(with data: Data?) {
-    self.photoData = data
-    
-    if let data {
-      self.photo = UIImage(data: data)
-    } else {
-      self.photo = nil
-    }
-  }
-  
-  func updateCropPhoto(with uiImage: UIImage) {
-    self.cropPhotoData = uiImage.pngData()
-    self.cropPhoto = uiImage
+  func updatePhoto(with uiImage: UIImage) {
+    self.photoData = uiImage.pngData()
+    self.photo = uiImage
   }
   
   func clearPhoto() {
     self.photoData = nil
     self.photo = nil
-    self.cropPhotoData = nil
-    self.cropPhoto = nil
   }
   
   var isValidEdition: Bool {
@@ -122,7 +106,6 @@ final class EditRaceViewModel {
         edition.startDate = draft.startDate
         edition.endDate = draft.endDate
         edition.photoData = draft.photoData
-        edition.cropPhotoData = draft.cropPhotoData
         edition.updatedDate = .now
         
         try syncCategories(on: edition, with: draft.distances)
@@ -132,7 +115,6 @@ final class EditRaceViewModel {
           startDate: draft.startDate,
           endDate: draft.endDate,
           photoData: draft.photoData,
-          cropPhotoData: draft.cropPhotoData,
           createBy: userId,
           race: race,
           categories: []
@@ -174,7 +156,6 @@ final class EditRaceViewModel {
       Race(
         name: name,
         photoData: photoData,
-        cropPhotoData: cropPhotoData,
         location: RaceLocation(
           country: country,
           province: province.isEmpty ? nil : province,
@@ -191,7 +172,6 @@ final class EditRaceViewModel {
     } else {
       race.name = name
       race.photoData = photoData
-      race.cropPhotoData = cropPhotoData
       race.country = country
       race.province = province
       race.city = city

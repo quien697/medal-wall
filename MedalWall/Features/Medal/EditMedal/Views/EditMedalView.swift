@@ -24,6 +24,7 @@ struct EditMedalView: View {
   // Medal photo picker
   @State private var isPresentingPhotoPicker: Bool = false
   @State private var selectedPhoto: PhotosPickerItem?
+  @State private var rawPickedImage: UIImage?
   // Event photos picker
   @State private var isPresentingEventPhotosPicker: Bool = false
   @State private var selectedEventPhotos: [PhotosPickerItem] = []
@@ -35,22 +36,18 @@ struct EditMedalView: View {
   var body: some View {
     NavigationStack {
       Form {
-        let photo = viewModel.cropPhoto ?? viewModel.photo
-        
         EditPhotoPicker(
-          photo: photo,
-          hint: "Tap to \(photo == nil ? "add a new" : "update the") medal photo",
+          photo: viewModel.photo,
+          hint: "Tap to \(viewModel.photo == nil ? "add a new" : "update the") medal photo",
           photoView: {
-            MedalImage(photo: photo)
+            MedalImage(photo: viewModel.photo)
           },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
           },
-          onCrop: {
-            isPresentingCropImageView = true
-          },
           onRemove: {
             selectedPhoto = nil
+            rawPickedImage = nil
             viewModel.clearPhoto()
           }
         )
@@ -143,11 +140,11 @@ struct EditMedalView: View {
       )
       .onChange(of: selectedPhoto) { _, newItem in
         guard let newItem else { return }
-        
         Task {
-          if let data = try await newItem.loadTransferable(type: Data.self) {
-            viewModel.clearPhoto()
-            viewModel.updatePhoto(with: data)
+          if let data = try? await newItem.loadTransferable(type: Data.self),
+             let uiImage = UIImage(data: data) {
+            rawPickedImage = uiImage
+            isPresentingCropImageView = true
           } else {
             errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
           }
@@ -180,13 +177,16 @@ struct EditMedalView: View {
           selectedEventPhotos = []
         }
       }
-      .sheet(isPresented: $isPresentingCropImageView) {
+      .sheet(isPresented: $isPresentingCropImageView, onDismiss: {
+        selectedPhoto = nil
+        rawPickedImage = nil
+      }) {
         CropImageView(
-          image: viewModel.photo,
-          type: .medal,
+          image: rawPickedImage,
+          cropShape: .circle
         ) { croppedImage in
           if let croppedImage {
-            viewModel.updateCropPhoto(with: croppedImage)
+            viewModel.updatePhoto(with: croppedImage)
           }
         }
       }

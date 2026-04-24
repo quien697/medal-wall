@@ -15,9 +15,8 @@ struct EditPhotoPicker<Preview: View>: View {
   let hint: String
   @ViewBuilder let photoView: () -> Preview
   let onChooseFromLibrary: () -> Void
-  let onCrop: () -> Void
   let onRemove: () -> Void
-
+  
   // MARK: - Body
   var body: some View {
     Button {
@@ -31,13 +30,12 @@ struct EditPhotoPicker<Preview: View>: View {
             titleVisibility: .visible
           ) {
             Button("Choose from Library") { onChooseFromLibrary() }
-
+            
             if photo != nil {
-              Button("Crop Photo") { onCrop() }
               Button("Remove Photo", role: .destructive) { onRemove() }
             }
           } // confirmationDialog
-
+        
         Text(hint)
           .font(.subheadline)
           .multilineTextAlignment(.center)
