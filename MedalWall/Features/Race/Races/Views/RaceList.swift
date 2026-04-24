@@ -44,7 +44,7 @@ struct RaceList: View {
             RaceDetailView(race: race)
           } label: {
             RaceRow(
-              photo: race.cropPhoto ?? race.photo,
+              photo: race.photo,
               name: race.name,
               location: race.location.formatted,
               editionCount: race.editions.count

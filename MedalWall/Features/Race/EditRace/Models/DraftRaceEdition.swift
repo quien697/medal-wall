@@ -18,19 +18,11 @@ struct DraftRaceEdition: Identifiable {
   var startDate: Date
   var endDate: Date
   var photoData: Data? = nil
-  var cropPhotoData: Data? = nil
   var distances: [RaceDistance] = []
   
   var photo: UIImage? {
     if let photoData {
       return UIImage(data: photoData)
-    }
-    return nil
-  }
-  
-  var cropPhoto: UIImage? {
-    if let cropPhotoData {
-      return UIImage(data: cropPhotoData)
     }
     return nil
   }
@@ -49,7 +41,6 @@ struct DraftRaceEdition: Identifiable {
     self.startDate = edition.startDate
     self.endDate = edition.endDate
     self.photoData = edition.photoData
-    self.cropPhotoData = edition.cropPhotoData
     self.distances = edition.distances
   }
   
@@ -61,7 +52,6 @@ struct DraftRaceEdition: Identifiable {
     self.startDate = Date()
     self.endDate = Date()
     self.photoData = nil
-    self.cropPhotoData = nil
     self.distances = []
   }
 }
