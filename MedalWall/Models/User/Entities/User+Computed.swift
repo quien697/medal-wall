@@ -17,14 +17,6 @@ extension User {
     return nil
   }
   
-  var cropAvatar: UIImage? {
-    if let cropAvatarData {
-      return UIImage(data: cropAvatarData)
-    }
-    
-    return nil
-  }
-  
   var genderEnum: Gender? {
     guard let gender = gender else { return nil }
     

@@ -32,15 +32,6 @@ extension ImageType {
     }
   }
   
-  var cornerRadius: CGFloat {
-    switch self {
-    case .avatarThumbnail, .avatar, .medal:
-      return size.height / 2
-    case .raceThumbnail, .raceHero, .eventThumbnail, .event:
-      return 16
-    }
-  }
-  
   var size: CGSize {
     switch self {
     case .avatarThumbnail:  return CGSize(width: 60,  height: 60)

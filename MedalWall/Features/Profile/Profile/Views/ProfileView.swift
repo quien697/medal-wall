@@ -24,7 +24,6 @@ struct ProfileView: View {
           ScrollView {
             ProfileHeaderSection(
               avatar: user.avatar,
-              cropAvatar: user.cropAvatar,
               userName: user.fullName,
               bio: user.bio
             )
@@ -81,7 +80,6 @@ struct ProfileView: View {
           NoProfileView()
         }
       }
-
     } // NavigationStack
   }
 }

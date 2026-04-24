@@ -15,7 +15,6 @@ final class Medal {
   var date: Date
   var bibNumber: String
   var photoData: Data?
-  var cropPhotoData: Data?
   var country: String
   var province: String?
   var city: String
@@ -43,7 +42,6 @@ final class Medal {
     date: Date,
     bibNumber: String,
     photoData: Data? = nil,
-    cropPhotoData: Data? = nil,
     location: RaceLocation,
     raceDistance: RaceDistance,
     finishTime: TimeInterval? = nil,
@@ -64,7 +62,6 @@ final class Medal {
     self.date = date
     self.bibNumber = bibNumber
     self.photoData = photoData
-    self.cropPhotoData = cropPhotoData
     self.country = location.country
     self.province = location.province
     self.city = location.city
