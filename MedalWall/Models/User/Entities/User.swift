@@ -14,7 +14,6 @@ final class User {
   var firstName: String
   var lastName: String
   var avatarData: Data?
-  var cropAvatarData: Data?
   var bio: String?
   var gender: String?
   var birthday: Date?
@@ -26,7 +25,6 @@ final class User {
     id: UUID = UUID(),
     name: UserName = UserName(firstName: "", lastName: ""),
     avatarData: Data? = nil,
-    cropAvatarData: Data? = nil,
     bio: String? = nil,
     gender: Gender? = nil,
     birthday: Date? = nil,
@@ -38,7 +36,6 @@ final class User {
     self.firstName = name.trimmedFirstName
     self.lastName = name.trimmedLastName
     self.avatarData = avatarData
-    self.cropAvatarData = cropAvatarData
     self.bio = bio
     self.gender = gender?.rawValue
     self.birthday = birthday

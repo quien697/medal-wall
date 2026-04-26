@@ -51,7 +51,7 @@ struct MedalCard: View {
   let medal = Medal.sampleData[1]
   
   MedalCard(
-    photo: medal.cropPhoto ?? medal.photo,
+    photo: medal.photo,
     distance: medal.distance.displayLabel,
     name: medal.name,
     finishTime: medal.finishTime?.formattedHMS ?? "-",

@@ -15,8 +15,6 @@ final class EditMedalViewModel {
   var bibNumber: String = ""
   var photoData: Data? = nil
   var photo: UIImage? = nil
-  var cropPhotoData: Data? = nil
-  var cropPhoto: UIImage? = nil
   var country: String = ""
   var province: String = ""
   var city: String = ""
@@ -49,8 +47,6 @@ final class EditMedalViewModel {
       self.bibNumber = medal.bibNumber
       self.photoData = medal.photoData
       self.photo = medal.photo
-      self.cropPhotoData = medal.cropPhotoData
-      self.cropPhoto = medal.cropPhoto
       self.country = medal.location.country
       self.province = medal.location.province ?? ""
       self.city = medal.location.city
@@ -90,21 +86,14 @@ final class EditMedalViewModel {
     repository.configure(context: context)
   }
   
-  func updatePhoto(with data: Data?) {
-    self.photoData = data
-    self.photo = data.flatMap { UIImage(data: $0) }
-  }
-  
-  func updateCropPhoto(with uiImage: UIImage) {
-    self.cropPhotoData = uiImage.pngData()
-    self.cropPhoto = uiImage
+  func updatePhoto(with uiImage: UIImage) {
+    self.photoData = uiImage.pngData()
+    self.photo = uiImage
   }
   
   func clearPhoto() {
     self.photoData = nil
     self.photo = nil
-    self.cropPhotoData = nil
-    self.cropPhoto = nil
   }
   
   func addEventPhotos(_ dataList: [Data]) {
@@ -131,7 +120,6 @@ final class EditMedalViewModel {
       medal.date = date
       medal.bibNumber = bibNumber
       medal.photoData = photoData
-      medal.cropPhotoData = cropPhotoData
       medal.country = country
       medal.province = province.isEmpty ? nil : province
       medal.city = city
@@ -162,7 +150,6 @@ final class EditMedalViewModel {
         date: date,
         bibNumber: bibNumber,
         photoData: photoData,
-        cropPhotoData: cropPhotoData,
         location: RaceLocation(
           country: country,
           province: province.isEmpty ? nil : province,

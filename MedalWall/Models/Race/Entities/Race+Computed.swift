@@ -17,14 +17,6 @@ extension Race {
     return nil
   }
   
-  var cropPhoto: UIImage? {
-    if let cropPhotoData {
-      return UIImage(data: cropPhotoData)
-    }
-    
-    return nil
-  }
-  
   var location: RaceLocation {
     RaceLocation(
       country: country,
