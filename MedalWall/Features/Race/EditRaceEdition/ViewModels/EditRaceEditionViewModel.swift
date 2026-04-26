@@ -42,17 +42,12 @@ final class EditRaceEditionViewModel {
     return Calendar.current.date(from: DateComponents(year: draftEdition.year, month: 12, day: 31)) ?? Date()
   }
   
-  func updatePhoto(with data: Data?) {
-    draftEdition.photoData = data
-  }
-  
-  func updateCropPhoto(with uiImage: UIImage) {
-    draftEdition.cropPhotoData = uiImage.pngData()
+  func updatePhoto(with uiImage: UIImage) {
+    draftEdition.photoData = uiImage.pngData()
   }
   
   func clearPhoto() {
     draftEdition.photoData = nil
-    draftEdition.cropPhotoData = nil
   }
   
   func toggleOneDay() {

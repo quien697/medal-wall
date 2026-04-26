@@ -10,16 +10,13 @@ import SwiftUI
 struct AvatarImage: View {
   private let systemImageName: String = "person.fill"
   let photo: UIImage?
-  let cropPhoto: UIImage?
   let imageType: ImageType
   
   init(
     photo: UIImage?,
-    cropPhoto: UIImage?,
     imageType: ImageType = .avatar
   ) {
     self.photo = photo
-    self.cropPhoto = cropPhoto
     self.imageType = imageType
   }
   
@@ -65,7 +62,7 @@ struct AvatarImage: View {
           y: 10
         )
         .overlay {
-          if let uiImage = cropPhoto ?? photo {
+          if let uiImage = photo {
             Image(uiImage: uiImage)
               .styled(as: imageType)
           } else {
@@ -79,23 +76,20 @@ struct AvatarImage: View {
 }
 
 #Preview {
-  AvatarImage(photo: UIImage(named: "quien"), cropPhoto: nil)
-  AvatarImage(photo: UIImage(named: "taipei-marathon-medal-2019"), cropPhoto: nil)
-  AvatarImage(photo: nil, cropPhoto: nil)
+  AvatarImage(photo: UIImage(named: "quien"))
+  AvatarImage(photo: UIImage(named: "taipei-marathon-medal-2019"))
+  AvatarImage(photo: nil)
   
   AvatarImage(
     photo: UIImage(named: "quien"),
-    cropPhoto: nil,
     imageType: .avatarThumbnail
   )
   AvatarImage(
     photo: UIImage(named: "taipei-marathon-medal-2019"),
-    cropPhoto: nil,
     imageType: .avatarThumbnail
   )
   AvatarImage(
     photo: nil,
-    cropPhoto: nil,
     imageType: .avatarThumbnail
   )
 }

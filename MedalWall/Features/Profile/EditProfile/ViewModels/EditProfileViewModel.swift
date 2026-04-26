@@ -1,5 +1,5 @@
 //
-//  ProfileEditViewModel.swift
+//  EditProfileViewModel.swift
 //  MedalWall
 //
 //  Created by Quien on 2025-12-04.
@@ -9,12 +9,10 @@ import SwiftUI
 import SwiftData
 
 @Observable
-class ProfileEditViewModel {
+class EditProfileViewModel {
   var userName: UserName = UserName(firstName: "", lastName: "")
   var avatarData: Data? = nil
   var avatar: UIImage? = nil
-  var cropAvatarData: Data? = nil
-  var cropAvatar: UIImage? = nil
   var bio: String = ""
   var gender: Gender? = nil
   var birthday: Date = .now
@@ -35,8 +33,6 @@ class ProfileEditViewModel {
       )
       self.avatarData = profile.avatarData
       self.avatar = profile.avatar
-      self.cropAvatarData = profile.cropAvatarData
-      self.cropAvatar = profile.cropAvatar
       self.bio = profile.bio ?? ""
       self.gender = profile.genderEnum
       if let birthday = profile.birthday {
@@ -57,26 +53,14 @@ class ProfileEditViewModel {
     self.repository = UserRepository(context: context)
   }
   
-  func updatePhoto(with data: Data?) {
-    self.avatarData = data
-    
-    if let data {
-      self.avatar = UIImage(data: data)
-    } else {
-      self.avatar = nil
-    }
-  }
-  
-  func updateCropPhoto(with uiImage: UIImage) {
-    self.cropAvatarData = uiImage.pngData()
-    self.cropAvatar = uiImage
+  func updatePhoto(with uiImage: UIImage) {
+    self.avatarData = uiImage.pngData()
+    self.avatar = uiImage
   }
   
   func clearPhoto() {
     self.avatarData = nil
     self.avatar = nil
-    self.cropAvatarData = nil
-    self.cropAvatar = nil
   }
   
   func save() throws {
@@ -86,7 +70,6 @@ class ProfileEditViewModel {
       profile.firstName = userName.trimmedFirstName
       profile.lastName = userName.trimmedLastName
       profile.avatarData = avatarData
-      profile.cropAvatarData = cropAvatarData
       profile.bio = bio
       profile.gender = gender?.rawValue
       profile.birthday = isBirthdaySet ? birthday : nil
@@ -95,12 +78,10 @@ class ProfileEditViewModel {
       let newProfile = User(
         name: userName,
         avatarData: avatarData,
-        cropAvatarData: cropAvatarData,
         bio: bio,
         gender: gender,
         birthday: isBirthdaySet ? birthday : nil
       )
-      
       try repository.insertUser(newProfile)
     }
     

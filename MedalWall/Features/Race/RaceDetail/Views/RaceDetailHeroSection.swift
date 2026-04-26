@@ -46,7 +46,7 @@ struct RaceDetailHeroSection: View {
   
   ScrollView {
     RaceDetailHeroSection(
-      photo: race.cropPhoto ?? race.photo,
+      photo: race.photo,
       name: race.name,
       location: race.location.formatted,
       url: race.url

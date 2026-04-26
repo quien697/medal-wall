@@ -27,7 +27,7 @@ struct MedalDetailView: View {
   var body: some View {
     ScrollView {
       MedalDetailHeroSection(
-        photo: viewModel.medal.cropPhoto ?? viewModel.medal.photo,
+        photo: viewModel.medal.photo,
         name: viewModel.medal.name,
         raceDistance: viewModel.medal.distance.category.description,
         raceDistanceType: viewModel.medal.distance.type.displayName,
