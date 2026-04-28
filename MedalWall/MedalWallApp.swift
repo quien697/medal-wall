@@ -7,9 +7,11 @@
 
 import SwiftUI
 import SwiftData
+import FirebaseCore
 
 @main
 struct MedalWallApp: App {
+  @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
   @AppStorage("appTheme") private var appTheme: AppTheme = .system
   @State private var userManager: UserManager?
   
@@ -54,5 +56,17 @@ struct MedalWallApp: App {
       }
     } // WindowGroup
     .modelContainer(sharedModelContainer)
+  }
+}
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+  
+  func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+  ) -> Bool {
+    FirebaseApp.configure()
+    
+    return true
   }
 }
