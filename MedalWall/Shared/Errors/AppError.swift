@@ -8,6 +8,14 @@
 import Foundation
 
 enum AppError: LocalizedError, Identifiable {
+  // Auth, Login Errors
+  case invalidCredential
+  case missingNonce
+  case missingIdentityToken
+  case nonceFailed(String)
+  case tokenSerializationFailed(String)
+  case signInFailed
+  
   // Repository / Persistence Errors
   case contextNotAttached
   case raceSaveFailed
@@ -50,6 +58,13 @@ enum AppError: LocalizedError, Identifiable {
       "Photo Load Failed"
     case .photoDataInvalid:
       "Photo Data Invalid"
+    case .invalidCredential,
+        .missingNonce,
+        .missingIdentityToken,
+        .nonceFailed(_),
+        .tokenSerializationFailed(_),
+        .signInFailed:
+      "Sign In Failed"
     case .unknown:
       "Unexpected Error"
     }
@@ -75,6 +90,18 @@ enum AppError: LocalizedError, Identifiable {
       "We couldn't load this photo."
     case .photoDataInvalid:
       "We couldn't process the selected image."
+    case .invalidCredential:
+      "Failed to get Apple ID credential."
+    case .missingNonce:
+      "Sign-in session expired."
+    case .missingIdentityToken:
+      "Failed to fetch identity token from Apple."
+    case .nonceFailed(let status):
+      "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(status)."
+    case .tokenSerializationFailed(let description):
+      "Failed to serialize token string from data: \(description)."
+    case .signInFailed:
+      "We couldn't sign you in."
     case .unknown:
       "Something unexpected happened."
     }
@@ -96,6 +123,13 @@ enum AppError: LocalizedError, Identifiable {
       "Please try selecting the image again."
     case .photoDataInvalid:
       "Please try choosing a different image."
+    case .invalidCredential,
+        .missingNonce,
+        .missingIdentityToken,
+        .nonceFailed(_),
+        .tokenSerializationFailed(_),
+        .signInFailed:
+      "Please try signing in again."
     case .unknown:
       "Please try again later."
     }

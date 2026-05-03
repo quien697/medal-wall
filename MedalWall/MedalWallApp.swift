@@ -11,6 +11,7 @@ import FirebaseCore
 
 @main
 struct MedalWallApp: App {
+  @Environment(\.scenePhase) private var scenePhase
   @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
   @AppStorage("appTheme") private var appTheme: AppTheme = .system
   @State private var userManager: UserManager?
@@ -37,8 +38,8 @@ struct MedalWallApp: App {
     WindowGroup {
       Group {
         if let userManager {
-          if userManager.currentUser != nil {
-            ContentView()
+          if userManager.isLoggedIn {
+            TempView()
           } else {
             LoginView()
           }
@@ -56,6 +57,13 @@ struct MedalWallApp: App {
       }
     } // WindowGroup
     .modelContainer(sharedModelContainer)
+    .onChange(of: scenePhase) { _, newPhase in
+      if newPhase == .active {
+        Task {
+          await userManager?.validateSession()
+        }
+      }
+    }
   }
 }
 

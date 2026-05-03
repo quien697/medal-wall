@@ -7,17 +7,18 @@
 
 import SwiftUI
 import SwiftData
+import AuthenticationServices
 
 struct LoginView: View {
   @Environment(UserManager.self) private var userManager
-  @State private var isLoading = false
+  @State private var viewModel = LoginViewModel()
   
   var body: some View {
     ZStack {
       Color.Background.primary.ignoresSafeArea()
       
-      if isLoading {
-        LoadingView(text: "Setting up...")
+      if viewModel.isLoading {
+        LoadingView(text: "Signing in...")
       } else {
         VStack {
           Image(systemName: "medal.fill")
@@ -38,26 +39,40 @@ struct LoginView: View {
           Spacer()
           
           Button("Get Started with Guest") {
-            isLoading = true
-            
-            Task {
-              try? userManager.startAsGuest()
-            }
+            try? userManager.startAsGuest()
           }
           .buttonStyle(.borderedProminent)
           .controlSize(.large)
           
+          SignInWithAppleButton(
+            onRequest: { request in
+              viewModel.prepareAppleRequest(request)
+            },
+            onCompletion: { result in
+              Task {
+                await viewModel.handleAppleCompletion(result)
+              }
+            }
+          )
+          .frame(height: 50)
+          .padding(.top, 8)
+          
         } // VStack
         .padding(.top, 52)
         .padding(.bottom, 36)
+        .padding(.horizontal, 24)
       }
     } // ZStack
+    .alert(viewModel.error?.title ?? "Sign In Failed", isPresented: .constant(viewModel.error != nil)) {
+      Button("OK") { viewModel.error = nil }
+    } message: {
+      Text(viewModel.error?.message ?? "")
+    }
   }
 }
 
 #Preview {
   @Previewable @Environment(\.modelContext) var modelContext
-  
   LoginView()
     .environment(UserManager(modelContext: modelContext))
 }

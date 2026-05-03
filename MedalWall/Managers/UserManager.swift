@@ -7,17 +7,39 @@
 
 import SwiftUI
 import SwiftData
+import FirebaseAuth
 
 @Observable
 class UserManager {
   private let repository: UserRepository
   private let context: ModelContext
+  private let authService = AuthService()
   private(set) var currentUser: User?
+  private(set) var firebaseUser: FirebaseAuth.User?
+  
+  var isLoggedIn: Bool { firebaseUser != nil || currentUser != nil }
   
   init(modelContext: ModelContext) {
     self.context = modelContext
     self.repository = UserRepository(context: modelContext)
     loadUser()
+    addAuthListener()
+  }
+  
+  private func addAuthListener() {
+    _ = Auth.auth().addStateDidChangeListener { [weak self] _, user in
+      Task { [weak self] in
+        self?.firebaseUser = user
+      }
+    }
+  }
+  
+  func validateSession() async {
+    await authService.validateSession()
+  }
+  
+  func signOut() throws {
+    try authService.signOut()
   }
   
   private func loadUser() {
@@ -26,15 +48,12 @@ class UserManager {
     }
   }
   
-  /// Updates the current user (called from settings/profile edit)
   func updateUser(_ user: User) {
     self.currentUser = user
   }
   
-  /// Seeds guest user and sample data, then loads the user
   func startAsGuest() throws {
     try DefaultDataSeeder.seed(in: context)
-    
     loadUser()
   }
 }
