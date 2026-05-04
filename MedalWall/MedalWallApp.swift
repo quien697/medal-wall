@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import FirebaseCore
+import GoogleSignIn
 
 @main
 struct MedalWallApp: App {
@@ -49,6 +50,9 @@ struct MedalWallApp: App {
       } // Group
       .environment(userManager)
       .preferredColorScheme(appTheme.colorScheme)
+      .onOpenURL { url in
+        GIDSignIn.sharedInstance.handle(url)
+      }
       .task {
         guard userManager == nil else { return }
         

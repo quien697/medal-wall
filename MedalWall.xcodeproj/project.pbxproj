@@ -99,12 +99,20 @@
 			);
 			target = 60B570BE2EA616CA000B3FDE /* MedalWallTests */;
 		};
+		60B195D92FA87D590073D440 /* Exceptions for "MedalWall" folder in "MedalWall" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 60B570AF2EA616C8000B3FDE /* MedalWall */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		60B570B22EA616C8000B3FDE /* MedalWall */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				60B195D92FA87D590073D440 /* Exceptions for "MedalWall" folder in "MedalWall" target */,
 				605C9AA02ECB0935007D3A96 /* Exceptions for "MedalWall" folder in "MedalWallTests" target */,
 			);
 			path = MedalWall;
@@ -537,6 +545,7 @@
 				DEVELOPMENT_TEAM = 4CDTPKY853;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MedalWall/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -572,6 +581,7 @@
 				DEVELOPMENT_TEAM = 4CDTPKY853;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MedalWall/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -6,8 +6,9 @@
 //
 
 import Foundation
-import FirebaseAuth
 import AuthenticationServices
+import FirebaseAuth
+import GoogleSignIn
 
 final class AuthService {
   
@@ -17,6 +18,10 @@ final class AuthService {
   
   func signUp(email: String, password: String) async throws -> AuthDataResult {
     try await Auth.auth().createUser(withEmail: email, password: password)
+  }
+  
+  func signOut() throws {
+    try Auth.auth().signOut()
   }
   
   @discardableResult
@@ -35,6 +40,12 @@ final class AuthService {
     return result
   }
   
+  @discardableResult
+  func signInWithGoogle(idToken: String, accessToken: String) async throws -> AuthDataResult {
+    let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
+    return try await Auth.auth().signIn(with: credential)
+  }
+  
   /// Updates the current Firebase user's `displayName` from Apple's `PersonNameComponents`.
   /// Only writes if `displayName` is not already set — Apple provides `fullName` on the first sign-in only.
   func updateDisplayName(with fullName: PersonNameComponents?) async {
@@ -51,14 +62,11 @@ final class AuthService {
     changeRequest.commitChanges { _ in }
   }
   
-  func signOut() throws {
-    try Auth.auth().signOut()
-  }
-  
   /// Reloads the current user from Firebase to verify the account still exists.
   /// Signs out locally if the account was deleted — e.g. removed from the Firebase console.
   func validateSession() async {
     guard let user = Auth.auth().currentUser else { return }
+    
     do {
       try await user.reload()
     } catch let error as NSError {

@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import AuthenticationServices
+import GoogleSignInSwift
 
 struct LoginView: View {
   @Environment(UserManager.self) private var userManager
@@ -57,6 +58,11 @@ struct LoginView: View {
           .frame(height: 50)
           .padding(.top, 8)
           
+          GoogleSignInButton(viewModel: GoogleSignInButtonViewModel(style: .wide)) {
+            Task {
+              await viewModel.signInWithGoogle()
+            }
+          }
         } // VStack
         .padding(.top, 52)
         .padding(.bottom, 36)

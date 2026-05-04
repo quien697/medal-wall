@@ -8,6 +8,8 @@
 import Foundation
 import CryptoKit
 import AuthenticationServices
+import FirebaseCore
+import GoogleSignIn
 
 @Observable
 final class LoginViewModel {
@@ -15,6 +17,42 @@ final class LoginViewModel {
   private var currentNonce: String?
   var isLoading = false
   var error: AppError?
+  
+  // MARK: - Sign in with Apple
+  
+  /// Generates a cryptographically secure random nonce string using `SecRandomCopyBytes`.
+  /// The nonce is sent with the sign-in request so Apple can tie the ID token back to
+  /// this specific request, preventing replay attacks.
+  private func randomNonceString(length: Int = 32) throws(AppError) -> String {
+    precondition(length > 0)
+    var randomBytes = [UInt8](repeating: 0, count: length)
+    let errorCode = SecRandomCopyBytes(kSecRandomDefault, randomBytes.count, &randomBytes)
+    guard errorCode == errSecSuccess else {
+      throw AppError.nonceFailed("\(errorCode)")
+    }
+    
+    let charset: [Character] =
+    Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+    let nonce = randomBytes.map { byte in
+      // Pick a random character from the set, wrapping around if needed.
+      charset[Int(byte) % charset.count]
+    }
+    
+    return String(nonce)
+  }
+  
+  /// Returns the SHA256 hash of the given string as a hex-encoded string.
+  /// The hashed nonce is sent to Apple; Firebase then re-hashes the original
+  /// and compares both values to verify the response is untampered.
+  private func sha256(_ input: String) -> String {
+    let inputData = Data(input.utf8)
+    let hashedData = SHA256.hash(data: inputData)
+    let hashString = hashedData.compactMap {
+      String(format: "%02x", $0)
+    }.joined()
+    
+    return hashString
+  }
   
   /// Configures the Apple Sign In request with a hashed nonce and requested scopes.
   /// Call this from `SignInWithAppleButton`'s `onRequest` closure.
@@ -64,37 +102,37 @@ final class LoginViewModel {
     }
   }
   
-  /// Generates a cryptographically secure random nonce string using `SecRandomCopyBytes`.
-  /// The nonce is sent with the sign-in request so Apple can tie the ID token back to
-  /// this specific request, preventing replay attacks.
-  private func randomNonceString(length: Int = 32) throws(AppError) -> String {
-    precondition(length > 0)
-    var randomBytes = [UInt8](repeating: 0, count: length)
-    let errorCode = SecRandomCopyBytes(kSecRandomDefault, randomBytes.count, &randomBytes)
-    guard errorCode == errSecSuccess else {
-      throw AppError.nonceFailed("\(errorCode)")
-    }
-    
-    let charset: [Character] =
-    Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
-    let nonce = randomBytes.map { byte in
-      // Pick a random character from the set, wrapping around if needed.
-      charset[Int(byte) % charset.count]
-    }
-    
-    return String(nonce)
-  }
+  // MARK: - Sign in with Google
   
-  /// Returns the SHA256 hash of the given string as a hex-encoded string.
-  /// The hashed nonce is sent to Apple; Firebase then re-hashes the original
-  /// and compares both values to verify the response is untampered.
-  private func sha256(_ input: String) -> String {
-    let inputData = Data(input.utf8)
-    let hashedData = SHA256.hash(data: inputData)
-    let hashString = hashedData.compactMap {
-      String(format: "%02x", $0)
-    }.joined()
-    
-    return hashString
+  /// Presents the Google Sign-In sheet and signs the user in to Firebase.
+  @MainActor
+  func signInWithGoogle() async {
+    isLoading = true
+    defer { isLoading = false }
+
+    guard let clientID = FirebaseApp.app()?.options.clientID else {
+      self.error = .signInFailed
+      return
+    }
+
+    GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
+
+    guard let windowScene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
+          let rootViewController = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
+      self.error = .signInFailed
+      return
+    }
+
+    do {
+      let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
+      guard let idToken = result.user.idToken?.tokenString else {
+        self.error = .missingIdentityToken
+        return
+      }
+      let accessToken = result.user.accessToken.tokenString
+      try await authService.signInWithGoogle(idToken: idToken, accessToken: accessToken)
+    } catch {
+      self.error = .signInFailed
+    }
   }
 }
