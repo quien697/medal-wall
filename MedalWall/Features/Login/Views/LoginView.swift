@@ -62,7 +62,13 @@ struct LoginView: View {
             .padding(.top, 8)
             
             Button {
-              isPresentingEmailSignIn = true
+              Task {
+                if await viewModel.isConnected() {
+                  isPresentingEmailSignIn = true
+                } else {
+                  errorWrapper = ErrorWrapper(error: .noInternetConnection)
+                }
+              }
             } label: {
               Label("Continue with Email", systemImage: "envelope")
                 .frame(maxWidth: .infinity)

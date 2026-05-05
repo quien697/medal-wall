@@ -15,6 +15,7 @@ enum AppError: LocalizedError, Identifiable, Equatable {
   case nonceFailed(String)
   case tokenSerializationFailed(String)
   case signInFailed
+  case noInternetConnection
   case sendEmailSignInLinkFailed(String)
   
   // Repository / Persistence Errors
@@ -61,6 +62,8 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "Photo Data Invalid"
     case .sendEmailSignInLinkFailed:
       "Send Email Sign-in Link Failed"
+    case .noInternetConnection:
+      "No Internet Connection"
     case .invalidCredential,
         .missingNonce,
         .missingIdentityToken,
@@ -105,6 +108,8 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "Failed to serialize token string from data: \(description)."
     case .sendEmailSignInLinkFailed(let description):
       "We couldn't send the sign-in link to your email. \(description)"
+    case .noInternetConnection:
+      "You're not connected to the internet."
     case .signInFailed:
       "We couldn't sign you in."
     case .unknown:
@@ -130,6 +135,8 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "Please try choosing a different image."
     case .sendEmailSignInLinkFailed:
       "Please check your email address and try again."
+    case .noInternetConnection:
+      "Please check your connection and try again."
     case .invalidCredential,
         .missingNonce,
         .missingIdentityToken,

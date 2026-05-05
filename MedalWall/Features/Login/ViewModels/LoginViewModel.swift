@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Network
 import CryptoKit
 import AuthenticationServices
 import FirebaseCore
@@ -20,19 +21,31 @@ final class LoginViewModel {
   var error: AppError?
   var email = ""
   var isEmailLinkSent = false
-
+  
   // MARK: - Computed
   var isEmailValid: Bool {
     let parts = email.split(separator: "@")
     return parts.count == 2 && parts[1].contains(".")
   }
   
-  // MARK: - Functions - Sign in with Email Link
-
+  // MARK: - Functions
+  
+  func isConnected() async -> Bool {
+    await withCheckedContinuation { continuation in
+      let monitor = NWPathMonitor()
+      monitor.pathUpdateHandler = { path in
+        monitor.cancel()
+        continuation.resume(returning: path.status == .satisfied)
+      }
+      monitor.start(queue: .global())
+    }
+  }
+  
   /// Sends a Firebase sign-in link to the given email address.
   func sendEmailLink() async {
     isLoading = true
     defer { isLoading = false }
+    
     do {
       try await authService.sendSignInLink(to: email)
       UserDefaults.standard.set(email, forKey: AuthService.pendingEmailSignInKey)
@@ -41,14 +54,12 @@ final class LoginViewModel {
       self.error = .sendEmailSignInLinkFailed(error.localizedDescription)
     }
   }
-
+  
   /// Resets email link flow state; call on sheet dismiss.
   func resetEmailFlow() {
     email = ""
     isEmailLinkSent = false
   }
-
-  // MARK: - Functions - Sign in with Apple
   
   /// Generates a cryptographically secure random nonce string using `SecRandomCopyBytes`.
   /// The nonce is sent with the sign-in request so Apple can tie the ID token back to
@@ -127,40 +138,46 @@ final class LoginViewModel {
       } catch {
         self.error = .signInFailed
       }
-    case .failure:
+    case .failure(let error):
+      if let authError = error as? ASAuthorizationError,
+         authError.code == .canceled || authError.code == .unknown {
+        return
+      }
       self.error = .signInFailed
     }
   }
-
-  // MARK: - Functions - Sign in with Google
-
+  
   /// Presents the Google Sign-In sheet and signs the user in to Firebase.
   func signInWithGoogle() async {
     isLoading = true
     defer { isLoading = false }
-
+    
     guard let clientID = FirebaseApp.app()?.options.clientID else {
       self.error = .signInFailed
       return
     }
-
+    
     GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
-
+    
     guard let windowScene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
           let rootViewController = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
       self.error = .signInFailed
       return
     }
-
+    
     do {
       let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
       guard let idToken = result.user.idToken?.tokenString else {
         self.error = .missingIdentityToken
         return
       }
+      
       let accessToken = result.user.accessToken.tokenString
       try await authService.signInWithGoogle(idToken: idToken, accessToken: accessToken)
     } catch {
+      if (error as NSError).code == GIDSignInError.Code.canceled.rawValue {
+        return
+      }
       self.error = .signInFailed
     }
   }
