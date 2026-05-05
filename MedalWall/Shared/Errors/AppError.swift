@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum AppError: LocalizedError, Identifiable {
+enum AppError: LocalizedError, Identifiable, Equatable {
   // Auth, Login Errors
   case invalidCredential
   case missingNonce
@@ -15,6 +15,7 @@ enum AppError: LocalizedError, Identifiable {
   case nonceFailed(String)
   case tokenSerializationFailed(String)
   case signInFailed
+  case sendEmailSignInLinkFailed(String)
   
   // Repository / Persistence Errors
   case contextNotAttached
@@ -58,6 +59,8 @@ enum AppError: LocalizedError, Identifiable {
       "Photo Load Failed"
     case .photoDataInvalid:
       "Photo Data Invalid"
+    case .sendEmailSignInLinkFailed:
+      "Send Email Sign-in Link Failed"
     case .invalidCredential,
         .missingNonce,
         .missingIdentityToken,
@@ -100,6 +103,8 @@ enum AppError: LocalizedError, Identifiable {
       "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(status)."
     case .tokenSerializationFailed(let description):
       "Failed to serialize token string from data: \(description)."
+    case .sendEmailSignInLinkFailed(let description):
+      "We couldn't send the sign-in link to your email. \(description)"
     case .signInFailed:
       "We couldn't sign you in."
     case .unknown:
@@ -123,6 +128,8 @@ enum AppError: LocalizedError, Identifiable {
       "Please try selecting the image again."
     case .photoDataInvalid:
       "Please try choosing a different image."
+    case .sendEmailSignInLinkFailed:
+      "Please check your email address and try again."
     case .invalidCredential,
         .missingNonce,
         .missingIdentityToken,

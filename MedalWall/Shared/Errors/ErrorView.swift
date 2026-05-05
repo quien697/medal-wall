@@ -40,10 +40,6 @@ struct ErrorView: View {
   }
 }
 
-private enum SampleError: Error {
-  case errorRequired
-}
-
 #Preview {
   ErrorView(errorWrapper: ErrorWrapper(error: AppError.duplicateDistance))
 }
