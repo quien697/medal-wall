@@ -11,39 +11,12 @@ import FirebaseAuth
 import GoogleSignIn
 
 final class AuthService {
-  
-  func signIn(email: String, password: String) async throws -> AuthDataResult {
-    try await Auth.auth().signIn(withEmail: email, password: password)
-  }
-  
-  func signUp(email: String, password: String) async throws -> AuthDataResult {
-    try await Auth.auth().createUser(withEmail: email, password: password)
-  }
+  static let pendingEmailSignInKey = "pendingEmailSignIn"
+
+  // MARK: - Common
   
   func signOut() throws {
     try Auth.auth().signOut()
-  }
-  
-  @discardableResult
-  func signInWithApple(
-    idTokenString: String,
-    rawNonce: String,
-    fullName: PersonNameComponents?
-  ) async throws -> AuthDataResult {
-    let credential = OAuthProvider.appleCredential(
-      withIDToken: idTokenString,
-      rawNonce: rawNonce,
-      fullName: fullName
-    )
-    let result = try await Auth.auth().signIn(with: credential)
-    await updateDisplayName(with: fullName)
-    return result
-  }
-  
-  @discardableResult
-  func signInWithGoogle(idToken: String, accessToken: String) async throws -> AuthDataResult {
-    let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
-    return try await Auth.auth().signIn(with: credential)
   }
   
   /// Updates the current Firebase user's `displayName` from Apple's `PersonNameComponents`.
@@ -76,16 +49,48 @@ final class AuthService {
     }
   }
   
-  /// Emits the current Firebase user whenever auth state changes (sign in, sign out, token refresh).
-  /// Yields `nil` when no user is signed in.
-  //  var authStateStream: AsyncStream<FirebaseAuth.User?> {
-  //    AsyncStream { continuation in
-  //      let handle = Auth.auth().addStateDidChangeListener { _, user in
-  //        continuation.yield(user)
-  //      }
-  //      continuation.onTermination = { _ in
-  //        Auth.auth().removeStateDidChangeListener(handle)
-  //      }
-  //    }
-  //  }
+  // MARK: - Sign in with Email Link
+  
+  func sendSignInLink(to email: String) async throws {
+    let authorizedDomain: String = "https://medal-wall-4697.firebaseapp.com"
+    let actionCodeSettings = ActionCodeSettings()
+    actionCodeSettings.url = URL(string: authorizedDomain)
+    actionCodeSettings.handleCodeInApp = true
+    actionCodeSettings.setIOSBundleID(Bundle.main.bundleIdentifier!)
+    try await Auth.auth().sendSignInLink(
+      toEmail: email,
+      actionCodeSettings: actionCodeSettings
+    )
+  }
+  
+  @discardableResult
+  func signInWithEmailLink(email: String, link: String) async throws -> AuthDataResult {
+    try await Auth.auth().signIn(withEmail: email, link: link)
+  }
+  
+  // MARK: - Sign in Apple
+  
+  @discardableResult
+  func signInWithApple(
+    idTokenString: String,
+    rawNonce: String,
+    fullName: PersonNameComponents?
+  ) async throws -> AuthDataResult {
+    let credential = OAuthProvider.appleCredential(
+      withIDToken: idTokenString,
+      rawNonce: rawNonce,
+      fullName: fullName
+    )
+    let result = try await Auth.auth().signIn(with: credential)
+    await updateDisplayName(with: fullName)
+    return result
+  }
+  
+  // MARK: - Sign in with google
+  
+  @discardableResult
+  func signInWithGoogle(idToken: String, accessToken: String) async throws -> AuthDataResult {
+    let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
+    return try await Auth.auth().signIn(with: credential)
+  }
 }

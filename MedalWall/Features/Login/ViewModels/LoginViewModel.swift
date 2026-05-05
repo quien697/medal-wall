@@ -13,12 +13,42 @@ import GoogleSignIn
 
 @Observable
 final class LoginViewModel {
+  // MARK: - Properties
   private let authService = AuthService()
   private var currentNonce: String?
   var isLoading = false
   var error: AppError?
+  var email = ""
+  var isEmailLinkSent = false
+
+  // MARK: - Computed
+  var isEmailValid: Bool {
+    let parts = email.split(separator: "@")
+    return parts.count == 2 && parts[1].contains(".")
+  }
   
-  // MARK: - Sign in with Apple
+  // MARK: - Functions - Sign in with Email Link
+
+  /// Sends a Firebase sign-in link to the given email address.
+  func sendEmailLink() async {
+    isLoading = true
+    defer { isLoading = false }
+    do {
+      try await authService.sendSignInLink(to: email)
+      UserDefaults.standard.set(email, forKey: AuthService.pendingEmailSignInKey)
+      isEmailLinkSent = true
+    } catch {
+      self.error = .sendEmailSignInLinkFailed(error.localizedDescription)
+    }
+  }
+
+  /// Resets email link flow state; call on sheet dismiss.
+  func resetEmailFlow() {
+    email = ""
+    isEmailLinkSent = false
+  }
+
+  // MARK: - Functions - Sign in with Apple
   
   /// Generates a cryptographically secure random nonce string using `SecRandomCopyBytes`.
   /// The nonce is sent with the sign-in request so Apple can tie the ID token back to
@@ -101,11 +131,10 @@ final class LoginViewModel {
       self.error = .signInFailed
     }
   }
-  
-  // MARK: - Sign in with Google
-  
+
+  // MARK: - Functions - Sign in with Google
+
   /// Presents the Google Sign-In sheet and signs the user in to Firebase.
-  @MainActor
   func signInWithGoogle() async {
     isLoading = true
     defer { isLoading = false }

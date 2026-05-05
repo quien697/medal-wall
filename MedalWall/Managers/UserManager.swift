@@ -37,6 +37,17 @@ class UserManager {
   func validateSession() async {
     await authService.validateSession()
   }
+
+  func handleEmailLink(_ link: String) async {
+    guard let email = UserDefaults.standard.string(forKey: AuthService.pendingEmailSignInKey) else { return }
+
+    do {
+      try await authService.signInWithEmailLink(email: email, link: link)
+      UserDefaults.standard.removeObject(forKey: AuthService.pendingEmailSignInKey)
+    } catch {
+      // sign-in failure surfaces through the auth state listener
+    }
+  }
   
   func signOut() throws {
     try authService.signOut()

@@ -13,6 +13,8 @@ import GoogleSignInSwift
 struct LoginView: View {
   @Environment(UserManager.self) private var userManager
   @State private var viewModel = LoginViewModel()
+  @State private var isPresentingEmailSignIn: Bool = false
+  @State private var errorWrapper: ErrorWrapper?
   
   var body: some View {
     ZStack {
@@ -25,7 +27,7 @@ struct LoginView: View {
           Image(systemName: "medal.fill")
             .font(.system(size: 100))
             .foregroundStyle(Color.Gold.primary)
-            .padding(.bottom, 36)
+            .padding(.bottom, 16)
           
           Text("Medal Wall")
             .font(.largeTitle)
@@ -33,46 +35,71 @@ struct LoginView: View {
             .fontWeight(.heavy)
             .padding(.bottom, 8)
           
-          Text("Your personal race archive")
+          Text("Sign up or log in to start collecting your medals")
             .font(.subheadline)
             .foregroundStyle(Color.Text.secondary)
+            .multilineTextAlignment(.center)
           
-          Spacer()
-          
-          Button("Get Started with Guest") {
-            try? userManager.startAsGuest()
-          }
-          .buttonStyle(.borderedProminent)
-          .controlSize(.large)
-          
-          SignInWithAppleButton(
-            onRequest: { request in
-              viewModel.prepareAppleRequest(request)
-            },
-            onCompletion: { result in
+          VStack {
+            SignInWithAppleButton(
+              .continue,
+              onRequest: { request in
+                viewModel.prepareAppleRequest(request)
+              },
+              onCompletion: { result in
+                Task {
+                  await viewModel.handleAppleCompletion(result)
+                }
+              }
+            )
+            .frame(maxWidth: .infinity, maxHeight: 50)
+            
+            GoogleSignInButton(viewModel: GoogleSignInButtonViewModel(style: .wide)) {
               Task {
-                await viewModel.handleAppleCompletion(result)
+                await viewModel.signInWithGoogle()
               }
             }
-          )
-          .frame(height: 50)
-          .padding(.top, 8)
-          
-          GoogleSignInButton(viewModel: GoogleSignInButtonViewModel(style: .wide)) {
-            Task {
-              await viewModel.signInWithGoogle()
+            .padding(.top, 8)
+            
+            Button {
+              isPresentingEmailSignIn = true
+            } label: {
+              Label("Continue with Email", systemImage: "envelope")
+                .frame(maxWidth: .infinity)
             }
-          }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+            .padding(.top, 8)
+            
+            Button("Continue as Guest") {
+              //            try? userManager.startAsGuest()
+            }
+            .font(.subheadline)
+            .foregroundStyle(Color.Text.secondary)
+            .padding(.top, 12)
+          } // VStack
+          .padding(.top)
+          .padding(.horizontal, 16)
         } // VStack
-        .padding(.top, 52)
-        .padding(.bottom, 36)
-        .padding(.horizontal, 24)
       }
     } // ZStack
-    .alert(viewModel.error?.title ?? "Sign In Failed", isPresented: .constant(viewModel.error != nil)) {
-      Button("OK") { viewModel.error = nil }
-    } message: {
-      Text(viewModel.error?.message ?? "")
+    .sheet(isPresented: $isPresentingEmailSignIn, onDismiss: viewModel.resetEmailFlow) {
+      SignInWithEmailLinkView(
+        email: $viewModel.email,
+        isLoading: viewModel.isLoading,
+        isEmailLinkSent: viewModel.isEmailLinkSent,
+        isEmailValid: viewModel.isEmailValid,
+        onSendLink: viewModel.sendEmailLink
+      )
+    }
+    .sheet(item: $errorWrapper) {
+      ErrorView(errorWrapper: $0)
+    }
+    .onChange(of: viewModel.error) { _, newError in
+      if let newError {
+        errorWrapper = ErrorWrapper(error: newError)
+        viewModel.error = nil
+      }
     }
   }
 }
