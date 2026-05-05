@@ -31,7 +31,7 @@ struct PhotoViewerHeader: View {
   VStack {
     Color.black.ignoresSafeArea()
     
-    PhotoViewerHeader(onClose: { print("onClose") })
+    PhotoViewerHeader(onClose: {})
     
     Spacer()
   }

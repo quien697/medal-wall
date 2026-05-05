@@ -63,14 +63,14 @@ struct EditMedalEventPhotosSection: View {
   Form {
     EditMedalEventPhotosSection(
       photos: draftEventPhoto,
-      onChooseFromLibrary: { print("onChooseFromLibrary") },
-      onRemove: { _ in print("onRemove") }
+      onChooseFromLibrary: {},
+      onRemove: { _ in }
     )
     
     EditMedalEventPhotosSection(
       photos: [],
-      onChooseFromLibrary: { print("onChooseFromLibrary") },
-      onRemove: { _ in print("onRemove") }
+      onChooseFromLibrary: {},
+      onRemove: { _ in }
     )
   }
 }

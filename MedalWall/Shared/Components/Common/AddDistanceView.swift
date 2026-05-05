@@ -20,5 +20,5 @@ struct AddDistanceView: View {
 }
 
 #Preview {
-  AddDistanceView(onSave: { _ in print("onSave") })
+  AddDistanceView(onSave: { _ in })
 }

@@ -66,7 +66,7 @@ struct EditMedalInfoSection: View {
       date: .constant(medal.date),
       bib: .constant(medal.bibNumber),
       distance: medal.distance.displayLabel,
-      onEditDistance: { print("onEditDistance") }
+      onEditDistance: {}
     )
   }
 }

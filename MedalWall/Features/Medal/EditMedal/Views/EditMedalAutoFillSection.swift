@@ -39,5 +39,5 @@ struct EditMedalAutoFillSection: View {
 }
 
 #Preview {
-  EditMedalAutoFillSection(onAction: { print("onAction") })
+  EditMedalAutoFillSection(onAction: {})
 }
