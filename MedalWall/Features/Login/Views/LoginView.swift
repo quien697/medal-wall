@@ -7,13 +7,10 @@
 
 import SwiftUI
 import SwiftData
-import AuthenticationServices
-import GoogleSignInSwift
 
 struct LoginView: View {
   @Environment(UserManager.self) private var userManager
   @State private var viewModel = LoginViewModel()
-  @State private var isPresentingEmailSignIn: Bool = false
   @State private var errorWrapper: ErrorWrapper?
   
   var body: some View {
@@ -40,56 +37,40 @@ struct LoginView: View {
             .foregroundStyle(Color.Text.secondary)
             .multilineTextAlignment(.center)
           
-          VStack {
-            SignInWithAppleButton(
-              .continue,
-              onRequest: { request in
-                viewModel.prepareAppleRequest(request)
-              },
-              onCompletion: { result in
-                Task {
-                  await viewModel.handleAppleCompletion(result)
-                }
-              }
-            )
-            .frame(maxWidth: .infinity, maxHeight: 50)
-            
-            GoogleSignInButton(viewModel: GoogleSignInButtonViewModel(style: .wide)) {
-              Task {
-                await viewModel.signInWithGoogle()
-              }
+          VStack(spacing: 16) {
+            SignInButton(
+              icon: Image(systemName: "apple.logo"),
+              title: "Continue with Apple")
+            {
+              await viewModel.signInWithApple()
             }
-            .padding(.top, 8)
             
-            Button {
-              Task {
-                if await viewModel.isConnected() {
-                  isPresentingEmailSignIn = true
-                } else {
-                  errorWrapper = ErrorWrapper(error: .noInternetConnection)
-                }
-              }
-            } label: {
-              Label("Continue with Email", systemImage: "envelope")
-                .frame(maxWidth: .infinity)
+            SignInButton(
+              icon: Image("google-icon"),
+              title: "Continue with Google")
+            {
+              await viewModel.signInWithGoogle()
             }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-            .padding(.top, 8)
             
-            Button("Continue as Guest") {
-              //            try? userManager.startAsGuest()
+            SignInButton(
+              icon: Image(systemName: "envelope"),
+              title: "Continue with Email")
+            {
+              await viewModel.signInWithEmailLink()
             }
-            .font(.subheadline)
-            .foregroundStyle(Color.Text.secondary)
-            .padding(.top, 12)
+            
+//            Button("Continue as Guest") {
+//                          try? userManager.startAsGuest()
+//            }
+//            .font(.subheadline)
+//            .foregroundStyle(Color.Text.secondary)
           } // VStack
           .padding(.top)
           .padding(.horizontal, 16)
         } // VStack
       }
     } // ZStack
-    .sheet(isPresented: $isPresentingEmailSignIn, onDismiss: viewModel.resetEmailFlow) {
+    .sheet(isPresented: $viewModel.isPresentingEmailSignIn, onDismiss: viewModel.resetEmailFlow) {
       SignInWithEmailLinkView(
         email: $viewModel.email,
         isLoading: viewModel.isLoading,

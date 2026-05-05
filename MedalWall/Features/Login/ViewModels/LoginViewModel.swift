@@ -16,11 +16,11 @@ import GoogleSignIn
 final class LoginViewModel {
   // MARK: - Properties
   private let authService = AuthService()
-  private var currentNonce: String?
   var isLoading = false
   var error: AppError?
   var email = ""
   var isEmailLinkSent = false
+  var isPresentingEmailSignIn = false
   
   // MARK: - Computed
   var isEmailValid: Bool {
@@ -41,6 +41,17 @@ final class LoginViewModel {
     }
   }
   
+  // MARK: Functions - Sign in with Email link
+
+  /// Shows the email sign-in sheet if the device is online, otherwise surfaces a connection error.
+  func signInWithEmailLink() async {
+    if await isConnected() {
+      isPresentingEmailSignIn = true
+    } else {
+      error = .noInternetConnection
+    }
+  }
+
   /// Sends a Firebase sign-in link to the given email address.
   func sendEmailLink() async {
     isLoading = true
@@ -55,10 +66,64 @@ final class LoginViewModel {
     }
   }
   
-  /// Resets email link flow state; call on sheet dismiss.
+  /// Resets email link flow state, call on sheet dismiss.
   func resetEmailFlow() {
     email = ""
     isEmailLinkSent = false
+  }
+  
+  // MARK: Functions - Sign in with Apple
+  
+  /// Presents the Apple Sign-In sheet and signs the user in to Firebase.
+  func signInWithApple() async {
+    do {
+      let nonce = try randomNonceString()
+      let request = ASAuthorizationAppleIDProvider().createRequest()
+      request.requestedScopes = [.fullName, .email]
+      request.nonce = sha256(nonce)
+      
+      let delegate = AppleSignInDelegate()
+      let controller = ASAuthorizationController(authorizationRequests: [request])
+      controller.delegate = delegate
+      controller.presentationContextProvider = delegate
+      controller.performRequests()
+      
+      let authorization = try await delegate.waitForAuthorization()
+      
+      guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
+        self.error = .invalidCredential
+        return
+      }
+      guard let appleIDToken = appleIDCredential.identityToken else {
+        self.error = .missingIdentityToken
+        return
+      }
+      guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+        self.error = .tokenSerializationFailed(appleIDToken.debugDescription)
+        return
+      }
+      
+      isLoading = true
+      defer { isLoading = false }
+      
+      try await authService.signInWithApple(
+        idTokenString: idTokenString,
+        rawNonce: nonce,
+        fullName: appleIDCredential.fullName
+      )
+    } catch {
+      guard let authError = error as? ASAuthorizationError else {
+        self.error = .signInFailed
+        return
+      }
+      
+      switch authError.code {
+      case .canceled, .unknown:
+        break
+      default:
+        self.error = .signInFailed
+      }
+    }
   }
   
   /// Generates a cryptographically secure random nonce string using `SecRandomCopyBytes`.
@@ -72,8 +137,7 @@ final class LoginViewModel {
       throw AppError.nonceFailed("\(errorCode)")
     }
     
-    let charset: [Character] =
-    Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+    let charset: [Character] = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
     let nonce = randomBytes.map { byte in
       // Pick a random character from the set, wrapping around if needed.
       charset[Int(byte) % charset.count]
@@ -91,61 +155,10 @@ final class LoginViewModel {
     let hashString = hashedData.compactMap {
       String(format: "%02x", $0)
     }.joined()
-    
     return hashString
   }
   
-  /// Configures the Apple Sign In request with a hashed nonce and requested scopes.
-  /// Call this from `SignInWithAppleButton`'s `onRequest` closure.
-  func prepareAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
-    do {
-      let nonce = try randomNonceString()
-      currentNonce = nonce
-      request.requestedScopes = [.fullName, .email]
-      request.nonce = sha256(nonce)
-    } catch {
-      self.error = error
-    }
-  }
-  
-  /// Handles the result from Apple's authentication sheet and signs in to Firebase.
-  /// Call this from `SignInWithAppleButton`'s `onCompletion` closure.
-  func handleAppleCompletion(_ result: Result<ASAuthorization, Error>) async {
-    switch result {
-    case .success(let authorization):
-      guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-        self.error = .invalidCredential
-        return
-      }
-      guard let nonce = currentNonce else {
-        self.error = .missingNonce
-        return
-      }
-      guard let appleIDToken = appleIDCredential.identityToken else {
-        self.error = .missingIdentityToken
-        return
-      }
-      guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-        self.error = .tokenSerializationFailed(appleIDToken.debugDescription)
-        return
-      }
-      
-      isLoading = true
-      defer { isLoading = false }
-      
-      do {
-        try await authService.signInWithApple(idTokenString: idTokenString, rawNonce: nonce, fullName: appleIDCredential.fullName)
-      } catch {
-        self.error = .signInFailed
-      }
-    case .failure(let error):
-      if let authError = error as? ASAuthorizationError,
-         authError.code == .canceled || authError.code == .unknown {
-        return
-      }
-      self.error = .signInFailed
-    }
-  }
+  // MARK: Functions - Sign in with Google
   
   /// Presents the Google Sign-In sheet and signs the user in to Firebase.
   func signInWithGoogle() async {
@@ -175,10 +188,12 @@ final class LoginViewModel {
       let accessToken = result.user.accessToken.tokenString
       try await authService.signInWithGoogle(idToken: idToken, accessToken: accessToken)
     } catch {
-      if (error as NSError).code == GIDSignInError.Code.canceled.rawValue {
-        return
+      switch (error as NSError).code {
+      case GIDSignInError.Code.canceled.rawValue:
+        break
+      default:
+        self.error = .signInFailed
       }
-      self.error = .signInFailed
     }
   }
 }
