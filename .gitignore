@@ -89,6 +89,9 @@ fastlane/test_output
 
 iOSInjectionProject/
 
+# Firebase
+.firebase/
+
 # AI Agent
 .claude/
 CLAUDE.local.md
