@@ -73,7 +73,7 @@ struct LoginView: View {
     .sheet(isPresented: $viewModel.isPresentingEmailSignIn, onDismiss: viewModel.resetEmailFlow) {
       SignInWithEmailLinkView(
         email: $viewModel.email,
-        isLoading: viewModel.isLoading,
+//        isLoading: viewModel.isLoading,
         isEmailLinkSent: viewModel.isEmailLinkSent,
         isEmailValid: viewModel.isEmailValid,
         onSendLink: viewModel.sendEmailLink

@@ -12,22 +12,28 @@ struct SignInWithEmailLinkView: View {
   @Environment(\.dismiss) private var dismiss
   // MARK: - Properties
   @Binding var email: String
-  let isLoading: Bool
   let isEmailLinkSent: Bool
   let isEmailValid: Bool
   let onSendLink: () async -> Void
-
+  
   // MARK: - Body
   var body: some View {
     NavigationStack {
       Group {
         if isEmailLinkSent {
-          confirmationView
+          EmailConfirmationSection(
+            email: email,
+            onDismiss: { dismiss() }
+          )
         } else {
-          emailInputView
+          EmailInputSection(
+            email: $email,
+            isEmailValid: isEmailValid,
+            onSendLink: onSendLink
+          )
         }
       } // Group
-      .navigationTitle("Sign in with Email Link")
+      .navigationTitle("Continue with Email")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
@@ -38,87 +44,24 @@ struct SignInWithEmailLinkView: View {
       } // toolbar
     } // NavigationStack
   }
+}
 
-  // MARK: - Email Input
-  private var emailInputView: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Text("Enter your email address and we'll send you a sign-in link. No password needed.")
-        .font(.subheadline)
-        .foregroundStyle(.secondary)
+#Preview("Email Input") {
+  @Previewable @State var email = ""
+  SignInWithEmailLinkView(
+    email: $email,
+    isEmailLinkSent: false,
+    isEmailValid: false,
+    onSendLink: {}
+  )
+}
 
-      TextField("you@example.com", text: $email)
-        .keyboardType(.emailAddress)
-        .textInputAutocapitalization(.never)
-        .autocorrectionDisabled()
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-
-      Spacer()
-
-      Button {
-        Task { await onSendLink() }
-      } label: {
-        Group {
-          if isLoading {
-            ProgressView()
-          } else {
-            Text("Send Link")
-          }
-        } // Group
-        .frame(maxWidth: .infinity)
-      }
-      .buttonStyle(.borderedProminent)
-      .controlSize(.large)
-      .disabled(!isEmailValid || isLoading)
-    } // VStack
-    .padding()
-  }
-
-  // MARK: - Confirmation
-  private var confirmationView: some View {
-    VStack(spacing: 16) {
-      Spacer()
-
-      Image(systemName: "envelope.badge.fill")
-        .font(.system(size: 64))
-        .foregroundStyle(.tint)
-
-      Text("Check your inbox")
-        .font(.title2)
-        .fontWeight(.semibold)
-
-      Text("We sent a sign-in link to\n**\(email)**")
-        .font(.body)
-        .foregroundStyle(.secondary)
-        .multilineTextAlignment(.center)
-
-      Spacer()
-
-      Button {
-        Task { await onSendLink() }
-      } label: {
-        Group {
-          if isLoading {
-            ProgressView()
-          } else {
-            Text("Resend Link")
-          }
-        } // Group
-        .frame(maxWidth: .infinity)
-      }
-      .buttonStyle(.bordered)
-      .controlSize(.large)
-
-      Button {
-        dismiss()
-      } label: {
-        Text("Done")
-          .frame(maxWidth: .infinity)
-      }
-      .buttonStyle(.borderedProminent)
-      .controlSize(.large)
-    } // VStack
-    .padding()
-  }
+#Preview("Confirmation") {
+  @Previewable @State var email = "quien697@gmail.com"
+  SignInWithEmailLinkView(
+    email: $email,
+    isEmailLinkSent: true,
+    isEmailValid: true,
+    onSendLink: {}
+  )
 }
