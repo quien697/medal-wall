@@ -58,12 +58,6 @@ struct LoginView: View {
             {
               await viewModel.signInWithEmailLink()
             }
-            
-//            Button("Continue as Guest") {
-//                          try? userManager.startAsGuest()
-//            }
-//            .font(.subheadline)
-//            .foregroundStyle(Color.Text.secondary)
           } // VStack
           .padding(.top)
           .padding(.horizontal, 16)

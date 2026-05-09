@@ -39,9 +39,9 @@ struct MedalWallApp: App {
   var body: some Scene {
     WindowGroup {
       Group {
-        if let userManager {
+        if let userManager, !userManager.isLoadingAuth {
           if userManager.isLoggedIn {
-            TempView()
+            ContentView()
           } else {
             LoginView()
           }
