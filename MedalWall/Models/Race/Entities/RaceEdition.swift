@@ -15,7 +15,7 @@ final class RaceEdition {
   var startDate: Date
   var endDate: Date
   var photoData: Data?
-  var createBy: UUID
+  var createdBy: String
   var createdDate: Date
   var updatedDate: Date
   
@@ -29,7 +29,7 @@ final class RaceEdition {
     startDate: Date,
     endDate: Date,
     photoData: Data? = nil,
-    createBy: UUID,
+    createdBy: String,
     createdDate: Date = .now,
     updatedDate: Date = .now,
     race: Race,
@@ -40,7 +40,7 @@ final class RaceEdition {
     self.startDate = startDate
     self.endDate = endDate
     self.photoData = photoData
-    self.createBy = createBy
+    self.createdBy = createdBy
     self.createdDate = createdDate
     self.updatedDate = updatedDate
     self.race = race

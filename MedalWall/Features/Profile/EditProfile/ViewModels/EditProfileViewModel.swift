@@ -18,10 +18,10 @@ final class EditProfileViewModel {
   var birthday: Date
   var isBirthdaySet: Bool
   
-  private let profile: AppUser
+  private let profile: User
   
   // MARK: - Init
-  init(profile: AppUser) {
+  init(profile: User) {
     self.profile = profile
     self.photo = nil
     self.userName = UserName(
@@ -66,7 +66,7 @@ final class EditProfileViewModel {
   }
   
   /// Returns a copy of the profile with the current draft values applied.
-  func makeUpdatedUser() -> AppUser {
+  func makeUpdatedUser() -> User {
     var updated = profile
     updated.firstName = userName.trimmedFirstName
     updated.lastName = userName.trimmedLastName.isEmpty ? nil : userName.trimmedLastName

@@ -22,9 +22,9 @@ struct ProfileView: View {
     NavigationStack {
       ScrollView {
         ProfileHeaderSection(
-          photoUrl: userManager.currentAppUser?.photoUrl,
+          photoUrl: userManager.currentUser?.photoUrl,
           userName: userManager.currentUserName,
-          bio: userManager.currentAppUser?.bio
+          bio: userManager.currentUser?.bio
         )
         
         ProfileSummarySection(
@@ -68,8 +68,8 @@ struct ProfileView: View {
         }
       } // toolbar
       .sheet(isPresented: $isPresentingEditProfile) {
-        if let appUser = userManager.currentAppUser {
-          EditProfileView(profile: appUser)
+        if let user = userManager.currentUser {
+          EditProfileView(profile: user)
         }
       }
     } // NavigationStack
@@ -77,8 +77,6 @@ struct ProfileView: View {
 }
 
 #Preview(traits: .sampleData) {
-  @Previewable @Environment(\.modelContext) var modelContext
-  
   ProfileView()
-    .environment(UserManager(modelContext: modelContext))
+    .environment(UserManager())
 }

@@ -165,19 +165,15 @@ struct EditRaceView: View {
 }
 
 #Preview("Add mode") {
-  @Previewable @Environment(\.modelContext) var modelContext
-  
   NavigationStack {
     EditRaceView(mode: .add, race: Race.sampleData.first!)
   }
-  .environment(UserManager(modelContext: modelContext))
+  .environment(UserManager())
 }
 
 #Preview("Edit mode") {
-  @Previewable @Environment(\.modelContext) var modelContext
-  
   NavigationStack {
     EditRaceView(mode: .edit, race: Race.sampleData.first!)
   }
-  .environment(UserManager(modelContext: modelContext))
+  .environment(UserManager())
 }

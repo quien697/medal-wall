@@ -7,7 +7,6 @@
 
 import SwiftUI
 import PhotosUI
-import SwiftData
 
 struct EditProfileView: View {
   // MARK: - Environment
@@ -24,7 +23,7 @@ struct EditProfileView: View {
   @State private var shouldDismiss: Bool = false
   
   // MARK: - Init
-  init(profile: AppUser) {
+  init(profile: User) {
     self._viewModel = State(initialValue: EditProfileViewModel(profile: profile))
   }
   
@@ -87,7 +86,7 @@ struct EditProfileView: View {
                   updatedUser.photoUrl = nil
                 }
                 let updatedUserPhoto = viewModel.isPhotoChanged ? viewModel.photo : nil
-                try await userManager.updateAppUser(updatedUser, photo: updatedUserPhoto)
+                try await userManager.updateUser(updatedUser, photo: updatedUserPhoto)
                 dismiss()
               } catch {
                 shouldDismiss = true
@@ -135,7 +134,7 @@ struct EditProfileView: View {
 }
 
 #Preview {
-  EditProfileView(profile: AppUser(
+  EditProfileView(profile: User(
     uid: "preview",
     email: "preview@example.com",
     firstName: "John",
@@ -147,5 +146,5 @@ struct EditProfileView: View {
     createdAt: .now,
     updatedAt: nil
   ))
-  .environment(UserManager(modelContext: try! ModelContainer(for: User.self).mainContext))
+  .environment(UserManager())
 }

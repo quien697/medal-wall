@@ -86,7 +86,6 @@ struct LoginView: View {
 }
 
 #Preview {
-  @Previewable @Environment(\.modelContext) var modelContext
   LoginView()
-    .environment(UserManager(modelContext: modelContext))
+    .environment(UserManager())
 }

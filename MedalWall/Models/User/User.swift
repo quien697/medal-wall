@@ -1,5 +1,5 @@
 //
-//  AppUser.swift
+//  User.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-04-28.
@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseAuth
 
-struct AppUser: Codable {
+struct User: Codable {
   let uid: String
   let email: String?
   var firstName: String?
@@ -21,8 +21,8 @@ struct AppUser: Codable {
   var updatedAt: Date?
 }
 
-extension AppUser {
-  /// Creates a new AppUser from Firebase Auth on first sign-in.
+extension User {
+  /// Creates a new User from Firebase Auth on first sign-in.
   /// firstName/lastName are seeded separately from the provider via UserDefaults.
   init(firebaseUser: FirebaseAuth.User) {
     uid = firebaseUser.uid
@@ -36,11 +36,11 @@ extension AppUser {
     createdAt = Date()
     updatedAt = nil
   }
-
+  
   var userName: UserName {
     UserName(firstName: firstName ?? "", lastName: lastName ?? "")
   }
-
+  
   /// Displays firstName lastName with a space. Falls back to "Runner" if both are empty.
   var name: String { userName.fullName }
 }

@@ -11,8 +11,8 @@ import UIKit
 extension Race {
   @MainActor
   static let sampleData: [Race] = {
-    let userId = User.guest.id
-    
+    let userID = "preview"
+
     let taipei: Race = Race(
       name: "Taipei Marathon",
       photoData: UIImage(named: "taipei-marathon")?.jpegData(compressionQuality: 0.9),
@@ -21,7 +21,7 @@ extension Race {
         city: "Taipei"
       ),
       url: "taipeicitymarathon.com",
-      createBy: userId
+      createdBy: userID
     )
     
     let taipeiDate2019 = DateComponents(calendar: .current, year: 2019, month: 12, day: 15)
@@ -30,7 +30,7 @@ extension Race {
       startDate: taipeiDate2019.date!,
       endDate: taipeiDate2019.date!,
       photoData: UIImage(named: "taipei-marathon-2019")?.jpegData(compressionQuality: 0.9),
-      createBy: userId,
+      createdBy: userID,
       race: taipei,
       categories: []
     )
@@ -40,7 +40,7 @@ extension Race {
       year: taipeiDate2020.year!,
       startDate: taipeiDate2020.date!,
       endDate: taipeiDate2020.date!,
-      createBy: userId,
+      createdBy: userID,
       race: taipei,
       categories: []
     )
@@ -51,7 +51,7 @@ extension Race {
       year: taipeiStartDate2025.year!,
       startDate: taipeiStartDate2025.date!,
       endDate: taipeiEndDate2025.date!,
-      createBy: userId,
+      createdBy: userID,
       race: taipei,
       categories: []
     )
@@ -104,7 +104,7 @@ extension Race {
         city: "Vancouver"
       ),
       url: "bmovanmarathon.ca/",
-      createBy: userId
+      createdBy: userID
     )
     
     let vancouverDate2022 = DateComponents(calendar: .current, year: 2022, month: 5, day: 1)
@@ -112,7 +112,7 @@ extension Race {
       year: vancouverDate2022.year!,
       startDate: vancouverDate2022.date!,
       endDate: vancouverDate2022.date!,
-      createBy: userId,
+      createdBy: userID,
       race: vancouver,
       categories: []
     )
@@ -122,7 +122,7 @@ extension Race {
       year: vancouverDate2026.year!,
       startDate: vancouverDate2026.date!,
       endDate: vancouverDate2026.date!,
-      createBy: userId,
+      createdBy: userID,
       race: vancouver,
       categories: []
     )

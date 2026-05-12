@@ -48,8 +48,6 @@ struct SettingsView: View {
 }
 
 #Preview {
-  @Previewable @Environment(\.modelContext) var modelContext
-  
   SettingsView()
-    .environment(UserManager(modelContext: modelContext))
+    .environment(UserManager())
 }

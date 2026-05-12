@@ -20,7 +20,6 @@ struct MedalWallApp: App {
   
   var sharedModelContainer: ModelContainer = {
     let schema = Schema([
-      User.self,
       Race.self,
       RaceEdition.self,
       RaceCategory.self,
@@ -61,9 +60,7 @@ struct MedalWallApp: App {
       }
       .task {
         guard userManager == nil else { return }
-        
-        let context = ModelContext(sharedModelContainer)
-        userManager = UserManager(modelContext: context)
+        userManager = UserManager()
       }
     } // WindowGroup
     .modelContainer(sharedModelContainer)

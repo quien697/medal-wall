@@ -6,19 +6,15 @@
 //
 
 import SwiftUI
-import SwiftData
 import FirebaseAuth
 
 @Observable
 class UserManager {
   // MARK: - Properties
-  private let repository: UserRepository
-  private let firestoreRepository = UserFirestoreRepository()
-  private let storageService = StorageService()
-  private let context: ModelContext
+  private let repository = UserFirestoreRepository()
   private let authService = AuthService()
-  private(set) var firebaseUser: FirebaseAuth.User?
-  private(set) var currentAppUser: AppUser?
+  private let storageService = StorageService()
+  private var firebaseUser: FirebaseAuth.User?
   private(set) var currentUser: User?
   private(set) var isLoadingAuth = true
   
@@ -26,9 +22,7 @@ class UserManager {
   var isLoggedIn: Bool { firebaseUser != nil }
   
   // MARK: - Init
-  init(modelContext: ModelContext) {
-    self.context = modelContext
-    self.repository = UserRepository(context: modelContext)
+  init() {
     addAuthListener()
   }
   
@@ -53,23 +47,19 @@ class UserManager {
     try authService.signOut()
   }
   
-  /// Persists an updated AppUser to Firestore, uploading a new user avatar to Storage if provided.
-  func updateAppUser(_ user: AppUser, photo: UIImage? = nil) async throws {
+  /// Persists an updated profile to Firestore, uploading a new photo to Storage first if provided.
+  func updateUser(_ user: User, photo: UIImage? = nil) async throws {
     var updatedUser = user
     if let photo {
       updatedUser.photoUrl = try await storageService.uploadUserAvatar(uid: user.uid, image: photo)
     }
-    try await firestoreRepository.updateUser(updatedUser)
-    self.currentAppUser = updatedUser
-  }
-  
-  /// Updates the local SwiftData user reference, e.g. after a profile edit.
-  func updateUser(_ user: User) {
-    self.currentUser = user
+    try await repository.updateUser(updatedUser)
+    self.currentUser = updatedUser
   }
   
   // MARK: - Private Functions
   
+  /// Registers a Firebase Auth state listener; called once on init.
   private func addAuthListener() {
     _ = Auth.auth().addStateDidChangeListener { [weak self] _, user in
       Task { [weak self] in
@@ -78,7 +68,6 @@ class UserManager {
         if let user {
           await self.loadOrFetchUser(firebaseUser: user)
         } else {
-          self.currentAppUser = nil
           self.currentUser = nil
         }
         self.isLoadingAuth = false
@@ -86,28 +75,24 @@ class UserManager {
     }
   }
   
+  /// Loads the Firestore profile for the signed-in user, or creates one if it doesn't exist yet.
   private func loadOrFetchUser(firebaseUser: FirebaseAuth.User) async {
     do {
-      if let existing = try await firestoreRepository.fetchUser(uid: firebaseUser.uid) {
-        self.currentAppUser = existing
+      if let existing = try await repository.fetchUser(uid: firebaseUser.uid) {
+        self.currentUser = existing
       } else {
-        let newUser = AppUser(firebaseUser: firebaseUser)
-        try await firestoreRepository.createUser(newUser)
-        self.currentAppUser = newUser
+        let newUser = User(firebaseUser: firebaseUser)
+        try await repository.createUser(newUser)
+        self.currentUser = newUser
       }
     } catch {
-      self.currentAppUser = AppUser(firebaseUser: firebaseUser)
+      self.currentUser = User(firebaseUser: firebaseUser)
     }
-    self.loadUser()
-  }
-  
-  private func loadUser() {
-    self.currentUser = try? repository.getUser()
   }
 }
 
 // MARK: - Convenience
 extension UserManager {
-  var currentUserID: UUID? { currentUser?.id }
-  var currentUserName: String { currentAppUser?.name ?? "Runner" }
+  var currentUserID: String? { firebaseUser?.uid }
+  var currentUserName: String { currentUser?.name ?? "Runner" }
 }

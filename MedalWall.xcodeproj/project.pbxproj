@@ -66,7 +66,6 @@
 			membershipExceptions = (
 				Data/MedalRepository.swift,
 				Data/RaceRepository.swift,
-				Data/UserRepository.swift,
 				Features/Profile/EditProfile/ViewModels/EditProfileViewModel.swift,
 				Features/Race/EditRace/ViewModels/EditRaceViewModel.swift,
 				Features/Race/EditRaceEdition/ViewModels/EditRaceEditionViewModel.swift,
@@ -86,14 +85,11 @@
 				Models/Race/RaceFilter.swift,
 				Models/Race/RaceLocation.swift,
 				Models/Race/RaceSort.swift,
-				Models/User/Entities/User.swift,
-				"Models/User/Entities/User+Computed.swift",
 				Models/User/Gender.swift,
 				Models/User/UserName.swift,
 				Resources/DefaultDataSeeder.swift,
 				"Resources/SampleData/Medal+SampleData.swift",
 				"Resources/SampleData/Race+SampleData.swift",
-				"Resources/SampleData/User+SampleData.swift",
 				Shared/Errors/AppError.swift,
 				Shared/Errors/ErrorWrapper.swift,
 			);

@@ -90,7 +90,7 @@ final class EditRaceViewModel {
   /// Only deletes removed categories and inserts new ones.
   /// Syncs editions on an existing race by diffing against drafts.
   /// Deletes removed editions, updates existing ones, and adds new ones.
-  private func syncEditions(on race: Race, with drafts: [DraftRaceEdition], by userId: UUID) throws {
+  private func syncEditions(on race: Race, with drafts: [DraftRaceEdition], by userID: String) throws {
     let sourceEditionIds = Set(drafts.compactMap { $0.sourceEditionId })
     
     // Delete editions removed from the draft list
@@ -115,7 +115,7 @@ final class EditRaceViewModel {
           startDate: draft.startDate,
           endDate: draft.endDate,
           photoData: draft.photoData,
-          createBy: userId,
+          createdBy: userID,
           race: race,
           categories: []
         )
@@ -149,7 +149,7 @@ final class EditRaceViewModel {
   
   /// Applies the draft changes to the model
   /// - Throws: AppError if repository is not configured or save fails
-  func save(by userId: UUID) throws {
+  func save(by userID: String) throws {
     let race = if let race = self.race {
       race
     } else {
@@ -163,7 +163,7 @@ final class EditRaceViewModel {
           district: district.isEmpty ? nil : district
         ),
         url: url.isEmpty ? nil : url,
-        createBy: userId
+        createdBy: userID
       )
     }
     
@@ -180,7 +180,7 @@ final class EditRaceViewModel {
       race.updatedDate = .now
     }
     
-    try syncEditions(on: race, with: editions, by: userId)
+    try syncEditions(on: race, with: editions, by: userID)
     try repository.save()
   }
 }

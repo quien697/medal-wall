@@ -32,7 +32,7 @@ final class Medal {
   var note: String?
   var tags: [String]
 
-  @Relationship var user: User
+  var userID: String
   @Relationship(deleteRule: .cascade, inverse: \EventPhoto.medal)
   var eventPhotos: [EventPhoto] = []
 
@@ -54,7 +54,7 @@ final class Medal {
     genderTotal: Int? = nil,
     note: String? = nil,
     tags: [String] = [],
-    user: User,
+    userID: String,
     eventPhotos: [EventPhoto] = []
   ) {
     self.id = id
@@ -78,7 +78,7 @@ final class Medal {
     self.genderTotal = genderTotal
     self.note = note
     self.tags = tags
-    self.user = user
+    self.userID = userID
     self.eventPhotos = eventPhotos
   }
 }

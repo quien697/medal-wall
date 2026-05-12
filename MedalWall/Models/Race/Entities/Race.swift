@@ -18,7 +18,7 @@ final class Race {
   var city: String
   var district: String?
   var url: String?
-  var createBy: UUID
+  var createdBy: String
   var createdDate: Date
   var updatedDate: Date
   
@@ -31,7 +31,7 @@ final class Race {
     photoData: Data? = nil,
     location: RaceLocation,
     url: String? = nil,
-    createBy: UUID,
+    createdBy: String,
     createdDate: Date = .now,
     updatedDate: Date = .now,
     editions: [RaceEdition] = []
@@ -44,7 +44,7 @@ final class Race {
     self.city = location.city
     self.district = location.district
     self.url = url
-    self.createBy = createBy
+    self.createdBy = createdBy
     self.createdDate = createdDate
     self.updatedDate = updatedDate
     self.editions = editions
