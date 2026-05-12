@@ -8,15 +8,39 @@
 import Foundation
 import FirebaseAuth
 
-struct AppUser {
+struct AppUser: Codable {
   let uid: String
   let email: String?
-  let displayName: String
+  var firstName: String?
+  var lastName: String?
+  var photoUrl: String?
+  var bio: String?
+  var gender: Gender?
+  var birthday: Date?
+  let createdAt: Date
+  var updatedAt: Date?
+}
 
+extension AppUser {
+  /// Creates a new AppUser from Firebase Auth on first sign-in.
+  /// firstName/lastName are seeded separately from the provider via UserDefaults.
   init(firebaseUser: FirebaseAuth.User) {
     uid = firebaseUser.uid
     email = firebaseUser.email
-    let name = firebaseUser.displayName ?? ""
-    displayName = name.isEmpty ? "Runner" : name
+    firstName = nil
+    lastName = nil
+    photoUrl = nil
+    bio = nil
+    gender = nil
+    birthday = nil
+    createdAt = Date()
+    updatedAt = nil
   }
+
+  var userName: UserName {
+    UserName(firstName: firstName ?? "", lastName: lastName ?? "")
+  }
+
+  /// Displays firstName lastName with a space. Falls back to "Runner" if both are empty.
+  var name: String { userName.fullName }
 }

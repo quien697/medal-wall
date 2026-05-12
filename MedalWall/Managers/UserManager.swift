@@ -13,14 +13,15 @@ import FirebaseAuth
 class UserManager {
   // MARK: - Properties
   private let repository: UserRepository
+  private let firestoreRepository = UserFirestoreRepository()
   private let context: ModelContext
   private let authService = AuthService()
   private(set) var firebaseUser: FirebaseAuth.User?
+  private(set) var currentAppUser: AppUser?
   private(set) var currentUser: User?
   private(set) var isLoadingAuth = true
 
   // MARK: - Computed
-  var currentAppUser: AppUser? { firebaseUser.map { AppUser(firebaseUser: $0) } }
   var isLoggedIn: Bool { firebaseUser != nil }
 
   // MARK: - Init
@@ -51,7 +52,13 @@ class UserManager {
     try authService.signOut()
   }
 
-  /// Updates the local SwiftData user reference, e.g. after an edit.
+  /// Persists an updated AppUser to Firestore, uploading a new avatar to Storage if provided.
+  func updateAppUser(_ user: AppUser) async throws {
+    try await firestoreRepository.updateUser(user)
+    self.currentAppUser = user
+  }
+
+  /// Updates the local SwiftData user reference, e.g. after a profile edit.
   func updateUser(_ user: User) {
     self.currentUser = user
   }
@@ -63,14 +70,30 @@ class UserManager {
       Task { [weak self] in
         guard let self else { return }
         self.firebaseUser = user
-        if user != nil {
-          self.loadUser()
+        if let user {
+          await self.loadOrFetchUser(firebaseUser: user)
         } else {
+          self.currentAppUser = nil
           self.currentUser = nil
         }
         self.isLoadingAuth = false
       }
     }
+  }
+
+  private func loadOrFetchUser(firebaseUser: FirebaseAuth.User) async {
+    do {
+      if let existing = try await firestoreRepository.fetchUser(uid: firebaseUser.uid) {
+        self.currentAppUser = existing
+      } else {
+        let newUser = AppUser(firebaseUser: firebaseUser)
+        try await firestoreRepository.createUser(newUser)
+        self.currentAppUser = newUser
+      }
+    } catch {
+      self.currentAppUser = AppUser(firebaseUser: firebaseUser)
+    }
+    self.loadUser()
   }
 
   private func loadUser() {
@@ -81,5 +104,5 @@ class UserManager {
 // MARK: - Convenience
 extension UserManager {
   var currentUserID: UUID? { currentUser?.id }
-  var userName: String { currentAppUser?.displayName ?? "Runner" }
+  var currentUserName: String { currentAppUser?.name ?? "Runner" }
 }

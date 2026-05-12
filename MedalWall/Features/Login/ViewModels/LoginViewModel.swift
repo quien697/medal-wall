@@ -42,7 +42,7 @@ final class LoginViewModel {
   }
   
   // MARK: Functions - Sign in with Email link
-
+  
   /// Shows the email sign-in sheet if the device is online, otherwise surfaces a connection error.
   func signInWithEmailLink() async {
     if await isConnected() {
@@ -51,7 +51,7 @@ final class LoginViewModel {
       error = .noInternetConnection
     }
   }
-
+  
   /// Sends a Firebase sign-in link to the given email address.
   func sendEmailLink() async {
     isLoading = true

@@ -12,27 +12,11 @@ import GoogleSignIn
 
 final class AuthService {
   static let pendingEmailSignInKey = "pendingEmailSignIn"
-
-  // MARK: - Common
+  
+  // MARK: - Functions
   
   func signOut() throws {
     try Auth.auth().signOut()
-  }
-  
-  /// Updates the current Firebase user's `displayName` from Apple's `PersonNameComponents`.
-  /// Only writes if `displayName` is not already set — Apple provides `fullName` on the first sign-in only.
-  func updateDisplayName(with fullName: PersonNameComponents?) async {
-    guard let user = Auth.auth().currentUser else { return }
-    guard user.displayName == nil || user.displayName?.isEmpty == true else { return }
-    guard let fullName else { return }
-    
-    let displayName = PersonNameComponentsFormatter().string(from: fullName)
-      .trimmingCharacters(in: .whitespaces)
-    guard !displayName.isEmpty else { return }
-    
-    let changeRequest = user.createProfileChangeRequest()
-    changeRequest.displayName = displayName
-    changeRequest.commitChanges { _ in }
   }
   
   /// Reloads the current user from Firebase to verify the account still exists.
@@ -81,9 +65,8 @@ final class AuthService {
       rawNonce: rawNonce,
       fullName: fullName
     )
-    let result = try await Auth.auth().signIn(with: credential)
-    await updateDisplayName(with: fullName)
-    return result
+    
+    return try await Auth.auth().signIn(with: credential)
   }
   
   // MARK: - Sign in with google
@@ -91,6 +74,7 @@ final class AuthService {
   @discardableResult
   func signInWithGoogle(idToken: String, accessToken: String) async throws -> AuthDataResult {
     let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
+    
     return try await Auth.auth().signIn(with: credential)
   }
 }

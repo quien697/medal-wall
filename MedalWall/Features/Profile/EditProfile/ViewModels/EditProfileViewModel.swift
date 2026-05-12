@@ -6,52 +6,44 @@
 //
 
 import SwiftUI
-import SwiftData
 
 @Observable
-class EditProfileViewModel {
-  var userName: UserName = UserName(firstName: "", lastName: "")
+final class EditProfileViewModel {
+  // MARK: - Properties
+  var userName: UserName
   var avatarData: Data? = nil
   var avatar: UIImage? = nil
-  var bio: String = ""
-  var gender: Gender? = nil
-  var birthday: Date = .now
-  var isBirthdaySet: Bool = false
+  var bio: String
+  var gender: Gender?
+  var birthday: Date
+  var isBirthdaySet: Bool
   
-  let mode: ItemEditMode
-  private var repository: UserRepository?
-  private let profile: User?
+  private let profile: AppUser
   
-  init(mode: ItemEditMode, profile: User?) {
-    self.mode = mode
+  // MARK: - Init
+  init(profile: AppUser) {
     self.profile = profile
-    
-    if let profile {
-      self.userName = UserName(
-        firstName: profile.firstName,
-        lastName: profile.lastName
-      )
-      self.avatarData = profile.avatarData
-      self.avatar = profile.avatar
-      self.bio = profile.bio ?? ""
-      self.gender = profile.genderEnum
-      if let birthday = profile.birthday {
-        self.birthday = birthday
-        self.isBirthdaySet = true
-      }
+    self.userName = UserName(
+      firstName: profile.firstName ?? "",
+      lastName: profile.lastName ?? ""
+    )
+    self.bio = profile.bio ?? ""
+    self.gender = profile.gender
+    if let birthday = profile.birthday {
+      self.birthday = birthday
+      self.isBirthdaySet = true
+    } else {
+      self.birthday = .now
+      self.isBirthdaySet = false
     }
   }
   
+  // MARK: - Computed
   var isFormValid: Bool {
-    !userName.trimmedFirstName.isEmpty &&
-    !userName.trimmedLastName.isEmpty
+    !userName.trimmedFirstName.isEmpty
   }
   
   // MARK: - Functions
-  
-  func configure(context: ModelContext) {
-    self.repository = UserRepository(context: context)
-  }
   
   func updatePhoto(with uiImage: UIImage) {
     self.avatarData = uiImage.pngData()
@@ -63,28 +55,14 @@ class EditProfileViewModel {
     self.avatar = nil
   }
   
-  func save() throws {
-    guard let repository else { throw AppError.contextNotAttached }
-    
-    if let profile {
-      profile.firstName = userName.trimmedFirstName
-      profile.lastName = userName.trimmedLastName
-      profile.avatarData = avatarData
-      profile.bio = bio
-      profile.gender = gender?.rawValue
-      profile.birthday = isBirthdaySet ? birthday : nil
-      profile.updatedDate = Date()
-    } else {
-      let newProfile = User(
-        name: userName,
-        avatarData: avatarData,
-        bio: bio,
-        gender: gender,
-        birthday: isBirthdaySet ? birthday : nil
-      )
-      try repository.insertUser(newProfile)
-    }
-    
-    try repository.save()
+  /// Returns a copy of the profile with the current draft values applied.
+  func makeUpdatedUser() -> AppUser {
+    var updated = profile
+    updated.firstName = userName.trimmedFirstName
+    updated.lastName = userName.trimmedLastName.isEmpty ? nil : userName.trimmedLastName
+    updated.bio = bio.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : bio.trimmingCharacters(in: .whitespacesAndNewlines)
+    updated.gender = gender
+    updated.birthday = isBirthdaySet ? birthday : nil
+    return updated
   }
 }

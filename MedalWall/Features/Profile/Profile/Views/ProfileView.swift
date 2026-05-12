@@ -13,6 +13,7 @@ struct ProfileView: View {
   @Environment(UserManager.self) private var userManager
   // MARK: - State
   @State private var viewModel = ProfileViewModel()
+  @State private var isPresentingEditProfile = false
   // MARK: - Query
   @Query private var medals: [Medal]
 
@@ -22,8 +23,8 @@ struct ProfileView: View {
       ScrollView {
         ProfileHeaderSection(
           avatar: userManager.currentUser?.avatar,
-          userName: userManager.userName,
-          bio: userManager.currentUser?.bio
+          userName: userManager.currentUserName,
+          bio: userManager.currentAppUser?.bio
         )
 
         ProfileSummarySection(
@@ -53,7 +54,24 @@ struct ProfileView: View {
             Image(systemName: "gearshape")
           }
         }
+
+        ToolbarItem(placement: .topBarTrailing) {
+          Menu {
+            Button {
+              isPresentingEditProfile = true
+            } label: {
+              Label("Edit Profile", systemImage: "square.and.pencil")
+            }
+          } label: {
+            Image(systemName: "ellipsis")
+          }
+        }
       } // toolbar
+      .sheet(isPresented: $isPresentingEditProfile) {
+        if let appUser = userManager.currentAppUser {
+          EditProfileView(profile: appUser)
+        }
+      }
     } // NavigationStack
   }
 }
