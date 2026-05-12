@@ -10,13 +10,16 @@ import SwiftUI
 struct AvatarImage: View {
   private let systemImageName: String = "person.fill"
   let photo: UIImage?
+  let photoUrl: String?
   let imageType: ImageType
-  
+
   init(
-    photo: UIImage?,
+    photo: UIImage? = nil,
+    photoUrl: String? = nil,
     imageType: ImageType = .avatar
   ) {
     self.photo = photo
+    self.photoUrl = photoUrl
     self.imageType = imageType
   }
   
@@ -65,6 +68,17 @@ struct AvatarImage: View {
           if let uiImage = photo {
             Image(uiImage: uiImage)
               .styled(as: imageType)
+          } else if let urlString = photoUrl, let url = URL(string: urlString) {
+            AsyncImage(url: url) { phase in
+              switch phase {
+              case .success(let image):
+                image.styled(as: imageType)
+              default:
+                Image(systemName: systemImageName)
+                  .font(.system(size: imageType.size.width / 2, weight: .semibold))
+                  .foregroundColor(.white)
+              }
+            }
           } else {
             Image(systemName: systemImageName)
               .font(.system(size: imageType.size.width / 2, weight: .semibold))

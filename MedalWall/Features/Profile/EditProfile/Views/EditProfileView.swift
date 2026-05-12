@@ -33,10 +33,10 @@ struct EditProfileView: View {
     NavigationStack {
       Form {
         EditPhotoPicker(
-          photo: viewModel.avatar,
-          hint: "Tap to \(viewModel.avatar == nil ? "add a" : "update your") profile photo",
+          photo: viewModel.photo,
+          hint: "Tap to \(viewModel.photo == nil ? "add a" : "update your") profile photo",
           photoView: {
-            AvatarImage(photo: viewModel.avatar)
+            AvatarImage(photo: viewModel.photo)
           },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
@@ -65,6 +65,9 @@ struct EditProfileView: View {
       .scrollContentBackground(.hidden)
       .background(Color.Background.primary)
       .disabled(isLoading)
+      .task {
+        await viewModel.loadExistingPhoto()
+      }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .close) {
@@ -77,9 +80,14 @@ struct EditProfileView: View {
             Task {
               isLoading = true
               defer { isLoading = false }
+              
               do {
                 var updatedUser = viewModel.makeUpdatedUser()
-                try await userManager.updateAppUser(updatedUser)
+                if viewModel.isPhotoChanged && viewModel.photo == nil {
+                  updatedUser.photoUrl = nil
+                }
+                let updatedUserPhoto = viewModel.isPhotoChanged ? viewModel.photo : nil
+                try await userManager.updateAppUser(updatedUser, photo: updatedUserPhoto)
                 dismiss()
               } catch {
                 shouldDismiss = true

@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct ProfileHeaderSection: View {
-  let avatar: UIImage?
+  let photoUrl: String?
   let userName: String
   let bio: String?
   
   var body: some View {
     SectionContainer {
       HStack(alignment: .top) {
-        AvatarImage(photo: avatar)
+        AvatarImage(photoUrl: photoUrl)
         
         VStack(alignment: .leading, spacing: 8) {
           Text("\(userName)")
@@ -39,9 +39,8 @@ struct ProfileHeaderSection: View {
 
 #Preview {
   VStack {
-    ProfileHeaderSection(avatar: UIImage(named: "quien"), userName: "Tsung-Hsun Liu", bio: "I am here to cross the finish line.")
-    
-    ProfileHeaderSection(avatar: nil, userName: "Tsung-Hsun Liu", bio: "Fike it till make it.")
+    ProfileHeaderSection(photoUrl: nil, userName: "Tsung-Hsun Liu", bio: "I am here to cross the finish line.")
+    ProfileHeaderSection(photoUrl: nil, userName: "Tsung-Hsun Liu", bio: "Fake it till you make it.")
   }
-  .background(Color.backgroundPrimary)
+  .background(Color.Background.primary)
 }

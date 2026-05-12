@@ -11,8 +11,8 @@ import SwiftUI
 final class EditProfileViewModel {
   // MARK: - Properties
   var userName: UserName
-  var avatarData: Data? = nil
-  var avatar: UIImage? = nil
+  var photo: UIImage?
+  private(set) var isPhotoChanged = false
   var bio: String
   var gender: Gender?
   var birthday: Date
@@ -23,6 +23,7 @@ final class EditProfileViewModel {
   // MARK: - Init
   init(profile: AppUser) {
     self.profile = profile
+    self.photo = nil
     self.userName = UserName(
       firstName: profile.firstName ?? "",
       lastName: profile.lastName ?? ""
@@ -45,14 +46,23 @@ final class EditProfileViewModel {
   
   // MARK: - Functions
   
+  func loadExistingPhoto() async {
+    guard let urlString = profile.photoUrl,
+          let url = URL(string: urlString),
+          let (data, _) = try? await URLSession.shared.data(from: url),
+          let image = UIImage(data: data) else { return }
+    
+    photo = image
+  }
+  
   func updatePhoto(with uiImage: UIImage) {
-    self.avatarData = uiImage.pngData()
-    self.avatar = uiImage
+    photo = uiImage
+    isPhotoChanged = true
   }
   
   func clearPhoto() {
-    self.avatarData = nil
-    self.avatar = nil
+    photo = nil
+    isPhotoChanged = true
   }
   
   /// Returns a copy of the profile with the current draft values applied.

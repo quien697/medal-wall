@@ -16,17 +16,17 @@ struct ProfileView: View {
   @State private var isPresentingEditProfile = false
   // MARK: - Query
   @Query private var medals: [Medal]
-
+  
   // MARK: - Body
   var body: some View {
     NavigationStack {
       ScrollView {
         ProfileHeaderSection(
-          avatar: userManager.currentUser?.avatar,
+          photoUrl: userManager.currentAppUser?.photoUrl,
           userName: userManager.currentUserName,
           bio: userManager.currentAppUser?.bio
         )
-
+        
         ProfileSummarySection(
           totalMedals: viewModel.totalMedals(medals),
           fullCount: viewModel.fullCount(medals),
@@ -34,7 +34,7 @@ struct ProfileView: View {
           bestFullTime: viewModel.bestFullTime(medals),
           bestHalfTime: viewModel.bestHalfTime(medals)
         )
-
+        
         .padding(.bottom, 10)
       } // ScrollView
       .scrollIndicators(.hidden)
@@ -46,7 +46,7 @@ struct ProfileView: View {
         ToolbarItem(placement: .title) {
           ExpandedNavigationTitle(title: "Profile")
         }
-
+        
         ToolbarItem(placement: .topBarTrailing) {
           NavigationLink {
             SettingsView()
@@ -54,7 +54,7 @@ struct ProfileView: View {
             Image(systemName: "gearshape")
           }
         }
-
+        
         ToolbarItem(placement: .topBarTrailing) {
           Menu {
             Button {
@@ -78,7 +78,7 @@ struct ProfileView: View {
 
 #Preview(traits: .sampleData) {
   @Previewable @Environment(\.modelContext) var modelContext
-
+  
   ProfileView()
     .environment(UserManager(modelContext: modelContext))
 }
