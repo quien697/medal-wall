@@ -33,7 +33,7 @@ final class AuthService {
     }
   }
   
-  // MARK: - Sign in with Email Link
+  // MARK: - Functions -> Sign in with Email Link
   
   func sendSignInLink(to email: String) async throws {
     let authorizedDomain: String = "https://medal-wall-4697.firebaseapp.com"
@@ -52,7 +52,7 @@ final class AuthService {
     try await Auth.auth().signIn(withEmail: email, link: link)
   }
   
-  // MARK: - Sign in Apple
+  // MARK: - Functions -> Sign in Apple
   
   @discardableResult
   func signInWithApple(
@@ -69,7 +69,7 @@ final class AuthService {
     return try await Auth.auth().signIn(with: credential)
   }
   
-  // MARK: - Sign in with google
+  // MARK: - Functions -> Sign in with google
   
   @discardableResult
   func signInWithGoogle(idToken: String, accessToken: String) async throws -> AuthDataResult {

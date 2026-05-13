@@ -11,6 +11,8 @@ import UIKit
 final class StorageService {
   private let storage = Storage.storage()
   
+  // MARK: - Functions
+  
   /// Uploads a user avatar to Firebase Storage and returns the download URL.
   func uploadUserAvatar(uid: String, image: UIImage) async throws -> String {
     guard let data = image.jpegData(compressionQuality: 0.8) else {
