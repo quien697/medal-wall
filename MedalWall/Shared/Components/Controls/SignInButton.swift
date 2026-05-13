@@ -11,16 +11,19 @@ struct SignInButton: View {
   // MARK: - Properties
   private let icon: Image?
   private let title: String
+  private let isLoading: Bool
   private let action: () async -> Void
 
   // MARK: - Init
   init(
     icon: Image? = nil,
     title: String,
+    isLoading: Bool = false,
     action: @escaping () async -> Void
   ) {
     self.icon = icon
     self.title = title
+    self.isLoading = isLoading
     self.action = action
   }
 
@@ -32,13 +35,17 @@ struct SignInButton: View {
       }
     } label: {
       HStack(spacing: 10) {
-        if let icon {
+        if isLoading {
+          ProgressView()
+            .tint(Color.Text.primary)
+            .frame(width: 20, height: 20)
+        } else if let icon {
           icon
             .resizable()
             .scaledToFit()
             .frame(width: 20, height: 20)
         }
-        
+
         Text(title)
       } // HStack
       .frame(maxWidth: .infinity)
@@ -54,7 +61,7 @@ struct SignInButton: View {
 #Preview {
   VStack(spacing: 12) {
     SignInButton(icon: Image(systemName: "apple.logo"), title: "Continue with Apple") {}
-    SignInButton(title: "Continue with Google") {}
+    SignInButton(icon: Image(systemName: "apple.logo"), title: "Continue with Apple", isLoading: true) {}
     SignInButton(icon: Image(systemName: "envelope"), title: "Continue with Email") {}
   } // VStack
   .padding()

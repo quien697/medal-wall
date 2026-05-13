@@ -14,6 +14,7 @@ struct SignInWithEmailLinkView: View {
   @Binding var email: String
   let isEmailLinkSent: Bool
   let isEmailValid: Bool
+  let isSendingEmail: Bool
   let onSendLink: () async -> Void
   
   // MARK: - Body
@@ -29,6 +30,7 @@ struct SignInWithEmailLinkView: View {
           EmailInputSection(
             email: $email,
             isEmailValid: isEmailValid,
+            isSendingEmail: isSendingEmail,
             onSendLink: onSendLink
           )
         }
@@ -46,22 +48,38 @@ struct SignInWithEmailLinkView: View {
   }
 }
 
-#Preview("Email Input") {
+#Preview("Idel") {
   @Previewable @State var email = ""
+  
   SignInWithEmailLinkView(
     email: $email,
     isEmailLinkSent: false,
     isEmailValid: false,
+    isSendingEmail: false,
+    onSendLink: {}
+  )
+}
+
+#Preview("Sending") {
+  @Previewable @State var email = "you@example.com"
+  
+  SignInWithEmailLinkView(
+    email: $email,
+    isEmailLinkSent: false,
+    isEmailValid: true,
+    isSendingEmail: true,
     onSendLink: {}
   )
 }
 
 #Preview("Confirmation") {
   @Previewable @State var email = "quien697@gmail.com"
+  
   SignInWithEmailLinkView(
     email: $email,
     isEmailLinkSent: true,
     isEmailValid: true,
+    isSendingEmail: false,
     onSendLink: {}
   )
 }

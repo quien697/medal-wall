@@ -12,20 +12,29 @@ import AuthenticationServices
 import FirebaseCore
 import GoogleSignIn
 
+enum ActiveSignIn {
+  case apple, google
+}
+
 @Observable
 final class LoginViewModel {
   // MARK: - Properties
   private let authService = AuthService()
-  var isLoading = false
-  var error: AppError?
   var email = ""
+  var activeSignIn: ActiveSignIn?
+  var isSendingEmail = false
   var isEmailLinkSent = false
   var isPresentingEmailSignIn = false
+  var error: AppError?
   
   // MARK: - Computed
   var isEmailValid: Bool {
     let parts = email.split(separator: "@")
     return parts.count == 2 && parts[1].contains(".")
+  }
+  
+  var isSigningIn: Bool {
+    activeSignIn != nil
   }
   
   // MARK: - Functions
@@ -41,7 +50,7 @@ final class LoginViewModel {
     }
   }
   
-  // MARK: Functions - Sign in with Email link
+  // MARK: - Functions -> Sign in with Email link
   
   /// Shows the email sign-in sheet if the device is online, otherwise surfaces a connection error.
   func signInWithEmailLink() async {
@@ -54,8 +63,8 @@ final class LoginViewModel {
   
   /// Sends a Firebase sign-in link to the given email address.
   func sendEmailLink() async {
-    isLoading = true
-    defer { isLoading = false }
+    isSendingEmail = true
+    defer { isSendingEmail = false }
     
     do {
       try await authService.sendSignInLink(to: email)
@@ -72,7 +81,7 @@ final class LoginViewModel {
     isEmailLinkSent = false
   }
   
-  // MARK: Functions - Sign in with Apple
+  // MARK: - Functions -> Sign in with Apple
   
   /// Presents the Apple Sign-In sheet and signs the user in to Firebase.
   func signInWithApple() async {
@@ -103,8 +112,8 @@ final class LoginViewModel {
         return
       }
       
-      isLoading = true
-      defer { isLoading = false }
+      activeSignIn = .apple
+      defer { activeSignIn = nil }
       
       try await authService.signInWithApple(
         idTokenString: idTokenString,
@@ -158,13 +167,10 @@ final class LoginViewModel {
     return hashString
   }
   
-  // MARK: Functions - Sign in with Google
+  // MARK: - Functions -> Sign in with Google
   
   /// Presents the Google Sign-In sheet and signs the user in to Firebase.
   func signInWithGoogle() async {
-    isLoading = true
-    defer { isLoading = false }
-    
     guard let clientID = FirebaseApp.app()?.options.clientID else {
       self.error = .signInFailed
       return
@@ -184,6 +190,9 @@ final class LoginViewModel {
         self.error = .missingIdentityToken
         return
       }
+      
+      activeSignIn = .google
+      defer { activeSignIn = nil }
       
       let accessToken = result.user.accessToken.tokenString
       try await authService.signInWithGoogle(idToken: idToken, accessToken: accessToken)
