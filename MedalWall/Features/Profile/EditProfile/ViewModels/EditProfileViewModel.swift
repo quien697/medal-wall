@@ -41,7 +41,8 @@ final class EditProfileViewModel {
   
   // MARK: - Computed
   var isFormValid: Bool {
-    !userName.trimmedFirstName.isEmpty
+    !userName.trimmedFirstName.isEmpty &&
+    !userName.trimmedLastName.isEmpty
   }
   
   // MARK: - Functions
@@ -69,8 +70,9 @@ final class EditProfileViewModel {
   func makeUpdatedUser() -> User {
     var updated = profile
     updated.firstName = userName.trimmedFirstName
-    updated.lastName = userName.trimmedLastName.isEmpty ? nil : userName.trimmedLastName
-    updated.bio = bio.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : bio.trimmingCharacters(in: .whitespacesAndNewlines)
+    updated.lastName = userName.trimmedLastName
+    let updatedBio = bio.trimmingCharacters(in: .whitespacesAndNewlines)
+    updated.bio = updatedBio.isEmpty ? nil : updatedBio
     updated.gender = gender
     updated.birthday = isBirthdaySet ? birthday : nil
     return updated
