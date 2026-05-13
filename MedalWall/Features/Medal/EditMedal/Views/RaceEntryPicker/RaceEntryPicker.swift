@@ -54,7 +54,5 @@ struct RaceEntryPicker: View {
 }
 
 #Preview(traits: .sampleData) {
-  RaceEntryPicker { selection in
-    print("Selected: \(selection.selectionLabel)")
-  }
+  RaceEntryPicker { _ in }
 }

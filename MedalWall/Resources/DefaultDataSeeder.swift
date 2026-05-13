@@ -11,9 +11,6 @@ import SwiftData
 enum DefaultDataSeeder {
   
   static func seed(in context: ModelContext) throws {
-    if try context.fetch(FetchDescriptor<User>()).isEmpty {
-      try insertDefaultUser(in: context)
-    }
     if try context.fetch(FetchDescriptor<Race>()).isEmpty {
       try insertDefaultRaces(in: context)
     }
@@ -22,10 +19,6 @@ enum DefaultDataSeeder {
     }
     
     try context.save()
-  }
-  
-  private static func insertDefaultUser(in context: ModelContext) throws {
-    context.insert(User.guest)
   }
   
   private static func insertDefaultRaces(in context: ModelContext) throws {

@@ -6,42 +6,40 @@
 //
 
 import SwiftUI
-import SwiftData
 
 @Observable
-class EditProfileViewModel {
-  var userName: UserName = UserName(firstName: "", lastName: "")
-  var avatarData: Data? = nil
-  var avatar: UIImage? = nil
-  var bio: String = ""
-  var gender: Gender? = nil
-  var birthday: Date = .now
-  var isBirthdaySet: Bool = false
+final class EditProfileViewModel {
+  // MARK: - Properties
+  var userName: UserName
+  var photo: UIImage?
+  private(set) var isPhotoChanged = false
+  var bio: String
+  var gender: Gender?
+  var birthday: Date
+  var isBirthdaySet: Bool
   
-  let mode: ItemEditMode
-  private var repository: UserRepository?
-  private let profile: User?
+  private let profile: User
   
-  init(mode: ItemEditMode, profile: User?) {
-    self.mode = mode
+  // MARK: - Init
+  init(profile: User) {
     self.profile = profile
-    
-    if let profile {
-      self.userName = UserName(
-        firstName: profile.firstName,
-        lastName: profile.lastName
-      )
-      self.avatarData = profile.avatarData
-      self.avatar = profile.avatar
-      self.bio = profile.bio ?? ""
-      self.gender = profile.genderEnum
-      if let birthday = profile.birthday {
-        self.birthday = birthday
-        self.isBirthdaySet = true
-      }
+    self.photo = nil
+    self.userName = UserName(
+      firstName: profile.firstName ?? "",
+      lastName: profile.lastName ?? ""
+    )
+    self.bio = profile.bio ?? ""
+    self.gender = profile.gender
+    if let birthday = profile.birthday {
+      self.birthday = birthday
+      self.isBirthdaySet = true
+    } else {
+      self.birthday = .now
+      self.isBirthdaySet = false
     }
   }
   
+  // MARK: - Computed
   var isFormValid: Bool {
     !userName.trimmedFirstName.isEmpty &&
     !userName.trimmedLastName.isEmpty
@@ -49,42 +47,34 @@ class EditProfileViewModel {
   
   // MARK: - Functions
   
-  func configure(context: ModelContext) {
-    self.repository = UserRepository(context: context)
+  func loadExistingPhoto() async {
+    guard let urlString = profile.photoUrl,
+          let url = URL(string: urlString),
+          let (data, _) = try? await URLSession.shared.data(from: url),
+          let image = UIImage(data: data) else { return }
+    
+    photo = image
   }
   
   func updatePhoto(with uiImage: UIImage) {
-    self.avatarData = uiImage.pngData()
-    self.avatar = uiImage
+    photo = uiImage
+    isPhotoChanged = true
   }
   
   func clearPhoto() {
-    self.avatarData = nil
-    self.avatar = nil
+    photo = nil
+    isPhotoChanged = true
   }
   
-  func save() throws {
-    guard let repository else { throw AppError.contextNotAttached }
-    
-    if let profile {
-      profile.firstName = userName.trimmedFirstName
-      profile.lastName = userName.trimmedLastName
-      profile.avatarData = avatarData
-      profile.bio = bio
-      profile.gender = gender?.rawValue
-      profile.birthday = isBirthdaySet ? birthday : nil
-      profile.updatedDate = Date()
-    } else {
-      let newProfile = User(
-        name: userName,
-        avatarData: avatarData,
-        bio: bio,
-        gender: gender,
-        birthday: isBirthdaySet ? birthday : nil
-      )
-      try repository.insertUser(newProfile)
-    }
-    
-    try repository.save()
+  /// Returns a copy of the profile with the current draft values applied.
+  func makeUpdatedUser() -> User {
+    var updated = profile
+    updated.firstName = userName.trimmedFirstName
+    updated.lastName = userName.trimmedLastName
+    let updatedBio = bio.trimmingCharacters(in: .whitespacesAndNewlines)
+    updated.bio = updatedBio.isEmpty ? nil : updatedBio
+    updated.gender = gender
+    updated.birthday = isBirthdaySet ? birthday : nil
+    return updated
   }
 }

@@ -5,7 +5,7 @@
 //  Created by Quien on 2025-10-30.
 //
 
-enum Gender: String, CaseIterable {
+enum Gender: String, CaseIterable, Codable {
   case male
   case female
   

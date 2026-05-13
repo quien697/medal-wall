@@ -7,7 +7,17 @@
 
 import Foundation
 
-enum AppError: LocalizedError, Identifiable {
+enum AppError: LocalizedError, Identifiable, Equatable {
+  // Auth, Login Errors
+  case invalidCredential
+  case missingNonce
+  case missingIdentityToken
+  case nonceFailed(String)
+  case tokenSerializationFailed(String)
+  case signInFailed
+  case noInternetConnection
+  case sendEmailSignInLinkFailed(String)
+  
   // Repository / Persistence Errors
   case contextNotAttached
   case raceSaveFailed
@@ -50,6 +60,17 @@ enum AppError: LocalizedError, Identifiable {
       "Photo Load Failed"
     case .photoDataInvalid:
       "Photo Data Invalid"
+    case .sendEmailSignInLinkFailed:
+      "Send Email Sign-in Link Failed"
+    case .noInternetConnection:
+      "No Internet Connection"
+    case .invalidCredential,
+        .missingNonce,
+        .missingIdentityToken,
+        .nonceFailed(_),
+        .tokenSerializationFailed(_),
+        .signInFailed:
+      "Sign In Failed"
     case .unknown:
       "Unexpected Error"
     }
@@ -75,6 +96,22 @@ enum AppError: LocalizedError, Identifiable {
       "We couldn't load this photo."
     case .photoDataInvalid:
       "We couldn't process the selected image."
+    case .invalidCredential:
+      "Failed to get Apple ID credential."
+    case .missingNonce:
+      "Sign-in session expired."
+    case .missingIdentityToken:
+      "Failed to fetch identity token from Apple."
+    case .nonceFailed(let status):
+      "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(status)."
+    case .tokenSerializationFailed(let description):
+      "Failed to serialize token string from data: \(description)."
+    case .sendEmailSignInLinkFailed(let description):
+      "We couldn't send the sign-in link to your email. \(description)"
+    case .noInternetConnection:
+      "You're not connected to the internet."
+    case .signInFailed:
+      "We couldn't sign you in."
     case .unknown:
       "Something unexpected happened."
     }
@@ -96,6 +133,17 @@ enum AppError: LocalizedError, Identifiable {
       "Please try selecting the image again."
     case .photoDataInvalid:
       "Please try choosing a different image."
+    case .sendEmailSignInLinkFailed:
+      "Please check your email address and try again."
+    case .noInternetConnection:
+      "Please check your connection and try again."
+    case .invalidCredential,
+        .missingNonce,
+        .missingIdentityToken,
+        .nonceFailed(_),
+        .tokenSerializationFailed(_),
+        .signInFailed:
+      "Please try signing in again."
     case .unknown:
       "Please try again later."
     }

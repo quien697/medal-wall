@@ -7,14 +7,14 @@
 
 import SwiftUI
 import PhotosUI
-import SwiftData
 
 struct EditProfileView: View {
   // MARK: - Environment
-  @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
+  @Environment(UserManager.self) private var userManager
   // MARK: - State
   @State private var viewModel: EditProfileViewModel
+  @State private var isLoading = false
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingPhotoPicker: Bool = false
   @State private var isPresentingCropImageView: Bool = false
@@ -22,18 +22,20 @@ struct EditProfileView: View {
   @State private var rawPickedImage: UIImage?
   @State private var shouldDismiss: Bool = false
   
-  init(mode: ItemEditMode, profile: User? = nil) {
-    self._viewModel = State(initialValue: EditProfileViewModel(mode: mode, profile: profile))
+  // MARK: - Init
+  init(profile: User) {
+    self._viewModel = State(initialValue: EditProfileViewModel(profile: profile))
   }
   
+  // MARK: - Body
   var body: some View {
     NavigationStack {
       Form {
         EditPhotoPicker(
-          photo: viewModel.avatar,
-          hint: "Tap to \(viewModel.avatar == nil ? "add a" : "update your") profile photo",
+          photo: viewModel.photo,
+          hint: "Tap to \(viewModel.photo == nil ? "add a" : "update your") profile photo",
           photoView: {
-            AvatarImage(photo: viewModel.avatar)
+            AvatarImage(photo: viewModel.photo)
           },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
@@ -57,12 +59,13 @@ struct EditProfileView: View {
         
         EditProfileBioSection(bio: $viewModel.bio)
       } // Form
-      .navigationTitle("\(viewModel.mode.displayName) Profile")
+      .navigationTitle("Edit Profile")
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
       .background(Color.Background.primary)
-      .onAppear {
-        viewModel.configure(context: modelContext)
+      .disabled(isLoading)
+      .task {
+        await viewModel.loadExistingPhoto()
       }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
@@ -73,15 +76,25 @@ struct EditProfileView: View {
         
         ToolbarItem(placement: .confirmationAction) {
           Button(role: .confirm) {
-            do {
-              try viewModel.save()
-              dismiss()
-            } catch {
-              shouldDismiss = true
-              errorWrapper = ErrorWrapper(error: AppError.userSaveFailed)
+            Task {
+              isLoading = true
+              defer { isLoading = false }
+              
+              do {
+                var updatedUser = viewModel.makeUpdatedUser()
+                if viewModel.isPhotoChanged && viewModel.photo == nil {
+                  updatedUser.photoUrl = nil
+                }
+                let updatedUserPhoto = viewModel.isPhotoChanged ? viewModel.photo : nil
+                try await userManager.updateUser(updatedUser, photo: updatedUserPhoto)
+                dismiss()
+              } catch {
+                shouldDismiss = true
+                errorWrapper = ErrorWrapper(error: AppError.userSaveFailed)
+              }
             }
           }
-          .disabled(!viewModel.isFormValid)
+          .disabled(!viewModel.isFormValid || isLoading)
         }
       } // toolbar
       .photosPicker(
@@ -105,10 +118,7 @@ struct EditProfileView: View {
         selectedPhoto = nil
         rawPickedImage = nil
       }) {
-        CropImageView(
-          image: rawPickedImage,
-          cropShape: .circle
-        ) { croppedImage in
+        CropImageView(image: rawPickedImage, cropShape: .circle) { croppedImage in
           if let croppedImage {
             viewModel.updatePhoto(with: croppedImage)
           }
@@ -124,5 +134,17 @@ struct EditProfileView: View {
 }
 
 #Preview {
-  EditProfileView(mode: .edit, profile: User.guest)
+  EditProfileView(profile: User(
+    uid: "preview",
+    email: "preview@example.com",
+    firstName: "John",
+    lastName: "Doe",
+    photoUrl: nil,
+    bio: nil,
+    gender: nil,
+    birthday: nil,
+    createdAt: .now,
+    updatedAt: nil
+  ))
+  .environment(UserManager())
 }

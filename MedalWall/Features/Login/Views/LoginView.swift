@@ -10,54 +10,81 @@ import SwiftData
 
 struct LoginView: View {
   @Environment(UserManager.self) private var userManager
-  @State private var isLoading = false
+  @State private var viewModel = LoginViewModel()
+  @State private var errorWrapper: ErrorWrapper?
   
   var body: some View {
     ZStack {
       Color.Background.primary.ignoresSafeArea()
-      
-      if isLoading {
-        LoadingView(text: "Setting up...")
-      } else {
-        VStack {
-          Image(systemName: "medal.fill")
-            .font(.system(size: 100))
-            .foregroundStyle(Color.Gold.primary)
-            .padding(.bottom, 36)
-          
-          Text("Medal Wall")
-            .font(.largeTitle)
-            .foregroundStyle(Color.Text.primary)
-            .fontWeight(.heavy)
-            .padding(.bottom, 8)
-          
-          Text("Your personal race archive")
-            .font(.subheadline)
-            .foregroundStyle(Color.Text.secondary)
-          
-          Spacer()
-          
-          Button("Get Started with Guest") {
-            isLoading = true
-            
-            Task {
-              try? userManager.startAsGuest()
-            }
+
+      VStack {
+        Image(systemName: "medal.fill")
+          .font(.system(size: 100))
+          .foregroundStyle(Color.Gold.primary)
+          .padding(.bottom, 16)
+
+        Text("Medal Wall")
+          .font(.largeTitle)
+          .foregroundStyle(Color.Text.primary)
+          .fontWeight(.heavy)
+          .padding(.bottom, 8)
+
+        Text("Sign up or log in to start collecting your medals")
+          .font(.subheadline)
+          .foregroundStyle(Color.Text.secondary)
+          .multilineTextAlignment(.center)
+
+        VStack(spacing: 16) {
+          SignInButton(
+            icon: Image(systemName: "apple.logo"),
+            title: "Continue with Apple",
+            isLoading: viewModel.activeSignIn == .apple)
+          {
+            await viewModel.signInWithApple()
           }
-          .buttonStyle(.borderedProminent)
-          .controlSize(.large)
-          
+
+          SignInButton(
+            icon: Image("google-icon"),
+            title: "Continue with Google",
+            isLoading: viewModel.activeSignIn == .google)
+          {
+            await viewModel.signInWithGoogle()
+          }
+
+          SignInButton(
+            icon: Image(systemName: "envelope"),
+            title: "Continue with Email")
+          {
+            await viewModel.signInWithEmailLink()
+          }
         } // VStack
-        .padding(.top, 52)
-        .padding(.bottom, 36)
-      }
+        .allowsHitTesting(!viewModel.isSigningIn)
+        .padding(.top)
+        .padding(.horizontal, 16)
+      } // VStack
     } // ZStack
+    .sheet(isPresented: $viewModel.isPresentingEmailSignIn, onDismiss: viewModel.resetEmailFlow) {
+      SignInWithEmailLinkView(
+        email: $viewModel.email,
+        isEmailLinkSent: viewModel.isEmailLinkSent,
+        isEmailValid: viewModel.isEmailValid,
+        isSendingEmail: viewModel.isSendingEmail,
+        onSendLink: viewModel.sendEmailLink
+      )
+    }
+    .sheet(item: $errorWrapper) {
+      ErrorView(errorWrapper: $0)
+    }
+    .onChange(of: viewModel.error) { _, newError in
+      if let newError {
+        errorWrapper = ErrorWrapper(error: newError)
+        viewModel.error = nil
+      }
+    }
   }
 }
 
 #Preview {
-  @Previewable @Environment(\.modelContext) var modelContext
-  
   LoginView()
-    .environment(UserManager(modelContext: modelContext))
+    .environment(UserManager())
 }

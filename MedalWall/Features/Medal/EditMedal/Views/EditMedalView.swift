@@ -114,13 +114,13 @@ struct EditMedalView: View {
         
         ToolbarItem(placement: .confirmationAction) {
           Button(role: .confirm) {
-            guard let user = userManager.currentUser else {
+            guard let userID = userManager.currentUserID else {
               errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
               return
             }
             
             do {
-              try viewModel.save(by: user)
+              try viewModel.save(by: userID)
               dismiss()
             } catch {
               shouldDismiss = true
@@ -217,10 +217,8 @@ struct EditMedalView: View {
 }
 
 #Preview {
-  @Previewable @Environment(\.modelContext) var modelContext
-  
   NavigationStack {
     EditMedalView(mode: .edit, medal: Medal.sampleData.first!)
   }
-  .environment(UserManager(modelContext: modelContext))
+  .environment(UserManager())
 }

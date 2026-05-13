@@ -12,7 +12,6 @@ struct SampleData: PreviewModifier {
   
   static func makeSharedContext() throws -> ModelContainer {
     let schema = Schema([
-      User.self,
       Race.self,
       RaceEdition.self,
       RaceCategory.self,
@@ -22,9 +21,9 @@ struct SampleData: PreviewModifier {
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
     let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
     let context = ModelContext(container)
-    context.insert(User.guest)
-    Race.sampleData.forEach { context.insert($0) }
-    Medal.sampleData.forEach { context.insert($0) }
+    
+    //    Race.sampleData.forEach { context.insert($0) }
+    //    Medal.sampleData.forEach { context.insert($0) }
     try context.save()
     
     return container

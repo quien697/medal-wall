@@ -10,8 +10,6 @@ import UIKit
 extension Medal {
   @MainActor
   static let sampleData: [Medal] = {
-    let user = User.guest
-    
     let taipeiRace = Race.sampleData[0]
     let taiepiRaceEdition2019 = taipeiRace.editions[0]
     let taipeiMedal2019: Medal = Medal(
@@ -30,7 +28,7 @@ extension Medal {
       genderTotal: 6081,
       note: "The weather was good, not too much up hill and down hill.",
       tags: ["Taipei", "台北", "Full Marathon", "全馬"],
-      user: user
+      userID: "preview"
     )
     
     let vancouverRace = Race.sampleData[1] // vancouver marathon
@@ -41,7 +39,7 @@ extension Medal {
       bibNumber: "2814",
       location: vancouverRace.location,
       raceDistance: vancouverRaceEdition.distances.first!,
-      user: user
+      userID: "preview"
     )
     
     return [taipeiMedal2019, vancouverMedal]

@@ -7,16 +7,25 @@
 
 import SwiftUI
 
+/// Circular avatar component with a gold gradient border.
+/// Use `init(photo:)` for a local `UIImage` (e.g. edit profile draft),
+/// or `init(photoUrl:)` for a remote URL loaded via `AsyncImage`.
+/// Falls back to a person placeholder when no image is available.
 struct AvatarImage: View {
   private let systemImageName: String = "person.fill"
   let photo: UIImage?
+  let photoUrl: String?
   let imageType: ImageType
-  
-  init(
-    photo: UIImage?,
-    imageType: ImageType = .avatar
-  ) {
+
+  init(photo: UIImage?, imageType: ImageType = .avatar) {
     self.photo = photo
+    self.photoUrl = nil
+    self.imageType = imageType
+  }
+
+  init(photoUrl: String?, imageType: ImageType = .avatar) {
+    self.photo = nil
+    self.photoUrl = photoUrl
     self.imageType = imageType
   }
   
@@ -65,6 +74,20 @@ struct AvatarImage: View {
           if let uiImage = photo {
             Image(uiImage: uiImage)
               .styled(as: imageType)
+          } else if let urlString = photoUrl, let url = URL(string: urlString) {
+            AsyncImage(url: url) { phase in
+              switch phase {
+              case .empty:
+                ProgressView()
+                  .scaleEffect(imageType == .avatarThumbnail ? 0.6 : 1.0)
+              case .success(let image):
+                image.styled(as: imageType)
+              default:
+                Image(systemName: systemImageName)
+                  .font(.system(size: imageType.size.width / 2, weight: .semibold))
+                  .foregroundColor(.white)
+              }
+            }
           } else {
             Image(systemName: systemImageName)
               .font(.system(size: imageType.size.width / 2, weight: .semibold))

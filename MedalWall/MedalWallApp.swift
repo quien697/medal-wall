@@ -7,15 +7,19 @@
 
 import SwiftUI
 import SwiftData
+import FirebaseCore
+import FirebaseAuth
+import GoogleSignIn
 
 @main
 struct MedalWallApp: App {
+  @Environment(\.scenePhase) private var scenePhase
+  @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
   @AppStorage("appTheme") private var appTheme: AppTheme = .system
   @State private var userManager: UserManager?
   
   var sharedModelContainer: ModelContainer = {
     let schema = Schema([
-      User.self,
       Race.self,
       RaceEdition.self,
       RaceCategory.self,
@@ -34,8 +38,8 @@ struct MedalWallApp: App {
   var body: some Scene {
     WindowGroup {
       Group {
-        if let userManager {
-          if userManager.currentUser != nil {
+        if let userManager, !userManager.isLoadingAuth {
+          if userManager.isLoggedIn {
             ContentView()
           } else {
             LoginView()
@@ -46,13 +50,38 @@ struct MedalWallApp: App {
       } // Group
       .environment(userManager)
       .preferredColorScheme(appTheme.colorScheme)
+      .onOpenURL { url in
+        GIDSignIn.sharedInstance.handle(url)
+        if Auth.auth().isSignIn(withEmailLink: url.absoluteString) {
+          Task {
+            await userManager?.handleEmailLink(url.absoluteString)
+          }
+        }
+      }
       .task {
         guard userManager == nil else { return }
-        
-        let context = ModelContext(sharedModelContainer)
-        userManager = UserManager(modelContext: context)
+        userManager = UserManager()
       }
     } // WindowGroup
     .modelContainer(sharedModelContainer)
+    .onChange(of: scenePhase) { _, newPhase in
+      if newPhase == .active {
+        Task {
+          await userManager?.validateSession()
+        }
+      }
+    }
+  }
+}
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+  
+  func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+  ) -> Bool {
+    FirebaseApp.configure()
+    
+    return true
   }
 }

@@ -114,7 +114,7 @@ final class EditMedalViewModel {
     district = selection.race.district ?? ""
   }
   
-  func save(by user: User) throws {
+  func save(by userID: String) throws {
     if let medal, mode == .edit {
       medal.name = name
       medal.date = date
@@ -167,7 +167,7 @@ final class EditMedalViewModel {
         genderTotal: genderTotal,
         note: note.isEmpty ? nil : note,
         tags: tags,
-        user: user
+        userID: userID
       )
       
       try repository.insertMedal(newMedal)
