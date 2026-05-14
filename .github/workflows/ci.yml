@@ -12,6 +12,9 @@ jobs:
     runs-on: macos-15
 
     env:
+      # Pin to a specific Xcode version so CI uses the same toolchain as local development.
+      # macos-15 runners ship with an older Xcode by default; without this the build would
+      # use a different Swift/SDK version than the project targets.
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
 
     steps:
@@ -28,6 +31,8 @@ jobs:
 
       - name: Build
         run: |
+          # CODE_SIGNING_ALLOWED=NO: CI runners have no signing identity, so code signing must be disabled.
+          # xcpretty: formats xcodebuild's verbose output into readable pass/fail lines.
           xcodebuild build \
             -project MedalWall.xcodeproj \
             -scheme MedalWall \
@@ -46,6 +51,7 @@ jobs:
             | xcpretty
 
       - name: Upload test results
+        # Runs even when the previous step fails so test results are always available for debugging
         if: always()
         uses: actions/upload-artifact@v4
         with:
