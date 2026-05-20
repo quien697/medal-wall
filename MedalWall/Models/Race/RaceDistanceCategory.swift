@@ -33,6 +33,7 @@ enum RaceDistanceCategory: CustomStringConvertible, Hashable {
     }
   }
   
+  /// The numeric distance in kilometres used for Codable storage and sorting.
   nonisolated
   var value: Double {
     switch self {
@@ -45,8 +46,8 @@ enum RaceDistanceCategory: CustomStringConvertible, Hashable {
   }
 }
 
-/// Initializes a distance category from a numeric distance value (in kilometers)..
 extension RaceDistanceCategory {
+  /// Reconstructs a category from its stored numeric value (kilometres).
   nonisolated
   init(value: Double) {
     switch value {
@@ -58,6 +59,7 @@ extension RaceDistanceCategory {
     }
   }
   
+  /// The preset cases shown in the distance picker (excludes custom).
   static var standardCases: [RaceDistanceCategory] {
     [.full, .half, .`10KM`, .`5KM`]
   }

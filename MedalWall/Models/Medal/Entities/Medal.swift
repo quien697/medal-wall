@@ -42,7 +42,7 @@ final class Medal {
     date: Date,
     bibNumber: String,
     photoData: Data? = nil,
-    location: RaceLocation,
+    location: GeoLocation,
     raceDistance: RaceDistance,
     finishTime: TimeInterval? = nil,
     overallPlacement: Int? = nil,

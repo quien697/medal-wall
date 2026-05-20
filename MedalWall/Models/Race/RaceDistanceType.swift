@@ -13,7 +13,7 @@ enum RaceDistanceType: String, Hashable, CaseIterable, Identifiable {
   
   var id: String { rawValue }
   
-  /// Defines display name for UI
+  /// Human-readable label shown in the UI.
   var displayName: String {
     switch self {
     case .inPerson: return "In-person"
@@ -22,7 +22,7 @@ enum RaceDistanceType: String, Hashable, CaseIterable, Identifiable {
     }
   }
   
-  /// Defines the sort order for UI
+  /// In-person first, then virtual, then wheelchair.
   var sortOrder: Int {
     switch self {
     case .inPerson: return 0

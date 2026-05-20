@@ -14,8 +14,8 @@ extension Medal {
     photoData.flatMap { UIImage(data: $0) }
   }
 
-  var location: RaceLocation {
-    RaceLocation(country: country, province: province, city: city, district: district)
+  var location: GeoLocation {
+    GeoLocation(country: country, province: province, city: city, district: district)
   }
   
   var distance: RaceDistance {

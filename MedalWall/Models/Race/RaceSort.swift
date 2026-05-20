@@ -13,15 +13,15 @@ enum RaceSort: String, CaseIterable, Hashable {
   
   var displayName: String {
     switch self {
-    case .name: return "Name"
+    case .name:    return "Name"
     case .country: return "Country"
     }
   }
   
-  var order: [SortDescriptor<Race>] {
+  var comparator: (Race, Race) -> Bool {
     switch self {
-    case .name:    return [SortDescriptor(\.name)]
-    case .country: return [SortDescriptor(\.country)]
+    case .name:    return { $0.name.localizedCompare($1.name) == .orderedAscending }
+    case .country: return { $0.location.country.localizedCompare($1.location.country) == .orderedAscending }
     }
   }
 }
