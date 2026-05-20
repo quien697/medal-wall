@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RaceDetailHeroSection: View {
-  let photo: UIImage?
+  let photoUrl: String?
   let name: String
   let location: String
   let url: String?
@@ -16,7 +16,7 @@ struct RaceDetailHeroSection: View {
   var body: some View {
     DetailHeroSection {
       RaceImage(
-        urlString: nil,
+        urlString: photoUrl,
         imageType: .raceHero
       )
     } infoContent: {
@@ -26,8 +26,8 @@ struct RaceDetailHeroSection: View {
         .foregroundStyle(Color.Text.primary)
       
       Label(location, systemImage: "mappin.and.ellipse")
-      .font(.caption)
-      .foregroundStyle(Color.Text.secondary)
+        .font(.caption)
+        .foregroundStyle(Color.Text.secondary)
       
       if let url = url, let urlObj = URL(string: url) {
         Link(destination: urlObj) {
@@ -46,7 +46,7 @@ struct RaceDetailHeroSection: View {
   
   ScrollView {
     RaceDetailHeroSection(
-      photo: nil,
+      photoUrl: race.photoUrl,
       name: race.name,
       location: race.location.formatted,
       url: race.websiteUrl

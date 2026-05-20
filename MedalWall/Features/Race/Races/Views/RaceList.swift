@@ -20,12 +20,16 @@ struct RaceList: View {
         RaceNoResultView(searchText: searchText)
       } else {
         List(races) { race in
-          RaceRow(
-            photoUrl: race.photoUrl,
-            name: race.name,
-            location: race.location.formatted,
-            editionCount: 0
-          )
+          NavigationLink {
+            RaceDetailView(race: race)
+          } label: {
+            RaceRow(
+              photoUrl: race.photoUrl,
+              name: race.name,
+              location: race.location.formatted,
+              editionCount: 0
+            )
+          } // NavigationLink
           .swipeActions(edge: .trailing) {
             Button(role: .destructive) {
               onDelete(race)

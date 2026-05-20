@@ -6,11 +6,9 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct RaceDetailView: View {
   // MARK: - Environment
-  @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
   // MARK: - State
   @State private var viewModel: RaceDetailViewModel
@@ -27,17 +25,24 @@ struct RaceDetailView: View {
   var body: some View {
     VStack {
       RaceDetailHeroSection(
-        photo: nil,
+        photoUrl: viewModel.race.photoUrl,
         name: viewModel.race.name,
         location: viewModel.race.location.formatted,
         url: viewModel.race.fullWebsiteUrl
       )
       
       ScrollView {
-        RaceDetailEditionsSection(editions: [])
+        RaceDetailEditionsSection(editions: viewModel.editions)
       }
     } // VStack
     .background(Color.Background.primary)
+    .overlay {
+      if viewModel.isLoading {
+        ProgressView()
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          .background(Color.black.opacity(0.1))
+      }
+    }
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu("More Options", systemImage: "ellipsis") {
@@ -57,28 +62,33 @@ struct RaceDetailView: View {
         } // Menu
       } // ToolbarItem
     } // toolbar
-    .onAppear {
-      viewModel.configure(context: modelContext)
+    .task {
+      await viewModel.loadEditions()
     }
     .alert(isPresented: $isPresentingDeleteRaceConfirm) {
       .deleteConfirmation(
         name: viewModel.race.name,
         onDelete: {
-          do {
-            try viewModel.deleteRace(viewModel.race)
-            dismiss()
-          } catch {
-            errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
+          Task {
+            await viewModel.deleteRace()
+            if viewModel.error == nil {
+              dismiss()
+            }
           }
         }
       )
+    }
+    .onChange(of: viewModel.error) { _, error in
+      if let error {
+        errorWrapper = ErrorWrapper(error: error)
+      }
     }
     .sheet(isPresented: $isPresentingEditRace) {
       NavigationStack {
         EditRaceView(mode: .edit, race: viewModel.race)
       }
     } // sheet
-    .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
+    .sheet(item: $errorWrapper, onDismiss: { viewModel.error = nil }) { wrapper in
       ErrorView(errorWrapper: wrapper)
     } // sheet
   }
