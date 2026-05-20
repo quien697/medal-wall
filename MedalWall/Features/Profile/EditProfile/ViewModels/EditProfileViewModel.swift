@@ -48,12 +48,7 @@ final class EditProfileViewModel {
   // MARK: - Functions
   
   func loadExistingPhoto() async {
-    guard let urlString = profile.photoUrl,
-          let url = URL(string: urlString),
-          let (data, _) = try? await URLSession.shared.data(from: url),
-          let image = UIImage(data: data) else { return }
-    
-    photo = image
+    photo = await UIImage.load(from: profile.photoUrl)
   }
   
   func updatePhoto(with uiImage: UIImage) {

@@ -33,7 +33,6 @@ struct EditProfileView: View {
       Form {
         EditPhotoPicker(
           photo: viewModel.photo,
-          hint: "Tap to \(viewModel.photo == nil ? "add a" : "update your") profile photo",
           photoView: {
             AvatarImage(photo: viewModel.photo)
           },

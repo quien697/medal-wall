@@ -109,9 +109,7 @@ struct RacesView: View {
         }
       }
       .task {
-        if let uid = userManager.currentUserID {
-          await viewModel.loadRaces(uid: uid)
-        }
+        await viewModel.loadRaces()
       }
       .alert(isPresented: $isPresentingDeleteConfirm) {
         .deleteConfirmation(
@@ -128,8 +126,12 @@ struct RacesView: View {
           errorWrapper = ErrorWrapper(error: error)
         }
       }
-      .sheet(isPresented: $isPresentingAddRace) {
-        Text("Coming soon")
+      .sheet(isPresented: $isPresentingAddRace, onDismiss: {
+        Task {
+          await viewModel.loadRaces()
+        }
+      }) {
+        EditRaceView(mode: .add)
           .navigationTransition(.zoom(sourceID: addRace, in: namespace))
       }
       .sheet(item: $errorWrapper, onDismiss: { viewModel.error = nil }) { wrapper in

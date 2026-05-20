@@ -27,4 +27,34 @@ final class StorageService {
     
     return url.absoluteString
   }
+  
+  /// Uploads a race logo to Firebase Storage and returns the download URL.
+  func uploadRaceLogo(raceId: String, image: UIImage) async throws -> String {
+    guard let data = image.jpegData(compressionQuality: 0.8) else {
+      throw AppError.photoDataInvalid
+    }
+    
+    let metadata = StorageMetadata()
+    metadata.contentType = "image/jpeg"
+    let ref = storage.reference().child("races/\(raceId)/logo.jpg")
+    _ = try await ref.putDataAsync(data, metadata: metadata)
+    let url = try await ref.downloadURL()
+    
+    return url.absoluteString
+  }
+  
+  /// Uploads a race edition logo to Firebase Storage and returns the download URL.
+  func uploadRaceEditionLogo(raceId: String, editionId: String, image: UIImage) async throws -> String {
+    guard let data = image.jpegData(compressionQuality: 0.8) else {
+      throw AppError.photoDataInvalid
+    }
+    
+    let metadata = StorageMetadata()
+    metadata.contentType = "image/jpeg"
+    let ref = storage.reference().child("races/\(raceId)/editions/\(editionId)/logo.jpg")
+    _ = try await ref.putDataAsync(data, metadata: metadata)
+    let url = try await ref.downloadURL()
+    
+    return url.absoluteString
+  }
 }

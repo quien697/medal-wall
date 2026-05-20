@@ -38,7 +38,6 @@ struct EditMedalView: View {
       Form {
         EditPhotoPicker(
           photo: viewModel.photo,
-          hint: "Tap to \(viewModel.photo == nil ? "add a new" : "update the") medal photo",
           photoView: {
             MedalImage(photo: viewModel.photo)
           },

@@ -36,6 +36,17 @@ final class RaceDetailViewModel {
     }
   }
   
+  /// Reloads the race data from Firestore to reflect any edits.
+  func loadRace() async {
+    do {
+      if let updated = try await repository.fetchRace(id: race.id) {
+        race = updated
+      }
+    } catch {
+      // silently ignore — stale data is preferable to an error on dismiss
+    }
+  }
+  
   /// Deletes the race and all its editions from Firestore.
   func deleteRace() async {
     do {

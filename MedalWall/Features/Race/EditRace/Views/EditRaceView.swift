@@ -7,12 +7,10 @@
 
 import SwiftUI
 import PhotosUI
-import SwiftData
 
 struct EditRaceView: View {
   // MARK: - Environment
   @Environment(UserManager.self) private var userManager
-  @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
   // MARK: - State
   @State private var viewModel: EditRaceViewModel
@@ -21,11 +19,6 @@ struct EditRaceView: View {
   @State private var isPresentingCropImageView: Bool = false
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var rawPickedImage: UIImage?
-  @State private var shouldDismiss: Bool = false
-  @State private var isPresentingAddEdition: Bool = false
-  // MARK: - Namespace
-  @Namespace private var namespace
-  private let addEdition: String = "addEdition"
   
   // MARK: - Init
   init(mode: ItemEditMode, race: Race? = nil) {
@@ -38,9 +31,8 @@ struct EditRaceView: View {
       Form {
         EditPhotoPicker(
           photo: viewModel.photo,
-          hint: "Tap to \(viewModel.photo == nil ? "add a new" : "update the") race photo",
           photoView: {
-            RaceImage(urlString: nil, imageType: .raceHero)
+            RaceImage(photo: viewModel.photo, imageType: .raceHero)
           },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
@@ -56,7 +48,7 @@ struct EditRaceView: View {
         
         EditRaceInfoSection(
           name: $viewModel.name,
-          url: $viewModel.url
+          url: $viewModel.websiteUrl
         )
         
         EditRaceLocationSection(
@@ -65,30 +57,7 @@ struct EditRaceView: View {
           city: $viewModel.city,
           district: $viewModel.district
         )
-        
-        EditRaceEditionSection(
-          editions: viewModel.editions,
-          racePhoto: viewModel.photo,
-          namespace: namespace,
-          transitionID: addEdition,
-          onAdd: {
-            isPresentingAddEdition = true
-          },
-          onUpdate: { originalEdition, updatedEdition in
-            do {
-              try viewModel.updateEdition(old: originalEdition, with: updatedEdition)
-            } catch {
-              errorWrapper = ErrorWrapper(error: AppError.duplicateEdition)
-            }
-          },
-          onDelete: { edition in
-            viewModel.deleteEdition(edition)
-          }
-        )
       } // Form
-      .onAppear {
-        viewModel.configure(context: modelContext)
-      }
       .navigationTitle("\(viewModel.mode.displayName) Race")
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
@@ -101,22 +70,28 @@ struct EditRaceView: View {
         } // ToolbarItem
         
         ToolbarItem(placement: .confirmationAction) {
-          Button(role: .confirm) {
-            do {
-              if let userId = userManager.currentUserID {
-                try viewModel.save(by: userId)
-                dismiss()
-              } else {
+          if viewModel.isLoading {
+            ProgressView()
+          } else {
+            Button(role: .confirm) {
+              guard let userId = userManager.currentUserID else {
                 errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
+                return
               }
-            } catch {
-              shouldDismiss = true
-              errorWrapper = ErrorWrapper(error: AppError.raceSaveFailed)
+              Task {
+                await viewModel.save(by: userId)
+                if viewModel.error == nil {
+                  dismiss()
+                }
+              }
             }
+            .disabled(!viewModel.isFormValid)
           }
-          .disabled(!viewModel.isFormValid)
         } // ToolbarItem
       } // toolbar
+      .task {
+        await viewModel.loadExistingPhoto()
+      }
       .photosPicker(
         isPresented: $isPresentingPhotoPicker,
         selection: $selectedPhoto,
@@ -134,11 +109,10 @@ struct EditRaceView: View {
           }
         }
       }
-      .navigationDestination(isPresented: $isPresentingAddEdition) {
-        AddRaceEditionView { newEdition in
-          viewModel.addEdition(newEdition)
+      .onChange(of: viewModel.error) { _, error in
+        if let error {
+          errorWrapper = ErrorWrapper(error: error)
         }
-        .navigationTransition(.zoom(sourceID: addEdition, in: namespace))
       }
       .sheet(isPresented: $isPresentingCropImageView, onDismiss: {
         selectedPhoto = nil
@@ -154,26 +128,20 @@ struct EditRaceView: View {
         }
       }
       .sheet(item: $errorWrapper, onDismiss: {
-        if shouldDismiss {
-          dismiss()
-        }
+        viewModel.error = nil
       }) { wrapper in
         ErrorView(errorWrapper: wrapper)
-      }
+      } // sheet
     } // NavigationStack
   }
 }
 
 #Preview("Add mode") {
-  NavigationStack {
-    EditRaceView(mode: .add, race: Race.sampleData.first!)
-  }
-  .environment(UserManager())
+  EditRaceView(mode: .add)
+    .environment(UserManager())
 }
 
 #Preview("Edit mode") {
-  NavigationStack {
-    EditRaceView(mode: .edit, race: Race.sampleData.first!)
-  }
-  .environment(UserManager())
+  EditRaceView(mode: .edit, race: Race.sampleData.first!)
+    .environment(UserManager())
 }

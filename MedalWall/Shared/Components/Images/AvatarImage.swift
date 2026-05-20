@@ -13,9 +13,9 @@ import SwiftUI
 /// Falls back to a person placeholder when no image is available.
 struct AvatarImage: View {
   private let systemImageName: String = "person.fill"
-  let photo: UIImage?
-  let photoUrl: String?
-  let imageType: ImageType
+  private let photo: UIImage?
+  private let photoUrl: String?
+  private let imageType: ImageType
 
   init(photo: UIImage?, imageType: ImageType = .avatar) {
     self.photo = photo

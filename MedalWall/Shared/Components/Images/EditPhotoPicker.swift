@@ -12,10 +12,29 @@ struct EditPhotoPicker<Preview: View>: View {
   @State private var isPresentingConfirmation: Bool = false
   // MARK: - Properties
   let photo: UIImage?
-  let hint: String
+  let hint: String?
   @ViewBuilder let photoView: () -> Preview
   let onChooseFromLibrary: () -> Void
   let onRemove: () -> Void
+  
+  init(
+    photo: UIImage?,
+    hint: String? = nil,
+    @ViewBuilder photoView: @escaping () -> Preview,
+    onChooseFromLibrary: @escaping () -> Void,
+    onRemove: @escaping () -> Void
+  ) {
+    self.photo = photo
+    self.hint = hint
+    self.photoView = photoView
+    self.onChooseFromLibrary = onChooseFromLibrary
+    self.onRemove = onRemove
+  }
+  
+  // MARK: - Computed
+  private var displayHint: String {
+    hint ?? (photo == nil ? "Tap to add a photo" : "Tap to update the photo")
+  }
   
   // MARK: - Body
   var body: some View {
@@ -36,7 +55,7 @@ struct EditPhotoPicker<Preview: View>: View {
             }
           } // confirmationDialog
         
-        Text(hint)
+        Text(displayHint)
           .font(.subheadline)
           .multilineTextAlignment(.center)
           .foregroundStyle(Color.Text.tertiary)

@@ -31,7 +31,7 @@ final class RacesViewModel {
   // MARK: - Functions
   
   /// Loads all races created by the given user from Firestore.
-  func loadRaces(uid: String) async {
+  func loadRaces() async {
     isLoading = true
     defer { isLoading = false }
     

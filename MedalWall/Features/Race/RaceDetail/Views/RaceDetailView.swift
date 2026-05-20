@@ -83,10 +83,12 @@ struct RaceDetailView: View {
         errorWrapper = ErrorWrapper(error: error)
       }
     }
-    .sheet(isPresented: $isPresentingEditRace) {
-      NavigationStack {
-        EditRaceView(mode: .edit, race: viewModel.race)
+    .sheet(isPresented: $isPresentingEditRace, onDismiss: {
+      Task {
+        await viewModel.loadRace()
       }
+    }) {
+      EditRaceView(mode: .edit, race: viewModel.race)
     } // sheet
     .sheet(item: $errorWrapper, onDismiss: { viewModel.error = nil }) { wrapper in
       ErrorView(errorWrapper: wrapper)

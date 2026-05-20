@@ -6,175 +6,110 @@
 //
 
 import SwiftUI
-import SwiftData
 
 @Observable
 final class EditRaceViewModel {
+  // MARK: - Properties
   var name: String = ""
-  var photoData: Data? = nil
   var photo: UIImage? = nil
   var country: String = ""
   var province: String = ""
   var city: String = ""
   var district: String = ""
-  var url: String = ""
-  var editions: [DraftRaceEdition] = []
+  var websiteUrl: String = ""
+  var isLoading = false
+  var error: AppError?
+  private(set) var isPhotoChanged = false
   
   let mode: ItemEditMode
   private let race: Race?
+  private let repository = RaceFirestoreRepository()
+  private let storageService = StorageService()
   
+  // MARK: - Init
   init(mode: ItemEditMode, race: Race?) {
     self.mode = mode
-//    self.repository = RaceRepository()
     self.race = race
     
     if let race, mode == .edit {
       self.name = race.name
-      self.photoData = nil
-      self.photo = nil
       self.country = race.location.country
       self.province = race.location.province ?? ""
       self.city = race.location.city
       self.district = race.location.district ?? ""
-      self.url = ""
-      self.editions = []
+      self.websiteUrl = race.websiteUrl ?? ""
     }
   }
   
-  func configure(context: ModelContext) {
-//    repository.configure(context: context)
+  // MARK: - Computed
+  var isFormValid: Bool {
+    !name.trimmingCharacters(in: .whitespaces).isEmpty &&
+    !country.trimmingCharacters(in: .whitespaces).isEmpty &&
+    !city.trimmingCharacters(in: .whitespaces).isEmpty
   }
   
-  var isFormValid: Bool {
-    let hasValidName = !name.trimmingCharacters(in: .whitespaces).isEmpty
-    let hasValidCountry = !country.trimmingCharacters(in: .whitespaces).isEmpty
-    let hasValidCity = !city.trimmingCharacters(in: .whitespaces).isEmpty
-    
-    return hasValidName && hasValidCountry && hasValidCity
+  // MARK: - Functions
+  
+  /// Downloads the existing race photo into `photo` so the picker shows the current image.
+  func loadExistingPhoto() async {
+    photo = await UIImage.load(from: race?.photoUrl)
   }
   
   func updatePhoto(with uiImage: UIImage) {
-    self.photoData = uiImage.pngData()
-    self.photo = uiImage
+    photo = uiImage
+    isPhotoChanged = true
   }
   
   func clearPhoto() {
-    self.photoData = nil
-    self.photo = nil
+    photo = nil
+    isPhotoChanged = true
   }
   
-  var isValidEdition: Bool {
-    return true
-  }
-  
-  func updateEdition(old: DraftRaceEdition, with new: DraftRaceEdition) throws {
-    guard isFormValid else {
-      throw AppError.duplicateEdition
-    }
+  /// Creates or updates the race in Firestore, uploading the logo only when the photo was changed.
+  func save(by userID: String) async {
+    isLoading = true
+    defer { isLoading = false }
     
-    if let index = editions.firstIndex(where: { $0.id == old.id }) {
-      editions[index] = new
+    do {
+      switch mode {
+      case .add:
+        var newRace = Race(
+          name: name,
+          location: GeoLocation(
+            country: country,
+            province: province.isEmpty ? nil : province,
+            city: city,
+            district: district.isEmpty ? nil : district
+          ),
+          websiteUrl: websiteUrl.isEmpty ? nil : websiteUrl,
+          createdBy: userID
+        )
+        if let photo {
+          newRace.photoUrl = try await storageService.uploadRaceLogo(raceId: newRace.id, image: photo)
+        }
+        try await repository.createRace(newRace)
+        
+      case .edit:
+        guard var race else { return }
+        race.name = name
+        race.location = GeoLocation(
+          country: country,
+          province: province.isEmpty ? nil : province,
+          city: city,
+          district: district.isEmpty ? nil : district
+        )
+        race.websiteUrl = websiteUrl.isEmpty ? nil : websiteUrl
+        if isPhotoChanged {
+          if let photo {
+            race.photoUrl = try await storageService.uploadRaceLogo(raceId: race.id, image: photo)
+          } else {
+            race.photoUrl = nil
+          }
+        }
+        try await repository.updateRace(race)
+      }
+    } catch {
+      self.error = .raceSaveFailed
     }
-  }
-  
-  func addEdition(_ edition: DraftRaceEdition) {
-    editions.append(edition)
-  }
-  
-  func deleteEdition(_ edition: DraftRaceEdition) {
-    editions.removeAll { $0.id == edition.id }
-  }
-  
-  /// Syncs categories on an existing edition by diffing against draft distances.
-  /// Only deletes removed categories and inserts new ones.
-  /// Syncs editions on an existing race by diffing against drafts.
-  /// Deletes removed editions, updates existing ones, and adds new ones.
-//  private func syncEditions(on race: Race, with drafts: [DraftRaceEdition], by userID: String) throws {
-//    let sourceEditionIds = Set(drafts.compactMap { $0.sourceEditionId })
-//    
-//     Delete editions removed from the draft list
-//    for edition in race.editions where !sourceEditionIds.contains(edition.id) {
-//      try repository.deleteEdition(edition)
-//    }
-//    
-//     Update existing editions and add new ones
-//    for draft in drafts {
-//      if let sourceId = draft.sourceEditionId,
-//         let edition = race.editions.first(where: { $0.id == sourceId }) {
-//        edition.year = draft.year
-//        edition.startDate = draft.startDate
-//        edition.endDate = draft.endDate
-//        edition.photoData = draft.photoData
-//        edition.updatedDate = .now
-//        
-//        try syncCategories(on: edition, with: draft.distances)
-//      } else {
-//        let newEdition = RaceEdition(
-//          year: draft.year,
-//          startDate: draft.startDate,
-//          endDate: draft.endDate,
-//          photoData: draft.photoData,
-//          createdBy: userID,
-//          race: race,
-//          categories: []
-//        )
-//        
-//        try syncCategories(on: newEdition, with: draft.distances)
-//        try repository.insertEdition(newEdition, to: race)
-//      }
-//    }
-//  }
-  
-  /// Syncs categories on an edition by diffing against draft distances.
-  /// Only deletes removed categories and inserts new ones.
-//  private func syncCategories(on edition: RaceEdition, with draftDistances: [RaceDistance]) throws {
-//    // Delete categories no longer in draft
-//    for category in edition.categories {
-//      let distance = RaceDistance(
-//        category: RaceDistanceCategory(value: category.distance),
-//        type: RaceDistanceType(rawValue: category.type) ?? .inPerson
-//      )
-//      if !draftDistances.contains(distance) {
-//        try repository.deleteCategory(category)
-//      }
-//    }
-//    
-//    // Add new distances as categories
-//    for distance in draftDistances where !edition.distances.contains(distance) {
-//      let category = RaceCategory(distance: distance, raceEdition: edition)
-//      try repository.insertCategory(category, to: edition)
-//    }
-//  }
-  
-  /// Applies the draft changes to the model
-  /// - Throws: AppError if repository is not configured or save fails
-  func save(by userID: String) throws {
-//    let race = if let race = self.race {
-//      race
-//    } else {
-//      Race(
-//        name: name,
-//        photoData: photoData,
-//        location: GeoLocation(
-//          country: country,
-//          province: province.isEmpty ? nil : province,
-//          city: city,
-//          district: district.isEmpty ? nil : district
-//        ),
-//        url: url.isEmpty ? nil : url,
-//        createdBy: userID
-//      )
-//    }
-//    
-//    race.name = name
-//    race.photoData = photoData
-//    race.country = country
-//    race.province = province
-//    race.city = city
-//    race.district = district
-//    race.url = url.isEmpty ? nil : url
-    
-//    try syncEditions(on: race, with: editions, by: userID)
-//    try repository.save()
   }
 }
