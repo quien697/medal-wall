@@ -43,6 +43,9 @@ struct RaceDetailView: View {
           .background(Color.black.opacity(0.1))
       }
     }
+    .task {
+      await viewModel.loadEditions()
+    }
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu("More Options", systemImage: "ellipsis") {
@@ -62,9 +65,6 @@ struct RaceDetailView: View {
         } // Menu
       } // ToolbarItem
     } // toolbar
-    .task {
-      await viewModel.loadEditions()
-    }
     .alert(isPresented: $isPresentingDeleteRaceConfirm) {
       .deleteConfirmation(
         name: viewModel.race.name,

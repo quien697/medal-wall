@@ -103,6 +103,7 @@ final class EditRaceViewModel {
           if let photo {
             race.photoUrl = try await storageService.uploadRaceLogo(raceId: race.id, image: photo)
           } else {
+            try? await storageService.deleteRaceLogo(raceId: race.id)
             race.photoUrl = nil
           }
         }

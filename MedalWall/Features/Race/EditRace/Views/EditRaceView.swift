@@ -62,6 +62,9 @@ struct EditRaceView: View {
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
       .background(Color.Background.primary)
+      .task {
+        await viewModel.loadExistingPhoto()
+      }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .cancel) {
@@ -89,9 +92,6 @@ struct EditRaceView: View {
           }
         } // ToolbarItem
       } // toolbar
-      .task {
-        await viewModel.loadExistingPhoto()
-      }
       .photosPicker(
         isPresented: $isPresentingPhotoPicker,
         selection: $selectedPhoto,

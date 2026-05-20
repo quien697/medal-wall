@@ -38,6 +38,16 @@ struct RacesView: View {
       .toolbarRole(.editor)
       .searchable(text: $viewModel.searchText, prompt: "Search race events...")
       .autocorrectionDisabled()
+      .overlay {
+        if viewModel.isLoading {
+          ProgressView()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.black.opacity(0.1))
+        }
+      }
+      .task {
+        await viewModel.loadRaces()
+      }
       .toolbar {
         ToolbarItem(placement: .title) {
           ExpandedNavigationTitle(title: "Races")
@@ -101,16 +111,6 @@ struct RacesView: View {
           .buttonStyle(.glassProminent)
         } // ToolbarItem
       } // toolbar
-      .overlay {
-        if viewModel.isLoading {
-          ProgressView()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.black.opacity(0.1))
-        }
-      }
-      .task {
-        await viewModel.loadRaces()
-      }
       .alert(isPresented: $isPresentingDeleteConfirm) {
         .deleteConfirmation(
           name: selectedRace?.name ?? "Race",

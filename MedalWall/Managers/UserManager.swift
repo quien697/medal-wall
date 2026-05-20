@@ -47,11 +47,14 @@ class UserManager {
     try authService.signOut()
   }
   
-  /// Persists an updated profile to Firestore, uploading a new photo to Storage first if provided.
+  /// Persists an updated profile to Firestore, uploading a new photo to Storage first if provided,
+  /// or deleting the existing one if the photo was cleared.
   func updateUser(_ user: User, photo: UIImage? = nil) async throws {
     var updatedUser = user
     if let photo {
       updatedUser.photoUrl = try await storageService.uploadUserAvatar(uid: user.uid, image: photo)
+    } else if user.photoUrl == nil, currentUser?.photoUrl != nil {
+      try? await storageService.deleteUserAvatar(uid: user.uid)
     }
     try await repository.updateUser(updatedUser)
     self.currentUser = updatedUser
