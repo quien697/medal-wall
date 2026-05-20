@@ -20,9 +20,9 @@ struct MedalWallApp: App {
   
   var sharedModelContainer: ModelContainer = {
     let schema = Schema([
-      Race.self,
-      RaceEdition.self,
-      RaceCategory.self,
+//      Race.self,
+//      RaceEdition.self,
+//      RaceCategory.self,
       Medal.self,
       EventPhoto.self
     ])
