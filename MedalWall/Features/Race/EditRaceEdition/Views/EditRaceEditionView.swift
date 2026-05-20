@@ -40,7 +40,7 @@ struct EditRaceEditionView: View {
         EditPhotoPicker(
           photo: viewModel.draftEdition.photo,
           hint: "Tap to \(viewModel.draftEdition.photo == nil ? "add a new" : "update the") race photo,\nor leave empty to use the race logo.",
-          photoView: { RaceImage(photo: viewModel.draftEdition.photo, imageType: .raceHero) },
+          photoView: { RaceImage(urlString: nil, imageType: .raceHero) },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
           },
@@ -158,7 +158,7 @@ struct EditRaceEditionView: View {
   NavigationStack {
     EditRaceEditionView(
       mode: .edit,
-      edition: DraftRaceEdition(from: Race.sampleData.first!.editions.first!),
+      edition: DraftRaceEdition(from: RaceEdition.sampleData.first!),
       onAction: { _ in }
     )
   }

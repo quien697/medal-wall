@@ -108,10 +108,10 @@ final class EditMedalViewModel {
     name = "\(selection.race.name) \(selection.edition.year)"
     date = selection.edition.startDate
     distance = selection.distance
-    country = selection.race.country
-    province = selection.race.province ?? ""
-    city = selection.race.city
-    district = selection.race.district ?? ""
+    country = selection.race.location.country
+    province = selection.race.location.province ?? ""
+    city = selection.race.location.city
+    district = selection.race.location.district ?? ""
   }
   
   func save(by userID: String) throws {
@@ -150,7 +150,7 @@ final class EditMedalViewModel {
         date: date,
         bibNumber: bibNumber,
         photoData: photoData,
-        location: RaceLocation(
+        location: GeoLocation(
           country: country,
           province: province.isEmpty ? nil : province,
           city: city,

@@ -10,7 +10,7 @@ import SwiftData
 
 @Observable
 final class RaceDetailViewModel {
-  private var repository: RaceRepository?
+//  private var repository: RaceRepository?
   var race: Race
   
   init(race: Race) {
@@ -18,13 +18,13 @@ final class RaceDetailViewModel {
   }
   
   func configure(context: ModelContext) {
-    self.repository = RaceRepository(context: context)
+//    self.repository = RaceRepository(context: context)
   }
   
   func deleteRace(_ race: Race) throws {
-    guard let repository else { throw AppError.contextNotAttached }
-    
-    try repository.deleteRace(race)
-    try repository.save()
+//    guard let repository else { throw AppError.contextNotAttached }
+//    
+//    try repository.deleteRace(race)
+//    try repository.save()
   }
 }

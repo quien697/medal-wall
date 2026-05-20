@@ -27,14 +27,14 @@ struct RaceDetailView: View {
   var body: some View {
     VStack {
       RaceDetailHeroSection(
-        photo: viewModel.race.photo,
+        photo: nil,
         name: viewModel.race.name,
         location: viewModel.race.location.formatted,
-        url: viewModel.race.fullURL
+        url: viewModel.race.fullWebsiteUrl
       )
       
       ScrollView {
-        RaceDetailEditionsSection(editions: viewModel.race.editions)
+        RaceDetailEditionsSection(editions: [])
       }
     } // VStack
     .background(Color.Background.primary)

@@ -40,8 +40,5 @@ struct RaceEntryEditionRow: View {
 }
 
 #Preview {
-  let race = Race.sampleData.first!
-  let edition = race.editions.first!
-  
-  RaceEntryEditionRow(race: race, edition: edition, selection: .constant(nil))
+  RaceEntryEditionRow(race: Race.taipei, edition: RaceEdition.taipei2019, selection: .constant(nil))
 }

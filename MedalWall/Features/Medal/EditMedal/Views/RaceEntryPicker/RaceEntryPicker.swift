@@ -6,12 +6,12 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct RaceEntryPicker: View {
   @Environment(\.dismiss) private var dismiss
   @State private var selection: RaceEntry?
-  @Query(sort: \Race.name) private var races: [Race]
+  @State private var races: [Race] = []
+  @State private var editions: [String: [RaceEdition]] = [:]
   let onSelect: (RaceEntry) -> Void
   
   var body: some View {
@@ -28,7 +28,7 @@ struct RaceEntryPicker: View {
             description: Text("Add race events to use auto-fill")
           )
         } else {
-          RaceEntryList(races: races, selection: $selection)
+          RaceEntryList(races: races, editions: editions, selection: $selection)
         }
       }
       .navigationTitle("Pick Race Entry")

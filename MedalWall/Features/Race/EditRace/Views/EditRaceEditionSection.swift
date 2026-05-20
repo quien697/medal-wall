@@ -61,7 +61,7 @@ struct EditRaceEditionSection: View {
                     .styled(as: ImageType.raceThumbnail)
                 } else {
                   RaceImage(
-                    photo: racePhoto,
+                    urlString: nil,
                     imageType: .raceThumbnail
                   )
                 }
@@ -123,15 +123,14 @@ struct EditRaceEditionSection: View {
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   @Previewable @Namespace var namespace
-  let race = Race.sampleData.first!
-  let drafts = race.editions.map { DraftRaceEdition(from: $0) }
-  
+  let drafts = RaceEdition.sampleData.map { DraftRaceEdition(from: $0) }
+
   Form {
     EditRaceEditionSection(
       editions: drafts,
-      racePhoto: race.photo,
+      racePhoto: nil,
       namespace: namespace,
       transitionID: "transitionID",
       onAdd: {},

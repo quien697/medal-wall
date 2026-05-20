@@ -9,34 +9,36 @@ import SwiftUI
 
 struct RaceEntryList: View {
   let races: [Race]
+  let editions: [String: [RaceEdition]]
   @Binding var selection: RaceEntry?
-  
+
   var body: some View {
     List(races) { race in
+      let raceEditions = editions[race.id] ?? []
       VStack(alignment: .leading) {
         HStack(alignment: .top) {
           RaceImage(
-            photo: race.photo,
+            urlString: race.photoUrl,
             imageType: .raceThumbnail
           )
-          
+
           VStack(alignment: .leading) {
             Text(race.name)
               .font(.headline)
               .foregroundStyle(Color.Text.primary)
-            
+
             Text(race.location.formatted)
               .font(.subheadline)
               .foregroundStyle(Color.Text.secondary)
-            
-            Text("\(race.editions.count) editions")
+
+            Text("\(raceEditions.count) editions")
               .font(.subheadline)
               .foregroundStyle(Color.Text.tertiary)
           } // VStack
         } // HStack
-        
+
         VStack(alignment: .leading, spacing: 16) {
-          ForEach(race.editions.sorted { $0.year > $1.year }) { edition in
+          ForEach(raceEditions.sorted { $0.year > $1.year }) { edition in
             RaceEntryEditionRow(
               race: race,
               edition: edition,
@@ -54,5 +56,8 @@ struct RaceEntryList: View {
 }
 
 #Preview {
-  RaceEntryList(races: Race.sampleData, selection: .constant(nil))
+  let editions: [String: [RaceEdition]] = [
+    Race.taipei.id: [RaceEdition.taipei2019, RaceEdition.taipei2025]
+  ]
+  RaceEntryList(races: Race.sampleData, editions: editions, selection: .constant(nil))
 }

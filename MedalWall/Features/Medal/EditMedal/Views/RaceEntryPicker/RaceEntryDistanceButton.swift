@@ -41,17 +41,17 @@ struct RaceEntryDistanceChip: View {
 }
 
 #Preview {
-  let race = Race.sampleData.first!
-  let edition = race.editions.first!
+  let race = Race.taipei
+  let edition = RaceEdition.taipei2019
   let distance = edition.distances.first!
-  
+
   RaceEntryDistanceChip(
     race: race,
     edition: edition,
     distance: distance,
     selection: .constant(nil)
   )
-  
+
   RaceEntryDistanceChip(
     race: race,
     edition: edition,

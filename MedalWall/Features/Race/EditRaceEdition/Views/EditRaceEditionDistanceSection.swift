@@ -48,7 +48,7 @@ struct EditRaceEditionDistanceSection: View {
 }
 
 #Preview {
-  let distances = Race.sampleData.first!.editions.first!.distances
+  let distances = RaceEdition.sampleData.first!.distances
   
   Form {
     EditRaceEditionDistanceSection(

@@ -35,12 +35,12 @@ struct DraftRaceEdition: Identifiable {
   
   init(from edition: RaceEdition) {
     self.id = UUID()
-    self.sourceEditionId = edition.id
+    self.sourceEditionId = UUID()
     self.year = edition.year
     self.isOneDay = edition.isOneDay
     self.startDate = edition.startDate
     self.endDate = edition.endDate
-    self.photoData = edition.photoData
+    self.photoData = nil
     self.distances = edition.distances
   }
   

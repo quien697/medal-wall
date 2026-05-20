@@ -21,29 +21,28 @@ final class EditRaceViewModel {
   var editions: [DraftRaceEdition] = []
   
   let mode: ItemEditMode
-  private var repository: RaceRepository
   private let race: Race?
   
   init(mode: ItemEditMode, race: Race?) {
     self.mode = mode
-    self.repository = RaceRepository()
+//    self.repository = RaceRepository()
     self.race = race
     
     if let race, mode == .edit {
       self.name = race.name
-      self.photoData = race.photoData
-      self.photo = race.photo
+      self.photoData = nil
+      self.photo = nil
       self.country = race.location.country
       self.province = race.location.province ?? ""
       self.city = race.location.city
       self.district = race.location.district ?? ""
-      self.url = race.fullURL ?? ""
-      self.editions = race.editions.map { DraftRaceEdition(from: $0) }
+      self.url = ""
+      self.editions = []
     }
   }
   
   func configure(context: ModelContext) {
-    repository.configure(context: context)
+//    repository.configure(context: context)
   }
   
   var isFormValid: Bool {
@@ -90,97 +89,92 @@ final class EditRaceViewModel {
   /// Only deletes removed categories and inserts new ones.
   /// Syncs editions on an existing race by diffing against drafts.
   /// Deletes removed editions, updates existing ones, and adds new ones.
-  private func syncEditions(on race: Race, with drafts: [DraftRaceEdition], by userID: String) throws {
-    let sourceEditionIds = Set(drafts.compactMap { $0.sourceEditionId })
-    
-    // Delete editions removed from the draft list
-    for edition in race.editions where !sourceEditionIds.contains(edition.id) {
-      try repository.deleteEdition(edition)
-    }
-    
-    // Update existing editions and add new ones
-    for draft in drafts {
-      if let sourceId = draft.sourceEditionId,
-         let edition = race.editions.first(where: { $0.id == sourceId }) {
-        edition.year = draft.year
-        edition.startDate = draft.startDate
-        edition.endDate = draft.endDate
-        edition.photoData = draft.photoData
-        edition.updatedDate = .now
-        
-        try syncCategories(on: edition, with: draft.distances)
-      } else {
-        let newEdition = RaceEdition(
-          year: draft.year,
-          startDate: draft.startDate,
-          endDate: draft.endDate,
-          photoData: draft.photoData,
-          createdBy: userID,
-          race: race,
-          categories: []
-        )
-        
-        try syncCategories(on: newEdition, with: draft.distances)
-        try repository.insertEdition(newEdition, to: race)
-      }
-    }
-  }
+//  private func syncEditions(on race: Race, with drafts: [DraftRaceEdition], by userID: String) throws {
+//    let sourceEditionIds = Set(drafts.compactMap { $0.sourceEditionId })
+//    
+//     Delete editions removed from the draft list
+//    for edition in race.editions where !sourceEditionIds.contains(edition.id) {
+//      try repository.deleteEdition(edition)
+//    }
+//    
+//     Update existing editions and add new ones
+//    for draft in drafts {
+//      if let sourceId = draft.sourceEditionId,
+//         let edition = race.editions.first(where: { $0.id == sourceId }) {
+//        edition.year = draft.year
+//        edition.startDate = draft.startDate
+//        edition.endDate = draft.endDate
+//        edition.photoData = draft.photoData
+//        edition.updatedDate = .now
+//        
+//        try syncCategories(on: edition, with: draft.distances)
+//      } else {
+//        let newEdition = RaceEdition(
+//          year: draft.year,
+//          startDate: draft.startDate,
+//          endDate: draft.endDate,
+//          photoData: draft.photoData,
+//          createdBy: userID,
+//          race: race,
+//          categories: []
+//        )
+//        
+//        try syncCategories(on: newEdition, with: draft.distances)
+//        try repository.insertEdition(newEdition, to: race)
+//      }
+//    }
+//  }
   
   /// Syncs categories on an edition by diffing against draft distances.
   /// Only deletes removed categories and inserts new ones.
-  private func syncCategories(on edition: RaceEdition, with draftDistances: [RaceDistance]) throws {
-    // Delete categories no longer in draft
-    for category in edition.categories {
-      let distance = RaceDistance(
-        category: RaceDistanceCategory(value: category.distance),
-        type: RaceDistanceType(rawValue: category.type) ?? .inPerson
-      )
-      if !draftDistances.contains(distance) {
-        try repository.deleteCategory(category)
-      }
-    }
-    
-    // Add new distances as categories
-    for distance in draftDistances where !edition.distances.contains(distance) {
-      let category = RaceCategory(distance: distance, raceEdition: edition)
-      try repository.insertCategory(category, to: edition)
-    }
-  }
+//  private func syncCategories(on edition: RaceEdition, with draftDistances: [RaceDistance]) throws {
+//    // Delete categories no longer in draft
+//    for category in edition.categories {
+//      let distance = RaceDistance(
+//        category: RaceDistanceCategory(value: category.distance),
+//        type: RaceDistanceType(rawValue: category.type) ?? .inPerson
+//      )
+//      if !draftDistances.contains(distance) {
+//        try repository.deleteCategory(category)
+//      }
+//    }
+//    
+//    // Add new distances as categories
+//    for distance in draftDistances where !edition.distances.contains(distance) {
+//      let category = RaceCategory(distance: distance, raceEdition: edition)
+//      try repository.insertCategory(category, to: edition)
+//    }
+//  }
   
   /// Applies the draft changes to the model
   /// - Throws: AppError if repository is not configured or save fails
   func save(by userID: String) throws {
-    let race = if let race = self.race {
-      race
-    } else {
-      Race(
-        name: name,
-        photoData: photoData,
-        location: RaceLocation(
-          country: country,
-          province: province.isEmpty ? nil : province,
-          city: city,
-          district: district.isEmpty ? nil : district
-        ),
-        url: url.isEmpty ? nil : url,
-        createdBy: userID
-      )
-    }
+//    let race = if let race = self.race {
+//      race
+//    } else {
+//      Race(
+//        name: name,
+//        photoData: photoData,
+//        location: GeoLocation(
+//          country: country,
+//          province: province.isEmpty ? nil : province,
+//          city: city,
+//          district: district.isEmpty ? nil : district
+//        ),
+//        url: url.isEmpty ? nil : url,
+//        createdBy: userID
+//      )
+//    }
+//    
+//    race.name = name
+//    race.photoData = photoData
+//    race.country = country
+//    race.province = province
+//    race.city = city
+//    race.district = district
+//    race.url = url.isEmpty ? nil : url
     
-    if self.race == nil {
-      try repository.insertRace(race)
-    } else {
-      race.name = name
-      race.photoData = photoData
-      race.country = country
-      race.province = province
-      race.city = city
-      race.district = district
-      race.url = url.isEmpty ? nil : url
-      race.updatedDate = .now
-    }
-    
-    try syncEditions(on: race, with: editions, by: userID)
-    try repository.save()
+//    try syncEditions(on: race, with: editions, by: userID)
+//    try repository.save()
   }
 }

@@ -40,15 +40,7 @@ struct RaceDetailEditionsSection: View {
             }
             
             HStack(alignment: .top, spacing: 20) {
-              ZStack(alignment: .leading) {
-                if let uiImage = edition.photo ?? edition.race.photo {
-                  Image(uiImage: uiImage)
-                    .styled(as: ImageType.raceThumbnail)
-                } else {
-                  Image(systemName: "photo.fill")
-                    .placeholderStyled(as: ImageType.raceThumbnail)
-                }
-              } // ZStack
+              RaceImage(urlString: edition.photoUrl, imageType: .raceThumbnail)
               
               FlowLayout(spacing: 10) {
                 ForEach(edition.distances.sorted()) { distance in
@@ -72,7 +64,7 @@ struct RaceDetailEditionsSection: View {
 
 #Preview("Sample") {
   ScrollView {
-    RaceDetailEditionsSection(editions: Race.sampleData.first!.editions)
+    RaceDetailEditionsSection(editions: RaceEdition.sampleData)
   }
 }
 

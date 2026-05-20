@@ -8,13 +8,22 @@
 import SwiftUI
 
 struct RaceImage: View {
-  let photo: UIImage?
+  let urlString: String?
   let imageType: ImageType
   
   var body: some View {
-    if let photo {
-      Image(uiImage: photo)
-        .styled(as: imageType)
+    if let urlString, let url = URL(string: urlString) {
+      AsyncImage(url: url) { phase in
+        switch phase {
+        case .empty:
+          ProgressView()
+        case .success(let image):
+          image.styled(as: imageType)
+        default:
+          Image(systemName: "photo.fill")
+            .placeholderStyled(as: imageType)
+        }
+      }
     } else {
       Image(systemName: "photo.fill")
         .placeholderStyled(as: imageType)
@@ -23,6 +32,6 @@ struct RaceImage: View {
 }
 
 #Preview {
-  RaceImage(photo: nil, imageType: .raceHero)
-  RaceImage(photo: nil, imageType: .raceThumbnail)
+  RaceImage(urlString: nil, imageType: .raceHero)
+  RaceImage(urlString: nil, imageType: .raceThumbnail)
 }

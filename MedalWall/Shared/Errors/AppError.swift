@@ -20,6 +20,7 @@ enum AppError: LocalizedError, Identifiable, Equatable {
   
   // Repository / Persistence Errors
   case contextNotAttached
+  case raceFetchFailed(String)
   case raceSaveFailed
   case raceDeleteFailed
   case userSaveFailed
@@ -44,6 +45,8 @@ enum AppError: LocalizedError, Identifiable, Equatable {
     switch self {
     case .contextNotAttached:
       "Context hasn't attached yet"
+    case .raceFetchFailed:
+      "Failed to Load Races"
     case .raceSaveFailed:
       "Race Save Failed"
     case .raceDeleteFailed:
@@ -80,6 +83,8 @@ enum AppError: LocalizedError, Identifiable, Equatable {
     switch self {
     case .contextNotAttached:
       "Internal error: Data context not available."
+    case .raceFetchFailed(let description):
+      "We couldn't load your races. \(description)"
     case .raceSaveFailed:
       "We couldn't save your race event."
     case .raceDeleteFailed:
@@ -121,6 +126,8 @@ enum AppError: LocalizedError, Identifiable, Equatable {
     switch self {
     case .contextNotAttached:
       "Please restart the app. If the problem continues, contact support."
+    case .raceFetchFailed:
+      "Please check your connection and try again."
     case .raceSaveFailed, .raceDeleteFailed, .userSaveFailed:
       "Please try it again."
     case .userLoadFailed:

@@ -40,7 +40,7 @@ struct EditRaceView: View {
           photo: viewModel.photo,
           hint: "Tap to \(viewModel.photo == nil ? "add a new" : "update the") race photo",
           photoView: {
-            RaceImage(photo: viewModel.photo, imageType: .raceHero)
+            RaceImage(urlString: nil, imageType: .raceHero)
           },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true

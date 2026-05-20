@@ -16,7 +16,7 @@ struct RaceDetailHeroSection: View {
   var body: some View {
     DetailHeroSection {
       RaceImage(
-        photo: photo,
+        urlString: nil,
         imageType: .raceHero
       )
     } infoContent: {
@@ -46,10 +46,10 @@ struct RaceDetailHeroSection: View {
   
   ScrollView {
     RaceDetailHeroSection(
-      photo: race.photo,
+      photo: nil,
       name: race.name,
       location: race.location.formatted,
-      url: race.url
+      url: race.websiteUrl
     )
   }
 }

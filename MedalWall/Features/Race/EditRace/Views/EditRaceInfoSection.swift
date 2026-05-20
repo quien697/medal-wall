@@ -41,7 +41,7 @@ struct EditRaceInfoSection: View {
   Form {
     EditRaceInfoSection(
       name: .constant(race.name),
-      url: .constant(race.url ?? "")
+      url: .constant(race.websiteUrl ?? "")
     )
     
     EditRaceInfoSection(
