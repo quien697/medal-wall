@@ -12,13 +12,20 @@ struct EditRaceView: View {
   // MARK: - Environment
   @Environment(UserManager.self) private var userManager
   @Environment(\.dismiss) private var dismiss
+  
   // MARK: - State
   @State private var viewModel: EditRaceViewModel
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingPhotoPicker: Bool = false
   @State private var isPresentingCropImageView: Bool = false
+  @State private var isPresentingAddEdition = false
+  @State private var selectedEdition: DraftRaceEdition?
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var rawPickedImage: UIImage?
+  
+  // MARK: - Namespace
+  @Namespace private var namespace
+  private let addEdition = "addEdition"
   
   // MARK: - Init
   init(mode: ItemEditMode, race: Race? = nil) {
@@ -57,6 +64,21 @@ struct EditRaceView: View {
           city: $viewModel.city,
           district: $viewModel.district
         )
+        
+        if viewModel.mode == .edit, let raceId = viewModel.raceId {
+          EditRaceEditionSection(
+            raceId: raceId,
+            editions: viewModel.displayedEditions,
+            isLoading: viewModel.isEditionsLoading,
+            namespace: namespace,
+            transitionID: addEdition,
+            onTapAddEdition: { isPresentingAddEdition = true },
+            onTapEdition: { selectedEdition = $0 },
+            onAdd: { viewModel.stageAddEdition($0) },
+            onUpdate: { viewModel.stageUpdateEdition($0) },
+            onDelete: viewModel.stageDeleteEdition
+          )
+        }
       } // Form
       .navigationTitle("\(viewModel.mode.displayName) Race")
       .navigationBarTitleDisplayMode(.inline)
@@ -64,6 +86,7 @@ struct EditRaceView: View {
       .background(Color.Background.primary)
       .task {
         await viewModel.loadExistingPhoto()
+        await viewModel.loadEditions()
       }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
@@ -125,6 +148,42 @@ struct EditRaceView: View {
           if let croppedImage {
             viewModel.updatePhoto(with: croppedImage)
           }
+        }
+      }
+      .sheet(isPresented: $isPresentingAddEdition) {
+        if let raceId = viewModel.raceId {
+          EditRaceEditionView(
+            mode: .add,
+            raceId: raceId,
+            onCommit: { draft in
+              viewModel.stageAddEdition(draft)
+            }
+          )
+          .navigationTransition(.zoom(sourceID: addEdition, in: namespace))
+        }
+      }
+      .sheet(item: $selectedEdition) { draft in
+        if let raceId = viewModel.raceId {
+          EditRaceEditionView(
+            mode: .edit,
+            raceId: raceId,
+            edition: RaceEdition(
+              id: draft.id,
+              raceId: raceId,
+              year: draft.year,
+              startDate: draft.startDate,
+              endDate: draft.endDate,
+              photoUrl: draft.existingPhotoUrl,
+              distances: draft.distances,
+              createdBy: draft.createdBy
+            ),
+            onCommit: { updatedDraft in
+              viewModel.stageUpdateEdition(updatedDraft)
+            },
+            onDelete: {
+              viewModel.stageDeleteEdition(id: draft.id)
+            }
+          )
         }
       }
       .sheet(item: $errorWrapper, onDismiss: {

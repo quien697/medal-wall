@@ -9,12 +9,10 @@ import Foundation
 
 @Observable
 final class RaceDetailViewModel {
-  // MARK: - Properties
   var race: Race
   var editions: [RaceEdition] = []
   var isLoading = false
   var error: AppError?
-  
   private let repository = RaceFirestoreRepository()
   
   // MARK: - Init
@@ -23,6 +21,16 @@ final class RaceDetailViewModel {
   }
   
   // MARK: - Functions
+  /// Reloads the race data from Firestore to reflect any edits.
+  func loadRace() async {
+    do {
+      if let updated = try await repository.fetchRace(id: race.id) {
+        race = updated
+      }
+    } catch {
+      // silently ignore — stale data is preferable to an error on dismiss
+    }
+  }
   
   /// Loads all editions for this race from Firestore.
   func loadEditions() async {
@@ -33,17 +41,6 @@ final class RaceDetailViewModel {
       editions = try await repository.fetchEditions(raceId: race.id)
     } catch {
       self.error = .raceFetchFailed(error.localizedDescription)
-    }
-  }
-  
-  /// Reloads the race data from Firestore to reflect any edits.
-  func loadRace() async {
-    do {
-      if let updated = try await repository.fetchRace(id: race.id) {
-        race = updated
-      }
-    } catch {
-      // silently ignore — stale data is preferable to an error on dismiss
     }
   }
   

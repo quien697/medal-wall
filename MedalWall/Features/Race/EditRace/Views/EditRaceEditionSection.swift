@@ -8,28 +8,32 @@
 import SwiftUI
 
 struct EditRaceEditionSection: View {
+  // MARK: - Properties
+  let raceId: String
   let editions: [DraftRaceEdition]
-  let racePhoto: UIImage?
+  let isLoading: Bool
   let namespace: Namespace.ID
   let transitionID: String
-  let onAdd: () -> Void
-  let onUpdate: ((DraftRaceEdition, DraftRaceEdition) -> Void)
-  let onDelete: (DraftRaceEdition) -> Void
+  let onTapAddEdition: () -> Void
+  let onTapEdition: (DraftRaceEdition) -> Void
+  let onAdd: (DraftRaceEdition) -> Void
+  let onUpdate: (DraftRaceEdition) -> Void
+  let onDelete: (String) -> Void
   
-  private var sortedEditions: [DraftRaceEdition] {
-    editions.sorted(by: { $0.startDate > $1.startDate })
-  }
-  
+  // MARK: - Body
   var body: some View {
     Section("Editions") {
-      if editions.isEmpty {
+      if isLoading && editions.isEmpty {
+        ProgressView()
+          .frame(maxWidth: .infinity, alignment: .center)
+      } else if editions.isEmpty {
         ContentUnavailableView {
           Text("No editions yet.")
             .font(.subheadline)
             .foregroundStyle(Color.Text.tertiary)
           
           Button {
-            onAdd()
+            onTapAddEdition()
           } label: {
             Label("Add Edition", systemImage: "plus")
               .labelStyle(.titleAndIcon)
@@ -44,28 +48,16 @@ struct EditRaceEditionSection: View {
           .matchedTransitionSource(id: transitionID, in: namespace)
         } // ContentUnavailableView
       } else {
-        ForEach(sortedEditions) { edition in
-          NavigationLink {
-            EditRaceEditionView(
-              mode: .edit,
-              edition: edition,
-              onAction: { updatedEdition in
-                onUpdate(edition, updatedEdition)
-              }
-            )
+        ForEach(editions) { edition in
+          Button {
+            onTapEdition(edition)
           } label: {
             HStack(alignment: .top, spacing: 10) {
-              ZStack(alignment: .leading) {
-                if let uiImage = edition.photo {
-                  Image(uiImage: uiImage)
-                    .styled(as: ImageType.raceThumbnail)
-                } else {
-                  RaceImage(
-                    urlString: nil,
-                    imageType: .raceThumbnail
-                  )
-                }
-              } // ZStack
+              if let photo = edition.displayPhoto {
+                RaceImage(photo: photo, imageType: .raceThumbnail)
+              } else {
+                RaceImage(urlString: edition.displayPhotoUrl, imageType: .raceThumbnail)
+              }
               
               VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 10) {
@@ -87,7 +79,7 @@ struct EditRaceEditionSection: View {
                           font: .caption,
                           fgColor: Color.Text.tertiary,
                           vPadding: 6,
-                          hPadding: 10,
+                          hPadding: 10
                         )
                     }
                   } // HStack
@@ -96,16 +88,17 @@ struct EditRaceEditionSection: View {
               
               Spacer()
             } // HStack
-          } // NavigationLink
+          } // Button
+          .buttonStyle(.plain)
         } // ForEach
         .onDelete { offsets in
           for index in offsets {
-            onDelete(sortedEditions[index])
+            onDelete(editions[index].id)
           }
         }
         
         Button {
-          onAdd()
+          onTapAddEdition()
         } label: {
           Label("Add Another Edition", systemImage: "plus")
             .labelStyle(.titleAndIcon)
@@ -125,27 +118,19 @@ struct EditRaceEditionSection: View {
 
 #Preview {
   @Previewable @Namespace var namespace
-  let drafts = RaceEdition.sampleData.map { DraftRaceEdition(from: $0) }
-
+  
   Form {
     EditRaceEditionSection(
-      editions: drafts,
-      racePhoto: nil,
-      namespace: namespace,
-      transitionID: "transitionID",
-      onAdd: {},
-      onUpdate: { _, _ in },
-      onDelete: { _ in  }
-    )
-    
-    EditRaceEditionSection(
+      raceId: "race-taipei",
       editions: [],
-      racePhoto: nil,
+      isLoading: false,
       namespace: namespace,
       transitionID: "transitionID",
-      onAdd: {},
-      onUpdate: { _, _ in },
-      onDelete: { _ in  }
+      onTapAddEdition: {},
+      onTapEdition: { _ in },
+      onAdd: { _ in },
+      onUpdate: { _ in },
+      onDelete: { _ in }
     )
   }
 }

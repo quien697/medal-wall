@@ -7,30 +7,37 @@
 
 import SwiftUI
 import PhotosUI
-import SwiftData
 
 struct EditRaceEditionView: View {
   // MARK: - Environment
+  @Environment(UserManager.self) private var userManager
   @Environment(\.dismiss) private var dismiss
+  
   // MARK: - State
-  @State private var isPresentingPhotoPicker: Bool = false
-  @State private var isPresentingCropImageView: Bool = false
-  @State private var isPresentingAddDistance: Bool = false
+  @State private var isPresentingPhotoPicker = false
+  @State private var isPresentingCropImageView = false
+  @State private var isPresentingAddDistance = false
+  @State private var isPresentingDeleteConfirm = false
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var rawPickedImage: UIImage?
   @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: EditRaceEditionViewModel
+  
   // MARK: - Properties
-  let onAction: (DraftRaceEdition) -> Void
+  private let onCommit: ((DraftRaceEdition) -> Void)?
+  private let onDelete: (() -> Void)?
   
   // MARK: - Init
   init(
     mode: ItemEditMode,
-    edition: DraftRaceEdition? = nil,
-    onAction: @escaping (DraftRaceEdition) -> Void
+    raceId: String,
+    edition: RaceEdition? = nil,
+    onCommit: ((DraftRaceEdition) -> Void)? = nil,
+    onDelete: (() -> Void)? = nil
   ) {
-    self.onAction = onAction
-    self._viewModel = State(initialValue: EditRaceEditionViewModel(mode: mode, edition: edition))
+    self._viewModel = State(initialValue: EditRaceEditionViewModel(mode: mode, raceId: raceId, edition: edition))
+    self.onCommit = onCommit
+    self.onDelete = onDelete
   }
   
   // MARK: - Body
@@ -38,9 +45,11 @@ struct EditRaceEditionView: View {
     NavigationStack {
       VStack {
         EditPhotoPicker(
-          photo: viewModel.draftEdition.photo,
-          hint: "Tap to \(viewModel.draftEdition.photo == nil ? "add a new" : "update the") race photo,\nor leave empty to use the race logo.",
-          photoView: { RaceImage(urlString: nil, imageType: .raceHero) },
+          photo: viewModel.photo,
+          hint: viewModel.photoHint,
+          photoView: {
+            RaceImage(photo: viewModel.photo, imageType: .raceHero)
+          },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
           },
@@ -53,35 +62,36 @@ struct EditRaceEditionView: View {
         
         Form {
           EditRaceEditionDateSection(
-            isOneDay: viewModel.draftEdition.isOneDay,
-            year: $viewModel.draftEdition.year,
-            startDate: $viewModel.draftEdition.startDate,
-            endDate: $viewModel.draftEdition.endDate,
+            isOneDay: viewModel.isOneDay,
+            year: $viewModel.year,
+            startDate: $viewModel.startDate,
+            endDate: $viewModel.endDate,
             minYear: viewModel.minYear,
             maxYear: viewModel.maxYear,
             yearDateRange: viewModel.yearDateRange,
             minEndDate: viewModel.minEndDate,
             maxEndDate: viewModel.maxEndDate,
-            onToggleOneDay: {
-              viewModel.toggleOneDay()
-            },
-            onUpdateYear: {
-              viewModel.updateYear($0)
-            },
-            onUpdateStartDate: {
-              viewModel.updateStartDate($0)
-            }
+            onToggleOneDay: { viewModel.toggleOneDay() },
+            onUpdateYear: { viewModel.updateYear($0) },
+            onUpdateStartDate: { viewModel.updateStartDate($0) }
           )
           
           EditRaceEditionDistanceSection(
-            distances: viewModel.draftEdition.distances,
-            onRemove: {
-              viewModel.removeDistance($0)
-            },
-            onAdd: {
-              isPresentingAddDistance = true
-            }
+            distances: viewModel.distances,
+            onRemove: { viewModel.removeDistance($0) },
+            onAdd: { isPresentingAddDistance = true }
           )
+          
+          if viewModel.mode == .edit {
+            Section {
+              Button(role: .destructive) {
+                isPresentingDeleteConfirm = true
+              } label: {
+                Text("Delete Edition")
+                  .frame(maxWidth: .infinity, alignment: .center)
+              }
+            } // Section
+          }
         } // Form
       } // VStack
       .navigationTitle("\(viewModel.mode.displayName) Edition")
@@ -89,12 +99,53 @@ struct EditRaceEditionView: View {
       .scrollContentBackground(.hidden)
       .background(Color.Background.primary)
       .toolbar {
-        ToolbarItem(placement: .topBarTrailing) {
-          Button(role: .confirm) {
-            onAction(viewModel.draftEdition)
+        ToolbarItem(placement: .cancellationAction) {
+          Button(role: .cancel) {
             dismiss()
           }
-          .disabled(!viewModel.isFormValid)
+        } // ToolbarItem
+        
+        ToolbarItem(placement: .confirmationAction) {
+          if viewModel.isLoading {
+            ProgressView()
+          } else {
+            Button(role: .confirm) {
+              if let onCommit {
+                let draft = viewModel.buildDraft(userId: userManager.currentUserID ?? "")
+                onCommit(draft)
+                dismiss()
+              } else {
+                guard let userId = userManager.currentUserID else {
+                  errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
+                  return
+                }
+                
+                Task {
+                  await viewModel.save(by: userId)
+                  if viewModel.error == nil {
+                    dismiss()
+                  }
+                }
+              }
+            }
+            .disabled(!viewModel.isFormValid)
+          }
+        } // ToolbarItem
+      } // toolbar
+      .task {
+        await viewModel.loadExistingPhoto()
+      }
+      .alert(isPresented: $isPresentingDeleteConfirm) {
+        .deleteConfirmation(name: "Edition") {
+          if let onDelete {
+            onDelete()
+            dismiss()
+          } else {
+            Task {
+              await viewModel.deleteEdition()
+              if viewModel.error == nil { dismiss() }
+            }
+          }
         }
       }
       .photosPicker(
@@ -114,6 +165,9 @@ struct EditRaceEditionView: View {
           }
         }
       }
+      .onChange(of: viewModel.error) { _, error in
+        if let error { errorWrapper = ErrorWrapper(error: error) }
+      }
       .sheet(isPresented: $isPresentingCropImageView, onDismiss: {
         selectedPhoto = nil
         rawPickedImage = nil
@@ -122,9 +176,7 @@ struct EditRaceEditionView: View {
           image: rawPickedImage,
           cropShape: .square
         ) { croppedImage in
-          if let croppedImage {
-            viewModel.updatePhoto(with: croppedImage)
-          }
+          if let croppedImage { viewModel.updatePhoto(with: croppedImage) }
         }
       }
       .sheet(isPresented: $isPresentingAddDistance) {
@@ -137,29 +189,26 @@ struct EditRaceEditionView: View {
         }
         .presentationDetents([.medium])
       }
-      .sheet(item: $errorWrapper) { wrapper in
+      .sheet(
+        item: $errorWrapper,
+        onDismiss: { viewModel.error = nil }
+      ) { wrapper in
         ErrorView(errorWrapper: wrapper)
-      }
+      } // sheet
     } // NavigationStack
   }
 }
 
 #Preview("Add Mode") {
-  NavigationStack {
-    EditRaceEditionView(
-      mode: .add,
-      edition: nil,
-      onAction: { _ in }
-    )
-  }
+  EditRaceEditionView(mode: .add, raceId: "preview-race-id")
+    .environment(UserManager())
 }
 
-#Preview("Edit Mode", traits: .sampleData) {
-  NavigationStack {
-    EditRaceEditionView(
-      mode: .edit,
-      edition: DraftRaceEdition(from: RaceEdition.sampleData.first!),
-      onAction: { _ in }
-    )
-  }
+#Preview("Edit Mode") {
+  EditRaceEditionView(
+    mode: .edit,
+    raceId: RaceEdition.sampleData.first!.raceId,
+    edition: RaceEdition.sampleData.first!
+  )
+  .environment(UserManager())
 }

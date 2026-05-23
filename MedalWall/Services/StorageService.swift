@@ -55,7 +55,12 @@ final class StorageService {
   func uploadRaceEditionLogo(raceId: String, editionId: String, image: UIImage) async throws -> String {
     try await upload(image: image, to: Path.raceEditionLogo(raceId: raceId, editionId: editionId))
   }
-  
+
+  /// Deletes a race edition logo from Firebase Storage.
+  func deleteRaceEditionLogo(raceId: String, editionId: String) async throws {
+    try await delete(at: Path.raceEditionLogo(raceId: raceId, editionId: editionId))
+  }
+
   // MARK: - Functions -> Common
   
   private func upload(image: UIImage, to path: String) async throws -> String {

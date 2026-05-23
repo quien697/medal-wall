@@ -6,93 +6,235 @@
 //
 
 import SwiftUI
-import SwiftData
 
 @Observable
 final class EditRaceEditionViewModel {
+  // MARK: - Data
+  var year: Int
   let minYear: Int = 1911
   let maxYear: Int = 2060
-  var draftEdition: DraftRaceEdition
-  let mode: ItemEditMode
+  var isOneDay: Bool
+  var startDate: Date
+  var endDate: Date
+  var photo: UIImage?
+  var distances: [RaceDistance] = []
   
-  init(mode: ItemEditMode, edition: DraftRaceEdition?) {
+  // MARK: - State
+  var isPhotoChanged = false
+  var isLoading = false
+  var error: AppError?
+  
+  // MARK: - Dependencies
+  let mode: ItemEditMode
+  private let raceId: String
+  private let edition: RaceEdition?
+  private let repository = RaceFirestoreRepository()
+  private let storageService = StorageService()
+  
+  // MARK: - Init
+  init(mode: ItemEditMode, raceId: String, edition: RaceEdition?) {
     self.mode = mode
-    self.draftEdition = edition ?? DraftRaceEdition()
+    self.raceId = raceId
+    self.edition = edition
+    
+    if let edition, mode == .edit {
+      self.year = edition.year
+      self.isOneDay = edition.isOneDay
+      self.startDate = edition.startDate
+      self.endDate = edition.endDate
+      self.distances = edition.distances
+    } else {
+      let currentYear = Calendar.current.component(.year, from: Date())
+      self.year = currentYear
+      self.isOneDay = true
+      self.startDate = Date()
+      self.endDate = Date()
+      self.distances = []
+    }
+  }
+  
+  // MARK: - Computed
+  var photoHint: String {
+    let action = photo == nil ? "add a new" : "update the"
+    return "Tap to \(action) edition photo,\nor leave empty to use the race logo."
   }
   
   var isFormValid: Bool {
-    draftEdition.year >= minYear &&
-    draftEdition.year <= maxYear &&
-    draftEdition.startDate <= draftEdition.endDate
+    year >= minYear && year <= maxYear && startDate <= endDate
   }
   
   var yearDateRange: ClosedRange<Date> {
     let calendar = Calendar.current
-    let startOfYear = calendar.date(from: DateComponents(year: draftEdition.year, month: 1, day: 1)) ?? Date()
-    let endOfYear = calendar.date(from: DateComponents(year: draftEdition.year, month: 12, day: 31)) ?? Date()
-    
+    let startOfYear = calendar.date(from: DateComponents(year: year, month: 1, day: 1)) ?? Date()
+    let endOfYear = calendar.date(from: DateComponents(year: year, month: 12, day: 31)) ?? Date()
     return startOfYear...endOfYear
   }
   
-  var minEndDate: Date {
-    draftEdition.startDate
-  }
+  var minEndDate: Date { startDate }
   
   var maxEndDate: Date {
-    return Calendar.current.date(from: DateComponents(year: draftEdition.year, month: 12, day: 31)) ?? Date()
+    Calendar.current.date(from: DateComponents(year: year, month: 12, day: 31)) ?? Date()
   }
   
+  // MARK: - Functions
+  
+  /// Downloads the existing edition photo into `photo` so the picker shows the current image.
+  func loadExistingPhoto() async {
+    photo = await UIImage.load(from: edition?.photoUrl)
+  }
+  
+  /// Replaces the current photo and marks it as changed.
   func updatePhoto(with uiImage: UIImage) {
-    draftEdition.photoData = uiImage.pngData()
+    photo = uiImage
+    isPhotoChanged = true
   }
   
+  /// Clears the current photo and marks it as changed.
   func clearPhoto() {
-    draftEdition.photoData = nil
+    photo = nil
+    isPhotoChanged = true
   }
   
+  /// Toggles the one-day flag and aligns the end date with start date when enabled.
   func toggleOneDay() {
-    draftEdition.isOneDay.toggle()
-    
-    if draftEdition.isOneDay {
-      draftEdition.endDate = draftEdition.startDate
-    }
+    isOneDay.toggle()
+    if isOneDay { endDate = startDate }
   }
   
+  /// Updates the year and clamps both dates to remain within the new year's bounds.
   func updateYear(_ newYear: Int) {
-    draftEdition.year = newYear
-    let startOfYear = Calendar.current.date(from: DateComponents(year: newYear, month: 1, day: 1)) ?? Date()
-    let endOfYear = Calendar.current.date(from: DateComponents(year: newYear, month: 12, day: 31)) ?? Date()
-    
-    if draftEdition.startDate < startOfYear || draftEdition.startDate > endOfYear {
-      draftEdition.startDate = startOfYear
-    }
-    
-    if draftEdition.endDate < draftEdition.startDate || draftEdition.endDate > endOfYear {
-      draftEdition.endDate = draftEdition.isOneDay ? draftEdition.startDate : endOfYear
-    }
+    year = newYear
+    let calendar = Calendar.current
+    let startOfYear = calendar.date(from: DateComponents(year: newYear, month: 1, day: 1)) ?? Date()
+    let endOfYear = calendar.date(from: DateComponents(year: newYear, month: 12, day: 31)) ?? Date()
+    if startDate < startOfYear || startDate > endOfYear { startDate = startOfYear }
+    if endDate < startDate || endDate > endOfYear { endDate = isOneDay ? startDate : endOfYear }
   }
   
+  /// Updates the start date and advances the end date if it would fall before the new start.
   func updateStartDate(_ newStartDate: Date) {
-    draftEdition.startDate = newStartDate
-    
-    if draftEdition.isOneDay {
-      draftEdition.endDate = newStartDate
-    } else {
-      if draftEdition.endDate < newStartDate {
-        draftEdition.endDate = newStartDate
-      }
+    startDate = newStartDate
+    if isOneDay {
+      endDate = newStartDate
+    } else if endDate < newStartDate {
+      endDate = newStartDate
     }
   }
   
+  /// Appends a distance to the list, throwing if it is already present.
   func addDistance(_ distance: RaceDistance) throws {
-    guard !draftEdition.distances.contains(distance) else {
-      throw AppError.duplicateDistance
-    }
-    
-    draftEdition.distances.append(distance)
+    guard !distances.contains(distance) else { throw AppError.duplicateDistance }
+    distances.append(distance)
   }
   
+  /// Removes a distance from the list.
   func removeDistance(_ distance: RaceDistance) {
-    draftEdition.distances.removeAll { $0 == distance }
+    distances.removeAll { $0 == distance }
+  }
+  
+  /// Constructs a DraftRaceEdition from current form state without saving to Firestore.
+  func buildDraft(userId: String) -> DraftRaceEdition {
+    switch mode {
+    case .add:
+      var draft = DraftRaceEdition(
+        year: year,
+        isOneDay: isOneDay,
+        startDate: startDate,
+        endDate: endDate,
+        distances: distances,
+        createdBy: userId
+      )
+      if let photo, let data = photo.jpegData(compressionQuality: 0.8) {
+        draft.newPhotoData = data
+      }
+      return draft
+      
+    case .edit:
+      guard let edition else {
+        return DraftRaceEdition(
+          year: year, isOneDay: isOneDay, startDate: startDate,
+          endDate: endDate, distances: distances, createdBy: userId
+        )
+      }
+      var draft = DraftRaceEdition(from: edition)
+      draft.year = year
+      draft.isOneDay = isOneDay
+      draft.startDate = startDate
+      draft.endDate = endDate
+      draft.distances = distances
+      draft.isModified = true
+      if isPhotoChanged {
+        if let photo, let data = photo.jpegData(compressionQuality: 0.8) {
+          draft.newPhotoData = data
+          draft.isPhotoCleared = false
+        } else {
+          draft.newPhotoData = nil
+          draft.isPhotoCleared = true
+        }
+      }
+      return draft
+    }
+  }
+  
+  /// Creates or updates the edition in Firestore, uploading the photo only when it was changed.
+  func save(by userID: String) async {
+    isLoading = true
+    defer { isLoading = false }
+    
+    do {
+      switch mode {
+      case .add:
+        var newEdition = RaceEdition(
+          raceId: raceId,
+          year: year,
+          startDate: startDate,
+          endDate: endDate,
+          distances: distances,
+          createdBy: userID
+        )
+        if let photo {
+          newEdition.photoUrl = try await storageService.uploadRaceEditionLogo(
+            raceId: raceId, editionId: newEdition.id, image: photo
+          )
+        }
+        try await repository.createEdition(newEdition)
+        
+      case .edit:
+        guard var edition else { return }
+        edition.year = year
+        edition.startDate = startDate
+        edition.endDate = endDate
+        edition.distances = distances
+        if isPhotoChanged {
+          if let photo {
+            edition.photoUrl = try await storageService.uploadRaceEditionLogo(
+              raceId: raceId, editionId: edition.id, image: photo
+            )
+          } else {
+            try? await storageService.deleteRaceEditionLogo(raceId: raceId, editionId: edition.id)
+            edition.photoUrl = nil
+          }
+        }
+        try await repository.updateEdition(edition)
+      }
+    } catch {
+      self.error = .editionSaveFailed
+    }
+  }
+  
+  /// Deletes the edition from Firestore and cleans up its photo from Storage.
+  func deleteEdition() async {
+    guard let edition else { return }
+    isLoading = true
+    defer { isLoading = false }
+    
+    do {
+      if edition.photoUrl != nil {
+        try? await storageService.deleteRaceEditionLogo(raceId: raceId, editionId: edition.id)
+      }
+      try await repository.deleteEdition(raceId: raceId, editionId: edition.id)
+    } catch {
+      self.error = .editionDeleteFailed
+    }
   }
 }

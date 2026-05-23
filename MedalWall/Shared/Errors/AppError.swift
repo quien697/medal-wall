@@ -23,6 +23,8 @@ enum AppError: LocalizedError, Identifiable, Equatable {
   case raceFetchFailed(String)
   case raceSaveFailed
   case raceDeleteFailed
+  case editionSaveFailed
+  case editionDeleteFailed
   case userSaveFailed
   
   // User Manager
@@ -51,6 +53,10 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "Race Save Failed"
     case .raceDeleteFailed:
       "Race Delete Failed"
+    case .editionSaveFailed:
+      "Edition Save Failed"
+    case .editionDeleteFailed:
+      "Edition Delete Failed"
     case .userSaveFailed:
       "User Save Failed"
     case .userLoadFailed:
@@ -89,6 +95,10 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "We couldn't save your race event."
     case .raceDeleteFailed:
       "We couldn't delete this race event. Please try again."
+    case .editionSaveFailed:
+      "We couldn't save this edition."
+    case .editionDeleteFailed:
+      "We couldn't delete this edition. Please try again."
     case .userSaveFailed:
       "We couldn't save your user information."
     case .userLoadFailed:
@@ -128,7 +138,7 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "Please restart the app. If the problem continues, contact support."
     case .raceFetchFailed:
       "Please check your connection and try again."
-    case .raceSaveFailed, .raceDeleteFailed, .userSaveFailed:
+    case .raceSaveFailed, .raceDeleteFailed, .editionSaveFailed, .editionDeleteFailed, .userSaveFailed:
       "Please try it again."
     case .userLoadFailed:
       "Please restart the app. If the problem continues, you may need to reinstall."

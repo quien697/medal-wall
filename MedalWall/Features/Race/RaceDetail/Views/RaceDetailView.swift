@@ -10,6 +10,7 @@ import SwiftUI
 struct RaceDetailView: View {
   // MARK: - Environment
   @Environment(\.dismiss) private var dismiss
+  
   // MARK: - State
   @State private var viewModel: RaceDetailViewModel
   @State private var errorWrapper: ErrorWrapper?
@@ -86,6 +87,7 @@ struct RaceDetailView: View {
     .sheet(isPresented: $isPresentingEditRace, onDismiss: {
       Task {
         await viewModel.loadRace()
+        await viewModel.loadEditions()
       }
     }) {
       EditRaceView(mode: .edit, race: viewModel.race)

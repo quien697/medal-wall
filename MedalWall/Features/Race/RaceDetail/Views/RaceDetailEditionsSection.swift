@@ -37,7 +37,7 @@ struct RaceDetailEditionsSection: View {
                 .foregroundStyle(Color.Text.tertiary)
               
               Spacer()
-            }
+            } // HStack
             
             HStack(alignment: .top, spacing: 20) {
               RaceImage(urlString: edition.photoUrl, imageType: .raceThumbnail)
@@ -47,7 +47,7 @@ struct RaceDetailEditionsSection: View {
                   Text(distance.displayLabel)
                     .secondaryButtonStyle(
                       vPadding: 6,
-                      hPadding: 10,
+                      hPadding: 10
                     )
                 }
               } // FlowLayout
@@ -73,5 +73,3 @@ struct RaceDetailEditionsSection: View {
     RaceDetailEditionsSection(editions: [])
   }
 }
-
-

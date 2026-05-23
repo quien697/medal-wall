@@ -9,15 +9,18 @@ import Foundation
 
 @Observable
 final class RacesViewModel {
-  // MARK: - Properties
+  // MARK: - State
   var races: [Race] = []
   var isLoading = false
   var error: AppError?
+  
+  // MARK: - Filter
   var searchText: String = ""
   var selectedTypes: Set<RaceDistanceType> = []
   var selectedCategories: Set<RaceDistanceCategory> = []
   var selectedSort: RaceSort = .name
   
+  // MARK: - Dependencies
   private let repository = RaceFirestoreRepository()
   
   // MARK: - Computed
@@ -29,7 +32,6 @@ final class RacesViewModel {
   }
   
   // MARK: - Functions
-  
   /// Loads all races created by the given user from Firestore.
   func loadRaces() async {
     isLoading = true

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct EditRaceEditionDateSection: View {
+  // MARK: - Properties
   let isOneDay: Bool
   @Binding var year: Int
   @Binding var startDate: Date
@@ -21,6 +22,7 @@ struct EditRaceEditionDateSection: View {
   var onUpdateYear: (Int) -> Void
   var onUpdateStartDate: (Date) -> Void
   
+  // MARK: - Body
   var body: some View {
     Section("Date") {
       Toggle(isOn: Binding(
@@ -30,7 +32,7 @@ struct EditRaceEditionDateSection: View {
         Text("One Day Event")
           .fromLabelStyle()
       }
-
+      
       Picker(selection: Binding(
         get: { year },
         set: { onUpdateYear($0) }
@@ -56,7 +58,7 @@ struct EditRaceEditionDateSection: View {
         Text("Start Date")
           .fromLabelStyle()
       }
-
+      
       if !isOneDay {
         DatePicker(
           selection: $endDate,

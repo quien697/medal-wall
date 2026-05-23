@@ -10,12 +10,14 @@ import SwiftUI
 struct RacesView: View {
   // MARK: - Environment
   @Environment(UserManager.self) private var userManager
+  
   // MARK: - State
   @State private var viewModel: RacesViewModel = RacesViewModel()
   @State private var errorWrapper: ErrorWrapper?
   @State private var selectedRace: Race?
   @State private var isPresentingAddRace = false
   @State private var isPresentingDeleteConfirm = false
+  
   // MARK: - Namespace
   @Namespace private var namespace
   private let addRace = "addRace"

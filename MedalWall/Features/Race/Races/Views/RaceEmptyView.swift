@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct RaceEmptyView: View {
-  
   var body: some View {
     ContentUnavailableView(
       "No Race evnets",
