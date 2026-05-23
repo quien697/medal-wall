@@ -12,6 +12,7 @@ final class RaceFirestoreRepository {
   private let db = Firestore.firestore()
   private let collection = "races"
   private let editionsCollection = "editions"
+  private let editionCount = "editionCount"
 
   // MARK: - Race
 
@@ -62,9 +63,12 @@ final class RaceFirestoreRepository {
     return try snapshot.documents.map { try $0.data(as: RaceEdition.self) }
   }
 
-  /// Creates a new edition document under the race.
+  /// Creates a new edition document under the race and increments the race's edition count.
   func createEdition(_ edition: RaceEdition) async throws {
     try editionsRef(raceId: edition.raceId).document(edition.id).setData(from: edition)
+    try? await db.collection(collection).document(edition.raceId).updateData([
+      editionCount: FieldValue.increment(Int64(1))
+    ])
   }
 
   /// Replaces the edition document with the updated RaceEdition and stamps updatedAt.
@@ -74,8 +78,11 @@ final class RaceFirestoreRepository {
     try editionsRef(raceId: updated.raceId).document(updated.id).setData(from: updated)
   }
 
-  /// Deletes a single edition by ID.
+  /// Deletes a single edition by ID and decrements the race's edition count.
   func deleteEdition(raceId: String, editionId: String) async throws {
     try await editionsRef(raceId: raceId).document(editionId).delete()
+    try? await db.collection(collection).document(raceId).updateData([
+      editionCount: FieldValue.increment(Int64(-1))
+    ])
   }
 }

@@ -27,7 +27,7 @@ struct RaceList: View {
               photoUrl: race.photoUrl,
               name: race.name,
               location: race.location.formatted,
-              editionCount: 0
+              editionCount: race.editionCount
             )
           } // NavigationLink
           .swipeActions(edge: .trailing) {

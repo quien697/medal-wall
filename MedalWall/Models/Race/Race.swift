@@ -13,6 +13,7 @@ struct Race: Codable, Identifiable {
   var photoUrl: String?
   var location: GeoLocation
   var websiteUrl: String?
+  var editionCount: Int
   var createdBy: String
   var createdAt: Date
   var updatedAt: Date
@@ -25,6 +26,7 @@ struct Race: Codable, Identifiable {
     photoUrl: String? = nil,
     location: GeoLocation,
     websiteUrl: String? = nil,
+    editionCount: Int = 0,
     createdBy: String,
     createdAt: Date = .now,
     updatedAt: Date = .now
@@ -34,6 +36,7 @@ struct Race: Codable, Identifiable {
     self.photoUrl = photoUrl
     self.location = location
     self.websiteUrl = websiteUrl
+    self.editionCount = editionCount
     self.createdBy = createdBy
     self.createdAt = createdAt
     self.updatedAt = updatedAt
