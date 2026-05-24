@@ -56,54 +56,6 @@ struct RacesView: View {
         } // ToolbarItem
         
         ToolbarItem(placement: .topBarTrailing) {
-          Menu {
-            Picker("Sort", selection: $viewModel.selectedSort) {
-              ForEach(RaceSort.allCases, id: \.self) { sort in
-                Text("Sort by \(sort.displayName)")
-                  .tag(sort)
-              } // ForEach
-            } // Picker
-            
-            Section("Filter by Race Distance") {
-              ForEach(RaceDistanceCategory.standardCases, id: \.self) { category in
-                Button {
-                  if viewModel.selectedCategories.contains(category) {
-                    viewModel.selectedCategories.remove(category)
-                  } else {
-                    viewModel.selectedCategories.insert(category)
-                  }
-                } label: {
-                  Label(
-                    category.description,
-                    systemImage: viewModel.selectedCategories.contains(category) ? "checkmark.square" : "square"
-                  )
-                } // Button
-              } // ForEach
-            } // Section
-            
-            Section("Filter by Race Type") {
-              ForEach(RaceDistanceType.allCases, id: \.self) { type in
-                Button {
-                  if viewModel.selectedTypes.contains(type) {
-                    viewModel.selectedTypes.remove(type)
-                  } else {
-                    viewModel.selectedTypes.insert(type)
-                  }
-                } label: {
-                  Label(
-                    type.displayName,
-                    systemImage: viewModel.selectedTypes.contains(type) ? "checkmark.square" : "square"
-                  )
-                } // Button
-              } // ForEach
-            } // Section
-          } label: {
-            Label("Filter", systemImage: "line.3.horizontal.decrease")
-          } // Menu
-          .menuActionDismissBehavior(.disabled)
-        } // ToolbarItem
-        
-        ToolbarItem(placement: .topBarTrailing) {
           Button {
             isPresentingAddRace = true
           } label: {

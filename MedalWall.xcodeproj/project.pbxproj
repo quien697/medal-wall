@@ -73,7 +73,6 @@
 				Models/Race/RaceDistanceCategory.swift,
 				Models/Race/RaceDistanceType.swift,
 				Models/Race/RaceEdition.swift,
-				Models/Race/RaceSort.swift,
 				Models/User/Gender.swift,
 				Models/User/User.swift,
 				Models/User/UserName.swift,

@@ -16,9 +16,6 @@ final class RacesViewModel {
   
   // MARK: - Filter
   var searchText: String = ""
-  var selectedTypes: Set<RaceDistanceType> = []
-  var selectedCategories: Set<RaceDistanceCategory> = []
-  var selectedSort: RaceSort = .name
   
   // MARK: - Dependencies
   private let repository = RaceFirestoreRepository()
@@ -28,7 +25,7 @@ final class RacesViewModel {
     let searched = searchText.isEmpty
     ? races
     : races.filter { $0.name.localizedStandardContains(searchText) }
-    return searched.sorted(by: selectedSort.comparator)
+    return searched.sorted { $0.name.localizedCompare($1.name) == .orderedAscending }
   }
   
   // MARK: - Functions
