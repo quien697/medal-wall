@@ -10,7 +10,7 @@ import SwiftUI
 struct PhotoViewerFooter: View {
   let photos: [UIImage]
   @Binding var selectedIndex: Int
-  
+
   var body: some View {
     ScrollViewReader { proxy in
       ScrollView(.horizontal, showsIndicators: false) {
@@ -32,16 +32,16 @@ struct PhotoViewerFooter: View {
                 withAnimation { selectedIndex = index }
               }
               .id(index)
-          } // ForEach
-        } // HStack
+          }  // ForEach
+        }  // HStack
         .padding()
-      } // ScrollView
+      }  // ScrollView
       .onChange(of: selectedIndex) { _, newValue in
         withAnimation {
           proxy.scrollTo(newValue, anchor: .center)
         }
       }
-    } // ScrollViewReader
+    }  // ScrollViewReader
   }
 }
 

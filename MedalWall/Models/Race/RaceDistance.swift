@@ -12,12 +12,12 @@ struct RaceDistance: Identifiable, Hashable, Comparable, Codable {
   let id: UUID = UUID()
   var category: RaceDistanceCategory
   var type: RaceDistanceType
-  
+
   /// Fallback used when no distance has been selected yet.
   static var `default`: RaceDistance {
     RaceDistance(category: .full, type: .inPerson)
   }
-  
+
   /// `"42km"` for in-person, `"Virtual 21km"` for other types.
   var displayLabel: String {
     if type == .inPerson {
@@ -25,17 +25,16 @@ struct RaceDistance: Identifiable, Hashable, Comparable, Codable {
     }
     return "\(type.displayName) \(category.description)"
   }
-  
-  static func ==(lhs: RaceDistance, rhs: RaceDistance) -> Bool {
-    lhs.category.value == rhs.category.value &&
-    lhs.type == rhs.type
+
+  static func == (lhs: RaceDistance, rhs: RaceDistance) -> Bool {
+    lhs.category.value == rhs.category.value && lhs.type == rhs.type
   }
-  
+
   func hash(into hasher: inout Hasher) {
     hasher.combine(category.value)
     hasher.combine(type)
   }
-  
+
   /// Comparable:
   /// Sort by type first, then distance (largest to smallest)
   static func < (lhs: RaceDistance, rhs: RaceDistance) -> Bool {
@@ -47,12 +46,12 @@ struct RaceDistance: Identifiable, Hashable, Comparable, Codable {
 }
 
 extension RaceDistance {
-  
+
   private enum CodingKeys: String, CodingKey {
     case value
     case type
   }
-  
+
   /// Decodes from `{ "value": Double, "type": String }` — the Firestore storage format.
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -61,7 +60,7 @@ extension RaceDistance {
     self.category = RaceDistanceCategory(value: value)
     self.type = RaceDistanceType(rawValue: typeRaw) ?? .inPerson
   }
-  
+
   /// Encodes to `{ "value": Double, "type": String }` — the Firestore storage format.
   func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)

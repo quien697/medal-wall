@@ -13,7 +13,7 @@ struct EmailInputSection: View {
   let isEmailValid: Bool
   let isSendingEmail: Bool
   let onSendLink: () async -> Void
-  
+
   // MARK: - Body
   var body: some View {
     VStack(alignment: .center, spacing: 16) {
@@ -21,7 +21,7 @@ struct EmailInputSection: View {
         title: "What's your email?",
         subTitle: "Enter your email address and we'll send you a sign-in link. No password needed."
       )
-      
+
       TextField("you@example.com", text: $email)
         .keyboardType(.emailAddress)
         .textInputAutocapitalization(.never)
@@ -30,7 +30,7 @@ struct EmailInputSection: View {
         .background(Color.Card.Background.tertiary)
         .clipShape(.rect(cornerRadius: 12))
         .tint(Color.Text.primary)
-      
+
       Button {
         Task {
           await onSendLink()
@@ -43,22 +43,22 @@ struct EmailInputSection: View {
           } else {
             Text("Send Sign-in Link")
           }
-        } // Group
+        }  // Group
         .frame(maxWidth: .infinity)
-      } // Button
+      }  // Button
       .buttonStyle(.borderedProminent)
       .controlSize(.large)
       .disabled(!isEmailValid || isSendingEmail)
-      
+
       Spacer()
-    } // VStack
+    }  // VStack
     .padding()
   }
 }
 
 #Preview("Idle") {
   @Previewable @State var email = ""
-  
+
   EmailInputSection(
     email: $email,
     isEmailValid: false,
@@ -69,7 +69,7 @@ struct EmailInputSection: View {
 
 #Preview("Email Valid") {
   @Previewable @State var email = "you@example.com"
-  
+
   EmailInputSection(
     email: $email,
     isEmailValid: true,
@@ -80,7 +80,7 @@ struct EmailInputSection: View {
 
 #Preview("Sending") {
   @Previewable @State var email = "you@example.com"
-  
+
   EmailInputSection(
     email: $email,
     isEmailValid: true,

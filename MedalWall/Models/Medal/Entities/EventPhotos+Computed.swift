@@ -9,7 +9,7 @@ import UIKit
 
 /// Extends EventPhoto with computed values
 extension EventPhoto {
-  
+
   var image: UIImage? {
     UIImage(data: imageData)
   }

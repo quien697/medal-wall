@@ -10,17 +10,17 @@ import SwiftUI
 struct MedalImage: View {
   private let systemImageName: String = "medal.fill"
   private let imageType: ImageType = .medal
-  
+
   let size: CGFloat
   let photo: UIImage?
-  
+
   init(
     photo: UIImage? = nil,
   ) {
     self.photo = photo
     self.size = imageType.size.width
   }
-  
+
   var body: some View {
     ZStack {
       Hexagon()
@@ -55,7 +55,7 @@ struct MedalImage: View {
           y: 2
         )
         .frame(width: size * 0.9, height: size)
-      
+
       if let uiImage = photo {
         Image(uiImage: uiImage)
           .resizable()
@@ -72,7 +72,7 @@ struct MedalImage: View {
           .font(.system(size: size * 0.3, weight: .semibold))
           .foregroundColor(Color.Gold.primary)
       }
-    } // ZStack
+    }  // ZStack
   }
 }
 
@@ -80,7 +80,7 @@ struct MedalImage: View {
   VStack(spacing: 20) {
     MedalImage(photo: nil)
       .background(Color.Background.primary)
-    
+
     MedalImage(
       photo: UIImage(named: "bmo-vancouver-marathon-2022")
     )

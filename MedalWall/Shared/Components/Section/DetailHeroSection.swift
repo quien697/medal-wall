@@ -24,7 +24,7 @@ struct DetailHeroSection<ImageContent: View, InfoContent: View>: View {
   var body: some View {
     HStack(alignment: .top, spacing: 16) {
       imageContent
-      
+
       VStack(alignment: .leading, spacing: 8) {
         infoContent
       }

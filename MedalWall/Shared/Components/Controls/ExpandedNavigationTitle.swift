@@ -10,13 +10,13 @@ import SwiftUI
 /// A large title in an expanded font.
 struct ExpandedNavigationTitle: View {
   var title: LocalizedStringKey
-  
+
   var body: some View {
     HStack {
       Text(title)
         .font(.system(size: 34, weight: .bold))
         .fixedSize()
-      
+
       Spacer()
     }
   }

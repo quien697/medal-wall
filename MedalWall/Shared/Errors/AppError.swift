@@ -17,7 +17,7 @@ enum AppError: LocalizedError, Identifiable, Equatable {
   case signInFailed
   case noInternetConnection
   case sendEmailSignInLinkFailed(String)
-  
+
   // Repository / Persistence Errors
   case contextNotAttached
   case raceFetchFailed(String)
@@ -26,23 +26,23 @@ enum AppError: LocalizedError, Identifiable, Equatable {
   case editionSaveFailed
   case editionDeleteFailed
   case userSaveFailed
-  
+
   // User Manager
   case userLoadFailed
-  
+
   // Validation Errors
   case duplicateEdition
   case duplicateDistance
-  
+
   // Media Errors
   case photoLoadFailed
   case photoDataInvalid
-  
+
   // Unknown
   case unknown
-  
+
   var id: String { localizedDescription }
-  
+
   var title: String {
     switch self {
     case .contextNotAttached:
@@ -74,17 +74,17 @@ enum AppError: LocalizedError, Identifiable, Equatable {
     case .noInternetConnection:
       "No Internet Connection"
     case .invalidCredential,
-        .missingNonce,
-        .missingIdentityToken,
-        .nonceFailed(_),
-        .tokenSerializationFailed(_),
-        .signInFailed:
+      .missingNonce,
+      .missingIdentityToken,
+      .nonceFailed(_),
+      .tokenSerializationFailed(_),
+      .signInFailed:
       "Sign In Failed"
     case .unknown:
       "Unexpected Error"
     }
   }
-  
+
   var message: String {
     switch self {
     case .contextNotAttached:
@@ -131,14 +131,15 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "Something unexpected happened."
     }
   }
-  
+
   var guidance: String {
     switch self {
     case .contextNotAttached:
       "Please restart the app. If the problem continues, contact support."
     case .raceFetchFailed:
       "Please check your connection and try again."
-    case .raceSaveFailed, .raceDeleteFailed, .editionSaveFailed, .editionDeleteFailed, .userSaveFailed:
+    case .raceSaveFailed, .raceDeleteFailed, .editionSaveFailed, .editionDeleteFailed,
+      .userSaveFailed:
       "Please try it again."
     case .userLoadFailed:
       "Please restart the app. If the problem continues, you may need to reinstall."
@@ -155,11 +156,11 @@ enum AppError: LocalizedError, Identifiable, Equatable {
     case .noInternetConnection:
       "Please check your connection and try again."
     case .invalidCredential,
-        .missingNonce,
-        .missingIdentityToken,
-        .nonceFailed(_),
-        .tokenSerializationFailed(_),
-        .signInFailed:
+      .missingNonce,
+      .missingIdentityToken,
+      .nonceFailed(_),
+      .tokenSerializationFailed(_),
+      .signInFailed:
       "Please try signing in again."
     case .unknown:
       "Please try again later."

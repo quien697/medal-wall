@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AddRaceEditionView: View {
   let raceId: String
-  
+
   var body: some View {
     EditRaceEditionView(mode: .add, raceId: raceId)
   }

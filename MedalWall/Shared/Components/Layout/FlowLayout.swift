@@ -18,8 +18,7 @@ import SwiftUI
 ///
 struct FlowLayout: Layout {
   var spacing: CGFloat = 20
-//  var alignment: HorizontalAlignment = .leading
-  
+
   /// Calculates the total size needed to fit all subviews with the flow layout
   /// - Returns: The minimum size that can contain all subviews arranged in flowing lines
   func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
@@ -30,9 +29,11 @@ struct FlowLayout: Layout {
     )
     return result.size
   }
-  
+
   /// Positions each subview within the given bounds using the flow layout algorithm
-  func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+  func placeSubviews(
+    in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()
+  ) {
     let result = FlowResult(
       in: bounds.width,
       subviews: subviews,
@@ -46,14 +47,14 @@ struct FlowLayout: Layout {
       )
     }
   }
-  
+
   /// Holds the calculated layout information: total size and position of each subview
   struct FlowResult {
     /// The total size needed to contain all subviews
     var size: CGSize = .zero
     /// The position of each subview in the flow layout
     var positions: [CGPoint] = []
-    
+
     /// Calculates positions and total size by simulating the flow layout
     /// - Parameters:
     ///   - maxWidth: The maximum width available for the layout
@@ -63,10 +64,10 @@ struct FlowLayout: Layout {
       var currentX: CGFloat = 0
       var currentY: CGFloat = 0
       var lineHeight: CGFloat = 0
-      
+
       for subview in subviews {
         let size = subview.sizeThatFits(.unspecified)
-        
+
         // Check if this view fits on the current line
         if currentX + size.width > maxWidth && currentX > 0 {
           // Doesn't fit and wrap to next line
@@ -74,16 +75,16 @@ struct FlowLayout: Layout {
           currentY += lineHeight + spacing
           lineHeight = 0
         }
-        
+
         // Place the view at current position
         positions.append(CGPoint(x: currentX, y: currentY))
-        
+
         lineHeight = max(lineHeight, size.height)
         currentX += size.width + spacing
-        
+
         self.size.width = max(self.size.width, currentX - spacing)
       }
-      
+
       self.size.height = currentY + lineHeight
     }
   }

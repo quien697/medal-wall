@@ -5,8 +5,8 @@
 //  Created by Quien on 2025-12-24.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct MedalDetailView: View {
   // MARK: - Environment
@@ -17,12 +17,12 @@ struct MedalDetailView: View {
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingEditMedal = false
   @State private var isPresentingDeleteMedalConfirm = false
-  
+
   // MARK: - Init
   init(medal: Medal) {
     self._viewModel = State(initialValue: MedalDetailViewModel(medal: medal))
   }
-  
+
   // MARK: - Body
   var body: some View {
     ScrollView {
@@ -35,7 +35,7 @@ struct MedalDetailView: View {
         date: viewModel.medal.date.formattedMonthDayYear(),
         bib: viewModel.medal.bibNumber
       )
-      
+
       MedalDetailStatsSection(
         columns: viewModel.gridColumns,
         spacing: viewModel.gridSpacing,
@@ -49,11 +49,11 @@ struct MedalDetailView: View {
         genderPlacement: viewModel.genderPlacementText,
         genderTotal: viewModel.genderTotalText
       )
-      
+
       if let note = viewModel.medal.note, !note.isEmpty {
         MedalDetailNoteSection(note: note)
       }
-      
+
       if !viewModel.medal.eventPhotos.isEmpty {
         MedalDetailEventPhotosSection(photos: viewModel.medal.eventPhotos)
       }
@@ -73,9 +73,9 @@ struct MedalDetailView: View {
           } label: {
             Label("Edit Medal", systemImage: "square.and.pencil")
           }
-          
+
           Divider()
-          
+
           Button(role: .destructive) {
             isPresentingDeleteMedalConfirm = true
           } label: {

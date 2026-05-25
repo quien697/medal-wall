@@ -9,19 +9,19 @@ import SwiftUI
 
 struct EditMedalNoteSection: View {
   @Binding var note: String
-  
+
   var body: some View {
     Section("Notes") {
       TextEditor(text: $note)
         .frame(minHeight: 100)
-    } // Section
+    }  // Section
   }
 }
 
 #Preview {
   Form {
     EditMedalNoteSection(note: .constant(""))
-    
+
     EditMedalNoteSection(note: .constant("This is the best marathon event ever"))
   }
 }

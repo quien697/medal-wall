@@ -18,9 +18,9 @@ struct RaceEdition: Codable, Identifiable {
   var createdBy: String
   var createdAt: Date
   var updatedAt: Date
-  
+
   // MARK: - Init
-  
+
   init(
     id: String = UUID().uuidString,
     raceId: String,
@@ -44,13 +44,13 @@ struct RaceEdition: Codable, Identifiable {
     self.createdAt = createdAt
     self.updatedAt = updatedAt
   }
-  
+
   // MARK: - Computed
-  
+
   var isOneDay: Bool {
     Calendar.current.isDate(startDate, inSameDayAs: endDate)
   }
-  
+
   var dateDisplayLabel: String {
     let start = startDate.formatted(.dateTime.month().day())
     let end = ", \(endDate.formatted(.dateTime.month().day()))"

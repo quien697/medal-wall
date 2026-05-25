@@ -47,9 +47,9 @@ struct SignInButton: View {
         }
 
         Text(title)
-      } // HStack
+      }  // HStack
       .frame(maxWidth: .infinity)
-    } // label
+    }  // label
     .primaryButtonStyle(
       font: .default,
       fontWeight: .semibold,
@@ -61,8 +61,10 @@ struct SignInButton: View {
 #Preview {
   VStack(spacing: 12) {
     SignInButton(icon: Image(systemName: "apple.logo"), title: "Continue with Apple") {}
-    SignInButton(icon: Image(systemName: "apple.logo"), title: "Continue with Apple", isLoading: true) {}
+    SignInButton(
+      icon: Image(systemName: "apple.logo"), title: "Continue with Apple", isLoading: true
+    ) {}
     SignInButton(icon: Image(systemName: "envelope"), title: "Continue with Email") {}
-  } // VStack
+  }  // VStack
   .padding()
 }

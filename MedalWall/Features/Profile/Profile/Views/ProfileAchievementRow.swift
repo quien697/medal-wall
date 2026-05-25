@@ -12,19 +12,19 @@ struct ProfileAchievementRow: View {
     HStack {
       Image(systemName: "star")
         .font(.title2)
-      
+
       VStack(alignment: .leading) {
         Text("Top 6")
           .font(.headline)
           .fontWeight(.bold)
-        
+
         Text("The 6 World Marathon Majors")
           .font(.footnote)
           .foregroundStyle(Color.Text.tertiary)
       }
-      
+
       Spacer()
-      
+
       Image(systemName: "checkmark.circle.fill")
         .font(.title2)
     }

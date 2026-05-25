@@ -12,21 +12,21 @@ struct RaceImage: View {
   private let photo: UIImage?
   private let urlString: String?
   private let imageType: ImageType
-  
+
   /// Displays a locally held UIImage, falling back to the placeholder if nil.
   init(photo: UIImage?, imageType: ImageType) {
     self.photo = photo
     self.urlString = nil
     self.imageType = imageType
   }
-  
+
   /// Fetches and displays an image from a URL string, falling back to the placeholder if nil or loading fails.
   init(urlString: String?, imageType: ImageType) {
     self.photo = nil
     self.urlString = urlString
     self.imageType = imageType
   }
-  
+
   var body: some View {
     if let photo {
       Image(uiImage: photo)

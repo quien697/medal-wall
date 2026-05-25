@@ -11,14 +11,14 @@ struct EditRaceEditionDistanceSection: View {
   let distances: [RaceDistance]
   var onRemove: (RaceDistance) -> Void
   var onAdd: () -> Void
-  
+
   var body: some View {
     Section("Distances") {
       FlowLayout(spacing: 10) {
         ForEach(distances.sorted()) { distance in
           HStack(spacing: 6) {
             Text(distance.displayLabel)
-            
+
             Button {
               onRemove(distance)
             } label: {
@@ -34,7 +34,7 @@ struct EditRaceEditionDistanceSection: View {
             hPadding: 10
           )
         }
-        
+
         Button {
           onAdd()
         } label: {
@@ -42,21 +42,21 @@ struct EditRaceEditionDistanceSection: View {
             .goldOutLineButtonStyle()
         }
         .buttonStyle(.plain)
-      } // FlowLayout
+      }  // FlowLayout
     }
   }
 }
 
 #Preview {
   let distances = RaceEdition.sampleData.first!.distances
-  
+
   Form {
     EditRaceEditionDistanceSection(
       distances: distances,
       onRemove: { _ in },
       onAdd: {}
     )
-    
+
     EditRaceEditionDistanceSection(
       distances: [],
       onRemove: { _ in },

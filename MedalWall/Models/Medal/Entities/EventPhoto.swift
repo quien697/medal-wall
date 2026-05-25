@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import UIKit
 import SwiftData
+import UIKit
 
 @Model
 final class EventPhoto {

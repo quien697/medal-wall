@@ -10,7 +10,7 @@ import SwiftUI
 struct ErrorView: View {
   @Environment(\.dismiss) private var dismiss
   let errorWrapper: ErrorWrapper
-  
+
   var body: some View {
     NavigationStack {
       VStack(spacing: 16) {
@@ -18,29 +18,28 @@ struct ErrorView: View {
           .font(.system(size: 72))
           .foregroundStyle(.yellow)
           .padding(.bottom, 10)
-        
+
         Text(errorWrapper.error.title)
           .font(.title.bold())
-        
+
         Text(errorWrapper.error.message)
           .font(.body)
           .multilineTextAlignment(.center)
-        
+
         Text(errorWrapper.error.guidance)
           .font(.body)
           .multilineTextAlignment(.center)
-        
+
         Button("Continue") {
           dismiss()
         }
         .buttonStyle(.borderedProminent)
-      } // VStack
+      }  // VStack
       .padding()
-    } // NavigationStack
+    }  // NavigationStack
   }
 }
 
 #Preview {
   ErrorView(errorWrapper: ErrorWrapper(error: AppError.duplicateDistance))
 }
-

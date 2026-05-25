@@ -34,8 +34,8 @@ struct RaceEntryList: View {
             Text("\(raceEditions.count) editions")
               .font(.subheadline)
               .foregroundStyle(Color.Text.tertiary)
-          } // VStack
-        } // HStack
+          }  // VStack
+        }  // HStack
 
         VStack(alignment: .leading, spacing: 16) {
           ForEach(raceEditions.sorted { $0.year > $1.year }) { edition in
@@ -48,9 +48,9 @@ struct RaceEntryList: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .surfaceStyle(vPadding: 12, hPadding: 12)
-      } // VStack
+      }  // VStack
       .listRowSeparator(.hidden)
-    } // List
+    }  // List
     .listStyle(.plain)
   }
 }

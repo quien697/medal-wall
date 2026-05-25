@@ -5,8 +5,8 @@
 //  Created by Quien on 2025-12-21.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @Observable
 final class EditMedalViewModel {
@@ -31,16 +31,16 @@ final class EditMedalViewModel {
   var note: String = ""
   var tags: [String] = []
   var draftEventPhotos: [DraftEventPhoto] = []
-  
+
   let mode: ItemEditMode
   private var repository: MedalRepository
   private let medal: Medal?
-  
+
   init(mode: ItemEditMode, medal: Medal? = nil) {
     self.mode = mode
     self.repository = MedalRepository()
     self.medal = medal
-    
+
     if let medal, mode == .edit {
       self.name = medal.name
       self.date = medal.date
@@ -67,43 +67,42 @@ final class EditMedalViewModel {
         .map { DraftEventPhoto(data: $0.imageData) }
     }
   }
-  
+
   var isFormValid: Bool {
     let customDistanceValid: Bool = {
       if case .custom(let value) = distance.category { return value > 0 }
       return true
     }()
-    
-    return customDistanceValid &&
-    !name.trimmingCharacters(in: .whitespaces).isEmpty &&
-    !country.trimmingCharacters(in: .whitespaces).isEmpty &&
-    !city.trimmingCharacters(in: .whitespaces).isEmpty
+
+    return customDistanceValid && !name.trimmingCharacters(in: .whitespaces).isEmpty
+      && !country.trimmingCharacters(in: .whitespaces).isEmpty
+      && !city.trimmingCharacters(in: .whitespaces).isEmpty
   }
-  
+
   // MARK: - Functions
-  
+
   func configure(context: ModelContext) {
     repository.configure(context: context)
   }
-  
+
   func updatePhoto(with uiImage: UIImage) {
     self.photoData = uiImage.pngData()
     self.photo = uiImage
   }
-  
+
   func clearPhoto() {
     self.photoData = nil
     self.photo = nil
   }
-  
+
   func addEventPhotos(_ dataList: [Data]) {
     draftEventPhotos.append(contentsOf: dataList.map { DraftEventPhoto(data: $0) })
   }
-  
+
   func removeEventPhoto(id: UUID) {
     draftEventPhotos.removeAll { $0.id == id }
   }
-  
+
   func autoFill(from selection: RaceEntry) {
     name = "\(selection.race.name) \(selection.edition.year)"
     date = selection.edition.startDate
@@ -113,7 +112,7 @@ final class EditMedalViewModel {
     city = selection.race.location.city
     district = selection.race.location.district ?? ""
   }
-  
+
   func save(by userID: String) throws {
     if let medal, mode == .edit {
       medal.name = name
@@ -136,13 +135,14 @@ final class EditMedalViewModel {
       medal.genderTotal = genderTotal
       medal.note = note.isEmpty ? nil : note
       medal.tags = tags
-      
+
       for photo in medal.eventPhotos {
         try repository.deleteEventPhoto(photo)
       }
-      
+
       for (index, draft) in draftEventPhotos.enumerated() {
-        try repository.insertEventPhoto(EventPhoto(imageData: draft.data, sortOrder: index, medal: medal))
+        try repository.insertEventPhoto(
+          EventPhoto(imageData: draft.data, sortOrder: index, medal: medal))
       }
     } else {
       let newMedal = Medal(
@@ -169,14 +169,15 @@ final class EditMedalViewModel {
         tags: tags,
         userID: userID
       )
-      
+
       try repository.insertMedal(newMedal)
-      
+
       for (index, draft) in draftEventPhotos.enumerated() {
-        try repository.insertEventPhoto(EventPhoto(imageData: draft.data, sortOrder: index, medal: newMedal))
+        try repository.insertEventPhoto(
+          EventPhoto(imageData: draft.data, sortOrder: index, medal: newMedal))
       }
     }
-    
+
     try repository.save()
   }
 }

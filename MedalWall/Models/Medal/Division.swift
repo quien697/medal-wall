@@ -13,10 +13,11 @@ struct Division: Hashable, Sendable {
   var ageGroup: AgeGroup
 
   nonisolated
-  var rawValue: String {
+    var rawValue: String
+  {
     "\(gender.rawValue) \(ageGroup.rawValue)"
   }
-  
+
   var displayName: String {
     "\(gender.shortName) \(ageGroup.displayName)"
   }
@@ -29,15 +30,16 @@ struct Division: Hashable, Sendable {
   /// Reconstructs a `Division` from its persisted raw value.
   /// Splits on the last space, e.g. `"male from30to34"` → `.male` + `.from30to34`.
   nonisolated
-  init?(rawValue: String) {
+    init?(rawValue: String)
+  {
     guard let separatorIndex = rawValue.lastIndex(of: " ") else { return nil }
-    
+
     let genderRaw = String(rawValue[rawValue.startIndex..<separatorIndex])
     let ageGroupRaw = String(rawValue[rawValue.index(after: separatorIndex)...])
     guard let gender = Gender(rawValue: genderRaw),
-          let ageGroup = AgeGroup(rawValue: ageGroupRaw)
+      let ageGroup = AgeGroup(rawValue: ageGroupRaw)
     else { return nil }
-    
+
     self.gender = gender
     self.ageGroup = ageGroup
   }

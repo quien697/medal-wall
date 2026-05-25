@@ -17,7 +17,7 @@ struct TimePicker<Label: View>: View {
   private var fontColor: Color
   private var fontWeight: Font.Weight
   @Binding var value: TimeInterval?
-  
+
   // MARK: - Init
   init(
     _ title: String = "Select Time",
@@ -32,7 +32,7 @@ struct TimePicker<Label: View>: View {
     self._value = value
     self._draftDuration = State(initialValue: HMSDuration(value.wrappedValue))
   }
-  
+
   // MARK: - Custom label init
   init(
     _ title: String = "Select Time",
@@ -48,17 +48,17 @@ struct TimePicker<Label: View>: View {
     self._value = value
     self._draftDuration = State(initialValue: HMSDuration(value.wrappedValue))
   }
-  
+
   // MARK: - Computed
   private var currentDuration: HMSDuration { HMSDuration(value) }
-  
+
   // MARK: - Body
   var body: some View {
     HStack {
       label
-      
+
       Spacer()
-      
+
       Button {
         draftDuration = currentDuration
         isPresentingPickerView = true
@@ -68,7 +68,7 @@ struct TimePicker<Label: View>: View {
           .foregroundStyle(fontColor)
       }
       .buttonStyle(.bordered)
-    } // HStack
+    }  // HStack
     .sheet(isPresented: $isPresentingPickerView) {
       TimePickerSheet(
         draftDuration: $draftDuration,

@@ -13,7 +13,7 @@ struct TimePickerSheet: View {
   @Binding var isPresenting: Bool
   let title: String
   let fontColor: Color
-  
+
   var body: some View {
     NavigationStack {
       VStack {
@@ -30,13 +30,13 @@ struct TimePickerSheet: View {
               .stroke(fontColor.opacity(0.3), lineWidth: 1)
           )
           .padding()
-        
+
         DurationWheelPicker(duration: $draftDuration)
-        
+
         Spacer()
-        
+
         Divider()
-        
+
         Button {
           value = nil
           draftDuration = HMSDuration()
@@ -45,7 +45,7 @@ struct TimePickerSheet: View {
             .foregroundStyle(.red)
         }
         .padding(.vertical, 8)
-      } // VStack
+      }  // VStack
       .navigationTitle(title)
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
@@ -59,9 +59,9 @@ struct TimePickerSheet: View {
           }
           .foregroundStyle(fontColor)
         }
-      } // toolbar
+      }  // toolbar
       .presentationDetents([.medium])
-    } // NavigationStack
+    }  // NavigationStack
   }
 }
 

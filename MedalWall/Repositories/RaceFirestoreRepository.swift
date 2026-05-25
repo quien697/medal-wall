@@ -5,8 +5,8 @@
 //  Created by Quien on 2026-05-18.
 //
 
-import Foundation
 import FirebaseFirestore
+import Foundation
 
 final class RaceFirestoreRepository {
   private let db = Firestore.firestore()

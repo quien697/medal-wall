@@ -12,7 +12,7 @@ struct RaceDetailHeroSection: View {
   let name: String
   let location: String
   let url: String?
-  
+
   var body: some View {
     DetailHeroSection {
       RaceImage(
@@ -24,11 +24,11 @@ struct RaceDetailHeroSection: View {
         .font(.title2)
         .fontWeight(.bold)
         .foregroundStyle(Color.Text.primary)
-      
+
       Label(location, systemImage: "mappin.and.ellipse")
         .font(.caption)
         .foregroundStyle(Color.Text.secondary)
-      
+
       if let url = url, let urlObj = URL(string: url) {
         Link(destination: urlObj) {
           Label(url, systemImage: "link")
@@ -37,13 +37,13 @@ struct RaceDetailHeroSection: View {
             .underline(true, color: Color.Text.secondary)
         }
       }
-    } // DetailHeroSection
+    }  // DetailHeroSection
   }
 }
 
 #Preview {
   let race = Race.sampleData.first!
-  
+
   ScrollView {
     RaceDetailHeroSection(
       photoUrl: race.photoUrl,

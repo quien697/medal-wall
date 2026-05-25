@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RaceNoResultView: View {
   let searchText: String
-  
+
   var body: some View {
     ContentUnavailableView {
       Label("No Results", systemImage: "magnifyingglass")

@@ -12,28 +12,28 @@ struct RaceRow: View {
   let name: String
   let location: String
   let editionCount: Int
-  
+
   var body: some View {
     HStack {
       RaceImage(
         urlString: photoUrl,
         imageType: .raceThumbnail
       )
-      
+
       VStack(alignment: .leading) {
         Text(name)
           .font(.headline)
           .foregroundStyle(Color.Text.primary)
-        
+
         Text(location)
           .font(.subheadline)
           .foregroundStyle(Color.Text.secondary)
-        
+
         Text("\(editionCount) editions")
           .font(.subheadline)
           .foregroundStyle(Color.Text.tertiary)
       }
-    } // HStack
+    }  // HStack
   }
 }
 
@@ -44,9 +44,9 @@ struct RaceRow: View {
       name: "Taipei Marathon",
       location: "Taipei, Taiwan",
       editionCount: 2
-      
+
     )
-    
+
     RaceRow(
       photoUrl: nil,
       name: "BMO Vancouver Marathon",

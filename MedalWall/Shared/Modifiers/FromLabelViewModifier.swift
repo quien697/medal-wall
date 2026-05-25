@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FromLabelViewModifier: ViewModifier {
-  
+
   func body(content: Content) -> some View {
     content
       .fontWeight(.bold)
@@ -17,7 +17,7 @@ struct FromLabelViewModifier: ViewModifier {
 }
 
 extension View {
-  
+
   func fromLabelStyle() -> some View {
     modifier(FromLabelViewModifier())
   }
@@ -25,7 +25,7 @@ extension View {
 
 #Preview {
   let text: String = ""
-  
+
   Form {
     LabeledContent {
       TextField("Text", text: .constant(text))

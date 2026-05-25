@@ -5,8 +5,8 @@
 //  Created by Quien on 2025-10-30.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct MedalsView: View {
   // MARK: - Environment
@@ -20,7 +20,7 @@ struct MedalsView: View {
   private let addMedal: String = "addMedal"
   // MARK: - Query
   @Query private var medals: [Medal]
-  
+
   // MARK: - Body
   var body: some View {
     NavigationStack {
@@ -33,14 +33,14 @@ struct MedalsView: View {
             fullCount: viewModel.fullCount(medals),
             halfCount: viewModel.halfCount(medals)
           )
-          
+
           MedalGridSection(
             medals: medals,
             columns: viewModel.gridColumns,
             spacing: viewModel.gridSpacing,
             namespace: namespace
           )
-        } // ScrollView
+        }  // ScrollView
         .scrollIndicators(.hidden)
         .navigationTitle("Your Rewards")
         .background(Color.Background.primary)
@@ -50,7 +50,7 @@ struct MedalsView: View {
           ToolbarItem(placement: .title) {
             ExpandedNavigationTitle(title: "Your Rewards")
           }
-          
+
           ToolbarItem(placement: .topBarTrailing) {
             Button {
               isPresentingAddMedal = true
@@ -60,13 +60,13 @@ struct MedalsView: View {
             .matchedTransitionSource(id: addMedal, in: namespace)
             .buttonStyle(.glassProminent)
           }
-        } // toolbar
+        }  // toolbar
         .sheet(isPresented: $isPresentingAddMedal) {
           AddMedalView()
             .navigationTransition(.zoom(sourceID: addMedal, in: namespace))
         }
       }
-    } // NavigationStack
+    }  // NavigationStack
   }
 }
 

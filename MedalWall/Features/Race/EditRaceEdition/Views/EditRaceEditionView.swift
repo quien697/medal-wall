@@ -5,14 +5,14 @@
 //  Created by Quien on 2026-03-24.
 //
 
-import SwiftUI
 import PhotosUI
+import SwiftUI
 
 struct EditRaceEditionView: View {
   // MARK: - Environment
   @Environment(UserManager.self) private var userManager
   @Environment(\.dismiss) private var dismiss
-  
+
   // MARK: - State
   @State private var isPresentingPhotoPicker = false
   @State private var isPresentingCropImageView = false
@@ -22,11 +22,11 @@ struct EditRaceEditionView: View {
   @State private var rawPickedImage: UIImage?
   @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: EditRaceEditionViewModel
-  
+
   // MARK: - Properties
   private let onCommit: ((DraftRaceEdition) -> Void)?
   private let onDelete: (() -> Void)?
-  
+
   // MARK: - Init
   init(
     mode: ItemEditMode,
@@ -35,11 +35,12 @@ struct EditRaceEditionView: View {
     onCommit: ((DraftRaceEdition) -> Void)? = nil,
     onDelete: (() -> Void)? = nil
   ) {
-    self._viewModel = State(initialValue: EditRaceEditionViewModel(mode: mode, raceId: raceId, edition: edition))
+    self._viewModel = State(
+      initialValue: EditRaceEditionViewModel(mode: mode, raceId: raceId, edition: edition))
     self.onCommit = onCommit
     self.onDelete = onDelete
   }
-  
+
   // MARK: - Body
   var body: some View {
     NavigationStack {
@@ -59,7 +60,7 @@ struct EditRaceEditionView: View {
             viewModel.clearPhoto()
           }
         )
-        
+
         Form {
           EditRaceEditionDateSection(
             isOneDay: viewModel.isOneDay,
@@ -75,13 +76,13 @@ struct EditRaceEditionView: View {
             onUpdateYear: { viewModel.updateYear($0) },
             onUpdateStartDate: { viewModel.updateStartDate($0) }
           )
-          
+
           EditRaceEditionDistanceSection(
             distances: viewModel.distances,
             onRemove: { viewModel.removeDistance($0) },
             onAdd: { isPresentingAddDistance = true }
           )
-          
+
           if viewModel.mode == .edit {
             Section {
               Button(role: .destructive) {
@@ -90,10 +91,10 @@ struct EditRaceEditionView: View {
                 Text("Delete Edition")
                   .frame(maxWidth: .infinity, alignment: .center)
               }
-            } // Section
+            }  // Section
           }
-        } // Form
-      } // VStack
+        }  // Form
+      }  // VStack
       .navigationTitle("\(viewModel.mode.displayName) Edition")
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
@@ -103,8 +104,8 @@ struct EditRaceEditionView: View {
           Button(role: .cancel) {
             dismiss()
           }
-        } // ToolbarItem
-        
+        }  // ToolbarItem
+
         ToolbarItem(placement: .confirmationAction) {
           if viewModel.isLoading {
             ProgressView()
@@ -119,7 +120,7 @@ struct EditRaceEditionView: View {
                   errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
                   return
                 }
-                
+
                 Task {
                   await viewModel.save(by: userId)
                   if viewModel.error == nil {
@@ -130,8 +131,8 @@ struct EditRaceEditionView: View {
             }
             .disabled(!viewModel.isFormValid)
           }
-        } // ToolbarItem
-      } // toolbar
+        }  // ToolbarItem
+      }  // toolbar
       .task {
         await viewModel.loadExistingPhoto()
       }
@@ -157,7 +158,8 @@ struct EditRaceEditionView: View {
         guard let newItem else { return }
         Task {
           if let data = try? await newItem.loadTransferable(type: Data.self),
-             let uiImage = UIImage(data: data) {
+            let uiImage = UIImage(data: data)
+          {
             rawPickedImage = uiImage
             isPresentingCropImageView = true
           } else {
@@ -168,10 +170,13 @@ struct EditRaceEditionView: View {
       .onChange(of: viewModel.error) { _, error in
         if let error { errorWrapper = ErrorWrapper(error: error) }
       }
-      .sheet(isPresented: $isPresentingCropImageView, onDismiss: {
-        selectedPhoto = nil
-        rawPickedImage = nil
-      }) {
+      .sheet(
+        isPresented: $isPresentingCropImageView,
+        onDismiss: {
+          selectedPhoto = nil
+          rawPickedImage = nil
+        }
+      ) {
         CropImageView(
           image: rawPickedImage,
           cropShape: .square
@@ -194,8 +199,8 @@ struct EditRaceEditionView: View {
         onDismiss: { viewModel.error = nil }
       ) { wrapper in
         ErrorView(errorWrapper: wrapper)
-      } // sheet
-    } // NavigationStack
+      }  // sheet
+    }  // NavigationStack
   }
 }
 

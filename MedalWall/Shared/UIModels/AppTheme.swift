@@ -13,24 +13,24 @@ enum AppTheme: String, CaseIterable {
   var label: String {
     switch self {
     case .system: "System"
-    case .light:  "Light"
-    case .dark:   "Dark"
+    case .light: "Light"
+    case .dark: "Dark"
     }
   }
 
   var icon: String {
     switch self {
     case .system: "circle.lefthalf.filled"
-    case .light:  "sun.max"
-    case .dark:   "moon"
+    case .light: "sun.max"
+    case .dark: "moon"
     }
   }
 
   var colorScheme: ColorScheme? {
     switch self {
     case .system: nil
-    case .light:  .light
-    case .dark:   .dark
+    case .light: .light
+    case .dark: .dark
     }
   }
 }

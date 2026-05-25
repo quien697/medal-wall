@@ -11,7 +11,7 @@ struct EditMedalPlacementRow: View {
   let label: String
   @Binding var placement: Int?
   @Binding var total: Int?
-  
+
   var body: some View {
     LabeledContent {
       HStack(spacing: 4) {
@@ -19,19 +19,19 @@ struct EditMedalPlacementRow: View {
           .multilineTextAlignment(.trailing)
           .keyboardType(.numberPad)
           .fixedSize()
-        
+
         Text("of")
           .foregroundStyle(Color.Text.tertiary)
-        
+
         TextField("Total", value: $total, format: .number)
           .multilineTextAlignment(.trailing)
           .keyboardType(.numberPad)
           .fixedSize()
-      } // HStack
+      }  // HStack
     } label: {
       Text(label)
         .fromLabelStyle()
-    } // LabeledContent
+    }  // LabeledContent
   }
 }
 
@@ -42,7 +42,7 @@ struct EditMedalPlacementRow: View {
       placement: .constant(nil),
       total: .constant(nil)
     )
-    
+
     EditMedalPlacementRow(
       label: "Overall",
       placement: .constant(1928),

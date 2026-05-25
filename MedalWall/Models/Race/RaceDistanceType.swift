@@ -10,9 +10,9 @@ enum RaceDistanceType: String, Hashable, CaseIterable, Identifiable {
   case inPerson
   case virtual
   case wheelChair
-  
+
   var id: String { rawValue }
-  
+
   /// Human-readable label shown in the UI.
   var displayName: String {
     switch self {
@@ -21,7 +21,7 @@ enum RaceDistanceType: String, Hashable, CaseIterable, Identifiable {
     case .wheelChair: return "Wheel Chair"
     }
   }
-  
+
   /// In-person first, then virtual, then wheelchair.
   var sortOrder: Int {
     switch self {

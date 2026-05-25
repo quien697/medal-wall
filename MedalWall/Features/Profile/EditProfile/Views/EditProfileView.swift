@@ -5,8 +5,8 @@
 //  Created by Quien on 2025-12-04.
 //
 
-import SwiftUI
 import PhotosUI
+import SwiftUI
 
 struct EditProfileView: View {
   // MARK: - Environment
@@ -21,12 +21,12 @@ struct EditProfileView: View {
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var rawPickedImage: UIImage?
   @State private var shouldDismiss: Bool = false
-  
+
   // MARK: - Init
   init(profile: User) {
     self._viewModel = State(initialValue: EditProfileViewModel(profile: profile))
   }
-  
+
   // MARK: - Body
   var body: some View {
     NavigationStack {
@@ -47,7 +47,7 @@ struct EditProfileView: View {
         )
         .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
-        
+
         EditProfileInfoSection(
           firstName: $viewModel.userName.firstName,
           lastName: $viewModel.userName.lastName,
@@ -55,9 +55,9 @@ struct EditProfileView: View {
           birthday: $viewModel.birthday,
           isBirthdaySet: $viewModel.isBirthdaySet
         )
-        
+
         EditProfileBioSection(bio: $viewModel.bio)
-      } // Form
+      }  // Form
       .navigationTitle("Edit Profile")
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
@@ -72,13 +72,13 @@ struct EditProfileView: View {
             dismiss()
           }
         }
-        
+
         ToolbarItem(placement: .confirmationAction) {
           Button(role: .confirm) {
             Task {
               isLoading = true
               defer { isLoading = false }
-              
+
               do {
                 var updatedUser = viewModel.makeUpdatedUser()
                 if viewModel.isPhotoChanged && viewModel.photo == nil {
@@ -95,7 +95,7 @@ struct EditProfileView: View {
           }
           .disabled(!viewModel.isFormValid || isLoading)
         }
-      } // toolbar
+      }  // toolbar
       .photosPicker(
         isPresented: $isPresentingPhotoPicker,
         selection: $selectedPhoto,
@@ -105,7 +105,8 @@ struct EditProfileView: View {
         guard let newItem else { return }
         Task {
           if let data = try? await newItem.loadTransferable(type: Data.self),
-             let uiImage = UIImage(data: data) {
+            let uiImage = UIImage(data: data)
+          {
             rawPickedImage = uiImage
             isPresentingCropImageView = true
           } else {
@@ -113,37 +114,45 @@ struct EditProfileView: View {
           }
         }
       }
-      .sheet(isPresented: $isPresentingCropImageView, onDismiss: {
-        selectedPhoto = nil
-        rawPickedImage = nil
-      }) {
+      .sheet(
+        isPresented: $isPresentingCropImageView,
+        onDismiss: {
+          selectedPhoto = nil
+          rawPickedImage = nil
+        }
+      ) {
         CropImageView(image: rawPickedImage, cropShape: .circle) { croppedImage in
           if let croppedImage {
             viewModel.updatePhoto(with: croppedImage)
           }
         }
       }
-      .sheet(item: $errorWrapper, onDismiss: {
-        if shouldDismiss { dismiss() }
-      }) { wrapper in
+      .sheet(
+        item: $errorWrapper,
+        onDismiss: {
+          if shouldDismiss { dismiss() }
+        }
+      ) { wrapper in
         ErrorView(errorWrapper: wrapper)
       }
-    } // NavigationStack
+    }  // NavigationStack
   }
 }
 
 #Preview {
-  EditProfileView(profile: User(
-    uid: "preview",
-    email: "preview@example.com",
-    firstName: "John",
-    lastName: "Doe",
-    photoUrl: nil,
-    bio: nil,
-    gender: nil,
-    birthday: nil,
-    createdAt: .now,
-    updatedAt: nil
-  ))
+  EditProfileView(
+    profile: User(
+      uid: "preview",
+      email: "preview@example.com",
+      firstName: "John",
+      lastName: "Doe",
+      photoUrl: nil,
+      bio: nil,
+      gender: nil,
+      birthday: nil,
+      createdAt: .now,
+      updatedAt: nil
+    )
+  )
   .environment(UserManager())
 }

@@ -11,7 +11,7 @@ struct RaceEntryEditionRow: View {
   let race: Race
   let edition: RaceEdition
   @Binding var selection: RaceEntry?
-  
+
   var body: some View {
     VStack(alignment: .leading) {
       HStack {
@@ -19,12 +19,12 @@ struct RaceEntryEditionRow: View {
           .font(.headline)
           .fontWeight(.heavy)
           .foregroundStyle(Color.Gold.primary)
-        
+
         Text(edition.dateDisplayLabel)
           .font(.subheadline)
           .foregroundStyle(Color.Text.tertiary)
-      } // HStack
-      
+      }  // HStack
+
       FlowLayout(spacing: 8) {
         ForEach(edition.distances.sorted(), id: \.self) { distance in
           RaceEntryDistanceChip(
@@ -34,8 +34,8 @@ struct RaceEntryEditionRow: View {
             selection: $selection
           )
         }
-      } // FlowLayout
-    } // VStack
+      }  // FlowLayout
+    }  // VStack
   }
 }
 

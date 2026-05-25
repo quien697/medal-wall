@@ -5,8 +5,8 @@
 //  Created by Quien on 2026-04-28.
 //
 
-import Foundation
 import FirebaseAuth
+import Foundation
 
 struct User: Codable {
   let uid: String
@@ -36,11 +36,11 @@ extension User {
     createdAt = Date()
     updatedAt = nil
   }
-  
+
   var userName: UserName {
     UserName(firstName: firstName ?? "", lastName: lastName ?? "")
   }
-  
+
   /// Displays firstName lastName with a space. Falls back to "Runner" if both are empty.
   var name: String { userName.fullName }
 }

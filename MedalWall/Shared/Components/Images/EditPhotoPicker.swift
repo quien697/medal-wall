@@ -16,7 +16,7 @@ struct EditPhotoPicker<Preview: View>: View {
   @ViewBuilder let photoView: () -> Preview
   let onChooseFromLibrary: () -> Void
   let onRemove: () -> Void
-  
+
   init(
     photo: UIImage?,
     hint: String? = nil,
@@ -30,12 +30,12 @@ struct EditPhotoPicker<Preview: View>: View {
     self.onChooseFromLibrary = onChooseFromLibrary
     self.onRemove = onRemove
   }
-  
+
   // MARK: - Computed
   private var displayHint: String {
     hint ?? (photo == nil ? "Tap to add a photo" : "Tap to update the photo")
   }
-  
+
   // MARK: - Body
   var body: some View {
     Button {
@@ -49,19 +49,19 @@ struct EditPhotoPicker<Preview: View>: View {
             titleVisibility: .visible
           ) {
             Button("Choose from Library") { onChooseFromLibrary() }
-            
+
             if photo != nil {
               Button("Remove Photo", role: .destructive) { onRemove() }
             }
-          } // confirmationDialog
-        
+          }  // confirmationDialog
+
         Text(displayHint)
           .font(.subheadline)
           .multilineTextAlignment(.center)
           .foregroundStyle(Color.Text.tertiary)
-      } // VStack
+      }  // VStack
       .frame(maxWidth: .infinity)
-    } // Button
+    }  // Button
     .buttonStyle(.plain)
   }
 }

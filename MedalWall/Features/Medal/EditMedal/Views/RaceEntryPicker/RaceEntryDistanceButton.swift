@@ -12,13 +12,13 @@ struct RaceEntryDistanceChip: View {
   let edition: RaceEdition
   let distance: RaceDistance
   @Binding var selection: RaceEntry?
-  
+
   private var isSelected: Bool {
     selection?.race.id == race.id
-    && selection?.edition.id == edition.id
-    && selection?.distance == distance
+      && selection?.edition.id == edition.id
+      && selection?.distance == distance
   }
-  
+
   var body: some View {
     Button {
       if isSelected {

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct EditMedalResultSection: View {
   @Binding var finishTime: TimeInterval?
-  
+
   var body: some View {
     Section("Result") {
       TimePicker(
@@ -28,7 +28,7 @@ struct EditMedalResultSection: View {
 #Preview {
   Form {
     EditMedalResultSection(finishTime: .constant(nil))
-    
+
     EditMedalResultSection(finishTime: .constant(5 * 3600 + 10 * 60 + 1))
   }
 }

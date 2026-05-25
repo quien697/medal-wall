@@ -36,7 +36,7 @@ enum AgeGroup: String, Codable, CaseIterable, Identifiable {
 
   var displayName: String {
     switch self {
-    case .under20:    return "Under 20"
+    case .under20: return "Under 20"
     case .from20to24: return "20–24"
     case .from25to29: return "25–29"
     case .from30to34: return "30–34"
@@ -49,7 +49,7 @@ enum AgeGroup: String, Codable, CaseIterable, Identifiable {
     case .from65to69: return "65–69"
     case .from70to74: return "70–74"
     case .from75to79: return "75–79"
-    case .over80:     return "80+"
+    case .over80: return "80+"
     case .from20to29: return "20–29"
     case .from30to39: return "30–39"
     case .from40to49: return "40–49"
@@ -62,10 +62,10 @@ enum AgeGroup: String, Codable, CaseIterable, Identifiable {
   static var fiveYearCases: [AgeGroup] = [
     .under20, .from20to24, .from25to29, .from30to34, .from35to39,
     .from40to44, .from45to49, .from50to54, .from55to59, .from60to64,
-    .from65to69, .from70to74, .from75to79, .over80
+    .from65to69, .from70to74, .from75to79, .over80,
   ]
 
   static var tenYearCases: [AgeGroup] = [
-    .from20to29, .from30to39, .from40to49, .from50to59, .from60to69, .from70to79
+    .from20to29, .from30to39, .from40to49, .from50to59, .from60to69, .from70to79,
   ]
 }

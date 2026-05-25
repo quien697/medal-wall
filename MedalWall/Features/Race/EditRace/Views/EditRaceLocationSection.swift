@@ -12,7 +12,7 @@ struct EditRaceLocationSection: View {
   @Binding var province: String
   @Binding var city: String
   @Binding var district: String
-  
+
   var body: some View {
     Section("Location") {
       LabeledContent {
@@ -22,7 +22,7 @@ struct EditRaceLocationSection: View {
         Text("Country")
           .fromLabelStyle()
       }
-      
+
       LabeledContent {
         TextField("Optional", text: $province)
           .multilineTextAlignment(.trailing)
@@ -30,7 +30,7 @@ struct EditRaceLocationSection: View {
         Text("Province")
           .fromLabelStyle()
       }
-      
+
       LabeledContent {
         TextField("e.g. Taipei", text: $city)
           .multilineTextAlignment(.trailing)
@@ -38,7 +38,7 @@ struct EditRaceLocationSection: View {
         Text("City")
           .fromLabelStyle()
       }
-      
+
       LabeledContent {
         TextField("Optional", text: $district)
           .multilineTextAlignment(.trailing)
@@ -46,7 +46,7 @@ struct EditRaceLocationSection: View {
         Text("District")
           .fromLabelStyle()
       }
-    } // Section
+    }  // Section
   }
 }
 
@@ -58,7 +58,7 @@ struct EditRaceLocationSection: View {
       city: .constant("Taipei"),
       district: .constant("")
     )
-    
+
     EditRaceLocationSection(
       country: .constant("Canada"),
       province: .constant("BC"),

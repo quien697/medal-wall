@@ -13,14 +13,14 @@ struct RaceEntryPicker: View {
   @State private var races: [Race] = []
   @State private var editions: [String: [RaceEdition]] = [:]
   let onSelect: (RaceEntry) -> Void
-  
+
   var body: some View {
     NavigationStack {
       VStack(spacing: 0) {
         RaceEntrySubTitle(selection: selection)
-        
+
         Divider()
-        
+
         if races.isEmpty {
           ContentUnavailableView(
             "No Race Events",
@@ -39,7 +39,7 @@ struct RaceEntryPicker: View {
             dismiss()
           }
         }
-        
+
         if let selection {
           ToolbarItem(placement: .confirmationAction) {
             Button(role: .confirm) {
@@ -48,8 +48,8 @@ struct RaceEntryPicker: View {
             }
           }
         }
-      } // toolbar
-    } // NavigationStack
+      }  // toolbar
+    }  // NavigationStack
   }
 }
 

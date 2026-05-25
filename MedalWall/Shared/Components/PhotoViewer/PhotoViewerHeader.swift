@@ -9,11 +9,11 @@ import SwiftUI
 
 struct PhotoViewerHeader: View {
   let onClose: () -> Void
-  
+
   var body: some View {
     HStack {
       Spacer()
-      
+
       Button {
         onClose()
       } label: {
@@ -21,7 +21,7 @@ struct PhotoViewerHeader: View {
           .padding(.vertical, 6)
       }
       .buttonStyle(.glass)
-    } // HStack
+    }  // HStack
     .padding(.vertical, 8)
     .padding(.horizontal)
   }
@@ -30,9 +30,9 @@ struct PhotoViewerHeader: View {
 #Preview {
   VStack {
     Color.black.ignoresSafeArea()
-    
+
     PhotoViewerHeader(onClose: {})
-    
+
     Spacer()
   }
 }

@@ -21,22 +21,26 @@ struct EditRaceEditionDateSection: View {
   var onToggleOneDay: () -> Void
   var onUpdateYear: (Int) -> Void
   var onUpdateStartDate: (Date) -> Void
-  
+
   // MARK: - Body
   var body: some View {
     Section("Date") {
-      Toggle(isOn: Binding(
-        get: { isOneDay },
-        set: { _ in onToggleOneDay() }
-      )) {
+      Toggle(
+        isOn: Binding(
+          get: { isOneDay },
+          set: { _ in onToggleOneDay() }
+        )
+      ) {
         Text("One Day Event")
           .fromLabelStyle()
       }
-      
-      Picker(selection: Binding(
-        get: { year },
-        set: { onUpdateYear($0) }
-      )) {
+
+      Picker(
+        selection: Binding(
+          get: { year },
+          set: { onUpdateYear($0) }
+        )
+      ) {
         ForEach((minYear...maxYear).reversed(), id: \.self) { year in
           Text(String(year))
             .font(.body)
@@ -46,7 +50,7 @@ struct EditRaceEditionDateSection: View {
         Text("Year")
           .fromLabelStyle()
       }
-      
+
       DatePicker(
         selection: Binding(
           get: { startDate },
@@ -58,7 +62,7 @@ struct EditRaceEditionDateSection: View {
         Text("Start Date")
           .fromLabelStyle()
       }
-      
+
       if !isOneDay {
         DatePicker(
           selection: $endDate,
@@ -69,7 +73,7 @@ struct EditRaceEditionDateSection: View {
             .fromLabelStyle()
         }
       }
-    } // Section
+    }  // Section
   }
 }
 
@@ -89,7 +93,7 @@ struct EditRaceEditionDateSection: View {
       onUpdateYear: { _ in },
       onUpdateStartDate: { _ in }
     )
-    
+
     EditRaceEditionDateSection(
       isOneDay: false,
       year: .constant(2026),

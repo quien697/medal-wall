@@ -5,13 +5,13 @@
 //  Created by Quien on 2025-11-26.
 //
 
-import SwiftUI
 import PhotosUI
+import SwiftUI
 
 struct EditRaceInfoSection: View {
   @Binding var name: String
   @Binding var url: String
-  
+
   var body: some View {
     Section("Info") {
       LabeledContent {
@@ -22,7 +22,7 @@ struct EditRaceInfoSection: View {
           .fontWeight(.bold)
           .foregroundStyle(Color.Text.tertiary)
       }
-      
+
       LabeledContent {
         TextField("optional", text: $url)
           .multilineTextAlignment(.trailing)
@@ -31,19 +31,19 @@ struct EditRaceInfoSection: View {
           .fontWeight(.bold)
           .foregroundStyle(Color.Text.tertiary)
       }
-    } // Section
+    }  // Section
   }
 }
 
 #Preview {
   let race = Race.sampleData.first!
-  
+
   Form {
     EditRaceInfoSection(
       name: .constant(race.name),
       url: .constant(race.websiteUrl ?? "")
     )
-    
+
     EditRaceInfoSection(
       name: .constant(race.name),
       url: .constant("")

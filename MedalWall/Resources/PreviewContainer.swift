@@ -5,11 +5,11 @@
 //  Created by Quien on 2025-10-31.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct SampleData: PreviewModifier {
-  
+
   static func makeSharedContext() throws -> ModelContainer {
     let schema = Schema([
       //      Race.self,
@@ -21,14 +21,14 @@ struct SampleData: PreviewModifier {
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
     let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
     let context = ModelContext(container)
-    
+
     //    Race.sampleData.forEach { context.insert($0) }
     //    Medal.sampleData.forEach { context.insert($0) }
     //    try context.save()
-    
+
     return container
   }
-  
+
   func body(content: Content, context: ModelContainer) -> some View {
     content
       .modelContainer(context)

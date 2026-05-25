@@ -5,14 +5,14 @@
 //  Created by Quien on 2026-04-19.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct LoginView: View {
   @Environment(UserManager.self) private var userManager
   @State private var viewModel = LoginViewModel()
   @State private var errorWrapper: ErrorWrapper?
-  
+
   var body: some View {
     ZStack {
       Color.Background.primary.ignoresSafeArea()
@@ -38,31 +38,31 @@ struct LoginView: View {
           SignInButton(
             icon: Image(systemName: "apple.logo"),
             title: "Continue with Apple",
-            isLoading: viewModel.activeSignIn == .apple)
-          {
+            isLoading: viewModel.activeSignIn == .apple
+          ) {
             await viewModel.signInWithApple()
           }
 
           SignInButton(
             icon: Image("google-icon"),
             title: "Continue with Google",
-            isLoading: viewModel.activeSignIn == .google)
-          {
+            isLoading: viewModel.activeSignIn == .google
+          ) {
             await viewModel.signInWithGoogle()
           }
 
           SignInButton(
             icon: Image(systemName: "envelope"),
-            title: "Continue with Email")
-          {
+            title: "Continue with Email"
+          ) {
             await viewModel.signInWithEmailLink()
           }
-        } // VStack
+        }  // VStack
         .allowsHitTesting(!viewModel.isSigningIn)
         .padding(.top)
         .padding(.horizontal, 16)
-      } // VStack
-    } // ZStack
+      }  // VStack
+    }  // ZStack
     .sheet(isPresented: $viewModel.isPresentingEmailSignIn, onDismiss: viewModel.resetEmailFlow) {
       SignInWithEmailLinkView(
         email: $viewModel.email,

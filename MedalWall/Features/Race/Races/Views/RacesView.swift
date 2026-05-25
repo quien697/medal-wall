@@ -10,18 +10,18 @@ import SwiftUI
 struct RacesView: View {
   // MARK: - Environment
   @Environment(UserManager.self) private var userManager
-  
+
   // MARK: - State
   @State private var viewModel: RacesViewModel = RacesViewModel()
   @State private var errorWrapper: ErrorWrapper?
   @State private var selectedRace: Race?
   @State private var isPresentingAddRace = false
   @State private var isPresentingDeleteConfirm = false
-  
+
   // MARK: - Namespace
   @Namespace private var namespace
   private let addRace = "addRace"
-  
+
   // MARK: - Body
   var body: some View {
     NavigationStack {
@@ -53,8 +53,8 @@ struct RacesView: View {
       .toolbar {
         ToolbarItem(placement: .title) {
           ExpandedNavigationTitle(title: "Races")
-        } // ToolbarItem
-        
+        }  // ToolbarItem
+
         ToolbarItem(placement: .topBarTrailing) {
           Button {
             isPresentingAddRace = true
@@ -63,8 +63,8 @@ struct RacesView: View {
           }
           .matchedTransitionSource(id: addRace, in: namespace)
           .buttonStyle(.glassProminent)
-        } // ToolbarItem
-      } // toolbar
+        }  // ToolbarItem
+      }  // toolbar
       .alert(isPresented: $isPresentingDeleteConfirm) {
         .deleteConfirmation(
           name: selectedRace?.name ?? "Race",
@@ -74,24 +74,28 @@ struct RacesView: View {
             }
           }
         )
-      } // alert
+      }  // alert
       .onChange(of: viewModel.error) { _, error in
         if let error {
           errorWrapper = ErrorWrapper(error: error)
         }
       }
-      .sheet(isPresented: $isPresentingAddRace, onDismiss: {
-        Task {
-          await viewModel.loadRaces()
+      .sheet(
+        isPresented: $isPresentingAddRace,
+        onDismiss: {
+          Task {
+            await viewModel.loadRaces()
+          }
         }
-      }) {
+      ) {
         EditRaceView(mode: .add)
           .navigationTransition(.zoom(sourceID: addRace, in: namespace))
       }
-      .sheet(item: $errorWrapper, onDismiss: { viewModel.error = nil }) { wrapper in
+      .sheet(item: $errorWrapper, onDismiss: { viewModel.error = nil }) {
+        wrapper in
         ErrorView(errorWrapper: wrapper)
-      } // sheet
-    } // NavigationStack
+      }  // sheet
+    }  // NavigationStack
   }
 }
 

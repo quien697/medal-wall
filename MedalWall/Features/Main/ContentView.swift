@@ -13,11 +13,11 @@ struct ContentView: View {
       Tab("You", systemImage: "person.crop.circle") {
         ProfileView()
       }
-      
+
       Tab("Medal", systemImage: "medal") {
         MedalsView()
       }
-      
+
       Tab("Race", systemImage: "figure.run") {
         RacesView()
       }

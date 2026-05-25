@@ -35,9 +35,9 @@ struct EditMedalEventPhotosSection: View {
                 }
                 .buttonStyle(.plain)
                 .offset(x: 6, y: -6)
-              } // ZStack
+              }  // ZStack
             }
-          } // ForEach
+          }  // ForEach
 
           Button {
             onChooseFromLibrary()
@@ -46,11 +46,11 @@ struct EditMedalEventPhotosSection: View {
               .placeholderStyled(as: .eventThumbnail)
           }
           .buttonStyle(.plain)
-        } // HStack
+        }  // HStack
         .padding()
-      } // ScrollView
+      }  // ScrollView
       .listRowInsets(EdgeInsets())
-    } // Section
+    }  // Section
   }
 }
 
@@ -59,14 +59,14 @@ struct EditMedalEventPhotosSection: View {
   let draftEventPhoto: [DraftEventPhoto] = medal.eventPhotos
     .sorted { $0.sortOrder < $1.sortOrder }
     .map { DraftEventPhoto(data: $0.imageData) }
-  
+
   Form {
     EditMedalEventPhotosSection(
       photos: draftEventPhoto,
       onChooseFromLibrary: {},
       onRemove: { _ in }
     )
-    
+
     EditMedalEventPhotosSection(
       photos: [],
       onChooseFromLibrary: {},

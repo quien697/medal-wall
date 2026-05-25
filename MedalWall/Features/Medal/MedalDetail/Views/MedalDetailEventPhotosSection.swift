@@ -10,14 +10,16 @@ import SwiftUI
 struct MedalDetailEventPhotosSection: View {
   @State private var isPresentingPhotoViewer = false
   @State private var selectedPhotoIndex = 0
-  
+
   let photos: [EventPhoto]
 
   var body: some View {
     SectionContainer(title: "Event Photos") {
       ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 12) {
-          ForEach(Array(photos.sorted { $0.sortOrder < $1.sortOrder }.enumerated()), id: \.element.id) { index, photo in
+          ForEach(
+            Array(photos.sorted { $0.sortOrder < $1.sortOrder }.enumerated()), id: \.element.id
+          ) { index, photo in
             if let image = photo.image {
               Image(uiImage: image)
                 .resizable()
@@ -29,10 +31,10 @@ struct MedalDetailEventPhotosSection: View {
                   isPresentingPhotoViewer = true
                 }
             }
-          } // ForEach
-        } // HStack
-      } // ScrollView
-    } // SectionContainer
+          }  // ForEach
+        }  // HStack
+      }  // ScrollView
+    }  // SectionContainer
     .fullScreenCover(isPresented: $isPresentingPhotoViewer) {
       PhotoViewer(
         photos: photos.compactMap { $0.image },

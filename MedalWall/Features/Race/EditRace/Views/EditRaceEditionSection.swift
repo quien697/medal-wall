@@ -19,7 +19,7 @@ struct EditRaceEditionSection: View {
   let onAdd: (DraftRaceEdition) -> Void
   let onUpdate: (DraftRaceEdition) -> Void
   let onDelete: (String) -> Void
-  
+
   // MARK: - Body
   var body: some View {
     Section("Editions") {
@@ -31,7 +31,7 @@ struct EditRaceEditionSection: View {
           Text("No editions yet.")
             .font(.subheadline)
             .foregroundStyle(Color.Text.tertiary)
-          
+
           Button {
             onTapAddEdition()
           } label: {
@@ -46,7 +46,7 @@ struct EditRaceEditionSection: View {
           .buttonStyle(.plain)
           .padding(.top, 15)
           .matchedTransitionSource(id: transitionID, in: namespace)
-        } // ContentUnavailableView
+        }  // ContentUnavailableView
       } else {
         ForEach(editions) { edition in
           Button {
@@ -58,19 +58,19 @@ struct EditRaceEditionSection: View {
               } else {
                 RaceImage(urlString: edition.displayPhotoUrl, imageType: .raceThumbnail)
               }
-              
+
               VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 10) {
                   Text(String(edition.year))
                     .font(.title2)
                     .fontWeight(.heavy)
                     .foregroundStyle(Color.Gold.primary)
-                  
+
                   Text(edition.dateDisplayLabel)
                     .font(.subheadline)
                     .foregroundStyle(Color.Text.tertiary)
                 }
-                
+
                 ScrollView(.horizontal, showsIndicators: false) {
                   HStack {
                     ForEach(edition.distances.sorted()) { distance in
@@ -82,21 +82,21 @@ struct EditRaceEditionSection: View {
                           hPadding: 10
                         )
                     }
-                  } // HStack
-                } // ScrollView
-              } // VStack
-              
+                  }  // HStack
+                }  // ScrollView
+              }  // VStack
+
               Spacer()
-            } // HStack
-          } // Button
+            }  // HStack
+          }  // Button
           .buttonStyle(.plain)
-        } // ForEach
+        }  // ForEach
         .onDelete { offsets in
           for index in offsets {
             onDelete(editions[index].id)
           }
         }
-        
+
         Button {
           onTapAddEdition()
         } label: {
@@ -112,13 +112,13 @@ struct EditRaceEditionSection: View {
         .frame(maxWidth: .infinity)
         .matchedTransitionSource(id: transitionID, in: namespace)
       }
-    } // Section
+    }  // Section
   }
 }
 
 #Preview {
   @Previewable @Namespace var namespace
-  
+
   Form {
     EditRaceEditionSection(
       raceId: "race-taipei",

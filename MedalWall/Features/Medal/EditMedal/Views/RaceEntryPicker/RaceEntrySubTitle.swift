@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RaceEntrySubTitle: View {
   let selection: RaceEntry?
-  
+
   var body: some View {
     Group {
       if let selection {

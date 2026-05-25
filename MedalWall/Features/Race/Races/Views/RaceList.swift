@@ -29,7 +29,7 @@ struct RaceList: View {
               location: race.location.formatted,
               editionCount: race.editionCount
             )
-          } // NavigationLink
+          }  // NavigationLink
           .swipeActions(edge: .trailing) {
             Button(role: .destructive) {
               onDelete(race)
@@ -40,7 +40,7 @@ struct RaceList: View {
         }
         .scrollContentBackground(.hidden)
       }
-    } // Group
+    }  // Group
   }
 }
 

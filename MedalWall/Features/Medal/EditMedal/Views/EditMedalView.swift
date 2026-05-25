@@ -5,9 +5,9 @@
 //  Created by Quien on 2026-04-09.
 //
 
-import SwiftUI
 import PhotosUI
 import SwiftData
+import SwiftUI
 
 struct EditMedalView: View {
   // MARK: - Environment
@@ -28,11 +28,11 @@ struct EditMedalView: View {
   // Event photos picker
   @State private var isPresentingEventPhotosPicker: Bool = false
   @State private var selectedEventPhotos: [PhotosPickerItem] = []
-  
+
   init(mode: ItemEditMode, medal: Medal? = nil) {
     self._viewModel = State(initialValue: EditMedalViewModel(mode: mode, medal: medal))
   }
-  
+
   var body: some View {
     NavigationStack {
       Form {
@@ -52,13 +52,13 @@ struct EditMedalView: View {
         )
         .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
-        
+
         EditMedalAutoFillSection {
           isPresentingRaceEntryPicker = true
         }
-        
+
         EditMedalResultSection(finishTime: $viewModel.finishTime)
-        
+
         EditMedalInfoSection(
           name: $viewModel.name,
           date: $viewModel.date,
@@ -68,14 +68,14 @@ struct EditMedalView: View {
             isPresentingDistancePicker = true
           }
         )
-        
+
         EditMedalLocationSection(
           country: $viewModel.country,
           province: $viewModel.province,
           city: $viewModel.city,
           district: $viewModel.district
         )
-        
+
         EditMedalPlacementSection(
           overallPlacement: $viewModel.overallPlacement,
           totalParticipants: $viewModel.totalParticipants,
@@ -85,9 +85,9 @@ struct EditMedalView: View {
           divisionPlacement: $viewModel.divisionPlacement,
           divisionTotal: $viewModel.divisionTotal
         )
-        
+
         EditMedalNoteSection(note: $viewModel.note)
-        
+
         EditMedalEventPhotosSection(
           photos: viewModel.draftEventPhotos,
           onChooseFromLibrary: {
@@ -97,9 +97,9 @@ struct EditMedalView: View {
             viewModel.removeEventPhoto(id: $0)
           }
         )
-        
+
         EditMedalTagsSection(tags: $viewModel.tags)
-      } // Form
+      }  // Form
       .navigationTitle("\(viewModel.mode == .add ? "New" : "Edit") Medal")
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
@@ -109,15 +109,15 @@ struct EditMedalView: View {
           Button(role: .close) {
             dismiss()
           }
-        } // ToolbarItem
-        
+        }  // ToolbarItem
+
         ToolbarItem(placement: .confirmationAction) {
           Button(role: .confirm) {
             guard let userID = userManager.currentUserID else {
               errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
               return
             }
-            
+
             do {
               try viewModel.save(by: userID)
               dismiss()
@@ -127,8 +127,8 @@ struct EditMedalView: View {
             }
           }
           .disabled(!viewModel.isFormValid)
-        } // ToolbarItem
-      } // toolbar
+        }  // ToolbarItem
+      }  // toolbar
       .onAppear {
         viewModel.configure(context: modelContext)
       }
@@ -141,7 +141,8 @@ struct EditMedalView: View {
         guard let newItem else { return }
         Task {
           if let data = try? await newItem.loadTransferable(type: Data.self),
-             let uiImage = UIImage(data: data) {
+            let uiImage = UIImage(data: data)
+          {
             rawPickedImage = uiImage
             isPresentingCropImageView = true
           } else {
@@ -157,10 +158,10 @@ struct EditMedalView: View {
       )
       .onChange(of: selectedEventPhotos) { _, newItems in
         guard !newItems.isEmpty else { return }
-        
+
         Task {
           var dataList: [Data] = []
-          
+
           for item in newItems {
             if let data = try? await item.loadTransferable(type: Data.self) {
               dataList.append(data)
@@ -168,18 +169,21 @@ struct EditMedalView: View {
               errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
             }
           }
-          
+
           if !dataList.isEmpty {
             viewModel.addEventPhotos(dataList)
           }
-          
+
           selectedEventPhotos = []
         }
       }
-      .sheet(isPresented: $isPresentingCropImageView, onDismiss: {
-        selectedPhoto = nil
-        rawPickedImage = nil
-      }) {
+      .sheet(
+        isPresented: $isPresentingCropImageView,
+        onDismiss: {
+          selectedPhoto = nil
+          rawPickedImage = nil
+        }
+      ) {
         CropImageView(
           image: rawPickedImage,
           cropShape: .circle
@@ -204,14 +208,17 @@ struct EditMedalView: View {
           viewModel.autoFill(from: selection)
         }
       }
-      .sheet(item: $errorWrapper, onDismiss: {
-        if shouldDismiss {
-          dismiss()
+      .sheet(
+        item: $errorWrapper,
+        onDismiss: {
+          if shouldDismiss {
+            dismiss()
+          }
         }
-      }) { wrapper in
+      ) { wrapper in
         ErrorView(errorWrapper: wrapper)
       }
-    } // NavigationStack
+    }  // NavigationStack
   }
 }
 

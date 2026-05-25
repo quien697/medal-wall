@@ -5,14 +5,14 @@
 //  Created by Quien on 2025-10-30.
 //
 
-import SwiftUI
 import PhotosUI
+import SwiftUI
 
 struct EditRaceView: View {
   // MARK: - Environment
   @Environment(UserManager.self) private var userManager
   @Environment(\.dismiss) private var dismiss
-  
+
   // MARK: - State
   @State private var viewModel: EditRaceViewModel
   @State private var errorWrapper: ErrorWrapper?
@@ -22,16 +22,16 @@ struct EditRaceView: View {
   @State private var selectedEdition: DraftRaceEdition?
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var rawPickedImage: UIImage?
-  
+
   // MARK: - Namespace
   @Namespace private var namespace
   private let addEdition = "addEdition"
-  
+
   // MARK: - Init
   init(mode: ItemEditMode, race: Race? = nil) {
     self._viewModel = State(initialValue: EditRaceViewModel(mode: mode, race: race))
   }
-  
+
   // MARK: - Body
   var body: some View {
     NavigationStack {
@@ -52,19 +52,19 @@ struct EditRaceView: View {
         )
         .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
-        
+
         EditRaceInfoSection(
           name: $viewModel.name,
           url: $viewModel.websiteUrl
         )
-        
+
         EditRaceLocationSection(
           country: $viewModel.country,
           province: $viewModel.province,
           city: $viewModel.city,
           district: $viewModel.district
         )
-        
+
         if viewModel.mode == .edit, let raceId = viewModel.raceId {
           EditRaceEditionSection(
             raceId: raceId,
@@ -79,7 +79,7 @@ struct EditRaceView: View {
             onDelete: viewModel.stageDeleteEdition
           )
         }
-      } // Form
+      }  // Form
       .navigationTitle("\(viewModel.mode.displayName) Race")
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
@@ -93,8 +93,8 @@ struct EditRaceView: View {
           Button(role: .cancel) {
             dismiss()
           }
-        } // ToolbarItem
-        
+        }  // ToolbarItem
+
         ToolbarItem(placement: .confirmationAction) {
           if viewModel.isLoading {
             ProgressView()
@@ -113,8 +113,8 @@ struct EditRaceView: View {
             }
             .disabled(!viewModel.isFormValid)
           }
-        } // ToolbarItem
-      } // toolbar
+        }  // ToolbarItem
+      }  // toolbar
       .photosPicker(
         isPresented: $isPresentingPhotoPicker,
         selection: $selectedPhoto,
@@ -124,7 +124,8 @@ struct EditRaceView: View {
         guard let newItem else { return }
         Task {
           if let data = try? await newItem.loadTransferable(type: Data.self),
-             let uiImage = UIImage(data: data) {
+            let uiImage = UIImage(data: data)
+          {
             rawPickedImage = uiImage
             isPresentingCropImageView = true
           } else {
@@ -137,10 +138,13 @@ struct EditRaceView: View {
           errorWrapper = ErrorWrapper(error: error)
         }
       }
-      .sheet(isPresented: $isPresentingCropImageView, onDismiss: {
-        selectedPhoto = nil
-        rawPickedImage = nil
-      }) {
+      .sheet(
+        isPresented: $isPresentingCropImageView,
+        onDismiss: {
+          selectedPhoto = nil
+          rawPickedImage = nil
+        }
+      ) {
         CropImageView(
           image: rawPickedImage,
           cropShape: .square
@@ -186,12 +190,15 @@ struct EditRaceView: View {
           )
         }
       }
-      .sheet(item: $errorWrapper, onDismiss: {
-        viewModel.error = nil
-      }) { wrapper in
+      .sheet(
+        item: $errorWrapper,
+        onDismiss: {
+          viewModel.error = nil
+        }
+      ) { wrapper in
         ErrorView(errorWrapper: wrapper)
-      } // sheet
-    } // NavigationStack
+      }  // sheet
+    }  // NavigationStack
   }
 }
 

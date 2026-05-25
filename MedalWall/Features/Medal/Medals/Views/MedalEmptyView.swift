@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MedalEmptyView: View {
-  
+
   var body: some View {
     ContentUnavailableView(
       "No Medals",

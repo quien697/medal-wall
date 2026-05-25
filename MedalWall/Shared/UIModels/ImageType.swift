@@ -11,11 +11,11 @@ enum ImageType {
   // Profile
   case avatarThumbnail
   case avatar
-  
+
   // Race
   case raceThumbnail
   case raceHero
-  
+
   // Medal
   case medal
   case eventThumbnail
@@ -31,22 +31,22 @@ extension ImageType {
       return AnyShape(.rect(cornerRadius: 16))
     }
   }
-  
+
   var size: CGSize {
     switch self {
-    case .avatarThumbnail:  return CGSize(width: 60,  height: 60)
-    case .avatar:           return CGSize(width: 100, height: 100)
-    case .raceThumbnail:    return CGSize(width: 60,  height: 60)
-    case .raceHero:         return CGSize(width: 100, height: 100)
-    case .medal:            return CGSize(width: 160, height: 160)
-    case .eventThumbnail:   return CGSize(width: 100, height: 80)
-    case .event:            return CGSize(width: 140, height: 110)
+    case .avatarThumbnail: return CGSize(width: 60, height: 60)
+    case .avatar: return CGSize(width: 100, height: 100)
+    case .raceThumbnail: return CGSize(width: 60, height: 60)
+    case .raceHero: return CGSize(width: 100, height: 100)
+    case .medal: return CGSize(width: 160, height: 160)
+    case .eventThumbnail: return CGSize(width: 100, height: 80)
+    case .event: return CGSize(width: 140, height: 110)
     }
   }
 }
 
 extension Image {
-  
+
   func styled(as type: ImageType) -> some View {
     self
       .resizable()
@@ -54,7 +54,7 @@ extension Image {
       .frame(width: type.size.width, height: type.size.height)
       .clipShape(type.shape)
   }
-  
+
   func placeholderStyled(
     as type: ImageType,
     fgColor: Color = Color.Text.tertiary,

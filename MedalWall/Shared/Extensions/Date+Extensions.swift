@@ -8,11 +8,11 @@
 import Foundation
 
 extension Date {
-  
+
   func formattedMonthDay() -> String {
     formatted(.dateTime.month().day())
   }
-  
+
   func formattedMonthDayYear() -> String {
     formatted(.dateTime.month().day().year())
   }

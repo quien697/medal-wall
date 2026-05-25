@@ -12,7 +12,7 @@ struct MedalGridSection: View {
   let columns: [GridItem]
   let spacing: CGFloat
   let namespace: Namespace.ID
-  
+
   var body: some View {
     SectionContainer {
       LazyVGrid(columns: columns, spacing: spacing) {
@@ -32,14 +32,14 @@ struct MedalGridSection: View {
           }
           .buttonStyle(.plain)
         }
-      } // LazyVGrid
-    } // SectionContainer
+      }  // LazyVGrid
+    }  // SectionContainer
   }
 }
 
 #Preview {
   @Previewable @Namespace var namespace
-  
+
   MedalGridSection(
     medals: Medal.sampleData,
     columns: [GridItem](repeating: GridItem(.flexible(minimum: 80), spacing: 16), count: 2),

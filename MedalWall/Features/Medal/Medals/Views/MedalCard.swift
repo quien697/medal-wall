@@ -13,35 +13,35 @@ struct MedalCard: View {
   let name: String
   let finishTime: String
   let date: String
-  
+
   var body: some View {
     VStack {
       MedalImage(photo: photo)
-      
+
       VStack(alignment: .leading, spacing: 2) {
         Text("\(distance)")
           .font(.caption2)
           .fontWeight(.bold)
           .foregroundStyle(Color.Text.tertiary)
-        
+
         Text(name)
           .font(.headline)
           .foregroundStyle(Color.Text.primary)
           .lineLimit(2)
           .frame(minHeight: 44, alignment: .topLeading)
-        
+
         Text(finishTime)
           .font(.subheadline)
           .fontWeight(.heavy)
           .foregroundStyle(Color.Gold.primary)
-        
+
         Text(date)
           .font(.caption)
           .foregroundStyle(.secondary)
           .truncationMode(.tail)
-      } // VStack
+      }  // VStack
       .frame(maxWidth: .infinity, alignment: .leading)
-    } // VStack
+    }  // VStack
     .frame(maxWidth: .infinity)
     .surfaceStyle()
   }
@@ -49,7 +49,7 @@ struct MedalCard: View {
 
 #Preview {
   let medal = Medal.sampleData[1]
-  
+
   MedalCard(
     photo: medal.photo,
     distance: medal.distance.displayLabel,

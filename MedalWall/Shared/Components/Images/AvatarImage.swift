@@ -28,7 +28,7 @@ struct AvatarImage: View {
     self.photoUrl = photoUrl
     self.imageType = imageType
   }
-  
+
   var body: some View {
     ZStack {
       // Outer ring/border
@@ -37,7 +37,7 @@ struct AvatarImage: View {
           LinearGradient(
             colors: [
               Color.Gold.primary,
-              Color.Gold.secondary
+              Color.Gold.secondary,
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -47,14 +47,14 @@ struct AvatarImage: View {
           width: imageType.size.width * 1.1,
           height: imageType.size.height * 1.1
         )
-      
+
       // Inner circle
       Circle()
         .fill(
           LinearGradient(
             colors: [
               Color.Gold.primary,
-              Color.Gold.secondary
+              Color.Gold.secondary,
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -102,7 +102,7 @@ struct AvatarImage: View {
   AvatarImage(photo: UIImage(named: "quien"))
   AvatarImage(photo: UIImage(named: "taipei-marathon-medal-2019"))
   AvatarImage(photo: nil)
-  
+
   AvatarImage(
     photo: UIImage(named: "quien"),
     imageType: .avatarThumbnail

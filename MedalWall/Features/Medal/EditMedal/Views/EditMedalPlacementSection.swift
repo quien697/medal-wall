@@ -15,7 +15,7 @@ struct EditMedalPlacementSection: View {
   @Binding var division: Division?
   @Binding var divisionPlacement: Int?
   @Binding var divisionTotal: Int?
-  
+
   var body: some View {
     Section("Placement (Optional)") {
       EditMedalPlacementRow(
@@ -23,16 +23,16 @@ struct EditMedalPlacementSection: View {
         placement: $overallPlacement,
         total: $totalParticipants
       )
-      
+
       EditMedalPlacementRow(
         label: "Gender",
         placement: $genderPlacement,
         total: $genderTotal
       )
-      
+
       Picker(selection: $division) {
         Text("Not Set").tag(Division?.none)
-        
+
         Section("Female") {
           ForEach(AgeGroup.fiveYearCases, id: \.self) { ageGroup in
             let div = Division(gender: .female, ageGroup: ageGroup)
@@ -43,7 +43,7 @@ struct EditMedalPlacementSection: View {
             Text(div.displayName).tag(Division?.some(div))
           }
         }
-        
+
         Section("Male") {
           ForEach(AgeGroup.fiveYearCases, id: \.self) { ageGroup in
             let div = Division(gender: .male, ageGroup: ageGroup)
@@ -58,7 +58,7 @@ struct EditMedalPlacementSection: View {
         Text("Division Group")
           .fromLabelStyle()
       }
-      
+
       if division != nil {
         EditMedalPlacementRow(
           label: "Division",
@@ -66,13 +66,13 @@ struct EditMedalPlacementSection: View {
           total: $divisionTotal
         )
       }
-    } // Section
+    }  // Section
   }
 }
 
 #Preview {
   let medal = Medal.sampleData.first!
-  
+
   Form {
     EditMedalPlacementSection(
       overallPlacement: .constant(medal.overallPlacement),

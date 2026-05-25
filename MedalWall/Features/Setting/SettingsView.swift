@@ -5,8 +5,8 @@
 //  Created by Quien on 2025-12-02.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct SettingsView: View {
   // MARK: - Environment
@@ -25,7 +25,7 @@ struct SettingsView: View {
         } header: {
           Text("Preferences")
             .sectionTitleStyle()
-        } // Section
+        }  // Section
 
         Section {
           Button {
@@ -35,12 +35,12 @@ struct SettingsView: View {
               .frame(maxWidth: .infinity)
           }
           .goldOutLineButtonStyle(vPadding: 12)
-        } // Section
+        }  // Section
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
         .listSectionSpacing(16)
         .listRowInsets(.all, 0)
-      } // List
+      }  // List
       .navigationTitle("Settings")
       .toolbarTitleDisplayMode(.inline)
     }

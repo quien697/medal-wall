@@ -9,7 +9,7 @@ import SwiftUI
 
 struct EditMedalAutoFillSection: View {
   let onAction: () -> Void
-  
+
   var body: some View {
     Section {
       HStack {
@@ -17,14 +17,14 @@ struct EditMedalAutoFillSection: View {
           Text("Fill from race event")
             .font(.headline)
             .fontWeight(.bold)
-          
+
           Text("Pick a race event to auto-fill fields")
             .font(.subheadline)
             .foregroundStyle(Color.Text.tertiary)
         }
-        
+
         Spacer()
-        
+
         Button {
           onAction()
         } label: {
@@ -32,8 +32,8 @@ struct EditMedalAutoFillSection: View {
         }
         .buttonStyle(.plain)
         .goldFillButtonStyle()
-      } // HStack
-    } // Section
+      }  // HStack
+    }  // Section
     .listRowBackground(Color.Gold.primary.opacity(0.1))
   }
 }

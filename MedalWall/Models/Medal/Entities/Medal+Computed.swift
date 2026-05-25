@@ -17,7 +17,7 @@ extension Medal {
   var location: GeoLocation {
     GeoLocation(country: country, province: province, city: city, district: district)
   }
-  
+
   var distance: RaceDistance {
     RaceDistance(
       category: RaceDistanceCategory(value: raceDistance),
@@ -30,10 +30,10 @@ extension Medal {
   /// Average pace in minutes per kilometre
   var averagePace: Double? {
     guard let finishTime, raceDistance > 0 else { return nil }
-    
+
     return (finishTime / 60) / raceDistance
   }
-  
+
   var divisionEnum: Division? {
     guard let division else { return nil }
     return Division(rawValue: division)

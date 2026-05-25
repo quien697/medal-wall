@@ -14,12 +14,12 @@ final class RaceDetailViewModel {
   var isLoading = false
   var error: AppError?
   private let repository = RaceFirestoreRepository()
-  
+
   // MARK: - Init
   init(race: Race) {
     self.race = race
   }
-  
+
   // MARK: - Functions
   /// Reloads the race data from Firestore to reflect any edits.
   func loadRace() async {
@@ -31,19 +31,19 @@ final class RaceDetailViewModel {
       // silently ignore — stale data is preferable to an error on dismiss
     }
   }
-  
+
   /// Loads all editions for this race from Firestore.
   func loadEditions() async {
     isLoading = true
     defer { isLoading = false }
-    
+
     do {
       editions = try await repository.fetchEditions(raceId: race.id)
     } catch {
       self.error = .raceFetchFailed(error.localizedDescription)
     }
   }
-  
+
   /// Deletes the race and all its editions from Firestore.
   func deleteRace() async {
     do {

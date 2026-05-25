@@ -10,9 +10,9 @@ import SwiftUI
 @Observable
 final class MedalsViewModel {
   // MARK: - Properties
-  
+
   let gridSpacing: CGFloat = 16
-  
+
   // MARK: - Computed
   var gridColumns: [GridItem] {
     [GridItem](
@@ -20,17 +20,17 @@ final class MedalsViewModel {
       count: 2
     )
   }
-  
+
   // MARK: - Functions
-  
+
   func totalCount(_ medals: [Medal]) -> Int {
     medals.count
   }
-  
+
   func fullCount(_ medals: [Medal]) -> Int {
     medals.filter { $0.distance.category == .full }.count
   }
-  
+
   func halfCount(_ medals: [Medal]) -> Int {
     medals.filter { $0.distance.category == .half }.count
   }

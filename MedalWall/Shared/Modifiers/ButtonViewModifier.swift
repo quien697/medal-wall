@@ -14,7 +14,7 @@ struct ButtonViewModifier: ViewModifier {
   let bgColor: Color
   let vPadding: CGFloat
   let hPadding: CGFloat
-  
+
   func body(content: Content) -> some View {
     content
       .font(font)
@@ -32,7 +32,7 @@ struct ButtonViewModifier: ViewModifier {
 }
 
 extension View {
-  
+
   func primaryButtonStyle(
     font: Font = .subheadline,
     fontWeight: Font.Weight = .semibold,
@@ -41,16 +41,17 @@ extension View {
     vPadding: CGFloat = 8,
     hPadding: CGFloat = 12
   ) -> some View {
-    modifier(ButtonViewModifier(
-      font: font,
-      fontWeight: fontWeight,
-      fgColor: fgColor,
-      bgColor: bgColor,
-      vPadding: vPadding,
-      hPadding: hPadding
-    ))
+    modifier(
+      ButtonViewModifier(
+        font: font,
+        fontWeight: fontWeight,
+        fgColor: fgColor,
+        bgColor: bgColor,
+        vPadding: vPadding,
+        hPadding: hPadding
+      ))
   }
-  
+
   func secondaryButtonStyle(
     font: Font = .subheadline,
     fontWeight: Font.Weight = .semibold,
@@ -59,16 +60,17 @@ extension View {
     vPadding: CGFloat = 8,
     hPadding: CGFloat = 12
   ) -> some View {
-    modifier(ButtonViewModifier(
-      font: font,
-      fontWeight: fontWeight,
-      fgColor: fgColor,
-      bgColor: bgColor,
-      vPadding: vPadding,
-      hPadding: hPadding
-    ))
+    modifier(
+      ButtonViewModifier(
+        font: font,
+        fontWeight: fontWeight,
+        fgColor: fgColor,
+        bgColor: bgColor,
+        vPadding: vPadding,
+        hPadding: hPadding
+      ))
   }
-  
+
   func tertiaryButtonStyle(
     font: Font = .subheadline,
     fontWeight: Font.Weight = .semibold,
@@ -77,16 +79,17 @@ extension View {
     vPadding: CGFloat = 8,
     hPadding: CGFloat = 12
   ) -> some View {
-    modifier(ButtonViewModifier(
-      font: font,
-      fontWeight: fontWeight,
-      fgColor: fgColor,
-      bgColor: bgColor,
-      vPadding: vPadding,
-      hPadding: hPadding
-    ))
+    modifier(
+      ButtonViewModifier(
+        font: font,
+        fontWeight: fontWeight,
+        fgColor: fgColor,
+        bgColor: bgColor,
+        vPadding: vPadding,
+        hPadding: hPadding
+      ))
   }
-  
+
   func goldFillButtonStyle(
     font: Font = .subheadline,
     fontWeight: Font.Weight = .semibold,
@@ -95,16 +98,17 @@ extension View {
     vPadding: CGFloat = 8,
     hPadding: CGFloat = 12
   ) -> some View {
-    modifier(ButtonViewModifier(
-      font: font,
-      fontWeight: fontWeight,
-      fgColor: fgColor,
-      bgColor: bgColor,
-      vPadding: vPadding,
-      hPadding: hPadding
-    ))
+    modifier(
+      ButtonViewModifier(
+        font: font,
+        fontWeight: fontWeight,
+        fgColor: fgColor,
+        bgColor: bgColor,
+        vPadding: vPadding,
+        hPadding: hPadding
+      ))
   }
-  
+
   func goldOutLineButtonStyle(
     font: Font = .subheadline,
     fontWeight: Font.Weight = .semibold,
@@ -113,30 +117,31 @@ extension View {
     vPadding: CGFloat = 8,
     hPadding: CGFloat = 12
   ) -> some View {
-    modifier(ButtonViewModifier(
-      font: font,
-      fontWeight: fontWeight,
-      fgColor: fgColor,
-      bgColor: bgColor,
-      vPadding: vPadding,
-      hPadding: hPadding
-    ))
+    modifier(
+      ButtonViewModifier(
+        font: font,
+        fontWeight: fontWeight,
+        fgColor: fgColor,
+        bgColor: bgColor,
+        vPadding: vPadding,
+        hPadding: hPadding
+      ))
   }
 }
 
 #Preview {
   Text("Test Data")
     .primaryButtonStyle()
-  
+
   Text("Test Data")
     .secondaryButtonStyle()
-  
+
   Text("Test Data")
     .tertiaryButtonStyle()
-  
+
   Text("Test Data")
     .goldFillButtonStyle()
-  
+
   Text("Test Data")
     .goldOutLineButtonStyle()
 }

@@ -16,7 +16,7 @@ extension Race {
     id: "race-taipei",
     name: "Taipei Marathon",
     location: GeoLocation(country: "Taiwan", city: "Taipei"),
-    websiteUrl:"taipeicitymarathon.com",
+    websiteUrl: "taipeicitymarathon.com",
     createdBy: "preview"
   )
 
@@ -24,7 +24,7 @@ extension Race {
     id: "race-vancouver",
     name: "BMO Vancouver Marathon",
     location: GeoLocation(country: "Canada", province: "BC", city: "Vancouver"),
-    websiteUrl:"bmovanmarathon.ca",
+    websiteUrl: "bmovanmarathon.ca",
     createdBy: "preview"
   )
 
@@ -32,7 +32,7 @@ extension Race {
     id: "race-tokyo",
     name: "Tokyo Marathon",
     location: GeoLocation(country: "Japan", city: "Tokyo"),
-    websiteUrl:"marathon.tokyo",
+    websiteUrl: "marathon.tokyo",
     createdBy: "preview"
   )
 
@@ -40,7 +40,7 @@ extension Race {
     id: "race-boston",
     name: "Boston Marathon",
     location: GeoLocation(country: "United States", province: "MA", city: "Boston"),
-    websiteUrl:"baa.org/races/boston-marathon",
+    websiteUrl: "baa.org/races/boston-marathon",
     createdBy: "preview"
   )
 }
@@ -114,7 +114,7 @@ extension RaceEdition {
     startDate: DateComponents(calendar: .current, year: 2023, month: 3, day: 5).date!,
     endDate: DateComponents(calendar: .current, year: 2023, month: 3, day: 5).date!,
     distances: [
-      RaceDistance(category: .full, type: .inPerson),
+      RaceDistance(category: .full, type: .inPerson)
     ],
     createdBy: "preview"
   )
@@ -126,7 +126,7 @@ extension RaceEdition {
     startDate: DateComponents(calendar: .current, year: 2024, month: 4, day: 15).date!,
     endDate: DateComponents(calendar: .current, year: 2024, month: 4, day: 15).date!,
     distances: [
-      RaceDistance(category: .full, type: .inPerson),
+      RaceDistance(category: .full, type: .inPerson)
     ],
     createdBy: "preview"
   )

@@ -11,7 +11,7 @@ struct WheelUnitPicker: View {
   let title: String
   @Binding var value: Int
   let range: ClosedRange<Int>
-  
+
   var body: some View {
     VStack(alignment: .center, spacing: 0) {
       Picker(title, selection: $value) {
@@ -24,7 +24,7 @@ struct WheelUnitPicker: View {
       .pickerStyle(.wheel)
       .frame(height: 120)
       .clipped()
-      
+
       Text(title)
     }
     .frame(minWidth: 60)
@@ -33,14 +33,14 @@ struct WheelUnitPicker: View {
 
 #Preview {
   let duration: HMSDuration = HMSDuration()
-  
+
   HStack {
     WheelUnitPicker(
       title: "Hour",
       value: .constant(duration.hours),
       range: 0...24
     )
-    
+
     WheelUnitPicker(
       title: "Min",
       value: .constant(duration.minutes),

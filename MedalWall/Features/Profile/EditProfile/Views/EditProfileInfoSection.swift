@@ -13,7 +13,7 @@ struct EditProfileInfoSection: View {
   @Binding var gender: Gender?
   @Binding var birthday: Date
   @Binding var isBirthdaySet: Bool
-  
+
   var body: some View {
     Section("Info") {
       LabeledContent {
@@ -23,7 +23,7 @@ struct EditProfileInfoSection: View {
         Text("First Name")
           .fromLabelStyle()
       }
-      
+
       LabeledContent {
         TextField("Last Name", text: $lastName)
           .multilineTextAlignment(.trailing)
@@ -31,10 +31,10 @@ struct EditProfileInfoSection: View {
         Text("Last Name")
           .fromLabelStyle()
       }
-      
+
       Picker(selection: $gender) {
         Text("Not Set").tag(Gender?.none)
-        
+
         ForEach(Gender.allCases, id: \.self) { g in
           Text(g.displayName).tag(Gender?.some(g))
         }
@@ -42,7 +42,7 @@ struct EditProfileInfoSection: View {
         Text("Gender")
           .fromLabelStyle()
       }
-      
+
       LabeledContent {
         if isBirthdaySet {
           HStack {
@@ -54,7 +54,7 @@ struct EditProfileInfoSection: View {
             }
             .foregroundStyle(.red)
             .buttonStyle(.plain)
-            
+
             DatePicker("", selection: $birthday, displayedComponents: .date)
               .labelsHidden()
           }
