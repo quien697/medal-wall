@@ -9,7 +9,7 @@ import Foundation
 
 /// Represents a specific marathon distance combined with its details
 struct RaceDistance: Identifiable, Hashable, Comparable, Codable {
-  let id: UUID = UUID()
+  let id = UUID()
   var category: RaceDistanceCategory
   var type: RaceDistanceType
 

@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 struct DraftEventPhoto: Identifiable {
-  let id: UUID = UUID()
+  let id = UUID()
   let data: Data
 
   var image: UIImage? {

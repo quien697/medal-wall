@@ -76,8 +76,8 @@ enum AppError: LocalizedError, Identifiable, Equatable {
     case .invalidCredential,
       .missingNonce,
       .missingIdentityToken,
-      .nonceFailed(_),
-      .tokenSerializationFailed(_),
+      .nonceFailed,
+      .tokenSerializationFailed,
       .signInFailed:
       "Sign In Failed"
     case .unknown:
@@ -158,8 +158,8 @@ enum AppError: LocalizedError, Identifiable, Equatable {
     case .invalidCredential,
       .missingNonce,
       .missingIdentityToken,
-      .nonceFailed(_),
-      .tokenSerializationFailed(_),
+      .nonceFailed,
+      .tokenSerializationFailed,
       .signInFailed:
       "Please try signing in again."
     case .unknown:

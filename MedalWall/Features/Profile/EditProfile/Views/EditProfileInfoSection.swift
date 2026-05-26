@@ -35,8 +35,8 @@ struct EditProfileInfoSection: View {
       Picker(selection: $gender) {
         Text("Not Set").tag(Gender?.none)
 
-        ForEach(Gender.allCases, id: \.self) { g in
-          Text(g.displayName).tag(Gender?.some(g))
+        ForEach(Gender.allCases, id: \.self) { genderCase in
+          Text(genderCase.displayName).tag(Gender?.some(genderCase))
         }
       } label: {
         Text("Gender")

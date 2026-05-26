@@ -32,7 +32,7 @@ struct WheelUnitPicker: View {
 }
 
 #Preview {
-  let duration: HMSDuration = HMSDuration()
+  let duration = HMSDuration()
 
   HStack {
     WheelUnitPicker(

@@ -12,7 +12,7 @@ struct MedalsView: View {
   // MARK: - Environment
   @Environment(\.modelContext) private var modelContext
   // MARK: - State
-  @State private var viewModel: MedalsViewModel = MedalsViewModel()
+  @State private var viewModel = MedalsViewModel()
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingAddMedal = false
   // MARK: - Namespace

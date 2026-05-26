@@ -12,7 +12,7 @@ struct RacesView: View {
   @Environment(UserManager.self) private var userManager
 
   // MARK: - State
-  @State private var viewModel: RacesViewModel = RacesViewModel()
+  @State private var viewModel = RacesViewModel()
   @State private var errorWrapper: ErrorWrapper?
   @State private var selectedRace: Race?
   @State private var isPresentingAddRace = false

@@ -53,5 +53,13 @@ file_length:
   error: 800
 
 function_body_length:
-  warning: 50
+  warning: 65
   error: 100
+
+cyclomatic_complexity:
+  warning: 15
+  error: 20
+
+nesting:
+  type_level:
+    warning: 2

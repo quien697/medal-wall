@@ -54,16 +54,16 @@ struct HMSDuration: Equatable {
     let parts = string.split(separator: ":")
     guard
       parts.count == 3,
-      let h = Int(parts[0]),
-      let m = Int(parts[1]),
-      let s = Int(parts[2]),
-      (0...59).contains(m),
-      (0...59).contains(s),
-      h >= 0
+      let hours = Int(parts[0]),
+      let minutes = Int(parts[1]),
+      let seconds = Int(parts[2]),
+      (0...59).contains(minutes),
+      (0...59).contains(seconds),
+      hours >= 0
     else {
       return nil
     }
 
-    return HMSDuration(hours: h, minutes: m, seconds: s)
+    return HMSDuration(hours: hours, minutes: minutes, seconds: seconds)
   }
 }

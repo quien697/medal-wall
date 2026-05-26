@@ -44,7 +44,6 @@ struct RaceRow: View {
       name: "Taipei Marathon",
       location: "Taipei, Taiwan",
       editionCount: 2
-
     )
 
     RaceRow(

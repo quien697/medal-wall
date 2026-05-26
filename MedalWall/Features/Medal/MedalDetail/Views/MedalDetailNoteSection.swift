@@ -26,7 +26,8 @@ struct MedalDetailNoteSection: View {
   ScrollView {
     MedalDetailNoteSection(
       note:
-        "First half marathon! Legs felt strong until km 18. Absolutely loved the course along the city landmarks. Will be back!"
+        "First half marathon! Legs felt strong until km 18. Loved the course"
+        + " along the city landmarks. Will be back!"
     )
 
     MedalDetailNoteSection(note: "First half marathon!")
