@@ -41,6 +41,13 @@ See `ARCHITECTURE.md` for the full data model and design decisions. Summary:
 - Swift Testing framework (`@Test`, `#expect`) — not XCTest
 - Firebase iOS SDK (Auth only), GoogleSignIn-iOS
 
+## Tooling
+
+- **swift-format** — handles all formatting automatically (indentation, spacing, line length, import ordering). Config: `.swift-format`. Run via pre-commit hook.
+- **SwiftLint** — enforces code quality rules. Config: `.swiftlint.yml`. Runs as an Xcode build phase.
+
+The Code Style rules below cover **structural and architectural conventions** that tools cannot enforce. Formatting details (indentation, spacing) are authoritative in `.swift-format` — when in doubt, defer to the tool.
+
 ## Code Style
 
 ### View Structure
