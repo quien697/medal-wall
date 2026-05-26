@@ -13,21 +13,21 @@ final class EditMedalViewModel {
   var name: String = ""
   var date: Date = .now
   var bibNumber: String = ""
-  var photoData: Data? = nil
-  var photo: UIImage? = nil
+  var photoData: Data?
+  var photo: UIImage?
   var country: String = ""
   var province: String = ""
   var city: String = ""
   var district: String = ""
   var distance: RaceDistance = .default
-  var finishTime: TimeInterval? = nil
-  var overallPlacement: Int? = nil
-  var totalParticipants: Int? = nil
-  var division: Division? = nil
-  var divisionPlacement: Int? = nil
-  var divisionTotal: Int? = nil
-  var genderPlacement: Int? = nil
-  var genderTotal: Int? = nil
+  var finishTime: TimeInterval?
+  var overallPlacement: Int?
+  var totalParticipants: Int?
+  var division: Division?
+  var divisionPlacement: Int?
+  var divisionTotal: Int?
+  var genderPlacement: Int?
+  var genderTotal: Int?
   var note: String = ""
   var tags: [String] = []
   var draftEventPhotos: [DraftEventPhoto] = []

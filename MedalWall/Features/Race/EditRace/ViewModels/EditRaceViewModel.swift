@@ -11,7 +11,7 @@ import SwiftUI
 final class EditRaceViewModel {
   // MARK: - Data
   var name: String = ""
-  var photo: UIImage? = nil
+  var photo: UIImage?
   var country: String = ""
   var province: String = ""
   var city: String = ""
