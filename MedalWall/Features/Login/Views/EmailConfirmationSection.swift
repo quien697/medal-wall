@@ -18,7 +18,8 @@ struct EmailConfirmationSection: View {
       EmailSignInHeader(
         title: "Now check your email",
         subTitle:
-          "We sent To \(email).\nTo complete sign-in, tap the sign-in link in your email, if it doesn't arrive within 3 minutes, check your spam folder"
+          "We sent To \(email).\nTo complete sign-in, tap the sign-in link in your email,"
+          + " if it doesn't arrive within 3 minutes, check your spam folder"
       )
 
       Button {
