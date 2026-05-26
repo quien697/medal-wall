@@ -58,28 +58,28 @@ struct StatCard: View {
   let threeColumns = [
     GridItem(.flexible(minimum: 80), spacing: 8),
     GridItem(.flexible(minimum: 80), spacing: 8),
-    GridItem(.flexible(minimum: 80), spacing: 8),
+    GridItem(.flexible(minimum: 80), spacing: 8)
   ]
 
   let twoColumns = [
     GridItem(.flexible(minimum: 160), spacing: 8),
-    GridItem(.flexible(minimum: 160), spacing: 8),
+    GridItem(.flexible(minimum: 160), spacing: 8)
   ]
 
   LazyVGrid(columns: threeColumns, spacing: 8) {
     StatCard(
       title: "32",
-      subTitle: "Medals",
+      subTitle: "Medals"
     )
 
     StatCard(
       title: "12",
-      subTitle: "Full",
+      subTitle: "Full"
     )
 
     StatCard(
       title: "4",
-      subTitle: "Half",
+      subTitle: "Half"
     )
   }
 
@@ -93,7 +93,7 @@ struct StatCard: View {
     StatCard(
       title: "--:--:--",
       titleFont: .title,
-      subTitle: "Best Half",
+      subTitle: "Best Half"
     )
   }
 }

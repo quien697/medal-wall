@@ -30,7 +30,7 @@ struct Hexagon: InsettableShape {
       CGPoint(x: originX + w, y: originY + h * (1 - sideRatio)),  // lower-right
       CGPoint(x: originX + w * 0.5, y: originY + h),  // bottom
       CGPoint(x: originX, y: originY + h * (1 - sideRatio)),  // lower-left
-      CGPoint(x: originX, y: originY + h * sideRatio),  // upper-left
+      CGPoint(x: originX, y: originY + h * sideRatio)  // upper-left
     ]
 
     path.move(to: points[0])

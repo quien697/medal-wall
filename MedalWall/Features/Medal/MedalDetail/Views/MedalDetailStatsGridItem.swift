@@ -60,7 +60,7 @@ struct MedalDetailStatsGridItem: View {
 #Preview {
   let columns = [
     GridItem(.flexible(minimum: 80), spacing: 10),
-    GridItem(.flexible(minimum: 80), spacing: 10),
+    GridItem(.flexible(minimum: 80), spacing: 10)
   ]
 
   LazyVGrid(columns: columns, spacing: 10) {

@@ -62,10 +62,10 @@ enum AgeGroup: String, Codable, CaseIterable, Identifiable {
   static var fiveYearCases: [AgeGroup] = [
     .under20, .from20to24, .from25to29, .from30to34, .from35to39,
     .from40to44, .from45to49, .from50to54, .from55to59, .from60to64,
-    .from65to69, .from70to74, .from75to79, .over80,
+    .from65to69, .from70to74, .from75to79, .over80
   ]
 
   static var tenYearCases: [AgeGroup] = [
-    .from20to29, .from30to39, .from40to49, .from50to59, .from60to69, .from70to79,
+    .from20to29, .from30to39, .from40to49, .from50to59, .from60to69, .from70to79
   ]
 }

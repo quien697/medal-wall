@@ -37,7 +37,7 @@ struct AvatarImage: View {
           LinearGradient(
             colors: [
               Color.Gold.primary,
-              Color.Gold.secondary,
+              Color.Gold.secondary
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -54,7 +54,7 @@ struct AvatarImage: View {
           LinearGradient(
             colors: [
               Color.Gold.primary,
-              Color.Gold.secondary,
+              Color.Gold.secondary
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing

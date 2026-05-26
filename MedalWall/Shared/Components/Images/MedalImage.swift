@@ -31,7 +31,7 @@ struct MedalImage: View {
               .init(color: Color.Gold.primary, location: 0.35),
               .init(color: Color.Gold.secondary, location: 0.5),
               .init(color: Color.Gold.primary, location: 0.75),
-              .init(color: Color.Gold.secondary.opacity(0.8), location: 1.0),
+              .init(color: Color.Gold.secondary.opacity(0.8), location: 1.0)
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing

@@ -58,7 +58,7 @@ extension RaceEdition {
     endDate: DateComponents(calendar: .current, year: 2019, month: 12, day: 15).date!,
     distances: [
       RaceDistance(category: .full, type: .inPerson),
-      RaceDistance(category: .half, type: .inPerson),
+      RaceDistance(category: .half, type: .inPerson)
     ],
     createdBy: "preview"
   )
@@ -72,7 +72,7 @@ extension RaceEdition {
     distances: [
       RaceDistance(category: .full, type: .inPerson),
       RaceDistance(category: .half, type: .inPerson),
-      RaceDistance(category: .half, type: .virtual),
+      RaceDistance(category: .half, type: .virtual)
     ],
     createdBy: "preview"
   )
@@ -88,7 +88,7 @@ extension RaceEdition {
       RaceDistance(category: .half, type: .inPerson),
       RaceDistance(category: .custom(8.0), type: .inPerson),
       RaceDistance(category: .full, type: .virtual),
-      RaceDistance(category: .half, type: .virtual),
+      RaceDistance(category: .half, type: .virtual)
     ],
     createdBy: "preview"
   )
@@ -102,7 +102,7 @@ extension RaceEdition {
     distances: [
       RaceDistance(category: .full, type: .inPerson),
       RaceDistance(category: .half, type: .inPerson),
-      RaceDistance(category: .custom(8.0), type: .inPerson),
+      RaceDistance(category: .custom(8.0), type: .inPerson)
     ],
     createdBy: "preview"
   )
