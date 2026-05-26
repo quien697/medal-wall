@@ -17,9 +17,7 @@ enum RaceDistanceCategory: CustomStringConvertible, Hashable {
   case custom(Double)
 
   /// Defines display name for UI
-  nonisolated
-    var description: String
-  {
+  nonisolated var description: String {
     switch self {
     case .full: return "42km"
     case .half: return "21km"
@@ -35,9 +33,7 @@ enum RaceDistanceCategory: CustomStringConvertible, Hashable {
   }
 
   /// The numeric distance in kilometres used for Codable storage and sorting.
-  nonisolated
-    var value: Double
-  {
+  nonisolated var value: Double {
     switch self {
     case .full: return 42.195
     case .half: return 21.0975
@@ -50,9 +46,7 @@ enum RaceDistanceCategory: CustomStringConvertible, Hashable {
 
 extension RaceDistanceCategory {
   /// Reconstructs a category from its stored numeric value (kilometres).
-  nonisolated
-    init(value: Double)
-  {
+  nonisolated init(value: Double) {
     switch value {
     case 42.195: self = .full
     case 21.0975: self = .half
