@@ -86,15 +86,19 @@ struct RacesView: View {
           Task {
             await viewModel.loadRaces()
           }
+        },
+        content: {
+          EditRaceView(mode: .add)
+            .navigationTransition(.zoom(sourceID: addRace, in: namespace))
         }
-      ) {
-        EditRaceView(mode: .add)
-          .navigationTransition(.zoom(sourceID: addRace, in: namespace))
-      }
-      .sheet(item: $errorWrapper, onDismiss: { viewModel.error = nil }) {
-        wrapper in
-        ErrorView(errorWrapper: wrapper)
-      }  // sheet
+      )
+      .sheet(
+        item: $errorWrapper,
+        onDismiss: { viewModel.error = nil },
+        content: { wrapper in
+          ErrorView(errorWrapper: wrapper)
+        }
+      )  // sheet
     }  // NavigationStack
   }
 }

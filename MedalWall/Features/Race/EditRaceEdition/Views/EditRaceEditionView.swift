@@ -175,15 +175,16 @@ struct EditRaceEditionView: View {
         onDismiss: {
           selectedPhoto = nil
           rawPickedImage = nil
+        },
+        content: {
+          CropImageView(
+            image: rawPickedImage,
+            cropShape: .square
+          ) { croppedImage in
+            if let croppedImage { viewModel.updatePhoto(with: croppedImage) }
+          }
         }
-      ) {
-        CropImageView(
-          image: rawPickedImage,
-          cropShape: .square
-        ) { croppedImage in
-          if let croppedImage { viewModel.updatePhoto(with: croppedImage) }
-        }
-      }
+      )
       .sheet(isPresented: $isPresentingAddDistance) {
         AddDistanceView { newDistance in
           do {
@@ -196,10 +197,11 @@ struct EditRaceEditionView: View {
       }
       .sheet(
         item: $errorWrapper,
-        onDismiss: { viewModel.error = nil }
-      ) { wrapper in
-        ErrorView(errorWrapper: wrapper)
-      }  // sheet
+        onDismiss: { viewModel.error = nil },
+        content: { wrapper in
+          ErrorView(errorWrapper: wrapper)
+        }
+      )  // sheet
     }  // NavigationStack
   }
 }

@@ -143,17 +143,18 @@ struct EditRaceView: View {
         onDismiss: {
           selectedPhoto = nil
           rawPickedImage = nil
-        }
-      ) {
-        CropImageView(
-          image: rawPickedImage,
-          cropShape: .square
-        ) { croppedImage in
-          if let croppedImage {
-            viewModel.updatePhoto(with: croppedImage)
+        },
+        content: {
+          CropImageView(
+            image: rawPickedImage,
+            cropShape: .square
+          ) { croppedImage in
+            if let croppedImage {
+              viewModel.updatePhoto(with: croppedImage)
+            }
           }
         }
-      }
+      )
       .sheet(isPresented: $isPresentingAddEdition) {
         if let raceId = viewModel.raceId {
           EditRaceEditionView(
@@ -194,10 +195,11 @@ struct EditRaceView: View {
         item: $errorWrapper,
         onDismiss: {
           viewModel.error = nil
+        },
+        content: { wrapper in
+          ErrorView(errorWrapper: wrapper)
         }
-      ) { wrapper in
-        ErrorView(errorWrapper: wrapper)
-      }  // sheet
+      )  // sheet
     }  // NavigationStack
   }
 }

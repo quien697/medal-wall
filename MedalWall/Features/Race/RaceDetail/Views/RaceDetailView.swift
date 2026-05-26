@@ -91,13 +91,18 @@ struct RaceDetailView: View {
           await viewModel.loadRace()
           await viewModel.loadEditions()
         }
+      },
+      content: {
+        EditRaceView(mode: .edit, race: viewModel.race)
       }
-    ) {
-      EditRaceView(mode: .edit, race: viewModel.race)
-    }  // sheet
-    .sheet(item: $errorWrapper, onDismiss: { viewModel.error = nil }) { wrapper in
-      ErrorView(errorWrapper: wrapper)
-    }  // sheet
+    )  // sheet
+    .sheet(
+      item: $errorWrapper,
+      onDismiss: { viewModel.error = nil },
+      content: { wrapper in
+        ErrorView(errorWrapper: wrapper)
+      }
+    )  // sheet
   }
 }
 

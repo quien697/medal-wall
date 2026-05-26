@@ -119,22 +119,24 @@ struct EditProfileView: View {
         onDismiss: {
           selectedPhoto = nil
           rawPickedImage = nil
-        }
-      ) {
-        CropImageView(image: rawPickedImage, cropShape: .circle) { croppedImage in
-          if let croppedImage {
-            viewModel.updatePhoto(with: croppedImage)
+        },
+        content: {
+          CropImageView(image: rawPickedImage, cropShape: .circle) { croppedImage in
+            if let croppedImage {
+              viewModel.updatePhoto(with: croppedImage)
+            }
           }
         }
-      }
+      )
       .sheet(
         item: $errorWrapper,
         onDismiss: {
           if shouldDismiss { dismiss() }
+        },
+        content: { wrapper in
+          ErrorView(errorWrapper: wrapper)
         }
-      ) { wrapper in
-        ErrorView(errorWrapper: wrapper)
-      }
+      )
     }  // NavigationStack
   }
 }
