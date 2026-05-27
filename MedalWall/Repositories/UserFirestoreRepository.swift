@@ -16,7 +16,6 @@ final class UserFirestoreRepository {
   func fetchUser(uid: String) async throws -> User? {
     let snapshot = try await db.collection(collection).document(uid).getDocument()
     guard snapshot.exists else { return nil }
-
     return try snapshot.data(as: User.self)
   }
 

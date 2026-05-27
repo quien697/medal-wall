@@ -23,8 +23,8 @@ struct MedalWallApp: App {
       //      Race.self,
       //      RaceEdition.self,
       //      RaceCategory.self,
-      Medal.self,
-      EventPhoto.self
+      //      Medal.self,
+      //      EventPhoto.self
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

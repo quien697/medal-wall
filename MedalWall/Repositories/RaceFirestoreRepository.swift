@@ -18,8 +18,7 @@ final class RaceFirestoreRepository {
 
   /// Fetches all races created.
   func fetchRaces() async throws -> [Race] {
-    let snapshot = try await db.collection(collection)
-      .getDocuments()
+    let snapshot = try await db.collection(collection).getDocuments()
     return try snapshot.documents.map { try $0.data(as: Race.self) }
   }
 

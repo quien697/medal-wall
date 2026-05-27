@@ -9,7 +9,19 @@ import SwiftUI
 
 @Observable
 final class ProfileViewModel {
+  // MARK: - Data
+  var medals: [Medal] = []
+
+  // MARK: - Dependencies
   private let emptyWithDash: String = "-"
+  private let repository = MedalFirestoreRepository()
+
+  // MARK: - Functions
+
+  /// Loads all medals for the given user from Firestore.
+  func loadMedals(userId: String) async {
+    medals = (try? await repository.fetchMedals(userId: userId)) ?? []
+  }
 
   func totalMedals(_ medals: [Medal]) -> Int {
     medals.count

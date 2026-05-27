@@ -10,14 +10,22 @@ import SwiftUI
 struct MedalImage: View {
   private let systemImageName: String = "medal.fill"
   private let imageType: ImageType = .medal
+  private let photo: UIImage?
+  private let urlString: String?
+  private let size: CGFloat
 
-  let size: CGFloat
-  let photo: UIImage?
-
-  init(
-    photo: UIImage? = nil,
-  ) {
+  /// Displays a locally held UIImage (e.g. a newly selected photo not yet uploaded).
+  init(photo: UIImage? = nil) {
     self.photo = photo
+    self.urlString = nil
+    self.size = imageType.size.width
+  }
+
+  /// Fetches and displays an image from a URL string, falling back to the placeholder if nil or
+  /// loading fails.
+  init(urlString: String?) {
+    self.photo = nil
+    self.urlString = urlString
     self.size = imageType.size.width
   }
 
@@ -62,17 +70,31 @@ struct MedalImage: View {
           .scaledToFill()
           .frame(width: size * 0.72, height: size * 0.72)
           .clipShape(imageType.shape)
-          .shadow(
-            radius: 6,
-            x: 6,
-            y: 6
-          )
+          .shadow(radius: 6, x: 6, y: 6)
+      } else if let urlString, let url = URL(string: urlString) {
+        AsyncImage(url: url) { phase in
+          switch phase {
+          case .success(let image):
+            image
+              .resizable()
+              .scaledToFill()
+              .frame(width: size * 0.72, height: size * 0.72)
+              .clipShape(imageType.shape)
+              .shadow(radius: 6, x: 6, y: 6)
+          default:
+            placeholder
+          }
+        }
       } else {
-        Image(systemName: systemImageName)
-          .font(.system(size: size * 0.3, weight: .semibold))
-          .foregroundColor(Color.Gold.primary)
+        placeholder
       }
     }  // ZStack
+  }
+
+  private var placeholder: some View {
+    Image(systemName: systemImageName)
+      .font(.system(size: size * 0.3, weight: .semibold))
+      .foregroundColor(Color.Gold.primary)
   }
 }
 
@@ -82,7 +104,7 @@ struct MedalImage: View {
       .background(Color.Background.primary)
 
     MedalImage(
-      photo: UIImage(named: "bmo-vancouver-marathon-2022")
+      photo: UIImage(named: "bmo-vancouver-marathon")
     )
     .background(Color.Background.primary)
   }

@@ -9,19 +9,26 @@ import SwiftUI
 
 @Observable
 final class MedalsViewModel {
-  // MARK: - Properties
+  // MARK: - Data
+  var medals: [Medal] = []
+
+  // MARK: - State
+  var isLoading = false
+  var error: AppError?
+
+  // MARK: - Dependencies
+  private let repository = MedalFirestoreRepository()
+
+  // MARK: - Computed
 
   let gridSpacing: CGFloat = 16
 
-  // MARK: - Computed
   var gridColumns: [GridItem] {
     [GridItem](
       repeating: GridItem(.flexible(minimum: 80), spacing: gridSpacing),
       count: 2
     )
   }
-
-  // MARK: - Functions
 
   func totalCount(_ medals: [Medal]) -> Int {
     medals.count
@@ -33,5 +40,18 @@ final class MedalsViewModel {
 
   func halfCount(_ medals: [Medal]) -> Int {
     medals.filter { $0.distance.category == .half }.count
+  }
+
+  // MARK: - Functions
+
+  /// Loads all medals for the given user from Firestore.
+  func loadMedals(userId: String) async {
+    defer { isLoading = false }
+    isLoading = true
+    do {
+      medals = try await repository.fetchMedals(userId: userId)
+    } catch {
+      self.error = .medalFetchFailed(error.localizedDescription)
+    }
   }
 }

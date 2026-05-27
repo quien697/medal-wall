@@ -8,14 +8,13 @@
 import UIKit
 
 extension Medal {
-  @MainActor
   static let sampleData: [Medal] = {
     let taipeiMedal2019 = Medal(
       name: "Sample \(Race.taipei.name) \(RaceEdition.taipei2019.year)",
       date: RaceEdition.taipei2019.startDate,
       bibNumber: "00001",
       location: Race.taipei.location,
-      raceDistance: RaceEdition.taipei2019.distances[0],
+      distance: RaceEdition.taipei2019.distances[0],
       finishTime: 3 * 3600 + 30 * 60 + 24,
       overallPlacement: 1058,
       totalParticipants: 7373,
@@ -34,7 +33,7 @@ extension Medal {
       date: RaceEdition.vancouver2022.startDate,
       bibNumber: "2814",
       location: Race.vancouver.location,
-      raceDistance: RaceEdition.vancouver2022.distances.first!,
+      distance: RaceEdition.vancouver2022.distances.first!,
       userID: "preview"
     )
 

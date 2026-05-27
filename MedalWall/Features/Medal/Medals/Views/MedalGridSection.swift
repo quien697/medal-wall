@@ -22,7 +22,7 @@ struct MedalGridSection: View {
               .navigationTransition(.zoom(sourceID: medal.id, in: namespace))
           } label: {
             MedalCard(
-              photo: medal.photo,
+              photoUrl: medal.photoUrl,
               distance: medal.distance.displayLabel,
               name: medal.name,
               finishTime: medal.finishTime?.formattedHMS ?? "-",

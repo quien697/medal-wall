@@ -6,14 +6,13 @@
 //
 
 import PhotosUI
-import SwiftData
 import SwiftUI
 
 struct EditMedalView: View {
   // MARK: - Environment
   @Environment(UserManager.self) private var userManager
-  @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
+
   // MARK: - State
   @State private var viewModel: EditMedalViewModel
   @State private var errorWrapper: ErrorWrapper?
@@ -109,28 +108,36 @@ struct EditMedalView: View {
           Button(role: .close) {
             dismiss()
           }
+          .disabled(viewModel.isLoading)
         }  // ToolbarItem
 
         ToolbarItem(placement: .confirmationAction) {
-          Button(role: .confirm) {
-            guard let userID = userManager.currentUserID else {
-              errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
-              return
-            }
+          if viewModel.isLoading {
+            ProgressView()
+          } else {
+            Button(role: .confirm) {
+              guard let userID = userManager.currentUserID else {
+                errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
+                return
+              }
 
-            do {
-              try viewModel.save(by: userID)
-              dismiss()
-            } catch {
-              shouldDismiss = true
-              errorWrapper = ErrorWrapper(error: AppError.unknown)
+              Task {
+                do {
+                  try await viewModel.save(by: userID)
+                  dismiss()
+                } catch {
+                  shouldDismiss = true
+                  errorWrapper = ErrorWrapper(error: AppError.medalSaveFailed)
+                }
+              }
             }
+            .disabled(!viewModel.isFormValid)
           }
-          .disabled(!viewModel.isFormValid)
         }  // ToolbarItem
       }  // toolbar
-      .onAppear {
-        viewModel.configure(context: modelContext)
+      .interactiveDismissDisabled(viewModel.isLoading)
+      .task {
+        await viewModel.loadPhoto()
       }
       .photosPicker(
         isPresented: $isPresentingPhotoPicker,

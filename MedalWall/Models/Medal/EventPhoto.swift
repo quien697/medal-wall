@@ -6,29 +6,25 @@
 //
 
 import Foundation
-import SwiftData
-import UIKit
 
-@Model
-final class EventPhoto {
-  @Attribute(.unique) var id: UUID
-  var imageData: Data
+struct EventPhoto: Codable, Identifiable {
+  let id: String
+  var imageUrl: String
   var caption: String?
   var sortOrder: Int
-
-  @Relationship var medal: Medal
+  var createdAt: Date
 
   init(
-    id: UUID = UUID(),
-    imageData: Data,
+    id: String = UUID().uuidString,
+    imageUrl: String,
     caption: String? = nil,
     sortOrder: Int = 0,
-    medal: Medal
+    createdAt: Date = .now
   ) {
     self.id = id
-    self.imageData = imageData
+    self.imageUrl = imageUrl
     self.caption = caption
     self.sortOrder = sortOrder
-    self.medal = medal
+    self.createdAt = createdAt
   }
 }

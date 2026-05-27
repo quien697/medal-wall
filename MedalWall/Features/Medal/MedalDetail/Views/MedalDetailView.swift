@@ -5,13 +5,12 @@
 //  Created by Quien on 2025-12-24.
 //
 
-import SwiftData
 import SwiftUI
 
 struct MedalDetailView: View {
   // MARK: - Environment
-  @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
+
   // MARK: - State
   @State private var viewModel: MedalDetailViewModel
   @State private var errorWrapper: ErrorWrapper?
@@ -27,7 +26,7 @@ struct MedalDetailView: View {
   var body: some View {
     ScrollView {
       MedalDetailHeroSection(
-        photo: viewModel.medal.photo,
+        photoUrl: viewModel.medal.photoUrl,
         name: viewModel.medal.name,
         raceDistance: viewModel.medal.distance.category.description,
         raceDistanceType: viewModel.medal.distance.type.displayName,
@@ -84,28 +83,37 @@ struct MedalDetailView: View {
         }
       }
     }
-    .onAppear {
-      viewModel.configure(context: modelContext)
-    }
     .alert(isPresented: $isPresentingDeleteMedalConfirm) {
       .deleteConfirmation(
         name: viewModel.medal.name,
         onDelete: {
-          do {
-            try viewModel.deleteMedal(viewModel.medal)
-            dismiss()
-          } catch {
-            errorWrapper = ErrorWrapper(error: AppError.unknown)
+          Task {
+            do {
+              try await viewModel.deleteMedal(viewModel.medal)
+              dismiss()
+            } catch {
+              errorWrapper = ErrorWrapper(error: AppError.medalDeleteFailed)
+            }
           }
         }
       )
     }
-    .sheet(isPresented: $isPresentingEditMedal) {
-      EditMedalView(mode: .edit, medal: viewModel.medal)
-    }
-    .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
-      ErrorView(errorWrapper: wrapper)
-    }
+    .sheet(
+      isPresented: $isPresentingEditMedal,
+      onDismiss: {
+        Task { await viewModel.reloadMedal() }
+      },
+      content: {
+        EditMedalView(mode: .edit, medal: viewModel.medal)
+      }
+    )
+    .sheet(
+      item: $errorWrapper,
+      onDismiss: nil,
+      content: { wrapper in
+        ErrorView(errorWrapper: wrapper)
+      }
+    )
   }
 }
 

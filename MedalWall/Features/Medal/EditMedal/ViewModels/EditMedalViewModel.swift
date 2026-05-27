@@ -2,18 +2,15 @@
 //  EditMedalViewModel.swift
 //  MedalWall
 //
-//  Created by Quien on 2025-12-21.
-//
 
-import SwiftData
 import SwiftUI
 
 @Observable
 final class EditMedalViewModel {
+  // MARK: - Data
   var name: String = ""
   var date: Date = .now
   var bibNumber: String = ""
-  var photoData: Data?
   var photo: UIImage?
   var country: String = ""
   var province: String = ""
@@ -32,21 +29,28 @@ final class EditMedalViewModel {
   var tags: [String] = []
   var draftEventPhotos: [DraftEventPhoto] = []
 
+  // MARK: - State
+  var isLoading = false
+  var error: AppError?
+
+  // MARK: - Dependencies
   let mode: ItemEditMode
-  private var repository: MedalRepository
   private let medal: Medal?
+  private let medalId: String
+  private let repository = MedalFirestoreRepository()
+  private let storageService = StorageService()
+
+  // MARK: - Init
 
   init(mode: ItemEditMode, medal: Medal? = nil) {
     self.mode = mode
-    self.repository = MedalRepository()
     self.medal = medal
+    self.medalId = medal?.id ?? UUID().uuidString
 
     if let medal, mode == .edit {
       self.name = medal.name
       self.date = medal.date
       self.bibNumber = medal.bibNumber
-      self.photoData = medal.photoData
-      self.photo = medal.photo
       self.country = medal.location.country
       self.province = medal.location.province ?? ""
       self.city = medal.location.city
@@ -64,9 +68,11 @@ final class EditMedalViewModel {
       self.tags = medal.tags
       self.draftEventPhotos = medal.eventPhotos
         .sorted { $0.sortOrder < $1.sortOrder }
-        .map { DraftEventPhoto(data: $0.imageData) }
+        .map { DraftEventPhoto(id: $0.id, imageUrl: $0.imageUrl) }
     }
   }
+
+  // MARK: - Computed
 
   var isFormValid: Bool {
     let customDistanceValid: Bool = {
@@ -81,28 +87,32 @@ final class EditMedalViewModel {
 
   // MARK: - Functions
 
-  func configure(context: ModelContext) {
-    repository.configure(context: context)
+  /// Downloads the existing medal cover photo so the edit form can display it.
+  func loadPhoto() async {
+    photo = await UIImage.load(from: medal?.photoUrl)
   }
 
+  /// Sets the newly selected cover photo.
   func updatePhoto(with uiImage: UIImage) {
-    self.photoData = uiImage.pngData()
     self.photo = uiImage
   }
 
+  /// Clears the cover photo.
   func clearPhoto() {
-    self.photoData = nil
     self.photo = nil
   }
 
+  /// Appends new event photos from the photo picker.
   func addEventPhotos(_ dataList: [Data]) {
     draftEventPhotos.append(contentsOf: dataList.map { DraftEventPhoto(data: $0) })
   }
 
-  func removeEventPhoto(id: UUID) {
+  /// Removes an event photo draft by id.
+  func removeEventPhoto(id: String) {
     draftEventPhotos.removeAll { $0.id == id }
   }
 
+  /// Auto-fills form fields from a selected race entry.
   func autoFill(from selection: RaceEntry) {
     name = "\(selection.race.name) \(selection.edition.year)"
     date = selection.edition.startDate
@@ -113,50 +123,49 @@ final class EditMedalViewModel {
     district = selection.race.location.district ?? ""
   }
 
-  func save(by userID: String) throws {
+  /// Saves the medal to Firestore, uploading any new photos to Firebase Storage first.
+  func save(by userID: String) async throws {
+    isLoading = true
+    defer { isLoading = false }
+    let location = GeoLocation(
+      country: country,
+      province: province.isEmpty ? nil : province,
+      city: city,
+      district: district.isEmpty ? nil : district
+    )
+
+    let photoUrl = try await resolvedPhotoUrl(userId: userID)
+    let eventPhotos = try await resolvedEventPhotos(userId: userID)
+
     if let medal, mode == .edit {
-      medal.name = name
-      medal.date = date
-      medal.bibNumber = bibNumber
-      medal.photoData = photoData
-      medal.country = country
-      medal.province = province.isEmpty ? nil : province
-      medal.city = city
-      medal.district = district.isEmpty ? nil : district
-      medal.raceDistance = distance.category.value
-      medal.raceDistanceType = distance.type.rawValue
-      medal.finishTime = finishTime
-      medal.overallPlacement = overallPlacement
-      medal.totalParticipants = totalParticipants
-      medal.division = division?.rawValue
-      medal.divisionPlacement = divisionPlacement
-      medal.divisionTotal = divisionTotal
-      medal.genderPlacement = genderPlacement
-      medal.genderTotal = genderTotal
-      medal.note = note.isEmpty ? nil : note
-      medal.tags = tags
-
-      for photo in medal.eventPhotos {
-        try repository.deleteEventPhoto(photo)
-      }
-
-      for (index, draft) in draftEventPhotos.enumerated() {
-        try repository.insertEventPhoto(
-          EventPhoto(imageData: draft.data, sortOrder: index, medal: medal))
-      }
+      var updated = medal
+      updated.name = name
+      updated.date = date
+      updated.bibNumber = bibNumber
+      updated.photoUrl = photoUrl
+      updated.location = location
+      updated.distance = distance
+      updated.finishTime = finishTime
+      updated.overallPlacement = overallPlacement
+      updated.totalParticipants = totalParticipants
+      updated.division = division?.rawValue
+      updated.divisionPlacement = divisionPlacement
+      updated.divisionTotal = divisionTotal
+      updated.genderPlacement = genderPlacement
+      updated.genderTotal = genderTotal
+      updated.note = note.isEmpty ? nil : note
+      updated.tags = tags
+      updated.eventPhotos = eventPhotos
+      try await repository.updateMedal(updated)
     } else {
       let newMedal = Medal(
+        id: medalId,
         name: name,
         date: date,
         bibNumber: bibNumber,
-        photoData: photoData,
-        location: GeoLocation(
-          country: country,
-          province: province.isEmpty ? nil : province,
-          city: city,
-          district: district.isEmpty ? nil : district
-        ),
-        raceDistance: distance,
+        photoUrl: photoUrl,
+        location: location,
+        distance: distance,
         finishTime: finishTime,
         overallPlacement: overallPlacement,
         totalParticipants: totalParticipants,
@@ -167,17 +176,30 @@ final class EditMedalViewModel {
         genderTotal: genderTotal,
         note: note.isEmpty ? nil : note,
         tags: tags,
+        eventPhotos: eventPhotos,
         userID: userID
       )
+      try await repository.createMedal(newMedal)
+    }
+  }
 
-      try repository.insertMedal(newMedal)
+  private func resolvedPhotoUrl(userId: String) async throws -> String? {
+    guard let photo else { return medal?.photoUrl }
+    return try await storageService.uploadMedalPhoto(
+      userId: userId, medalId: medalId, image: photo)
+  }
 
-      for (index, draft) in draftEventPhotos.enumerated() {
-        try repository.insertEventPhoto(
-          EventPhoto(imageData: draft.data, sortOrder: index, medal: newMedal))
+  private func resolvedEventPhotos(userId: String) async throws -> [EventPhoto] {
+    var result: [EventPhoto] = []
+    for (index, draft) in draftEventPhotos.enumerated() {
+      if draft.isNew, let image = draft.image {
+        let url = try await storageService.uploadMedalEventPhoto(
+          userId: userId, medalId: medalId, photoId: draft.id, image: image)
+        result.append(EventPhoto(id: draft.id, imageUrl: url, sortOrder: index))
+      } else if let url = draft.imageUrl {
+        result.append(EventPhoto(id: draft.id, imageUrl: url, sortOrder: index))
       }
     }
-
-    try repository.save()
+    return result
   }
 }

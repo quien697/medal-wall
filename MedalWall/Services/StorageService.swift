@@ -25,6 +25,14 @@ final class StorageService {
     static func raceEditionLogo(raceId: String, editionId: String) -> String {
       "races/\(raceId)/editions/\(editionId)/logo.jpg"
     }
+
+    static func medalPhoto(userId: String, medalId: String) -> String {
+      "users/\(userId)/medals/\(medalId)/medal.jpg"
+    }
+
+    static func medalEventPhoto(userId: String, medalId: String, photoId: String) -> String {
+      "users/\(userId)/medals/\(medalId)/eventPhotos/\(photoId).jpg"
+    }
   }
 
   // MARK: - Functions -> User
@@ -61,6 +69,33 @@ final class StorageService {
   /// Deletes a race edition logo from Firebase Storage.
   func deleteRaceEditionLogo(raceId: String, editionId: String) async throws {
     try await delete(at: Path.raceEditionLogo(raceId: raceId, editionId: editionId))
+  }
+
+  // MARK: - Functions -> Medal
+
+  /// Uploads a medal cover photo and returns the download URL.
+  func uploadMedalPhoto(userId: String, medalId: String, image: UIImage) async throws -> String {
+    try await upload(image: image, to: Path.medalPhoto(userId: userId, medalId: medalId))
+  }
+
+  /// Deletes a medal cover photo from Firebase Storage.
+  func deleteMedalPhoto(userId: String, medalId: String) async throws {
+    try await delete(at: Path.medalPhoto(userId: userId, medalId: medalId))
+  }
+
+  /// Uploads a medal event photo and returns the download URL.
+  func uploadMedalEventPhoto(
+    userId: String, medalId: String, photoId: String, image: UIImage
+  ) async throws -> String {
+    try await upload(
+      image: image,
+      to: Path.medalEventPhoto(userId: userId, medalId: medalId, photoId: photoId)
+    )
+  }
+
+  /// Deletes a medal event photo from Firebase Storage.
+  func deleteMedalEventPhoto(userId: String, medalId: String, photoId: String) async throws {
+    try await delete(at: Path.medalEventPhoto(userId: userId, medalId: medalId, photoId: photoId))
   }
 
   // MARK: - Functions -> Common

@@ -18,8 +18,6 @@ struct Race: Codable, Identifiable {
   var createdAt: Date
   var updatedAt: Date
 
-  // MARK: - Init
-
   init(
     id: String = UUID().uuidString,
     name: String,
@@ -40,12 +38,5 @@ struct Race: Codable, Identifiable {
     self.createdBy = createdBy
     self.createdAt = createdAt
     self.updatedAt = updatedAt
-  }
-
-  // MARK: - Computed
-
-  var fullWebsiteUrl: String? {
-    guard let url = websiteUrl else { return nil }
-    return url.hasPrefix("http://") || url.hasPrefix("https://") ? url : "https://\(url)"
   }
 }

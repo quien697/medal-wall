@@ -25,6 +25,11 @@ enum AppError: LocalizedError, Identifiable, Equatable {
   case raceDeleteFailed
   case editionSaveFailed
   case editionDeleteFailed
+  case medalFetchFailed(String)
+  case medalSaveFailed
+  case medalDeleteFailed
+  case eventPhotoSaveFailed
+  case eventPhotoDeleteFailed
   case userSaveFailed
 
   // User Manager
@@ -57,6 +62,16 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "Edition Save Failed"
     case .editionDeleteFailed:
       "Edition Delete Failed"
+    case .medalFetchFailed:
+      "Failed to Load Medals"
+    case .medalSaveFailed:
+      "Medal Save Failed"
+    case .medalDeleteFailed:
+      "Medal Delete Failed"
+    case .eventPhotoSaveFailed:
+      "Photo Save Failed"
+    case .eventPhotoDeleteFailed:
+      "Photo Delete Failed"
     case .userSaveFailed:
       "User Save Failed"
     case .userLoadFailed:
@@ -99,6 +114,16 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "We couldn't save this edition."
     case .editionDeleteFailed:
       "We couldn't delete this edition. Please try again."
+    case .medalFetchFailed(let description):
+      "We couldn't load your medals. \(description)"
+    case .medalSaveFailed:
+      "We couldn't save this medal."
+    case .medalDeleteFailed:
+      "We couldn't delete this medal. Please try again."
+    case .eventPhotoSaveFailed:
+      "We couldn't save this photo."
+    case .eventPhotoDeleteFailed:
+      "We couldn't delete this photo. Please try again."
     case .userSaveFailed:
       "We couldn't save your user information."
     case .userLoadFailed:
@@ -136,9 +161,10 @@ enum AppError: LocalizedError, Identifiable, Equatable {
     switch self {
     case .contextNotAttached:
       "Please restart the app. If the problem continues, contact support."
-    case .raceFetchFailed:
+    case .raceFetchFailed, .medalFetchFailed:
       "Please check your connection and try again."
     case .raceSaveFailed, .raceDeleteFailed, .editionSaveFailed, .editionDeleteFailed,
+      .medalSaveFailed, .medalDeleteFailed, .eventPhotoSaveFailed, .eventPhotoDeleteFailed,
       .userSaveFailed:
       "Please try it again."
     case .userLoadFailed:

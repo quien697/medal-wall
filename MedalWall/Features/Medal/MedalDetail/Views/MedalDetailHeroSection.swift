@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MedalDetailHeroSection: View {
-  let photo: UIImage?
+  let photoUrl: String?
   let name: String
   let raceDistance: String
   let raceDistanceType: String
@@ -18,7 +18,7 @@ struct MedalDetailHeroSection: View {
 
   var body: some View {
     DetailHeroSection {
-      MedalImage(photo: photo)
+      MedalImage(urlString: photoUrl)
     } infoContent: {
       HStack(spacing: 6) {
         Text(raceDistance)
@@ -50,7 +50,7 @@ struct MedalDetailHeroSection: View {
   let medal = Medal.sampleData.first!
 
   MedalDetailHeroSection(
-    photo: medal.photo,
+    photoUrl: medal.photoUrl,
     name: medal.name,
     raceDistance: medal.distance.category.description,
     raceDistanceType: medal.distance.type.displayName,

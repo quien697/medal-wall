@@ -142,19 +142,6 @@ struct EditProfileView: View {
 }
 
 #Preview {
-  EditProfileView(
-    profile: User(
-      uid: "preview",
-      email: "preview@example.com",
-      firstName: "John",
-      lastName: "Doe",
-      photoUrl: nil,
-      bio: nil,
-      gender: nil,
-      birthday: nil,
-      createdAt: .now,
-      updatedAt: nil
-    )
-  )
-  .environment(UserManager())
+  EditProfileView(profile: User.preview)
+    .environment(UserManager())
 }

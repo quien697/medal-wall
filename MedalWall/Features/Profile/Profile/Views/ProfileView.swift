@@ -5,17 +5,15 @@
 //  Created by Quien on 2025-10-30.
 //
 
-import SwiftData
 import SwiftUI
 
 struct ProfileView: View {
   // MARK: - Environment
   @Environment(UserManager.self) private var userManager
+
   // MARK: - State
   @State private var viewModel = ProfileViewModel()
   @State private var isPresentingEditProfile = false
-  // MARK: - Query
-  @Query private var medals: [Medal]
 
   // MARK: - Body
   var body: some View {
@@ -28,11 +26,11 @@ struct ProfileView: View {
         )
 
         ProfileSummarySection(
-          totalMedals: viewModel.totalMedals(medals),
-          fullCount: viewModel.fullCount(medals),
-          halfCount: viewModel.halfCount(medals),
-          bestFullTime: viewModel.bestFullTime(medals),
-          bestHalfTime: viewModel.bestHalfTime(medals)
+          totalMedals: viewModel.totalMedals(viewModel.medals),
+          fullCount: viewModel.fullCount(viewModel.medals),
+          halfCount: viewModel.halfCount(viewModel.medals),
+          bestFullTime: viewModel.bestFullTime(viewModel.medals),
+          bestHalfTime: viewModel.bestHalfTime(viewModel.medals)
         )
 
         .padding(.bottom, 10)
@@ -42,6 +40,10 @@ struct ProfileView: View {
       .background(Color.Background.primary)
       .toolbarTitleDisplayMode(.inlineLarge)
       .toolbarRole(.editor)
+      .onAppear {
+        guard let userId = userManager.currentUserID else { return }
+        Task { await viewModel.loadMedals(userId: userId) }
+      }
       .toolbar {
         ToolbarItem(placement: .title) {
           ExpandedNavigationTitle(title: "Profile")
@@ -76,7 +78,7 @@ struct ProfileView: View {
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   ProfileView()
     .environment(UserManager())
 }

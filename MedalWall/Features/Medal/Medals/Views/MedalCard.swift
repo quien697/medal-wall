@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MedalCard: View {
-  let photo: UIImage?
+  let photoUrl: String?
   let distance: String
   let name: String
   let finishTime: String
@@ -16,7 +16,7 @@ struct MedalCard: View {
 
   var body: some View {
     VStack {
-      MedalImage(photo: photo)
+      MedalImage(urlString: photoUrl)
 
       VStack(alignment: .leading, spacing: 2) {
         Text("\(distance)")
@@ -51,7 +51,7 @@ struct MedalCard: View {
   let medal = Medal.sampleData[1]
 
   MedalCard(
-    photo: medal.photo,
+    photoUrl: medal.photoUrl,
     distance: medal.distance.displayLabel,
     name: medal.name,
     finishTime: medal.finishTime?.formattedHMS ?? "-",

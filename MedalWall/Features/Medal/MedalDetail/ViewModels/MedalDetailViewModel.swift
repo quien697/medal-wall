@@ -5,18 +5,15 @@
 //  Created by Quien on 2025-12-24.
 //
 
-import SwiftData
 import SwiftUI
 
 @Observable
 final class MedalDetailViewModel {
-  // MARK: - Properties
+  var medal: Medal
+  let gridSpacing: CGFloat = 10
   private let emptyWithDash: String = "-"
   private let emptyString: String = ""
-  let gridSpacing: CGFloat = 10
-
-  private var repository: MedalRepository?
-  var medal: Medal
+  private let repository = MedalFirestoreRepository()
 
   // MARK: - Init
 
@@ -82,13 +79,16 @@ final class MedalDetailViewModel {
 
   // MARK: - Functions
 
-  func configure(context: ModelContext) {
-    self.repository = MedalRepository(context: context)
+  /// Reloads the medal from Firestore and updates the local state.
+  func reloadMedal() async {
+    guard let updated = try? await repository.fetchMedal(id: medal.id, userId: medal.userID) else {
+      return
+    }
+    medal = updated
   }
 
-  func deleteMedal(_ medal: Medal) throws {
-    guard let repository else { throw AppError.contextNotAttached }
-    try repository.deleteMedal(medal)
-    try repository.save()
+  /// Deletes the medal from Firestore.
+  func deleteMedal(_ medal: Medal) async throws {
+    try await repository.deleteMedal(id: medal.id, userId: medal.userID)
   }
 }
