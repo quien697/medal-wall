@@ -37,7 +37,6 @@ struct DraftRaceEdition: Identifiable {
   var isModified: Bool
 
   // MARK: - Init
-
   /// Creates a draft backed by an existing Firestore edition.
   init(from edition: RaceEdition) {
     self.id = edition.id
@@ -74,7 +73,6 @@ struct DraftRaceEdition: Identifiable {
   }
 
   // MARK: - Computed
-
   var displayPhoto: UIImage? {
     newPhotoData.flatMap { UIImage(data: $0) }
   }

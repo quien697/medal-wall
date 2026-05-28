@@ -14,7 +14,6 @@ final class AuthService {
   static let pendingEmailSignInKey = "pendingEmailSignIn"
 
   // MARK: - Functions
-
   func signOut() throws {
     try Auth.auth().signOut()
   }
@@ -34,7 +33,6 @@ final class AuthService {
   }
 
   // MARK: - Functions -> Sign in with Email Link
-
   func sendSignInLink(to email: String) async throws {
     let authorizedDomain: String = "https://medal-wall-4697.firebaseapp.com"
     let actionCodeSettings = ActionCodeSettings()
@@ -53,7 +51,6 @@ final class AuthService {
   }
 
   // MARK: - Functions -> Sign in Apple
-
   @discardableResult
   func signInWithApple(
     idTokenString: String,
@@ -70,7 +67,6 @@ final class AuthService {
   }
 
   // MARK: - Functions -> Sign in with google
-
   @discardableResult
   func signInWithGoogle(idToken: String, accessToken: String) async throws -> AuthDataResult {
     let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)

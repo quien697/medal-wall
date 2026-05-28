@@ -45,7 +45,6 @@ final class EditProfileViewModel {
   }
 
   // MARK: - Functions
-
   func loadExistingPhoto() async {
     photo = await UIImage.load(from: profile.photoUrl)
   }

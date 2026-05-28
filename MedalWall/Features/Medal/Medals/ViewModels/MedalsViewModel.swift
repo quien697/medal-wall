@@ -20,7 +20,6 @@ final class MedalsViewModel {
   private let repository = MedalFirestoreRepository()
 
   // MARK: - Functions
-
   /// Loads all medals for the given user from Firestore.
   func loadMedals(userId: String) async {
     defer { isLoading = false }

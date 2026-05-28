@@ -15,7 +15,6 @@ final class RaceFirestoreRepository {
   private let editionCount = "editionCount"
 
   // MARK: - Race
-
   /// Fetches all races created.
   func fetchRaces() async throws -> [Race] {
     let snapshot = try await db.collection(collection).getDocuments()
@@ -51,7 +50,6 @@ final class RaceFirestoreRepository {
   }
 
   // MARK: - Race Edition
-
   private func editionsRef(raceId: String) -> CollectionReference {
     db.collection(collection).document(raceId).collection(editionsCollection)
   }

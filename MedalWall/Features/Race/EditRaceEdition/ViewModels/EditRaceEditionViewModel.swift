@@ -77,7 +77,6 @@ final class EditRaceEditionViewModel {
   }
 
   // MARK: - Functions
-
   /// Downloads the existing edition photo into `photo` so the picker shows the current image.
   func loadExistingPhoto() async {
     photo = await UIImage.load(from: edition?.photoUrl)

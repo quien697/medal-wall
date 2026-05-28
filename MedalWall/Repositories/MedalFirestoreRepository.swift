@@ -16,7 +16,6 @@ final class MedalFirestoreRepository {
   }
 
   // MARK: - Medal
-
   /// Fetches all medals for a user.
   func fetchMedals(userId: String) async throws -> [Medal] {
     let snapshot = try await medalsRef(userId: userId).getDocuments()

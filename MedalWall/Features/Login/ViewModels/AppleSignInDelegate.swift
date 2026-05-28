@@ -16,7 +16,6 @@ final class AppleSignInDelegate: NSObject,
   private var continuation: CheckedContinuation<ASAuthorization, Error>?
 
   // MARK: - Functions
-
   /// Suspends until Apple's authorization sheet completes, then returns the result.
   func waitForAuthorization() async throws -> ASAuthorization {
     try await withCheckedThrowingContinuation { continuation in

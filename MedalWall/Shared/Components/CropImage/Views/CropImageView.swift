@@ -119,7 +119,6 @@ struct CropImageView: View {
   }
 
   // MARK: - Private functions
-
   // The size scaledToFill renders the image at inside containerSize.
   // scaledToFill picks the axis whose scale factor is larger, so one dimension
   // matches the container and the other overflows — this overflow is what the

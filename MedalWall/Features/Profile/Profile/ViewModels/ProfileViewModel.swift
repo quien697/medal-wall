@@ -23,7 +23,6 @@ final class ProfileViewModel {
   var bestHalfTime: String { medals.bestHalfTime?.formattedHMS ?? "-" }
 
   // MARK: - Functions
-
   /// Loads all medals for the given user from Firestore.
   func loadMedals(userId: String) async {
     medals = (try? await repository.fetchMedals(userId: userId)) ?? []

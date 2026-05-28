@@ -63,3 +63,10 @@ cyclomatic_complexity:
 nesting:
   type_level:
     warning: 2
+
+custom_rules:
+  mark_no_blank_line_after:
+    name: "No blank line after MARK"
+    regex: '(// MARK: -[^\n]*)\n\n'
+    message: "Remove the blank line after // MARK: comments"
+    severity: warning

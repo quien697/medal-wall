@@ -38,7 +38,6 @@ final class LoginViewModel {
   }
 
   // MARK: - Functions
-
   func isConnected() async -> Bool {
     await withCheckedContinuation { continuation in
       let monitor = NWPathMonitor()
@@ -51,7 +50,6 @@ final class LoginViewModel {
   }
 
   // MARK: - Functions -> Sign in with Email link
-
   /// Shows the email sign-in sheet if the device is online, otherwise surfaces a connection error.
   func signInWithEmailLink() async {
     if await isConnected() {
@@ -82,7 +80,6 @@ final class LoginViewModel {
   }
 
   // MARK: - Functions -> Sign in with Apple
-
   /// Presents the Apple Sign-In sheet and signs the user in to Firebase.
   func signInWithApple() async {
     do {
@@ -170,7 +167,6 @@ final class LoginViewModel {
   }
 
   // MARK: - Functions -> Sign in with Google
-
   /// Presents the Google Sign-In sheet and signs the user in to Firebase.
   func signInWithGoogle() async {
     guard let clientID = FirebaseApp.app()?.options.clientID else {

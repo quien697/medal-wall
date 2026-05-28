@@ -41,7 +41,6 @@ final class EditMedalViewModel {
   private let storageService = StorageService()
 
   // MARK: - Init
-
   init(mode: ItemEditMode, medal: Medal? = nil) {
     self.mode = mode
     self.medal = medal
@@ -73,7 +72,6 @@ final class EditMedalViewModel {
   }
 
   // MARK: - Computed
-
   var isFormValid: Bool {
     let customDistanceValid: Bool = {
       if case .custom(let value) = distance.category { return value > 0 }
@@ -86,7 +84,6 @@ final class EditMedalViewModel {
   }
 
   // MARK: - Functions
-
   /// Downloads the existing medal cover photo so the edit form can display it.
   func loadPhoto() async {
     photo = await UIImage.load(from: medal?.photoUrl)
@@ -183,6 +180,7 @@ final class EditMedalViewModel {
     }
   }
 
+  /// Returns the final cover photo URL — uploads a new image if one was selected, otherwise reuses the existing URL.
   private func resolvedPhotoUrl(userId: String) async throws -> String? {
     guard let photo else { return medal?.photoUrl }
     return try await storageService.uploadMedalPhoto(
@@ -190,6 +188,7 @@ final class EditMedalViewModel {
     )
   }
 
+  /// Uploads any new event photo drafts to Firebase Storage and returns the final EventPhoto array with stable sort order.
   private func resolvedEventPhotos(userId: String) async throws -> [EventPhoto] {
     var result: [EventPhoto] = []
     for (index, draft) in draftEventPhotos.enumerated() {

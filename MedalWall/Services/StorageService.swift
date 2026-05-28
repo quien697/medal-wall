@@ -12,7 +12,6 @@ final class StorageService {
   private let storage = Storage.storage()
 
   // MARK: - Paths
-
   private enum Path {
     static func userAvatar(uid: String) -> String {
       "users/\(uid)/avatar/profile.jpg"
@@ -36,7 +35,6 @@ final class StorageService {
   }
 
   // MARK: - Functions -> User
-
   /// Uploads a user avatar to Firebase Storage and returns the download URL.
   func uploadUserAvatar(uid: String, image: UIImage) async throws -> String {
     try await upload(image: image, to: Path.userAvatar(uid: uid))
@@ -48,7 +46,6 @@ final class StorageService {
   }
 
   // MARK: - Functions -> Race
-
   /// Uploads a race logo to Firebase Storage and returns the download URL.
   func uploadRaceLogo(raceId: String, image: UIImage) async throws -> String {
     try await upload(image: image, to: Path.raceLogo(raceId: raceId))
@@ -72,7 +69,6 @@ final class StorageService {
   }
 
   // MARK: - Functions -> Medal
-
   /// Uploads a medal cover photo and returns the download URL.
   func uploadMedalPhoto(userId: String, medalId: String, image: UIImage) async throws -> String {
     try await upload(image: image, to: Path.medalPhoto(userId: userId, medalId: medalId))
@@ -99,7 +95,6 @@ final class StorageService {
   }
 
   // MARK: - Functions -> Common
-
   private func upload(image: UIImage, to path: String) async throws -> String {
     guard let data = image.jpegData(compressionQuality: 0.8) else {
       throw AppError.photoDataInvalid

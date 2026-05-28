@@ -26,7 +26,7 @@ struct MedalDetailHeroSection: View {
 
         Text(raceDistanceType)
           .secondaryButtonStyle(font: .caption, vPadding: 4, hPadding: 8)
-      }
+      }  // HStack
 
       Text(name)
         .font(.title3)

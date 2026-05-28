@@ -9,6 +9,7 @@ import SwiftUI
 
 @Observable
 final class MedalDetailViewModel {
+  // MARK: - Properties
   var medal: Medal
   let gridSpacing: CGFloat = 10
   private let emptyWithDash: String = "-"
@@ -16,13 +17,11 @@ final class MedalDetailViewModel {
   private let repository = MedalFirestoreRepository()
 
   // MARK: - Init
-
   init(medal: Medal) {
     self.medal = medal
   }
 
   // MARK: - Computed
-
   var gridColumns: [GridItem] {
     [GridItem](
       repeating: GridItem(.flexible(minimum: 80), spacing: gridSpacing),
@@ -78,7 +77,6 @@ final class MedalDetailViewModel {
   }
 
   // MARK: - Functions
-
   /// Reloads the medal from Firestore and updates the local state.
   func reloadMedal() async {
     guard let updated = try? await repository.fetchMedal(id: medal.id, userId: medal.userID) else {

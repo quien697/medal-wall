@@ -20,7 +20,6 @@ struct RaceEdition: Codable, Identifiable {
   var updatedAt: Date
 
   // MARK: - Init
-
   init(
     id: String = UUID().uuidString,
     raceId: String,
@@ -46,7 +45,6 @@ struct RaceEdition: Codable, Identifiable {
   }
 
   // MARK: - Computed
-
   var isOneDay: Bool {
     Calendar.current.isDate(startDate, inSameDayAs: endDate)
   }

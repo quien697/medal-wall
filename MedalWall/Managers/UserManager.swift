@@ -27,7 +27,6 @@ class UserManager {
   }
 
   // MARK: - Functions
-
   /// Validates the current Firebase session, signing out if the token is invalid.
   func validateSession() async {
     await authService.validateSession()
@@ -63,7 +62,6 @@ class UserManager {
   }
 
   // MARK: - Private Functions
-
   /// Registers a Firebase Auth state listener; called once on init.
   private func addAuthListener() {
     _ = Auth.auth().addStateDidChangeListener { [weak self] _, user in
