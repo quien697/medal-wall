@@ -186,7 +186,8 @@ final class EditMedalViewModel {
   private func resolvedPhotoUrl(userId: String) async throws -> String? {
     guard let photo else { return medal?.photoUrl }
     return try await storageService.uploadMedalPhoto(
-      userId: userId, medalId: medalId, image: photo)
+      userId: userId, medalId: medalId, image: photo
+    )
   }
 
   private func resolvedEventPhotos(userId: String) async throws -> [EventPhoto] {

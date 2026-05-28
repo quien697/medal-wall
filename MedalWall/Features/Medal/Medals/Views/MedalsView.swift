@@ -23,27 +23,10 @@ struct MedalsView: View {
   // MARK: - Body
   var body: some View {
     NavigationStack {
-      Group {
-        if viewModel.medals.isEmpty && !viewModel.isLoading {
-          MedalEmptyView()
-        } else {
-          ScrollView {
-            MedalStatsSection(
-              totalCount: viewModel.totalCount,
-              fullCount: viewModel.fullCount,
-              halfCount: viewModel.halfCount
-            )
-
-            MedalGridSection(
-              medals: viewModel.medals,
-              columns: viewModel.gridColumns,
-              spacing: viewModel.gridSpacing,
-              namespace: namespace
-            )
-          }  // ScrollView
-          .scrollIndicators(.hidden)
-        }
-      }  // Group
+      MedalGrid(
+        medals: viewModel.medals,
+        isLoading: viewModel.isLoading
+      )
       .navigationTitle("Your Rewards")
       .background(Color.Background.primary)
       .toolbarTitleDisplayMode(.inlineLarge)
