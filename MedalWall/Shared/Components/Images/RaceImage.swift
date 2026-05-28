@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RaceImage: View {
-  private let systemImageName: String = "person.fill"
+  private let systemImageName: String = "figure.run"
   private let photo: UIImage?
   private let urlString: String?
   private let imageType: ImageType
