@@ -82,13 +82,14 @@ struct EditRaceEditionDateSection: View {
     EditRaceEditionDateSection(
       isOneDay: true,
       year: .constant(2026),
-      startDate: .constant(Date()),
-      endDate: .constant(Date()),
+      startDate: .constant(Date(timeIntervalSinceReferenceDate: 0)),
+      endDate: .constant(Date(timeIntervalSinceReferenceDate: 0)),
       minYear: 1911,
       maxYear: 2060,
-      yearDateRange: Date()...Date(),
-      minEndDate: Date(),
-      maxEndDate: Date(),
+      yearDateRange: Date(
+        timeIntervalSinceReferenceDate: 0)...Date(timeIntervalSinceReferenceDate: 0),
+      minEndDate: Date(timeIntervalSinceReferenceDate: 0),
+      maxEndDate: Date(timeIntervalSinceReferenceDate: 0),
       onToggleOneDay: {},
       onUpdateYear: { _ in },
       onUpdateStartDate: { _ in }
@@ -97,13 +98,14 @@ struct EditRaceEditionDateSection: View {
     EditRaceEditionDateSection(
       isOneDay: false,
       year: .constant(2026),
-      startDate: .constant(Date()),
-      endDate: .constant(Date()),
+      startDate: .constant(Date(timeIntervalSinceReferenceDate: 0)),
+      endDate: .constant(Date(timeIntervalSinceReferenceDate: 0)),
       minYear: 1911,
       maxYear: 2060,
-      yearDateRange: Date()...Date(),
-      minEndDate: Date(),
-      maxEndDate: Date(),
+      yearDateRange: Date(
+        timeIntervalSinceReferenceDate: 0)...Date(timeIntervalSinceReferenceDate: 0),
+      minEndDate: Date(timeIntervalSinceReferenceDate: 0),
+      maxEndDate: Date(timeIntervalSinceReferenceDate: 0),
       onToggleOneDay: {},
       onUpdateYear: { _ in },
       onUpdateStartDate: { _ in }

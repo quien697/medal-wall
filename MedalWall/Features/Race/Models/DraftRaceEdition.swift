@@ -55,7 +55,11 @@ struct DraftRaceEdition: Identifiable {
 
   /// Creates a new draft with no Firestore backing.
   init(
-    year: Int, isOneDay: Bool, startDate: Date, endDate: Date, distances: [RaceDistance],
+    year: Int,
+    isOneDay: Bool,
+    startDate: Date,
+    endDate: Date,
+    distances: [RaceDistance],
     createdBy: String
   ) {
     self.id = UUID().uuidString
