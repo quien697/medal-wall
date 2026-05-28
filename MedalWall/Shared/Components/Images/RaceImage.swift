@@ -8,21 +8,50 @@
 import SwiftUI
 
 struct RaceImage: View {
-  let photo: UIImage?
-  let imageType: ImageType
-  
+  private let systemImageName: String = "figure.run"
+  private let photo: UIImage?
+  private let urlString: String?
+  private let imageType: ImageType
+
+  /// Displays a locally held UIImage, falling back to the placeholder if nil.
+  init(photo: UIImage?, imageType: ImageType) {
+    self.photo = photo
+    self.urlString = nil
+    self.imageType = imageType
+  }
+
+  /// Fetches and displays an image from a URL string, falling back to the placeholder if nil or loading fails.
+  init(urlString: String?, imageType: ImageType) {
+    self.photo = nil
+    self.urlString = urlString
+    self.imageType = imageType
+  }
+
   var body: some View {
     if let photo {
       Image(uiImage: photo)
         .styled(as: imageType)
+    } else if let urlString, let url = URL(string: urlString) {
+      AsyncImage(url: url) { phase in
+        switch phase {
+        case .success(let image):
+          image.styled(as: imageType)
+        default:
+          Image(systemName: systemImageName)
+            .placeholderStyled(as: imageType)
+            .overlay {
+              if case .empty = phase { ProgressView() }
+            }
+        }
+      }
     } else {
-      Image(systemName: "photo.fill")
+      Image(systemName: systemImageName)
         .placeholderStyled(as: imageType)
     }
   }
 }
 
 #Preview {
-  RaceImage(photo: nil, imageType: .raceHero)
-  RaceImage(photo: nil, imageType: .raceThumbnail)
+  RaceImage(urlString: nil, imageType: .raceHero)
+  RaceImage(urlString: nil, imageType: .raceThumbnail)
 }

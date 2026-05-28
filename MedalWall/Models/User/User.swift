@@ -5,8 +5,8 @@
 //  Created by Quien on 2026-04-28.
 //
 
-import Foundation
 import FirebaseAuth
+import Foundation
 
 struct User: Codable {
   let uid: String
@@ -19,9 +19,7 @@ struct User: Codable {
   var birthday: Date?
   let createdAt: Date
   var updatedAt: Date?
-}
 
-extension User {
   /// Creates a new User from Firebase Auth on first sign-in.
   /// firstName/lastName are seeded separately from the provider via UserDefaults.
   init(firebaseUser: FirebaseAuth.User) {
@@ -36,11 +34,29 @@ extension User {
     createdAt = Date()
     updatedAt = nil
   }
-  
-  var userName: UserName {
-    UserName(firstName: firstName ?? "", lastName: lastName ?? "")
+
+  /// Creates a User with explicit field values for use in previews and tests.
+  init(
+    uid: String,
+    email: String?,
+    firstName: String? = nil,
+    lastName: String? = nil,
+    photoUrl: String? = nil,
+    bio: String? = nil,
+    gender: Gender? = nil,
+    birthday: Date? = nil,
+    createdAt: Date = .now,
+    updatedAt: Date? = nil
+  ) {
+    self.uid = uid
+    self.email = email
+    self.firstName = firstName
+    self.lastName = lastName
+    self.photoUrl = photoUrl
+    self.bio = bio
+    self.gender = gender
+    self.birthday = birthday
+    self.createdAt = createdAt
+    self.updatedAt = updatedAt
   }
-  
-  /// Displays firstName lastName with a space. Falls back to "Runner" if both are empty.
-  var name: String { userName.fullName }
 }

@@ -6,32 +6,33 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct RacesView: View {
   // MARK: - Environment
-  @Environment(\.modelContext) private var modelContext
+  @Environment(UserManager.self) private var userManager
+
   // MARK: - State
-  @State private var viewModel: RacesViewModel = RacesViewModel()
+  @State private var viewModel = RacesViewModel()
   @State private var errorWrapper: ErrorWrapper?
-  @State private var selectedRace: Race? = nil
-  @State private var isPresentingAddRace: Bool = false
+  @State private var selectedRace: Race?
+  @State private var isPresentingAddRace = false
   @State private var isPresentingDeleteConfirm = false
+
   // MARK: - Namespace
   @Namespace private var namespace
-  private let addRace: String = "addRace"
-  
+  private let addRace = "addRace"
+
+  // MARK: - Body
   var body: some View {
     NavigationStack {
       RaceList(
+        races: viewModel.filteredRaces,
         searchText: viewModel.searchText,
-        predicate: viewModel.predicate,
-        sortOrder: viewModel.sortOrder,
-        applyFilter: viewModel.filteredRaces
-      ) { race in
-        selectedRace = race
-        isPresentingDeleteConfirm = true
-      }
+        onDelete: { race in
+          selectedRace = race
+          isPresentingDeleteConfirm = true
+        }
+      )
       .scrollIndicators(.hidden)
       .navigationTitle("Races")
       .background(Color.Background.primary)
@@ -39,53 +40,21 @@ struct RacesView: View {
       .toolbarRole(.editor)
       .searchable(text: $viewModel.searchText, prompt: "Search race events...")
       .autocorrectionDisabled()
+      .overlay {
+        if viewModel.isLoading {
+          ProgressView()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.black.opacity(0.1))
+        }
+      }
+      .task {
+        await viewModel.loadRaces()
+      }
       .toolbar {
         ToolbarItem(placement: .title) {
           ExpandedNavigationTitle(title: "Races")
-        }
-        
-        ToolbarItem(placement: .topBarTrailing) {
-          Menu {
-            Picker("Sort", selection: $viewModel.sortOrder) {
-              ForEach(RaceSort.allCases, id: \.self) { sort in
-                Text("Sort by \(sort.displayName)")
-                  .tag(sort.order)
-              } // ForEach
-            } // Picker
-            
-            Section("Filter by Race Distance") {
-              ForEach(RaceDistanceCategory.standardCases, id: \.self) { category in
-                Button {
-                  if viewModel.selectedCategories.contains(category) {
-                    viewModel.selectedCategories.remove(category)
-                  } else {
-                    viewModel.selectedCategories.insert(category)
-                  }
-                } label: {
-                  Label(category.description, systemImage: viewModel.selectedCategories.contains(category) ? "checkmark.square" : "square")
-                } // Button
-              } // ForEach
-            } // Section
-            
-            Section("Filter by Race Type") {
-              ForEach(RaceDistanceType.allCases, id: \.self) { type in
-                Button {
-                  if viewModel.selectedTypes.contains(type) {
-                    viewModel.selectedTypes.remove(type)
-                  } else {
-                    viewModel.selectedTypes.insert(type)
-                  }
-                } label: {
-                  Label(type.displayName, systemImage: viewModel.selectedTypes.contains(type) ? "checkmark.square" : "square")
-                } // Button
-              } // ForEach
-            } // Section
-          } label: {
-            Label("Filter", systemImage: "line.3.horizontal.decrease")
-          } // Menu
-          .menuActionDismissBehavior(.disabled)
-        } // ToolbarItem
-        
+        }  // ToolbarItem
+
         ToolbarItem(placement: .topBarTrailing) {
           Button {
             isPresentingAddRace = true
@@ -94,36 +63,47 @@ struct RacesView: View {
           }
           .matchedTransitionSource(id: addRace, in: namespace)
           .buttonStyle(.glassProminent)
-        } // ToolbarItem
-      } // toolbar
-      .onAppear {
-        viewModel.configure(context: modelContext)
-      }
-      .sheet(isPresented: $isPresentingAddRace) {
-        AddRaceView()
-          .navigationTransition(.zoom(sourceID: addRace, in: namespace))
-      }
+        }  // ToolbarItem
+      }  // toolbar
       .alert(isPresented: $isPresentingDeleteConfirm) {
         .deleteConfirmation(
           name: selectedRace?.name ?? "Race",
           onDelete: {
             if let race = selectedRace {
-              do {
-                try viewModel.deleteRace(race)
-              } catch {
-                errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
-              }
+              Task { await viewModel.deleteRace(race) }
             }
           }
         )
-      } // alert
-      .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
-        ErrorView(errorWrapper: wrapper)
-      } // sheet
-    } // NavigationStack
+      }  // alert
+      .onChange(of: viewModel.error) { _, error in
+        if let error {
+          errorWrapper = ErrorWrapper(error: error)
+        }
+      }
+      .sheet(
+        isPresented: $isPresentingAddRace,
+        onDismiss: {
+          Task {
+            await viewModel.loadRaces()
+          }
+        },
+        content: {
+          EditRaceView(mode: .add)
+            .navigationTransition(.zoom(sourceID: addRace, in: namespace))
+        }
+      )
+      .sheet(
+        item: $errorWrapper,
+        onDismiss: { viewModel.error = nil },
+        content: { wrapper in
+          ErrorView(errorWrapper: wrapper)
+        }
+      )  // sheet
+    }  // NavigationStack
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   RacesView()
+    .environment(UserManager())
 }

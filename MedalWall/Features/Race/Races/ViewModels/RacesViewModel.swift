@@ -5,63 +5,52 @@
 //  Created by Quien on 2025-11-21.
 //
 
-import SwiftUI
-import SwiftData
+import Foundation
 
 @Observable
 final class RacesViewModel {
-  private var repository: RaceRepository?
-  // Search
+  // MARK: - State
+  var races: [Race] = []
+  var isLoading = false
+  var error: AppError?
+
+  // MARK: - Filter
   var searchText: String = ""
-  // Filter
-  var selectedTypes: Set<RaceDistanceType> = []
-  var selectedCategories: Set<RaceDistanceCategory> = []
-  // Sort
-  var sortOrder: [SortDescriptor<Race>] = RaceSort.name.order
-  // Predicate for SwiftData Query - handles search only
-  var predicate: Predicate<Race> {
-    #Predicate<Race> { race in
-      searchText.isEmpty || race.name.localizedStandardContains(searchText)
+
+  // MARK: - Dependencies
+  private let repository = RaceFirestoreRepository()
+
+  // MARK: - Computed
+  var filteredRaces: [Race] {
+    let searched =
+      searchText.isEmpty
+      ? races
+      : races.filter { $0.name.localizedStandardContains(searchText) }
+    return searched.sorted {
+      $0.name.localizedCompare($1.name) == .orderedAscending
     }
   }
-  
-  /// In-memory filtering for complex filters (types and categories)
-  func filteredRaces(_ races: [Race]) -> [Race] {
-    var result = races
-    
-    // Filter by types if any are selected
-    if !selectedTypes.isEmpty {
-      result = result.filter { race in
-        race.editions.contains { edition in
-          edition.distances.contains { distance in
-            selectedTypes.contains(distance.type)
-          }
-        }
-      }
+
+  // MARK: - Functions
+  /// Loads all races created by the given user from Firestore.
+  func loadRaces() async {
+    isLoading = true
+    defer { isLoading = false }
+
+    do {
+      races = try await repository.fetchRaces()
+    } catch {
+      self.error = .raceFetchFailed(error.localizedDescription)
     }
-    
-    // Filter by categories if any are selected
-    if !selectedCategories.isEmpty {
-      result = result.filter { race in
-        race.editions.contains { edition in
-          edition.distances.contains { distance in
-            selectedCategories.contains(distance.category)
-          }
-        }
-      }
+  }
+
+  /// Deletes the race from Firestore and removes it from the local list.
+  func deleteRace(_ race: Race) async {
+    do {
+      try await repository.deleteRace(id: race.id)
+      races.removeAll { $0.id == race.id }
+    } catch {
+      self.error = .raceDeleteFailed
     }
-    
-    return result
-  }
-  
-  func configure(context: ModelContext) {
-    self.repository = RaceRepository(context: context)
-  }
-  
-  func deleteRace(_ race: Race) throws {
-    guard let repository else { throw AppError.contextNotAttached }
-    
-    try repository.deleteRace(race)
-    try repository.save()
   }
 }

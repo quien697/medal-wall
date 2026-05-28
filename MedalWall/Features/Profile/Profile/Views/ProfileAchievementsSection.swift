@@ -12,9 +12,9 @@ struct ProfileAchievementsSection: View {
     SectionContainer(title: "achievements") {
       VStack(spacing: 15) {
         ProfileAchievementRow()
-        
+
         ProfileAchievementRow()
-        
+
         ProfileAchievementRow()
       }
     }

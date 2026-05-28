@@ -17,7 +17,9 @@ struct EmailConfirmationSection: View {
     VStack(alignment: .center, spacing: 16) {
       EmailSignInHeader(
         title: "Now check your email",
-        subTitle: "We sent To \(email).\nTo complete sign-in, tap the sign-in link in your email, if it doesn't arrive within 3 minutes, check your spam folder"
+        subTitle:
+          "We sent To \(email).\nTo complete sign-in, tap the sign-in link in your email,"
+          + " if it doesn't arrive within 3 minutes, check your spam folder"
       )
 
       Button {
@@ -25,12 +27,12 @@ struct EmailConfirmationSection: View {
       } label: {
         Text("Close")
           .frame(maxWidth: .infinity)
-      } // Button
+      }  // Button
       .buttonStyle(.borderedProminent)
       .controlSize(.large)
-      
+
       Spacer()
-    } // VStack
+    }  // VStack
     .padding()
   }
 }

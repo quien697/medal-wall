@@ -10,7 +10,7 @@ import Foundation
 struct ErrorWrapper: Identifiable {
   let id: UUID
   let error: AppError
-  
+
   init(id: UUID = UUID(), error: AppError) {
     self.id = id
     self.error = error

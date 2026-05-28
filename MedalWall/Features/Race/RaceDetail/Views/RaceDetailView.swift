@@ -6,38 +6,47 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct RaceDetailView: View {
   // MARK: - Environment
-  @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
+
   // MARK: - State
   @State private var viewModel: RaceDetailViewModel
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingEditRace = false
   @State private var isPresentingDeleteRaceConfirm = false
-  
+
   // MARK: - Init
   init(race: Race) {
     self._viewModel = State(initialValue: RaceDetailViewModel(race: race))
   }
-  
+
   // MARK: - Body
   var body: some View {
     VStack {
       RaceDetailHeroSection(
-        photo: viewModel.race.photo,
+        photoUrl: viewModel.race.photoUrl,
         name: viewModel.race.name,
         location: viewModel.race.location.formatted,
-        url: viewModel.race.fullURL
+        url: viewModel.race.fullWebsiteUrl
       )
-      
+
       ScrollView {
-        RaceDetailEditionsSection(editions: viewModel.race.editions)
+        RaceDetailEditionsSection(editions: viewModel.editions)
       }
-    } // VStack
+    }  // VStack
     .background(Color.Background.primary)
+    .overlay {
+      if viewModel.isLoading {
+        ProgressView()
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          .background(Color.black.opacity(0.1))
+      }
+    }
+    .task {
+      await viewModel.loadEditions()
+    }
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Menu("More Options", systemImage: "ellipsis") {
@@ -46,41 +55,54 @@ struct RaceDetailView: View {
           } label: {
             Label("Edit Race", systemImage: "square.and.pencil")
           }
-          
+
           Divider()
-          
+
           Button(role: .destructive) {
             isPresentingDeleteRaceConfirm = true
           } label: {
             Label("Delete Race", systemImage: "trash")
           }
-        } // Menu
-      } // ToolbarItem
-    } // toolbar
-    .onAppear {
-      viewModel.configure(context: modelContext)
-    }
+        }  // Menu
+      }  // ToolbarItem
+    }  // toolbar
     .alert(isPresented: $isPresentingDeleteRaceConfirm) {
       .deleteConfirmation(
         name: viewModel.race.name,
         onDelete: {
-          do {
-            try viewModel.deleteRace(viewModel.race)
-            dismiss()
-          } catch {
-            errorWrapper = ErrorWrapper(error: AppError.raceDeleteFailed)
+          Task {
+            await viewModel.deleteRace()
+            if viewModel.error == nil {
+              dismiss()
+            }
           }
         }
       )
     }
-    .sheet(isPresented: $isPresentingEditRace) {
-      NavigationStack {
+    .onChange(of: viewModel.error) { _, error in
+      if let error {
+        errorWrapper = ErrorWrapper(error: error)
+      }
+    }
+    .sheet(
+      isPresented: $isPresentingEditRace,
+      onDismiss: {
+        Task {
+          await viewModel.loadRace()
+          await viewModel.loadEditions()
+        }
+      },
+      content: {
         EditRaceView(mode: .edit, race: viewModel.race)
       }
-    } // sheet
-    .sheet(item: $errorWrapper, onDismiss: nil) { wrapper in
-      ErrorView(errorWrapper: wrapper)
-    } // sheet
+    )  // sheet
+    .sheet(
+      item: $errorWrapper,
+      onDismiss: { viewModel.error = nil },
+      content: { wrapper in
+        ErrorView(errorWrapper: wrapper)
+      }
+    )  // sheet
   }
 }
 

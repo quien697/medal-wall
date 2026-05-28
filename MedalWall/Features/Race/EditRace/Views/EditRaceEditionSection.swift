@@ -8,28 +8,32 @@
 import SwiftUI
 
 struct EditRaceEditionSection: View {
+  // MARK: - Properties
+  let raceId: String
   let editions: [DraftRaceEdition]
-  let racePhoto: UIImage?
+  let isLoading: Bool
   let namespace: Namespace.ID
   let transitionID: String
-  let onAdd: () -> Void
-  let onUpdate: ((DraftRaceEdition, DraftRaceEdition) -> Void)
-  let onDelete: (DraftRaceEdition) -> Void
-  
-  private var sortedEditions: [DraftRaceEdition] {
-    editions.sorted(by: { $0.startDate > $1.startDate })
-  }
-  
+  let onTapAddEdition: () -> Void
+  let onTapEdition: (DraftRaceEdition) -> Void
+  let onAdd: (DraftRaceEdition) -> Void
+  let onUpdate: (DraftRaceEdition) -> Void
+  let onDelete: (String) -> Void
+
+  // MARK: - Body
   var body: some View {
     Section("Editions") {
-      if editions.isEmpty {
+      if isLoading && editions.isEmpty {
+        ProgressView()
+          .frame(maxWidth: .infinity, alignment: .center)
+      } else if editions.isEmpty {
         ContentUnavailableView {
           Text("No editions yet.")
             .font(.subheadline)
             .foregroundStyle(Color.Text.tertiary)
-          
+
           Button {
-            onAdd()
+            onTapAddEdition()
           } label: {
             Label("Add Edition", systemImage: "plus")
               .labelStyle(.titleAndIcon)
@@ -42,43 +46,31 @@ struct EditRaceEditionSection: View {
           .buttonStyle(.plain)
           .padding(.top, 15)
           .matchedTransitionSource(id: transitionID, in: namespace)
-        } // ContentUnavailableView
+        }  // ContentUnavailableView
       } else {
-        ForEach(sortedEditions) { edition in
-          NavigationLink {
-            EditRaceEditionView(
-              mode: .edit,
-              edition: edition,
-              onAction: { updatedEdition in
-                onUpdate(edition, updatedEdition)
-              }
-            )
+        ForEach(editions) { edition in
+          Button {
+            onTapEdition(edition)
           } label: {
             HStack(alignment: .top, spacing: 10) {
-              ZStack(alignment: .leading) {
-                if let uiImage = edition.photo {
-                  Image(uiImage: uiImage)
-                    .styled(as: ImageType.raceThumbnail)
-                } else {
-                  RaceImage(
-                    photo: racePhoto,
-                    imageType: .raceThumbnail
-                  )
-                }
-              } // ZStack
-              
+              if let photo = edition.displayPhoto {
+                RaceImage(photo: photo, imageType: .raceThumbnail)
+              } else {
+                RaceImage(urlString: edition.displayPhotoUrl, imageType: .raceThumbnail)
+              }
+
               VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 10) {
                   Text(String(edition.year))
                     .font(.title2)
                     .fontWeight(.heavy)
                     .foregroundStyle(Color.Gold.primary)
-                  
+
                   Text(edition.dateDisplayLabel)
                     .font(.subheadline)
                     .foregroundStyle(Color.Text.tertiary)
                 }
-                
+
                 ScrollView(.horizontal, showsIndicators: false) {
                   HStack {
                     ForEach(edition.distances.sorted()) { distance in
@@ -87,25 +79,26 @@ struct EditRaceEditionSection: View {
                           font: .caption,
                           fgColor: Color.Text.tertiary,
                           vPadding: 6,
-                          hPadding: 10,
+                          hPadding: 10
                         )
                     }
-                  } // HStack
-                } // ScrollView
-              } // VStack
-              
+                  }  // HStack
+                }  // ScrollView
+              }  // VStack
+
               Spacer()
-            } // HStack
-          } // NavigationLink
-        } // ForEach
+            }  // HStack
+          }  // Button
+          .buttonStyle(.plain)
+        }  // ForEach
         .onDelete { offsets in
           for index in offsets {
-            onDelete(sortedEditions[index])
+            onDelete(editions[index].id)
           }
         }
-        
+
         Button {
-          onAdd()
+          onTapAddEdition()
         } label: {
           Label("Add Another Edition", systemImage: "plus")
             .labelStyle(.titleAndIcon)
@@ -119,34 +112,25 @@ struct EditRaceEditionSection: View {
         .frame(maxWidth: .infinity)
         .matchedTransitionSource(id: transitionID, in: namespace)
       }
-    } // Section
+    }  // Section
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   @Previewable @Namespace var namespace
-  let race = Race.sampleData.first!
-  let drafts = race.editions.map { DraftRaceEdition(from: $0) }
-  
+
   Form {
     EditRaceEditionSection(
-      editions: drafts,
-      racePhoto: race.photo,
-      namespace: namespace,
-      transitionID: "transitionID",
-      onAdd: {},
-      onUpdate: { _, _ in },
-      onDelete: { _ in  }
-    )
-    
-    EditRaceEditionSection(
+      raceId: "race-taipei",
       editions: [],
-      racePhoto: nil,
+      isLoading: false,
       namespace: namespace,
       transitionID: "transitionID",
-      onAdd: {},
-      onUpdate: { _, _ in },
-      onDelete: { _ in  }
+      onTapAddEdition: {},
+      onTapEdition: { _ in },
+      onAdd: { _ in },
+      onUpdate: { _ in },
+      onDelete: { _ in }
     )
   }
 }

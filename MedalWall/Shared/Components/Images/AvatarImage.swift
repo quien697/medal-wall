@@ -13,9 +13,9 @@ import SwiftUI
 /// Falls back to a person placeholder when no image is available.
 struct AvatarImage: View {
   private let systemImageName: String = "person.fill"
-  let photo: UIImage?
-  let photoUrl: String?
-  let imageType: ImageType
+  private let photo: UIImage?
+  private let photoUrl: String?
+  private let imageType: ImageType
 
   init(photo: UIImage?, imageType: ImageType = .avatar) {
     self.photo = photo
@@ -28,7 +28,7 @@ struct AvatarImage: View {
     self.photoUrl = photoUrl
     self.imageType = imageType
   }
-  
+
   var body: some View {
     ZStack {
       // Outer ring/border
@@ -47,7 +47,7 @@ struct AvatarImage: View {
           width: imageType.size.width * 1.1,
           height: imageType.size.height * 1.1
         )
-      
+
       // Inner circle
       Circle()
         .fill(
@@ -102,7 +102,7 @@ struct AvatarImage: View {
   AvatarImage(photo: UIImage(named: "quien"))
   AvatarImage(photo: UIImage(named: "taipei-marathon-medal-2019"))
   AvatarImage(photo: nil)
-  
+
   AvatarImage(
     photo: UIImage(named: "quien"),
     imageType: .avatarThumbnail

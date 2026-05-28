@@ -9,33 +9,22 @@ import SwiftUI
 
 @Observable
 final class ProfileViewModel {
-  private let emptyWithDash: String = "-"
-  
-  func totalMedals(_ medals: [Medal]) -> Int {
-    medals.count
-  }
-  
-  func fullCount(_ medals: [Medal]) -> Int {
-    medals.filter { $0.distance.category == .full }.count
-  }
-  
-  func halfCount(_ medals: [Medal]) -> Int {
-    medals.filter { $0.distance.category == .half }.count
-  }
-  
-  func bestFullTime(_ medals: [Medal]) -> String {
-    medals
-      .filter { $0.distance.category == .full }
-      .compactMap { $0.finishTime }
-      .min()
-      .map { $0.formattedHMS } ?? emptyWithDash
-  }
-  
-  func bestHalfTime(_ medals: [Medal]) -> String {
-    medals
-      .filter { $0.distance.category == .half }
-      .compactMap { $0.finishTime }
-      .min()
-      .map { $0.formattedHMS } ?? emptyWithDash
+  // MARK: - Data
+  var medals: [Medal] = []
+
+  // MARK: - Dependencies
+  private let repository = MedalFirestoreRepository()
+
+  // MARK: - Computed
+  var totalMedals: Int { medals.count }
+  var fullCount: Int { medals.fullCount }
+  var halfCount: Int { medals.halfCount }
+  var bestFullTime: String { medals.bestFullTime?.formattedHMS ?? "-" }
+  var bestHalfTime: String { medals.bestHalfTime?.formattedHMS ?? "-" }
+
+  // MARK: - Functions
+  /// Loads all medals for the given user from Firestore.
+  func loadMedals(userId: String) async {
+    medals = (try? await repository.fetchMedals(userId: userId)) ?? []
   }
 }

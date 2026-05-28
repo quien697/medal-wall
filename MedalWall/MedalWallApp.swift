@@ -5,11 +5,10 @@
 //  Created by Quien on 2025-10-20.
 //
 
-import SwiftUI
-import SwiftData
-import FirebaseCore
 import FirebaseAuth
+import FirebaseCore
 import GoogleSignIn
+import SwiftUI
 
 @main
 struct MedalWallApp: App {
@@ -17,24 +16,7 @@ struct MedalWallApp: App {
   @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
   @AppStorage("appTheme") private var appTheme: AppTheme = .system
   @State private var userManager: UserManager?
-  
-  var sharedModelContainer: ModelContainer = {
-    let schema = Schema([
-      Race.self,
-      RaceEdition.self,
-      RaceCategory.self,
-      Medal.self,
-      EventPhoto.self
-    ])
-    let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-    
-    do {
-      return try ModelContainer(for: schema, configurations: [modelConfiguration])
-    } catch {
-      fatalError("Could not create ModelContainer: \(error)")
-    }
-  }()
-  
+
   var body: some Scene {
     WindowGroup {
       Group {
@@ -47,7 +29,7 @@ struct MedalWallApp: App {
         } else {
           LoadingView(text: "Loading...")
         }
-      } // Group
+      }  // Group
       .environment(userManager)
       .preferredColorScheme(appTheme.colorScheme)
       .onOpenURL { url in
@@ -62,8 +44,7 @@ struct MedalWallApp: App {
         guard userManager == nil else { return }
         userManager = UserManager()
       }
-    } // WindowGroup
-    .modelContainer(sharedModelContainer)
+    }  // WindowGroup
     .onChange(of: scenePhase) { _, newPhase in
       if newPhase == .active {
         Task {
@@ -75,13 +56,13 @@ struct MedalWallApp: App {
 }
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-  
+
   func application(
     _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
     FirebaseApp.configure()
-    
+
     return true
   }
 }

@@ -6,85 +6,52 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct RaceList: View {
+  let races: [Race]
   let searchText: String
-  let applyFilter: ([Race]) -> [Race]
   let onDelete: (Race) -> Void
-  
-  @Query private var races: [Race]
-  
-  init(
-    searchText: String = "",
-    predicate: Predicate<Race>,
-    sortOrder: [SortDescriptor<Race>],
-    applyFilter: @escaping ([Race]) -> [Race] = { $0 },
-    onDelete: @escaping (Race) -> Void = { _ in }
-  ) {
-    self.searchText = searchText
-    self.applyFilter = applyFilter
-    self.onDelete = onDelete
-    
-    _races = Query(
-      filter: predicate,
-      sort: sortOrder
-    )
-  }
-  
+
   var body: some View {
     Group {
       if races.isEmpty && searchText.isEmpty {
         RaceEmptyView()
-      } else if (races.isEmpty && !searchText.isEmpty) || (applyFilter(races).isEmpty) {
+      } else if races.isEmpty {
         RaceNoResultView(searchText: searchText)
       } else {
-        List(applyFilter(races)) { race in
+        List(races) { race in
           NavigationLink {
             RaceDetailView(race: race)
           } label: {
             RaceRow(
-              photo: race.photo,
+              photoUrl: race.photoUrl,
               name: race.name,
               location: race.location.formatted,
-              editionCount: race.editions.count
+              editionCount: race.editionCount
             )
-            .swipeActions(edge: .trailing) {
-              Button(role: .destructive) {
-                onDelete(race)
-              } label: {
-                Label("Delete", systemImage: "trash")
-              }
+          }  // NavigationLink
+          .swipeActions(edge: .trailing) {
+            Button(role: .destructive) {
+              onDelete(race)
+            } label: {
+              Label("Delete", systemImage: "trash")
             }
           }
         }
         .scrollContentBackground(.hidden)
       }
-    } // Group
+    }  // Group
   }
 }
 
-#Preview("Sample", traits: .sampleData) {
-  RaceList(
-    searchText: "",
-    predicate: #Predicate<Race> { _ in true },
-    sortOrder: [SortDescriptor(\Race.name)]
-  )
+#Preview("Races") {
+  RaceList(races: Race.sampleData, searchText: "", onDelete: { _ in })
 }
 
 #Preview("Empty") {
-  RaceList(
-    searchText: "",
-    predicate: #Predicate<Race> { _ in true },
-    sortOrder: [SortDescriptor(\Race.name)]
-  )
+  RaceList(races: [], searchText: "", onDelete: { _ in })
 }
 
 #Preview("No Search Results") {
-  RaceList(
-    searchText: "XYZ Marathon",
-    predicate: #Predicate<Race> { _ in true },
-    sortOrder: [SortDescriptor(\Race.name)]
-  )
+  RaceList(races: [], searchText: "XYZ Marathon", onDelete: { _ in })
 }
-

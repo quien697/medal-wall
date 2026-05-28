@@ -17,9 +17,9 @@ final class EditProfileViewModel {
   var gender: Gender?
   var birthday: Date
   var isBirthdaySet: Bool
-  
+
   private let profile: User
-  
+
   // MARK: - Init
   init(profile: User) {
     self.profile = profile
@@ -38,34 +38,27 @@ final class EditProfileViewModel {
       self.isBirthdaySet = false
     }
   }
-  
+
   // MARK: - Computed
   var isFormValid: Bool {
-    !userName.trimmedFirstName.isEmpty &&
-    !userName.trimmedLastName.isEmpty
+    !userName.trimmedFirstName.isEmpty && !userName.trimmedLastName.isEmpty
   }
-  
+
   // MARK: - Functions
-  
   func loadExistingPhoto() async {
-    guard let urlString = profile.photoUrl,
-          let url = URL(string: urlString),
-          let (data, _) = try? await URLSession.shared.data(from: url),
-          let image = UIImage(data: data) else { return }
-    
-    photo = image
+    photo = await UIImage.load(from: profile.photoUrl)
   }
-  
+
   func updatePhoto(with uiImage: UIImage) {
     photo = uiImage
     isPhotoChanged = true
   }
-  
+
   func clearPhoto() {
     photo = nil
     isPhotoChanged = true
   }
-  
+
   /// Returns a copy of the profile with the current draft values applied.
   func makeUpdatedUser() -> User {
     var updated = profile

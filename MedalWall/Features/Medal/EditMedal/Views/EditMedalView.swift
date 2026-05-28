@@ -5,15 +5,14 @@
 //  Created by Quien on 2026-04-09.
 //
 
-import SwiftUI
 import PhotosUI
-import SwiftData
+import SwiftUI
 
 struct EditMedalView: View {
   // MARK: - Environment
   @Environment(UserManager.self) private var userManager
-  @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
+
   // MARK: - State
   @State private var viewModel: EditMedalViewModel
   @State private var errorWrapper: ErrorWrapper?
@@ -28,17 +27,16 @@ struct EditMedalView: View {
   // Event photos picker
   @State private var isPresentingEventPhotosPicker: Bool = false
   @State private var selectedEventPhotos: [PhotosPickerItem] = []
-  
+
   init(mode: ItemEditMode, medal: Medal? = nil) {
     self._viewModel = State(initialValue: EditMedalViewModel(mode: mode, medal: medal))
   }
-  
+
   var body: some View {
     NavigationStack {
       Form {
         EditPhotoPicker(
           photo: viewModel.photo,
-          hint: "Tap to \(viewModel.photo == nil ? "add a new" : "update the") medal photo",
           photoView: {
             MedalImage(photo: viewModel.photo)
           },
@@ -53,13 +51,13 @@ struct EditMedalView: View {
         )
         .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
-        
+
         EditMedalAutoFillSection {
           isPresentingRaceEntryPicker = true
         }
-        
+
         EditMedalResultSection(finishTime: $viewModel.finishTime)
-        
+
         EditMedalInfoSection(
           name: $viewModel.name,
           date: $viewModel.date,
@@ -69,14 +67,14 @@ struct EditMedalView: View {
             isPresentingDistancePicker = true
           }
         )
-        
+
         EditMedalLocationSection(
           country: $viewModel.country,
           province: $viewModel.province,
           city: $viewModel.city,
           district: $viewModel.district
         )
-        
+
         EditMedalPlacementSection(
           overallPlacement: $viewModel.overallPlacement,
           totalParticipants: $viewModel.totalParticipants,
@@ -86,9 +84,9 @@ struct EditMedalView: View {
           divisionPlacement: $viewModel.divisionPlacement,
           divisionTotal: $viewModel.divisionTotal
         )
-        
+
         EditMedalNoteSection(note: $viewModel.note)
-        
+
         EditMedalEventPhotosSection(
           photos: viewModel.draftEventPhotos,
           onChooseFromLibrary: {
@@ -98,9 +96,9 @@ struct EditMedalView: View {
             viewModel.removeEventPhoto(id: $0)
           }
         )
-        
+
         EditMedalTagsSection(tags: $viewModel.tags)
-      } // Form
+      }  // Form
       .navigationTitle("\(viewModel.mode == .add ? "New" : "Edit") Medal")
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
@@ -110,28 +108,36 @@ struct EditMedalView: View {
           Button(role: .close) {
             dismiss()
           }
-        } // ToolbarItem
-        
+          .disabled(viewModel.isLoading)
+        }  // ToolbarItem
+
         ToolbarItem(placement: .confirmationAction) {
-          Button(role: .confirm) {
-            guard let userID = userManager.currentUserID else {
-              errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
-              return
+          if viewModel.isLoading {
+            ProgressView()
+          } else {
+            Button(role: .confirm) {
+              guard let userID = userManager.currentUserID else {
+                errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
+                return
+              }
+
+              Task {
+                do {
+                  try await viewModel.save(by: userID)
+                  dismiss()
+                } catch {
+                  shouldDismiss = true
+                  errorWrapper = ErrorWrapper(error: AppError.medalSaveFailed)
+                }
+              }
             }
-            
-            do {
-              try viewModel.save(by: userID)
-              dismiss()
-            } catch {
-              shouldDismiss = true
-              errorWrapper = ErrorWrapper(error: AppError.unknown)
-            }
+            .disabled(!viewModel.isFormValid)
           }
-          .disabled(!viewModel.isFormValid)
-        } // ToolbarItem
-      } // toolbar
-      .onAppear {
-        viewModel.configure(context: modelContext)
+        }  // ToolbarItem
+      }  // toolbar
+      .interactiveDismissDisabled(viewModel.isLoading)
+      .task {
+        await viewModel.loadPhoto()
       }
       .photosPicker(
         isPresented: $isPresentingPhotoPicker,
@@ -142,7 +148,8 @@ struct EditMedalView: View {
         guard let newItem else { return }
         Task {
           if let data = try? await newItem.loadTransferable(type: Data.self),
-             let uiImage = UIImage(data: data) {
+            let uiImage = UIImage(data: data)
+          {
             rawPickedImage = uiImage
             isPresentingCropImageView = true
           } else {
@@ -158,10 +165,10 @@ struct EditMedalView: View {
       )
       .onChange(of: selectedEventPhotos) { _, newItems in
         guard !newItems.isEmpty else { return }
-        
+
         Task {
           var dataList: [Data] = []
-          
+
           for item in newItems {
             if let data = try? await item.loadTransferable(type: Data.self) {
               dataList.append(data)
@@ -169,27 +176,31 @@ struct EditMedalView: View {
               errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
             }
           }
-          
+
           if !dataList.isEmpty {
             viewModel.addEventPhotos(dataList)
           }
-          
+
           selectedEventPhotos = []
         }
       }
-      .sheet(isPresented: $isPresentingCropImageView, onDismiss: {
-        selectedPhoto = nil
-        rawPickedImage = nil
-      }) {
-        CropImageView(
-          image: rawPickedImage,
-          cropShape: .circle
-        ) { croppedImage in
-          if let croppedImage {
-            viewModel.updatePhoto(with: croppedImage)
+      .sheet(
+        isPresented: $isPresentingCropImageView,
+        onDismiss: {
+          selectedPhoto = nil
+          rawPickedImage = nil
+        },
+        content: {
+          CropImageView(
+            image: rawPickedImage,
+            cropShape: .circle
+          ) { croppedImage in
+            if let croppedImage {
+              viewModel.updatePhoto(with: croppedImage)
+            }
           }
         }
-      }
+      )
       .sheet(isPresented: $isPresentingDistancePicker) {
         EditDistanceView(
           mode: .edit,
@@ -205,14 +216,18 @@ struct EditMedalView: View {
           viewModel.autoFill(from: selection)
         }
       }
-      .sheet(item: $errorWrapper, onDismiss: {
-        if shouldDismiss {
-          dismiss()
+      .sheet(
+        item: $errorWrapper,
+        onDismiss: {
+          if shouldDismiss {
+            dismiss()
+          }
+        },
+        content: { wrapper in
+          ErrorView(errorWrapper: wrapper)
         }
-      }) { wrapper in
-        ErrorView(errorWrapper: wrapper)
-      }
-    } // NavigationStack
+      )
+    }  // NavigationStack
   }
 }
 

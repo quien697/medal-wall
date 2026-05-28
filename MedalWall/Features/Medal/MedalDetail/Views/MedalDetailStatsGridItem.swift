@@ -12,7 +12,7 @@ struct MedalDetailStatsGridItem: View {
   let headline: String
   let subHeadLine: String?
   let headLineColor: Color?
-  
+
   // MARK: - Init
   init(
     title: String,
@@ -25,7 +25,7 @@ struct MedalDetailStatsGridItem: View {
     self.subHeadLine = subHeadLine
     self.headLineColor = headLineColor
   }
-  
+
   // MARK: - Body
   var body: some View {
     VStack(alignment: .leading, spacing: 5) {
@@ -36,14 +36,14 @@ struct MedalDetailStatsGridItem: View {
         .foregroundStyle(Color.Text.secondary)
         .lineLimit(1)
         .minimumScaleFactor(0.5)
-      
+
       Text(headline)
         .font(.title2)
         .fontWeight(.bold)
         .foregroundStyle(headLineColor ?? Color.Text.primary)
         .lineLimit(1)
         .minimumScaleFactor(0.5)
-      
+
       if let subHeadLine {
         Text(subHeadLine)
           .font(.caption)
@@ -51,7 +51,7 @@ struct MedalDetailStatsGridItem: View {
           .lineLimit(1)
           .minimumScaleFactor(0.5)
       }
-    } // VStack
+    }  // VStack
     .frame(maxWidth: .infinity, alignment: .leading)
     .surfaceStyle()
   }
@@ -60,40 +60,40 @@ struct MedalDetailStatsGridItem: View {
 #Preview {
   let columns = [
     GridItem(.flexible(minimum: 80), spacing: 10),
-    GridItem(.flexible(minimum: 80), spacing: 10),
+    GridItem(.flexible(minimum: 80), spacing: 10)
   ]
-  
+
   LazyVGrid(columns: columns, spacing: 10) {
     MedalDetailStatsGridItem(
       title: "Finish Time",
       headline: "5:10:10",
       headLineColor: Color.Gold.primary
     )
-    
+
     MedalDetailStatsGridItem(
       title: "AVG Pace",
       headline: "5.31 /km"
     )
-    
+
     MedalDetailStatsGridItem(
       title: "Overall",
       headline: "4000",
       subHeadLine: "of 7000",
       headLineColor: Color.Gold.primary
     )
-    
+
     MedalDetailStatsGridItem(
       title: "Division",
       headline: "30",
       subHeadLine: "of 500"
     )
-    
+
     MedalDetailStatsGridItem(
       title: "Division Group",
       headline: "M30-40",
       subHeadLine: ""
     )
-    
+
     MedalDetailStatsGridItem(
       title: "Gender",
       headline: "700",

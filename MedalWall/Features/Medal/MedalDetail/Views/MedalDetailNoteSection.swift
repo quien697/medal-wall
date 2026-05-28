@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MedalDetailNoteSection: View {
   let note: String
-  
+
   var body: some View {
     SectionContainer(title: "Notes") {
       Text(note)
@@ -18,14 +18,18 @@ struct MedalDetailNoteSection: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .lineLimit(3...)
         .surfaceStyle()
-    } // SectionContainer
+    }  // SectionContainer
   }
 }
 
 #Preview {
   ScrollView {
-    MedalDetailNoteSection(note: "First half marathon! Legs felt strong until km 18. Absolutely loved the course along the city landmarks. Will be back!")
-    
+    MedalDetailNoteSection(
+      note:
+        "First half marathon! Legs felt strong until km 18. Loved the course"
+        + " along the city landmarks. Will be back!"
+    )
+
     MedalDetailNoteSection(note: "First half marathon!")
   }
 }

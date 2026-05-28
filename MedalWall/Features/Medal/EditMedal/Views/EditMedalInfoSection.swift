@@ -13,7 +13,7 @@ struct EditMedalInfoSection: View {
   @Binding var bib: String
   let distance: String
   var onEditDistance: () -> Void
-  
+
   var body: some View {
     Section("Info") {
       LabeledContent {
@@ -23,13 +23,14 @@ struct EditMedalInfoSection: View {
         Text("Name")
           .fromLabelStyle()
       }
-      
+
       DatePicker(
         selection: $date,
-        displayedComponents: .date) {
-          Text("Date")
-            .fromLabelStyle()
-        }
+        displayedComponents: .date
+      ) {
+        Text("Date")
+          .fromLabelStyle()
+      }
 
       LabeledContent {
         TextField("e.g. 4291 (Optional)", text: $bib)
@@ -38,13 +39,13 @@ struct EditMedalInfoSection: View {
         Text("Bib")
           .fromLabelStyle()
       }
-      
+
       HStack {
         Text("Distance")
           .fromLabelStyle()
-        
+
         Spacer()
-        
+
         Button {
           onEditDistance()
         } label: {
@@ -53,13 +54,13 @@ struct EditMedalInfoSection: View {
         }
         .buttonStyle(.bordered)
       }
-    } // Section
+    }  // Section
   }
 }
 
 #Preview {
   let medal = Medal.sampleData.first!
-  
+
   Form {
     EditMedalInfoSection(
       name: .constant(medal.name),

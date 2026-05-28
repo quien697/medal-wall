@@ -8,44 +8,49 @@
 import SwiftUI
 
 struct RaceRow: View {
-  let photo: UIImage?
+  let photoUrl: String?
   let name: String
   let location: String
   let editionCount: Int
-  
+
   var body: some View {
     HStack {
       RaceImage(
-        photo: photo,
+        urlString: photoUrl,
         imageType: .raceThumbnail
       )
-      
+
       VStack(alignment: .leading) {
         Text(name)
           .font(.headline)
           .foregroundStyle(Color.Text.primary)
-        
+
         Text(location)
           .font(.subheadline)
           .foregroundStyle(Color.Text.secondary)
-        
+
         Text("\(editionCount) editions")
           .font(.subheadline)
           .foregroundStyle(Color.Text.tertiary)
       }
-    } // HStack
+    }  // HStack
   }
 }
 
 #Preview {
-  let race = Race.sampleData.first!
-  
   List {
     RaceRow(
-      photo: race.photo,
-      name: race.name,
-      location: race.location.formatted,
-      editionCount: race.editions.count
+      photoUrl: nil,
+      name: "Taipei Marathon",
+      location: "Taipei, Taiwan",
+      editionCount: 2
+    )
+
+    RaceRow(
+      photoUrl: nil,
+      name: "BMO Vancouver Marathon",
+      location: "Vancouver, BC, Canada",
+      editionCount: 0
     )
   }
 }

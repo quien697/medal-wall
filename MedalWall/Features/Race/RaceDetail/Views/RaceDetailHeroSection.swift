@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct RaceDetailHeroSection: View {
-  let photo: UIImage?
+  let photoUrl: String?
   let name: String
   let location: String
   let url: String?
-  
+
   var body: some View {
     DetailHeroSection {
       RaceImage(
-        photo: photo,
+        urlString: photoUrl,
         imageType: .raceHero
       )
     } infoContent: {
@@ -24,11 +24,11 @@ struct RaceDetailHeroSection: View {
         .font(.title2)
         .fontWeight(.bold)
         .foregroundStyle(Color.Text.primary)
-      
+
       Label(location, systemImage: "mappin.and.ellipse")
-      .font(.caption)
-      .foregroundStyle(Color.Text.secondary)
-      
+        .font(.caption)
+        .foregroundStyle(Color.Text.secondary)
+
       if let url = url, let urlObj = URL(string: url) {
         Link(destination: urlObj) {
           Label(url, systemImage: "link")
@@ -37,19 +37,19 @@ struct RaceDetailHeroSection: View {
             .underline(true, color: Color.Text.secondary)
         }
       }
-    } // DetailHeroSection
+    }  // DetailHeroSection
   }
 }
 
 #Preview {
   let race = Race.sampleData.first!
-  
+
   ScrollView {
     RaceDetailHeroSection(
-      photo: race.photo,
+      photoUrl: race.photoUrl,
       name: race.name,
       location: race.location.formatted,
-      url: race.url
+      url: race.websiteUrl
     )
   }
 }

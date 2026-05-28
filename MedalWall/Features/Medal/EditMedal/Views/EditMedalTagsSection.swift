@@ -10,7 +10,7 @@ import SwiftUI
 struct EditMedalTagsSection: View {
   @Binding var tags: [String]
   @State private var input: String = ""
-  
+
   var body: some View {
     Section("Tags") {
       FlowLayout(spacing: 8) {
@@ -27,12 +27,12 @@ struct EditMedalTagsSection: View {
           }
           .secondaryButtonStyle(vPadding: 5, hPadding: 10)
           .buttonStyle(.plain)
-        } // ForEach
-      } // FlowLayout
-      
+        }  // ForEach
+      }  // FlowLayout
+
       HStack {
         TextField("Add tag", text: $input)
-        
+
         if !input.trimmingCharacters(in: .whitespaces).isEmpty {
           Button {
             let trimmed = input.trimmingCharacters(in: .whitespaces)
@@ -40,7 +40,7 @@ struct EditMedalTagsSection: View {
               input = ""
               return
             }
-            
+
             tags.append(trimmed)
             input = ""
           } label: {
@@ -49,12 +49,12 @@ struct EditMedalTagsSection: View {
           }
           .buttonStyle(.plain)
         }
-      } // HStack
+      }  // HStack
       .listRowSeparator(.hidden)
       .padding(8)
       .background(Color.Card.Background.secondary)
       .clipShape(.rect(cornerRadius: 8))
-    } // Section
+    }  // Section
   }
 }
 

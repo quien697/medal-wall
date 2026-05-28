@@ -11,13 +11,13 @@ struct ProfileSummarySection: View {
   private let threeColumns = [
     GridItem(.flexible(minimum: 80), spacing: 8),
     GridItem(.flexible(minimum: 80), spacing: 8),
-    GridItem(.flexible(minimum: 80), spacing: 8),
+    GridItem(.flexible(minimum: 80), spacing: 8)
   ]
   private let twoColumns = [
     GridItem(.flexible(minimum: 160), spacing: 8),
-    GridItem(.flexible(minimum: 160), spacing: 8),
+    GridItem(.flexible(minimum: 160), spacing: 8)
   ]
-  
+
   let totalMedals: Int
   let fullCount: Int
   let halfCount: Int
@@ -31,7 +31,7 @@ struct ProfileSummarySection: View {
         StatCard(title: "\(fullCount)", subTitle: "Full")
         StatCard(title: "\(halfCount)", subTitle: "Half")
       }
-      
+
       LazyVGrid(columns: twoColumns, spacing: 8) {
         StatCard(
           title: bestFullTime,
@@ -44,7 +44,7 @@ struct ProfileSummarySection: View {
           subTitle: "Best Half"
         )
       }
-    } // SectionContainer
+    }  // SectionContainer
   }
 }
 

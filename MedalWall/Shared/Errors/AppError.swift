@@ -17,37 +17,61 @@ enum AppError: LocalizedError, Identifiable, Equatable {
   case signInFailed
   case noInternetConnection
   case sendEmailSignInLinkFailed(String)
-  
+
   // Repository / Persistence Errors
   case contextNotAttached
+  case raceFetchFailed(String)
   case raceSaveFailed
   case raceDeleteFailed
+  case editionSaveFailed
+  case editionDeleteFailed
+  case medalFetchFailed(String)
+  case medalSaveFailed
+  case medalDeleteFailed
+  case eventPhotoSaveFailed
+  case eventPhotoDeleteFailed
   case userSaveFailed
-  
+
   // User Manager
   case userLoadFailed
-  
+
   // Validation Errors
   case duplicateEdition
   case duplicateDistance
-  
+
   // Media Errors
   case photoLoadFailed
   case photoDataInvalid
-  
+
   // Unknown
   case unknown
-  
+
   var id: String { localizedDescription }
-  
+
   var title: String {
     switch self {
     case .contextNotAttached:
       "Context hasn't attached yet"
+    case .raceFetchFailed:
+      "Failed to Load Races"
     case .raceSaveFailed:
       "Race Save Failed"
     case .raceDeleteFailed:
       "Race Delete Failed"
+    case .editionSaveFailed:
+      "Edition Save Failed"
+    case .editionDeleteFailed:
+      "Edition Delete Failed"
+    case .medalFetchFailed:
+      "Failed to Load Medals"
+    case .medalSaveFailed:
+      "Medal Save Failed"
+    case .medalDeleteFailed:
+      "Medal Delete Failed"
+    case .eventPhotoSaveFailed:
+      "Photo Save Failed"
+    case .eventPhotoDeleteFailed:
+      "Photo Delete Failed"
     case .userSaveFailed:
       "User Save Failed"
     case .userLoadFailed:
@@ -65,25 +89,41 @@ enum AppError: LocalizedError, Identifiable, Equatable {
     case .noInternetConnection:
       "No Internet Connection"
     case .invalidCredential,
-        .missingNonce,
-        .missingIdentityToken,
-        .nonceFailed(_),
-        .tokenSerializationFailed(_),
-        .signInFailed:
+      .missingNonce,
+      .missingIdentityToken,
+      .nonceFailed,
+      .tokenSerializationFailed,
+      .signInFailed:
       "Sign In Failed"
     case .unknown:
       "Unexpected Error"
     }
   }
-  
+
   var message: String {
     switch self {
     case .contextNotAttached:
       "Internal error: Data context not available."
+    case .raceFetchFailed(let description):
+      "We couldn't load your races. \(description)"
     case .raceSaveFailed:
       "We couldn't save your race event."
     case .raceDeleteFailed:
       "We couldn't delete this race event. Please try again."
+    case .editionSaveFailed:
+      "We couldn't save this edition."
+    case .editionDeleteFailed:
+      "We couldn't delete this edition. Please try again."
+    case .medalFetchFailed(let description):
+      "We couldn't load your medals. \(description)"
+    case .medalSaveFailed:
+      "We couldn't save this medal."
+    case .medalDeleteFailed:
+      "We couldn't delete this medal. Please try again."
+    case .eventPhotoSaveFailed:
+      "We couldn't save this photo."
+    case .eventPhotoDeleteFailed:
+      "We couldn't delete this photo. Please try again."
     case .userSaveFailed:
       "We couldn't save your user information."
     case .userLoadFailed:
@@ -116,12 +156,16 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "Something unexpected happened."
     }
   }
-  
+
   var guidance: String {
     switch self {
     case .contextNotAttached:
       "Please restart the app. If the problem continues, contact support."
-    case .raceSaveFailed, .raceDeleteFailed, .userSaveFailed:
+    case .raceFetchFailed, .medalFetchFailed:
+      "Please check your connection and try again."
+    case .raceSaveFailed, .raceDeleteFailed, .editionSaveFailed, .editionDeleteFailed,
+      .medalSaveFailed, .medalDeleteFailed, .eventPhotoSaveFailed, .eventPhotoDeleteFailed,
+      .userSaveFailed:
       "Please try it again."
     case .userLoadFailed:
       "Please restart the app. If the problem continues, you may need to reinstall."
@@ -138,11 +182,11 @@ enum AppError: LocalizedError, Identifiable, Equatable {
     case .noInternetConnection:
       "Please check your connection and try again."
     case .invalidCredential,
-        .missingNonce,
-        .missingIdentityToken,
-        .nonceFailed(_),
-        .tokenSerializationFailed(_),
-        .signInFailed:
+      .missingNonce,
+      .missingIdentityToken,
+      .nonceFailed,
+      .tokenSerializationFailed,
+      .signInFailed:
       "Please try signing in again."
     case .unknown:
       "Please try again later."

@@ -6,70 +6,85 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct MedalsView: View {
   // MARK: - Environment
-  @Environment(\.modelContext) private var modelContext
+  @Environment(UserManager.self) private var userManager
+
   // MARK: - State
-  @State private var viewModel: MedalsViewModel = MedalsViewModel()
+  @State private var viewModel = MedalsViewModel()
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingAddMedal = false
+
   // MARK: - Namespace
   @Namespace private var namespace
   private let addMedal: String = "addMedal"
-  // MARK: - Query
-  @Query private var medals: [Medal]
-  
+
   // MARK: - Body
   var body: some View {
     NavigationStack {
-      if medals.isEmpty {
-        MedalEmptyView()
-      } else {
-        ScrollView {
-          MedalStatsSection(
-            totalCount: viewModel.totalCount(medals),
-            fullCount: viewModel.fullCount(medals),
-            halfCount: viewModel.halfCount(medals)
-          )
-          
-          MedalGridSection(
-            medals: medals,
-            columns: viewModel.gridColumns,
-            spacing: viewModel.gridSpacing,
-            namespace: namespace
-          )
-        } // ScrollView
-        .scrollIndicators(.hidden)
-        .navigationTitle("Your Rewards")
-        .background(Color.Background.primary)
-        .toolbarTitleDisplayMode(.inlineLarge)
-        .toolbarRole(.editor)
-        .toolbar {
-          ToolbarItem(placement: .title) {
-            ExpandedNavigationTitle(title: "Your Rewards")
+      MedalGrid(
+        medals: viewModel.medals,
+        isLoading: viewModel.isLoading
+      )
+      .navigationTitle("Your Rewards")
+      .background(Color.Background.primary)
+      .toolbarTitleDisplayMode(.inlineLarge)
+      .toolbarRole(.editor)
+      .overlay {
+        if viewModel.isLoading {
+          ProgressView()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.black.opacity(0.1))
+        }
+      }
+      .toolbar {
+        ToolbarItem(placement: .title) {
+          ExpandedNavigationTitle(title: "Your Rewards")
+        }
+
+        ToolbarItem(placement: .topBarTrailing) {
+          Button {
+            isPresentingAddMedal = true
+          } label: {
+            Image(systemName: "plus")
           }
-          
-          ToolbarItem(placement: .topBarTrailing) {
-            Button {
-              isPresentingAddMedal = true
-            } label: {
-              Image(systemName: "plus")
-            }
-            .matchedTransitionSource(id: addMedal, in: namespace)
-            .buttonStyle(.glassProminent)
-          }
-        } // toolbar
-        .sheet(isPresented: $isPresentingAddMedal) {
+          .matchedTransitionSource(id: addMedal, in: namespace)
+          .buttonStyle(.glassProminent)
+        }
+      }  // toolbar
+      .onAppear {
+        guard let userId = userManager.currentUserID else { return }
+        Task { await viewModel.loadMedals(userId: userId) }
+      }
+      .sheet(
+        isPresented: $isPresentingAddMedal,
+        onDismiss: {
+          guard let userId = userManager.currentUserID else { return }
+          Task { await viewModel.loadMedals(userId: userId) }
+        },
+        content: {
           AddMedalView()
             .navigationTransition(.zoom(sourceID: addMedal, in: namespace))
         }
+      )
+      .sheet(
+        item: $errorWrapper,
+        onDismiss: { viewModel.error = nil },
+        content: { wrapper in
+          ErrorView(errorWrapper: wrapper)
+        }
+      )
+      .onChange(of: viewModel.error) { _, error in
+        if let error {
+          errorWrapper = ErrorWrapper(error: error)
+        }
       }
-    } // NavigationStack
+    }  // NavigationStack
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   MedalsView()
+    .environment(UserManager())
 }

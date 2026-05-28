@@ -6,17 +6,15 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ProfileView: View {
   // MARK: - Environment
   @Environment(UserManager.self) private var userManager
+
   // MARK: - State
   @State private var viewModel = ProfileViewModel()
   @State private var isPresentingEditProfile = false
-  // MARK: - Query
-  @Query private var medals: [Medal]
-  
+
   // MARK: - Body
   var body: some View {
     NavigationStack {
@@ -26,27 +24,31 @@ struct ProfileView: View {
           userName: userManager.currentUserName,
           bio: userManager.currentUser?.bio
         )
-        
+
         ProfileSummarySection(
-          totalMedals: viewModel.totalMedals(medals),
-          fullCount: viewModel.fullCount(medals),
-          halfCount: viewModel.halfCount(medals),
-          bestFullTime: viewModel.bestFullTime(medals),
-          bestHalfTime: viewModel.bestHalfTime(medals)
+          totalMedals: viewModel.totalMedals,
+          fullCount: viewModel.fullCount,
+          halfCount: viewModel.halfCount,
+          bestFullTime: viewModel.bestFullTime,
+          bestHalfTime: viewModel.bestHalfTime
         )
-        
+
         .padding(.bottom, 10)
-      } // ScrollView
+      }  // ScrollView
       .scrollIndicators(.hidden)
       .navigationTitle("Profile")
       .background(Color.Background.primary)
       .toolbarTitleDisplayMode(.inlineLarge)
       .toolbarRole(.editor)
+      .onAppear {
+        guard let userId = userManager.currentUserID else { return }
+        Task { await viewModel.loadMedals(userId: userId) }
+      }
       .toolbar {
         ToolbarItem(placement: .title) {
           ExpandedNavigationTitle(title: "Profile")
         }
-        
+
         ToolbarItem(placement: .topBarTrailing) {
           NavigationLink {
             SettingsView()
@@ -54,7 +56,7 @@ struct ProfileView: View {
             Image(systemName: "gearshape")
           }
         }
-        
+
         ToolbarItem(placement: .topBarTrailing) {
           Menu {
             Button {
@@ -66,17 +68,17 @@ struct ProfileView: View {
             Image(systemName: "ellipsis")
           }
         }
-      } // toolbar
+      }  // toolbar
       .sheet(isPresented: $isPresentingEditProfile) {
         if let user = userManager.currentUser {
           EditProfileView(profile: user)
         }
       }
-    } // NavigationStack
+    }  // NavigationStack
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   ProfileView()
     .environment(UserManager())
 }

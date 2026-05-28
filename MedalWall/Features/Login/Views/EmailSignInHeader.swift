@@ -23,12 +23,12 @@ struct EmailSignInHeader: View {
         .font(.title)
         .fontWeight(.bold)
         .foregroundStyle(Color.Text.primary)
-      
+
       Text(subTitle)
         .font(.body)
         .foregroundStyle(.secondary)
         .multilineTextAlignment(.center)
-    } // VStack
+    }  // VStack
   }
 }
 

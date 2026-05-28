@@ -16,7 +16,7 @@ struct SignInWithEmailLinkView: View {
   let isEmailValid: Bool
   let isSendingEmail: Bool
   let onSendLink: () async -> Void
-  
+
   // MARK: - Body
   var body: some View {
     NavigationStack {
@@ -34,7 +34,7 @@ struct SignInWithEmailLinkView: View {
             onSendLink: onSendLink
           )
         }
-      } // Group
+      }  // Group
       .navigationTitle("Continue with Email")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
@@ -43,14 +43,14 @@ struct SignInWithEmailLinkView: View {
             dismiss()
           }
         }
-      } // toolbar
-    } // NavigationStack
+      }  // toolbar
+    }  // NavigationStack
   }
 }
 
 #Preview("Idel") {
   @Previewable @State var email = ""
-  
+
   SignInWithEmailLinkView(
     email: $email,
     isEmailLinkSent: false,
@@ -62,7 +62,7 @@ struct SignInWithEmailLinkView: View {
 
 #Preview("Sending") {
   @Previewable @State var email = "you@example.com"
-  
+
   SignInWithEmailLinkView(
     email: $email,
     isEmailLinkSent: false,
@@ -74,7 +74,7 @@ struct SignInWithEmailLinkView: View {
 
 #Preview("Confirmation") {
   @Previewable @State var email = "quien697@gmail.com"
-  
+
   SignInWithEmailLinkView(
     email: $email,
     isEmailLinkSent: true,

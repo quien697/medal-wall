@@ -7,7 +7,7 @@
 
 enum ItemEditMode {
   case add, edit
-  
+
   var displayName: String {
     switch self {
     case .add: return "New"

@@ -8,16 +8,14 @@
 import SwiftUI
 
 struct AddRaceEditionView: View {
-  let onAction: (DraftRaceEdition) -> Void
-  
+  let raceId: String
+
   var body: some View {
-    EditRaceEditionView(
-      mode: .add,
-      onAction: onAction
-    )
+    EditRaceEditionView(mode: .add, raceId: raceId)
   }
 }
 
 #Preview {
-  AddRaceEditionView(onAction: { _ in })
+  AddRaceEditionView(raceId: "preview-race-id")
+    .environment(UserManager())
 }

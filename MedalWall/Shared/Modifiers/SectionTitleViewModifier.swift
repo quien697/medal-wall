@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SectionTitleViewModifier: ViewModifier {
-  
+
   func body(content: Content) -> some View {
     content
       .font(.headline)
@@ -19,7 +19,7 @@ struct SectionTitleViewModifier: ViewModifier {
 }
 
 extension View {
-  
+
   func sectionTitleStyle() -> some View {
     modifier(SectionTitleViewModifier())
   }

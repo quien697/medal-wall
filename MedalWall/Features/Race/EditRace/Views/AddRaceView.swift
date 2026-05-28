@@ -6,16 +6,14 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct AddRaceView: View {
   var body: some View {
-    NavigationStack {
-      EditRaceView(mode: .add)
-    }
+    EditRaceView(mode: .add)
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   AddRaceView()
+    .environment(UserManager())
 }

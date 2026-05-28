@@ -1,5 +1,5 @@
 //
-//  RaceEntryDistanceChip.swift
+//  RaceEntryDistanceButton.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-04-16.
@@ -7,18 +7,18 @@
 
 import SwiftUI
 
-struct RaceEntryDistanceChip: View {
+struct RaceEntryDistanceButton: View {
   let race: Race
   let edition: RaceEdition
   let distance: RaceDistance
   @Binding var selection: RaceEntry?
-  
+
   private var isSelected: Bool {
     selection?.race.id == race.id
-    && selection?.edition.id == edition.id
-    && selection?.distance == distance
+      && selection?.edition.id == edition.id
+      && selection?.distance == distance
   }
-  
+
   var body: some View {
     Button {
       if isSelected {
@@ -41,18 +41,18 @@ struct RaceEntryDistanceChip: View {
 }
 
 #Preview {
-  let race = Race.sampleData.first!
-  let edition = race.editions.first!
+  let race = Race.taipei
+  let edition = RaceEdition.taipei2019
   let distance = edition.distances.first!
-  
-  RaceEntryDistanceChip(
+
+  RaceEntryDistanceButton(
     race: race,
     edition: edition,
     distance: distance,
     selection: .constant(nil)
   )
-  
-  RaceEntryDistanceChip(
+
+  RaceEntryDistanceButton(
     race: race,
     edition: edition,
     distance: distance,

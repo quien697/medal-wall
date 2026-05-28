@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AddDistanceView: View {
   let onSave: (RaceDistance) -> Void
-  
+
   var body: some View {
     EditDistanceView(
       mode: .add,

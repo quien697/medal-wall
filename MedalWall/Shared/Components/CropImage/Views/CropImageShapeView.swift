@@ -10,7 +10,7 @@ import SwiftUI
 struct CropImageShapeView: View {
   let shape: CropImageShape
   let size: CGSize
-  
+
   var body: some View {
     switch shape {
     case .circle:

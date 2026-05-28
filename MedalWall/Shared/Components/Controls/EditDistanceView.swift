@@ -16,7 +16,7 @@ struct EditDistanceView: View {
   // MARK: - Properties
   let mode: ItemEditMode
   let onAction: (RaceDistance) -> Void
-  
+
   // MARK: - Init
   init(
     mode: ItemEditMode,
@@ -31,7 +31,7 @@ struct EditDistanceView: View {
     }()
     self.onAction = onAction
   }
-  
+
   // MARK: - Body
   var body: some View {
     NavigationStack {
@@ -40,12 +40,12 @@ struct EditDistanceView: View {
           Picker("Distance", selection: $draftDistance.category) {
             Text("Full Marathon").tag(RaceDistanceCategory.full)
             Text("Half Marathon").tag(RaceDistanceCategory.half)
-            Text("10K").tag(RaceDistanceCategory.`10KM`)
-            Text("5K").tag(RaceDistanceCategory.`5KM`)
+            Text("10K").tag(RaceDistanceCategory.tenKM)
+            Text("5K").tag(RaceDistanceCategory.fiveKM)
             Text("Custom").tag(RaceDistanceCategory.custom(customValue))
           }
           .pickerStyle(.navigationLink)
-          
+
           if case .custom = draftDistance.category {
             TextField("Custom distance (km)", value: $customValue, format: .number)
               .keyboardType(.decimalPad)
@@ -53,8 +53,8 @@ struct EditDistanceView: View {
                 draftDistance.category = .custom(newValue)
               }
           }
-        } // Section
-        
+        }  // Section
+
         Section("Distance Type") {
           Picker("Distance Type", selection: $draftDistance.type) {
             ForEach(RaceDistanceType.allCases, id: \.self) { type in
@@ -62,8 +62,8 @@ struct EditDistanceView: View {
             }
           }
           .pickerStyle(.segmented)
-        } // Section
-      } // Form
+        }  // Section
+      }  // Form
       .navigationTitle("\(mode.displayName) Distance")
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
@@ -71,15 +71,15 @@ struct EditDistanceView: View {
             dismiss()
           }
         }
-        
+
         ToolbarItem(placement: .confirmationAction) {
           Button(role: .confirm) {
             onAction(draftDistance)
             dismiss()
           }
         }
-      } // toolbar
-    } // NavigationStack
+      }  // toolbar
+    }  // NavigationStack
   }
 }
 

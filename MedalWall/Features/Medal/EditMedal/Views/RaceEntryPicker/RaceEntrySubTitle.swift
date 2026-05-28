@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RaceEntrySubTitle: View {
   let selection: RaceEntry?
-  
+
   var body: some View {
     Group {
       if let selection {
@@ -32,11 +32,10 @@ struct RaceEntrySubTitle: View {
 }
 
 #Preview {
-  let race = Race.sampleData.first!
-  let edition = race.editions.first!
+  let edition = RaceEdition.taipei2019
   let distance = edition.distances.first!
-  
+
   RaceEntrySubTitle(selection: nil)
-  
-  RaceEntrySubTitle(selection: RaceEntry(race: race, edition: edition, distance: distance))
+
+  RaceEntrySubTitle(selection: RaceEntry(race: Race.taipei, edition: edition, distance: distance))
 }

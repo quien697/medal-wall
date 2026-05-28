@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RaceDetailEditionsSection: View {
   let editions: [RaceEdition]
-  
+
   var body: some View {
     SectionContainer(title: "Editions") {
       if editions.isEmpty {
@@ -17,7 +17,7 @@ struct RaceDetailEditionsSection: View {
           Label("No Editions", systemImage: "tray")
             .font(.subheadline)
             .foregroundStyle(Color.Text.secondary)
-          
+
           Text("Add editions to track your race history.")
             .font(.subheadline)
             .foregroundStyle(Color.Text.tertiary)
@@ -31,48 +31,40 @@ struct RaceDetailEditionsSection: View {
                 .font(.title)
                 .fontWeight(.heavy)
                 .foregroundStyle(Color.Gold.primary)
-              
+
               Text(edition.dateDisplayLabel)
                 .font(.subheadline)
                 .foregroundStyle(Color.Text.tertiary)
-              
+
               Spacer()
-            }
-            
+            }  // HStack
+
             HStack(alignment: .top, spacing: 20) {
-              ZStack(alignment: .leading) {
-                if let uiImage = edition.photo ?? edition.race.photo {
-                  Image(uiImage: uiImage)
-                    .styled(as: ImageType.raceThumbnail)
-                } else {
-                  Image(systemName: "photo.fill")
-                    .placeholderStyled(as: ImageType.raceThumbnail)
-                }
-              } // ZStack
-              
+              RaceImage(urlString: edition.photoUrl, imageType: .raceThumbnail)
+
               FlowLayout(spacing: 10) {
                 ForEach(edition.distances.sorted()) { distance in
                   Text(distance.displayLabel)
                     .secondaryButtonStyle(
                       vPadding: 6,
-                      hPadding: 10,
+                      hPadding: 10
                     )
                 }
-              } // FlowLayout
-              
+              }  // FlowLayout
+
               Spacer()
-            } // HStack
-          } // VStack
+            }  // HStack
+          }  // VStack
           .surfaceStyle()
-        } // ForEach
+        }  // ForEach
       }
-    } // SectionContainer
+    }  // SectionContainer
   }
 }
 
 #Preview("Sample") {
   ScrollView {
-    RaceDetailEditionsSection(editions: Race.sampleData.first!.editions)
+    RaceDetailEditionsSection(editions: RaceEdition.sampleData)
   }
 }
 
@@ -81,5 +73,3 @@ struct RaceDetailEditionsSection: View {
     RaceDetailEditionsSection(editions: [])
   }
 }
-
-

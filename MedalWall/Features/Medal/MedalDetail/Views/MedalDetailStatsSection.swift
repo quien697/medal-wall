@@ -19,7 +19,7 @@ struct MedalDetailStatsSection: View {
   let divisionTotal: String
   let genderPlacement: String
   let genderTotal: String
-  
+
   var body: some View {
     SectionContainer(title: "Stats") {
       LazyVGrid(columns: columns, spacing: spacing) {
@@ -28,38 +28,38 @@ struct MedalDetailStatsSection: View {
           headline: finishTime,
           headLineColor: Color.Gold.primary
         )
-        
+
         MedalDetailStatsGridItem(
           title: "Avg Pace",
           headline: averagePace,
         )
-        
+
         MedalDetailStatsGridItem(
           title: "Overall",
           headline: overallPlacement,
           subHeadLine: totalParticipants,
           headLineColor: Color.Gold.primary
         )
-        
+
         MedalDetailStatsGridItem(
           title: "Gender",
           headline: genderPlacement,
           subHeadLine: genderTotal
         )
-        
+
         MedalDetailStatsGridItem(
           title: "Division Group",
           headline: division,
           subHeadLine: ""
         )
-        
+
         MedalDetailStatsGridItem(
           title: "Division",
           headline: divisionPlacement,
           subHeadLine: divisionTotal
         )
-      } // LazyVGrid
-    } // SectionContainer
+      }  // LazyVGrid
+    }  // SectionContainer
   }
 }
 
@@ -78,7 +78,7 @@ struct MedalDetailStatsSection: View {
       genderPlacement: "300",
       genderTotal: "of 4000"
     )
-    
+
     MedalDetailStatsSection(
       columns: [GridItem](repeating: GridItem(.flexible(minimum: 80), spacing: 10), count: 2),
       spacing: 10,

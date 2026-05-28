@@ -12,18 +12,17 @@ import SwiftUI
 enum RaceDistanceCategory: CustomStringConvertible, Hashable {
   case full
   case half
-  case `10KM`
-  case `5KM`
+  case tenKM
+  case fiveKM
   case custom(Double)
-  
+
   /// Defines display name for UI
-  nonisolated
-  var description: String {
+  nonisolated var description: String {
     switch self {
     case .full: return "42km"
     case .half: return "21km"
-    case .`10KM`: return "10km"
-    case .`5KM`: return "5km"
+    case .tenKM: return "10km"
+    case .fiveKM: return "5km"
     case .custom(let value):
       if value.truncatingRemainder(dividingBy: 1) == 0 {
         return "\(Int(value))km"
@@ -32,33 +31,33 @@ enum RaceDistanceCategory: CustomStringConvertible, Hashable {
       }
     }
   }
-  
-  nonisolated
-  var value: Double {
+
+  /// The numeric distance in kilometres used for Codable storage and sorting.
+  nonisolated var value: Double {
     switch self {
     case .full: return 42.195
     case .half: return 21.0975
-    case .`10KM`: return 10
-    case .`5KM`: return 5
+    case .tenKM: return 10
+    case .fiveKM: return 5
     case .custom(let value): return value
     }
   }
 }
 
-/// Initializes a distance category from a numeric distance value (in kilometers)..
 extension RaceDistanceCategory {
-  nonisolated
-  init(value: Double) {
+  /// Reconstructs a category from its stored numeric value (kilometres).
+  nonisolated init(value: Double) {
     switch value {
     case 42.195: self = .full
     case 21.0975: self = .half
-    case 10: self = .`10KM`
-    case 5: self = .`5KM`
+    case 10: self = .tenKM
+    case 5: self = .fiveKM
     default: self = .custom(value)
     }
   }
-  
+
+  /// The preset cases shown in the distance picker (excludes custom).
   static var standardCases: [RaceDistanceCategory] {
-    [.full, .half, .`10KM`, .`5KM`]
+    [.full, .half, .tenKM, .fiveKM]
   }
 }

@@ -11,7 +11,7 @@ struct RaceEntryEditionRow: View {
   let race: Race
   let edition: RaceEdition
   @Binding var selection: RaceEntry?
-  
+
   var body: some View {
     VStack(alignment: .leading) {
       HStack {
@@ -19,29 +19,33 @@ struct RaceEntryEditionRow: View {
           .font(.headline)
           .fontWeight(.heavy)
           .foregroundStyle(Color.Gold.primary)
-        
+
         Text(edition.dateDisplayLabel)
           .font(.subheadline)
           .foregroundStyle(Color.Text.tertiary)
-      } // HStack
-      
-      FlowLayout(spacing: 8) {
-        ForEach(edition.distances.sorted(), id: \.self) { distance in
-          RaceEntryDistanceChip(
-            race: race,
-            edition: edition,
-            distance: distance,
-            selection: $selection
-          )
-        }
-      } // FlowLayout
-    } // VStack
+      }  // HStack
+
+      if !edition.distances.isEmpty {
+        FlowLayout(spacing: 8) {
+          ForEach(edition.distances.sorted(), id: \.self) { distance in
+            RaceEntryDistanceButton(
+              race: race,
+              edition: edition,
+              distance: distance,
+              selection: $selection
+            )
+          }
+        }  // FlowLayout
+      } else {
+        Text("No Distances")
+          .fontWeight(.semibold)
+          .foregroundStyle(Color.Text.secondary)
+          .padding(.vertical, 6)
+      }
+    }  // VStack
   }
 }
 
 #Preview {
-  let race = Race.sampleData.first!
-  let edition = race.editions.first!
-  
-  RaceEntryEditionRow(race: race, edition: edition, selection: .constant(nil))
+  RaceEntryEditionRow(race: Race.taipei, edition: RaceEdition.taipei2019, selection: .constant(nil))
 }

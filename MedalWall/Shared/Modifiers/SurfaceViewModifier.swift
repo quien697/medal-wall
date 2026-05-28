@@ -14,7 +14,7 @@ struct SurfaceViewModifier: ViewModifier {
   let borderColor: Color
   let vPadding: CGFloat
   let hPadding: CGFloat
-  
+
   func body(content: Content) -> some View {
     content
       .padding(.vertical, vPadding)
@@ -30,24 +30,25 @@ struct SurfaceViewModifier: ViewModifier {
 }
 
 extension View {
-  
+
   func surfaceStyle(
     bgColor: Color = Color.Card.Background.primary,
     borderColor: Color? = nil,
     vPadding: CGFloat = 16,
     hPadding: CGFloat = 16
   ) -> some View {
-    modifier(SurfaceViewModifier(
-      bgColor: bgColor,
-      borderColor: borderColor ?? Color.Border.gray,
-      vPadding: vPadding,
-      hPadding: hPadding
-    ))
+    modifier(
+      SurfaceViewModifier(
+        bgColor: bgColor,
+        borderColor: borderColor ?? Color.Border.gray,
+        vPadding: vPadding,
+        hPadding: hPadding
+      ))
   }
 }
 
 #Preview {
-  VStack{
+  VStack {
     Text("42km")
       .surfaceStyle()
   }

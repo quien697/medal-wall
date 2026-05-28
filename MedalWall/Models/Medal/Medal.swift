@@ -6,21 +6,15 @@
 //
 
 import Foundation
-import SwiftData
 
-@Model
-final class Medal {
-  @Attribute(.unique) var id: UUID
+struct Medal: Codable, Identifiable {
+  let id: String
   var name: String
   var date: Date
   var bibNumber: String
-  var photoData: Data?
-  var country: String
-  var province: String?
-  var city: String
-  var district: String?
-  var raceDistance: Double
-  var raceDistanceType: String
+  var photoUrl: String?
+  var location: GeoLocation
+  var distance: RaceDistance
   var finishTime: TimeInterval?
   var overallPlacement: Int?
   var totalParticipants: Int?
@@ -31,19 +25,19 @@ final class Medal {
   var genderTotal: Int?
   var note: String?
   var tags: [String]
-
+  var eventPhotos: [EventPhoto]
   var userID: String
-  @Relationship(deleteRule: .cascade, inverse: \EventPhoto.medal)
-  var eventPhotos: [EventPhoto] = []
+  var createdAt: Date
+  var updatedAt: Date
 
   init(
-    id: UUID = UUID(),
+    id: String = UUID().uuidString,
     name: String,
     date: Date,
     bibNumber: String,
-    photoData: Data? = nil,
-    location: RaceLocation,
-    raceDistance: RaceDistance,
+    photoUrl: String? = nil,
+    location: GeoLocation,
+    distance: RaceDistance,
     finishTime: TimeInterval? = nil,
     overallPlacement: Int? = nil,
     totalParticipants: Int? = nil,
@@ -54,20 +48,18 @@ final class Medal {
     genderTotal: Int? = nil,
     note: String? = nil,
     tags: [String] = [],
+    eventPhotos: [EventPhoto] = [],
     userID: String,
-    eventPhotos: [EventPhoto] = []
+    createdAt: Date = .now,
+    updatedAt: Date = .now
   ) {
     self.id = id
     self.name = name
     self.date = date
     self.bibNumber = bibNumber
-    self.photoData = photoData
-    self.country = location.country
-    self.province = location.province
-    self.city = location.city
-    self.district = location.district
-    self.raceDistance = raceDistance.category.value
-    self.raceDistanceType = raceDistance.type.rawValue
+    self.photoUrl = photoUrl
+    self.location = location
+    self.distance = distance
     self.finishTime = finishTime
     self.overallPlacement = overallPlacement
     self.totalParticipants = totalParticipants
@@ -78,7 +70,9 @@ final class Medal {
     self.genderTotal = genderTotal
     self.note = note
     self.tags = tags
-    self.userID = userID
     self.eventPhotos = eventPhotos
+    self.userID = userID
+    self.createdAt = createdAt
+    self.updatedAt = updatedAt
   }
 }

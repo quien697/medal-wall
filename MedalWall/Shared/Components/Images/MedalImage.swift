@@ -10,17 +10,25 @@ import SwiftUI
 struct MedalImage: View {
   private let systemImageName: String = "medal.fill"
   private let imageType: ImageType = .medal
-  
-  let size: CGFloat
-  let photo: UIImage?
-  
-  init(
-    photo: UIImage? = nil,
-  ) {
+  private let photo: UIImage?
+  private let urlString: String?
+  private let size: CGFloat
+
+  /// Displays a locally held UIImage (e.g. a newly selected photo not yet uploaded).
+  init(photo: UIImage? = nil) {
     self.photo = photo
+    self.urlString = nil
     self.size = imageType.size.width
   }
-  
+
+  /// Fetches and displays an image from a URL string, falling back to the placeholder if nil or
+  /// loading fails.
+  init(urlString: String?) {
+    self.photo = nil
+    self.urlString = urlString
+    self.size = imageType.size.width
+  }
+
   var body: some View {
     ZStack {
       Hexagon()
@@ -31,7 +39,7 @@ struct MedalImage: View {
               .init(color: Color.Gold.primary, location: 0.35),
               .init(color: Color.Gold.secondary, location: 0.5),
               .init(color: Color.Gold.primary, location: 0.75),
-              .init(color: Color.Gold.secondary.opacity(0.8), location: 1.0),
+              .init(color: Color.Gold.secondary.opacity(0.8), location: 1.0)
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -55,24 +63,38 @@ struct MedalImage: View {
           y: 2
         )
         .frame(width: size * 0.9, height: size)
-      
+
       if let uiImage = photo {
         Image(uiImage: uiImage)
           .resizable()
           .scaledToFill()
           .frame(width: size * 0.72, height: size * 0.72)
           .clipShape(imageType.shape)
-          .shadow(
-            radius: 6,
-            x: 6,
-            y: 6
-          )
+          .shadow(radius: 6, x: 6, y: 6)
+      } else if let urlString, let url = URL(string: urlString) {
+        AsyncImage(url: url) { phase in
+          switch phase {
+          case .success(let image):
+            image
+              .resizable()
+              .scaledToFill()
+              .frame(width: size * 0.72, height: size * 0.72)
+              .clipShape(imageType.shape)
+              .shadow(radius: 6, x: 6, y: 6)
+          default:
+            placeholder
+          }
+        }
       } else {
-        Image(systemName: systemImageName)
-          .font(.system(size: size * 0.3, weight: .semibold))
-          .foregroundColor(Color.Gold.primary)
+        placeholder
       }
-    } // ZStack
+    }  // ZStack
+  }
+
+  private var placeholder: some View {
+    Image(systemName: systemImageName)
+      .font(.system(size: size * 0.3, weight: .semibold))
+      .foregroundColor(Color.Gold.primary)
   }
 }
 
@@ -80,9 +102,9 @@ struct MedalImage: View {
   VStack(spacing: 20) {
     MedalImage(photo: nil)
       .background(Color.Background.primary)
-    
+
     MedalImage(
-      photo: UIImage(named: "bmo-vancouver-marathon-2022")
+      photo: UIImage(named: "bmo-vancouver-marathon")
     )
     .background(Color.Background.primary)
   }
