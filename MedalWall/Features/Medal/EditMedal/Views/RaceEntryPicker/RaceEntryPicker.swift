@@ -61,6 +61,6 @@ struct RaceEntryPicker: View {
   }
 }
 
-#Preview(traits: .sampleData) {
+#Preview {
   RaceEntryPicker { _ in }
 }

@@ -77,7 +77,6 @@
 				Models/User/User.swift,
 				"Models/User/User+Computed.swift",
 				Models/User/UserName.swift,
-				Resources/DefaultDataSeeder.swift,
 				"Resources/SampleData/Medal+SampleData.swift",
 				"Resources/SampleData/Race+SampleData.swift",
 				Shared/Errors/AppError.swift,

@@ -5,7 +5,6 @@
 //  Created by Quien on 2025-12-02.
 //
 
-import SwiftData
 import SwiftUI
 
 struct SettingsView: View {

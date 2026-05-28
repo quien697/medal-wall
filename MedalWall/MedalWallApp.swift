@@ -8,7 +8,6 @@
 import FirebaseAuth
 import FirebaseCore
 import GoogleSignIn
-import SwiftData
 import SwiftUI
 
 @main
@@ -17,23 +16,6 @@ struct MedalWallApp: App {
   @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
   @AppStorage("appTheme") private var appTheme: AppTheme = .system
   @State private var userManager: UserManager?
-
-  var sharedModelContainer: ModelContainer = {
-    let schema = Schema([
-      //      Race.self,
-      //      RaceEdition.self,
-      //      RaceCategory.self,
-      //      Medal.self,
-      //      EventPhoto.self
-    ])
-    let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-    do {
-      return try ModelContainer(for: schema, configurations: [modelConfiguration])
-    } catch {
-      fatalError("Could not create ModelContainer: \(error)")
-    }
-  }()
 
   var body: some Scene {
     WindowGroup {
@@ -63,7 +45,6 @@ struct MedalWallApp: App {
         userManager = UserManager()
       }
     }  // WindowGroup
-    .modelContainer(sharedModelContainer)
     .onChange(of: scenePhase) { _, newPhase in
       if newPhase == .active {
         Task {

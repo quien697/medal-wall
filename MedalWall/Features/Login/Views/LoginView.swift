@@ -5,7 +5,6 @@
 //  Created by Quien on 2026-04-19.
 //
 
-import SwiftData
 import SwiftUI
 
 struct LoginView: View {
