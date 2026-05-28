@@ -1,6 +1,6 @@
 # Medal Wall
 
-![iOS](https://img.shields.io/badge/iOS-26-blue.svg) ![Swift](https://img.shields.io/badge/Swift-6-orange.svg) ![SwiftUI](https://img.shields.io/badge/SwiftUI-brightgreen.svg) ![Xcode](https://img.shields.io/badge/Xcode-26.2-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![iOS](https://img.shields.io/badge/iOS-26-blue.svg) ![Swift](https://img.shields.io/badge/Swift-6-orange.svg) ![SwiftUI](https://img.shields.io/badge/SwiftUI-brightgreen.svg) ![Firebase](https://img.shields.io/badge/Firebase-orange.svg) ![Xcode](https://img.shields.io/badge/Xcode-26.2-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
 It is a personal archive for every race I have completed.
 
@@ -10,7 +10,7 @@ It is a personal archive for every race I have completed.
 
 1. An iOS app for archiving race events and results.
 2. Allows users to manage races, track medals, and view detailed information for each event and achievement.
-3. Built with SwiftUI and SwiftData for local data persistence.
+3. Built with SwiftUI and backed by Firebase (Firestore + Auth + Storage).
 4. Follows MVVM architecture for clean separation of concerns.
 
 
@@ -20,7 +20,9 @@ It is a personal archive for every race I have completed.
 - iOS 26
 - Swift 6
 - SwiftUI
-- SwiftData - for local data storage
+- Firebase Firestore - cloud data persistence
+- Firebase Auth - authentication (Apple, Google, Email Link)
+- Firebase Storage - photo uploads
 - Swift Testing - unit & integration tests
 
 
