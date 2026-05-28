@@ -37,17 +37,19 @@ struct RaceEntryList: View {
           }  // VStack
         }  // HStack
 
-        VStack(alignment: .leading, spacing: 16) {
-          ForEach(raceEditions.sorted { $0.year > $1.year }) { edition in
-            RaceEntryEditionRow(
-              race: race,
-              edition: edition,
-              selection: $selection
-            )
+        if !raceEditions.isEmpty {
+          VStack(alignment: .leading, spacing: 16) {
+            ForEach(raceEditions.sorted { $0.year > $1.year }) { edition in
+              RaceEntryEditionRow(
+                race: race,
+                edition: edition,
+                selection: $selection
+              )
+            }
           }
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .surfaceStyle(vPadding: 12, hPadding: 12)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .surfaceStyle(vPadding: 12, hPadding: 12)
       }  // VStack
       .listRowSeparator(.hidden)
     }  // List

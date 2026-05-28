@@ -12,6 +12,7 @@ struct RaceEntryPicker: View {
   @State private var selection: RaceEntry?
   @State private var races: [Race] = []
   @State private var editions: [String: [RaceEdition]] = [:]
+  private let repository = RaceFirestoreRepository()
   let onSelect: (RaceEntry) -> Void
 
   var body: some View {
@@ -33,6 +34,13 @@ struct RaceEntryPicker: View {
       }
       .navigationTitle("Pick Race Entry")
       .navigationBarTitleDisplayMode(.inline)
+      .task {
+        guard let fetched = try? await repository.fetchRaces() else { return }
+        races = fetched
+        for race in fetched {
+          editions[race.id] = try? await repository.fetchEditions(raceId: race.id)
+        }
+      }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .cancel) {

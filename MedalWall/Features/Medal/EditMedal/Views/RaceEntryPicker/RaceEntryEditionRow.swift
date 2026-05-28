@@ -25,16 +25,23 @@ struct RaceEntryEditionRow: View {
           .foregroundStyle(Color.Text.tertiary)
       }  // HStack
 
-      FlowLayout(spacing: 8) {
-        ForEach(edition.distances.sorted(), id: \.self) { distance in
-          RaceEntryDistanceChip(
-            race: race,
-            edition: edition,
-            distance: distance,
-            selection: $selection
-          )
-        }
-      }  // FlowLayout
+      if !edition.distances.isEmpty {
+        FlowLayout(spacing: 8) {
+          ForEach(edition.distances.sorted(), id: \.self) { distance in
+            RaceEntryDistanceButton(
+              race: race,
+              edition: edition,
+              distance: distance,
+              selection: $selection
+            )
+          }
+        }  // FlowLayout
+      } else {
+        Text("No Distances")
+          .fontWeight(.semibold)
+          .foregroundStyle(Color.Text.secondary)
+          .padding(.vertical, 6)
+      }
     }  // VStack
   }
 }

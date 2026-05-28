@@ -1,5 +1,5 @@
 //
-//  RaceEntryDistanceChip.swift
+//  RaceEntryDistanceButton.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-04-16.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RaceEntryDistanceChip: View {
+struct RaceEntryDistanceButton: View {
   let race: Race
   let edition: RaceEdition
   let distance: RaceDistance
@@ -45,14 +45,14 @@ struct RaceEntryDistanceChip: View {
   let edition = RaceEdition.taipei2019
   let distance = edition.distances.first!
 
-  RaceEntryDistanceChip(
+  RaceEntryDistanceButton(
     race: race,
     edition: edition,
     distance: distance,
     selection: .constant(nil)
   )
 
-  RaceEntryDistanceChip(
+  RaceEntryDistanceButton(
     race: race,
     edition: edition,
     distance: distance,
