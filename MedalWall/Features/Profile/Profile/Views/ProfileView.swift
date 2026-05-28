@@ -26,11 +26,11 @@ struct ProfileView: View {
         )
 
         ProfileSummarySection(
-          totalMedals: viewModel.totalMedals(viewModel.medals),
-          fullCount: viewModel.fullCount(viewModel.medals),
-          halfCount: viewModel.halfCount(viewModel.medals),
-          bestFullTime: viewModel.bestFullTime(viewModel.medals),
-          bestHalfTime: viewModel.bestHalfTime(viewModel.medals)
+          totalMedals: viewModel.totalMedals,
+          fullCount: viewModel.fullCount,
+          halfCount: viewModel.halfCount,
+          bestFullTime: viewModel.bestFullTime,
+          bestHalfTime: viewModel.bestHalfTime
         )
 
         .padding(.bottom, 10)

@@ -20,6 +20,9 @@ final class MedalsViewModel {
   private let repository = MedalFirestoreRepository()
 
   // MARK: - Computed
+  var totalCount: Int { medals.count }
+  var fullCount: Int { medals.fullCount }
+  var halfCount: Int { medals.halfCount }
 
   let gridSpacing: CGFloat = 16
 
@@ -28,18 +31,6 @@ final class MedalsViewModel {
       repeating: GridItem(.flexible(minimum: 80), spacing: gridSpacing),
       count: 2
     )
-  }
-
-  func totalCount(_ medals: [Medal]) -> Int {
-    medals.count
-  }
-
-  func fullCount(_ medals: [Medal]) -> Int {
-    medals.filter { $0.distance.category == .full }.count
-  }
-
-  func halfCount(_ medals: [Medal]) -> Int {
-    medals.filter { $0.distance.category == .half }.count
   }
 
   // MARK: - Functions

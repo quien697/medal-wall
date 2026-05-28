@@ -29,9 +29,9 @@ struct MedalsView: View {
         } else {
           ScrollView {
             MedalStatsSection(
-              totalCount: viewModel.totalCount(viewModel.medals),
-              fullCount: viewModel.fullCount(viewModel.medals),
-              halfCount: viewModel.halfCount(viewModel.medals)
+              totalCount: viewModel.totalCount,
+              fullCount: viewModel.fullCount,
+              halfCount: viewModel.halfCount
             )
 
             MedalGridSection(
