@@ -189,8 +189,10 @@ struct EditRaceEditionView: View {
         AddDistanceView { newDistance in
           do {
             try viewModel.addDistance(newDistance)
+          } catch let appError as AppError {
+            errorWrapper = ErrorWrapper(error: appError)
           } catch {
-            errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
+            errorWrapper = ErrorWrapper(error: AppError.unknown)
           }
         }
         .presentationDetents([.medium])

@@ -120,8 +120,11 @@ final class EditRaceEditionViewModel {
     }
   }
 
-  /// Appends a distance to the list, throwing if it is already present.
+  /// Appends a distance to the list, throwing if the custom value is zero/negative or if it is already present.
   func addDistance(_ distance: RaceDistance) throws {
+    if case .custom(let value) = distance.category, value <= 0 {
+      throw AppError.invalidDistance
+    }
     guard !distances.contains(distance) else { throw AppError.duplicateDistance }
     distances.append(distance)
   }
