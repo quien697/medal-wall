@@ -172,7 +172,7 @@ struct DraftRaceEditionTests {
       distances: [], createdBy: createdBy
     )
 
-    let expected = day.formatted(.dateTime.month().day())
+    let expected = day.formattedMonthDay()
     #expect(draft.dateDisplayLabel == expected)
   }
 
@@ -186,8 +186,7 @@ struct DraftRaceEditionTests {
       distances: [], createdBy: createdBy
     )
 
-    let expected =
-      "\(start.formatted(.dateTime.month().day())), \(end.formatted(.dateTime.month().day()))"
+    let expected = "\(start.formattedMonthDay()), \(end.formattedMonthDay())"
     #expect(draft.dateDisplayLabel == expected)
   }
 
@@ -201,7 +200,7 @@ struct DraftRaceEditionTests {
       distances: [], createdBy: createdBy
     )
 
-    #expect(draft.dateDisplayLabel == start.formatted(.dateTime.month().day()))
+    #expect(draft.dateDisplayLabel == start.formattedMonthDay())
   }
 
   @Test("dateDisplayLabel shows the same date twice when isOneDay is false but dates are equal")
@@ -213,7 +212,7 @@ struct DraftRaceEditionTests {
       distances: [], createdBy: createdBy
     )
 
-    let formatted = day.formatted(.dateTime.month().day())
+    let formatted = day.formattedMonthDay()
     #expect(draft.dateDisplayLabel == "\(formatted), \(formatted)")
   }
 }

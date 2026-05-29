@@ -85,6 +85,7 @@
 				Services/StorageService.swift,
 				Shared/Errors/AppError.swift,
 				Shared/Errors/ErrorWrapper.swift,
+				"Shared/Extensions/Date+Extensions.swift",
 				"Shared/Extensions/UIImage+Extensions.swift",
 				Shared/UIModels/ItemEditMode.swift,
 			);

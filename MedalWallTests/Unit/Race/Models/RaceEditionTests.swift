@@ -48,7 +48,7 @@ struct RaceEditionTests {
     let day = Date(timeIntervalSinceReferenceDate: 0)
     let edition = makeEdition(startDate: day, endDate: day)
 
-    let expected = day.formatted(.dateTime.month().day())
+    let expected = day.formattedMonthDay()
     #expect(edition.dateDisplayLabel == expected)
   }
 
@@ -58,8 +58,7 @@ struct RaceEditionTests {
     let end = start.addingTimeInterval(86400)
     let edition = makeEdition(startDate: start, endDate: end)
 
-    let expected =
-      "\(start.formatted(.dateTime.month().day())), \(end.formatted(.dateTime.month().day()))"
+    let expected = "\(start.formattedMonthDay()), \(end.formattedMonthDay())"
     #expect(edition.dateDisplayLabel == expected)
   }
 }
