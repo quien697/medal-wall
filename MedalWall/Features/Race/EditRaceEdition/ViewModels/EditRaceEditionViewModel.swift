@@ -47,8 +47,10 @@ final class EditRaceEditionViewModel {
       let currentYear = Calendar.current.component(.year, from: Date())
       self.year = currentYear
       self.isOneDay = true
-      self.startDate = Date(timeIntervalSinceReferenceDate: 0)
-      self.endDate = Date(timeIntervalSinceReferenceDate: 0)
+      let startOfYear =
+        Calendar.current.date(from: DateComponents(year: currentYear, month: 1, day: 1)) ?? Date()
+      self.startDate = startOfYear
+      self.endDate = startOfYear
       self.distances = []
     }
   }
