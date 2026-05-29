@@ -10,18 +10,21 @@ import SwiftUI
 struct EditDistanceView: View {
   // MARK: - Environment
   @Environment(\.dismiss) private var dismiss
+
   // MARK: - State
   @State private var draftDistance: RaceDistance
   @State private var customValue: Double
+  @State private var errorWrapper: ErrorWrapper?
+
   // MARK: - Properties
   let mode: ItemEditMode
-  let onAction: (RaceDistance) -> Void
+  let onAction: (RaceDistance) throws -> Void
 
   // MARK: - Init
   init(
     mode: ItemEditMode,
     distance: RaceDistance,
-    onAction: @escaping (RaceDistance) -> Void
+    onAction: @escaping (RaceDistance) throws -> Void
   ) {
     self.mode = mode
     self.draftDistance = distance
@@ -74,11 +77,20 @@ struct EditDistanceView: View {
 
         ToolbarItem(placement: .confirmationAction) {
           Button(role: .confirm) {
-            onAction(draftDistance)
-            dismiss()
+            do {
+              try onAction(draftDistance)
+              dismiss()
+            } catch let appError as AppError {
+              errorWrapper = ErrorWrapper(error: appError)
+            } catch {
+              errorWrapper = ErrorWrapper(error: AppError.unknown)
+            }
           }
         }
       }  // toolbar
+      .sheet(item: $errorWrapper) { wrapper in
+        ErrorView(errorWrapper: wrapper)
+      }
     }  // NavigationStack
   }
 }
