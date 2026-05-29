@@ -43,10 +43,10 @@ struct RaceComputedTests {
     #expect(race.fullWebsiteUrl == "https://example.com")
   }
 
-  @Test("fullWebsiteUrl prepends https when websiteUrl is an empty string")
+  @Test("fullWebsiteUrl is nil when websiteUrl is an empty string")
   func testFullWebsiteUrlEmptyString() {
     let race = Race(name: "Test Race", location: location, websiteUrl: "", createdBy: "user1")
 
-    #expect(race.fullWebsiteUrl == "https://")
+    #expect(race.fullWebsiteUrl == nil)
   }
 }
