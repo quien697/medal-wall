@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct MedalDetailStatsSection: View {
-  let columns: [GridItem]
-  let spacing: CGFloat
+  // MARK: - Properties
+  private let spacing: CGFloat = 10
   let finishTime: String
   let averagePace: String
   let overallPlacement: String
@@ -20,6 +20,15 @@ struct MedalDetailStatsSection: View {
   let genderPlacement: String
   let genderTotal: String
 
+  // MARK: - Computed
+  var columns: [GridItem] {
+    [GridItem](
+      repeating: GridItem(.flexible(minimum: 80), spacing: spacing),
+      count: 2
+    )
+  }
+
+  // MARK: - Body
   var body: some View {
     SectionContainer(title: "Stats") {
       LazyVGrid(columns: columns, spacing: spacing) {
@@ -66,8 +75,6 @@ struct MedalDetailStatsSection: View {
 #Preview {
   ScrollView {
     MedalDetailStatsSection(
-      columns: [GridItem](repeating: GridItem(.flexible(minimum: 80), spacing: 10), count: 2),
-      spacing: 10,
       finishTime: "5:10:10",
       averagePace: "5:31 / km",
       overallPlacement: "5000",
@@ -80,8 +87,6 @@ struct MedalDetailStatsSection: View {
     )
 
     MedalDetailStatsSection(
-      columns: [GridItem](repeating: GridItem(.flexible(minimum: 80), spacing: 10), count: 2),
-      spacing: 10,
       finishTime: "-- : -- : --",
       averagePace: "--'-- \"",
       overallPlacement: "--",

@@ -11,9 +11,6 @@ import SwiftUI
 final class MedalDetailViewModel {
   // MARK: - Properties
   var medal: Medal
-  let gridSpacing: CGFloat = 10
-  private let emptyWithDash: String = "-"
-  private let emptyString: String = ""
   private let repository = MedalFirestoreRepository()
 
   // MARK: - Init
@@ -22,15 +19,8 @@ final class MedalDetailViewModel {
   }
 
   // MARK: - Computed
-  var gridColumns: [GridItem] {
-    [GridItem](
-      repeating: GridItem(.flexible(minimum: 80), spacing: gridSpacing),
-      count: 2
-    )
-  }
-
   var finishTimeText: String {
-    guard let finishTime = medal.finishTime else { return emptyWithDash }
+    guard let finishTime = medal.finishTime else { return "-" }
     return finishTime.formattedHMS
   }
 
@@ -42,37 +32,37 @@ final class MedalDetailViewModel {
   }
 
   var overallPlacementText: String {
-    guard let placement = medal.overallPlacement else { return emptyWithDash }
+    guard let placement = medal.overallPlacement else { return "-" }
     return "\(placement)"
   }
 
   var totalParticipantsText: String {
-    guard let total = medal.totalParticipants else { return emptyString }
+    guard let total = medal.totalParticipants else { return "" }
     return "of \(total)"
   }
 
   var divisionText: String {
-    guard let division = medal.divisionEnum else { return emptyWithDash }
+    guard let division = medal.divisionEnum else { return "-" }
     return division.displayName
   }
 
   var divisionPlacementText: String {
-    guard let placement = medal.divisionPlacement else { return emptyWithDash }
+    guard let placement = medal.divisionPlacement else { return "-" }
     return "\(placement)"
   }
 
   var divisionTotalText: String {
-    guard let total = medal.divisionTotal else { return emptyString }
+    guard let total = medal.divisionTotal else { return "" }
     return "of \(total)"
   }
 
   var genderPlacementText: String {
-    guard let placement = medal.genderPlacement else { return emptyWithDash }
+    guard let placement = medal.genderPlacement else { return "-" }
     return "\(placement)"
   }
 
   var genderTotalText: String {
-    guard let total = medal.genderTotal else { return emptyString }
+    guard let total = medal.genderTotal else { return "" }
     return "of \(total)"
   }
 

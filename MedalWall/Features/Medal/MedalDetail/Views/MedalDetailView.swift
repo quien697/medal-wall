@@ -36,8 +36,6 @@ struct MedalDetailView: View {
       )
 
       MedalDetailStatsSection(
-        columns: viewModel.gridColumns,
-        spacing: viewModel.gridSpacing,
         finishTime: viewModel.finishTimeText,
         averagePace: viewModel.averagePaceText,
         overallPlacement: viewModel.overallPlacementText,
