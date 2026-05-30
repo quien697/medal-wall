@@ -68,7 +68,7 @@ struct UserNameTests {
   func testUserNameBridgesNilFirstName() {
     let user = User(uid: "u1", email: nil, firstName: nil, lastName: "Liu")
 
-    #expect(user.userName.firstName == "")
+    #expect(user.userName.firstName.isEmpty)
     #expect(user.userName.lastName == "Liu")
   }
 
@@ -77,6 +77,6 @@ struct UserNameTests {
     let user = User(uid: "u1", email: nil, firstName: "Quien", lastName: nil)
 
     #expect(user.userName.firstName == "Quien")
-    #expect(user.userName.lastName == "")
+    #expect(user.userName.lastName.isEmpty)
   }
 }

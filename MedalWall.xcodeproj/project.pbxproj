@@ -56,6 +56,9 @@
 		605C9AA02ECB0935007D3A96 /* Exceptions for "MedalWall" folder in "MedalWallTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Features/Medal/EditMedal/ViewModels/EditMedalViewModel.swift,
+				Features/Medal/MedalDetail/ViewModels/MedalDetailViewModel.swift,
+				Features/Medal/Models/DraftEventPhoto.swift,
 				Features/Profile/EditProfile/ViewModels/EditProfileViewModel.swift,
 				Features/Race/EditRace/ViewModels/EditRaceViewModel.swift,
 				Features/Race/EditRaceEdition/ViewModels/EditRaceEditionViewModel.swift,
@@ -67,6 +70,7 @@
 				Models/Medal/EventPhoto.swift,
 				Models/Medal/Medal.swift,
 				"Models/Medal/Medal+Computed.swift",
+				"Models/Medal/Medal+Stats.swift",
 				Models/Medal/RaceEntry.swift,
 				Models/Race/Race.swift,
 				"Models/Race/Race+Computed.swift",
@@ -79,6 +83,7 @@
 				Models/User/User.swift,
 				"Models/User/User+Computed.swift",
 				Models/User/UserName.swift,
+				Repositories/MedalFirestoreRepository.swift,
 				Repositories/RaceFirestoreRepository.swift,
 				"Resources/SampleData/Medal+SampleData.swift",
 				"Resources/SampleData/Race+SampleData.swift",
