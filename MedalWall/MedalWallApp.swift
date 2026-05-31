@@ -61,10 +61,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
-    let isTesting = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-    if !isTesting {
-      FirebaseApp.configure()
-    }
+    FirebaseApp.configure()
 
     return true
   }
