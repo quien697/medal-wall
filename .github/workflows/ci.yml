@@ -31,14 +31,11 @@ jobs:
 
       - name: Build
         run: |
-          # CODE_SIGNING_ALLOWED=NO: CI runners have no signing identity, so code signing must be disabled.
-          # xcpretty: formats xcodebuild's verbose output into readable pass/fail lines.
           xcodebuild build \
             -project MedalWall.xcodeproj \
             -scheme MedalWall \
             -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
-            CODE_SIGNING_ALLOWED=NO \
-            | xcpretty
+            CODE_SIGNING_ALLOWED=NO
 
       - name: Test
         run: |
@@ -47,8 +44,7 @@ jobs:
             -scheme MedalWall \
             -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=latest' \
             -resultBundlePath TestResults.xcresult \
-            CODE_SIGNING_ALLOWED=NO \
-            | xcpretty
+            CODE_SIGNING_ALLOWED=NO
 
       - name: Upload test results
         # Runs even when the previous step fails so test results are always available for debugging
