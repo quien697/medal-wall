@@ -12,10 +12,8 @@ jobs:
     runs-on: macos-15
 
     env:
-      # Pin to a specific Xcode version so CI uses the same toolchain as local development.
-      # macos-15 runners ship with an older Xcode by default; without this the build would
-      # use a different Swift/SDK version than the project targets.
       DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout
@@ -47,9 +45,9 @@ jobs:
             CODE_SIGNING_ALLOWED=NO
 
       - name: Upload test results
-        # Runs even when the previous step fails so test results are always available for debugging
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: TestResults
           path: TestResults.xcresult
+          if-no-files-found: ignore
