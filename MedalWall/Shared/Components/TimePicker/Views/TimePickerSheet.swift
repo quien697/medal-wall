@@ -66,10 +66,14 @@ struct TimePickerSheet: View {
 }
 
 #Preview {
+  @Previewable @State var duration = HMSDuration(3 * 3600 + 20 * 60 + 44)
+  @Previewable @State var value: TimeInterval?
+  @Previewable @State var isPresenting = true
+
   TimePickerSheet(
-    draftDuration: .constant(HMSDuration(3 * 3600 + 20 * 60 + 44)),
-    value: .constant(nil),
-    isPresenting: .constant(true),
+    draftDuration: $duration,
+    value: $value,
+    isPresenting: $isPresenting,
     title: "Finish Time",
     fontColor: .orange
   )

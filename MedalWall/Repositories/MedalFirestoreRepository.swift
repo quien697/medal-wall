@@ -9,7 +9,7 @@ import FirebaseFirestore
 import Foundation
 
 final class MedalFirestoreRepository {
-  private let db = Firestore.firestore()
+  private var db: Firestore { Firestore.firestore() }
 
   private func medalsRef(userId: String) -> CollectionReference {
     db.collection("users").document(userId).collection("medals")

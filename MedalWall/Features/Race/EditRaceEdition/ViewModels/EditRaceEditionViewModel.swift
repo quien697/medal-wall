@@ -47,8 +47,10 @@ final class EditRaceEditionViewModel {
       let currentYear = Calendar.current.component(.year, from: Date())
       self.year = currentYear
       self.isOneDay = true
-      self.startDate = Date()
-      self.endDate = Date()
+      let startOfYear =
+        Calendar.current.date(from: DateComponents(year: currentYear, month: 1, day: 1)) ?? Date()
+      self.startDate = startOfYear
+      self.endDate = startOfYear
       self.distances = []
     }
   }
@@ -120,8 +122,11 @@ final class EditRaceEditionViewModel {
     }
   }
 
-  /// Appends a distance to the list, throwing if it is already present.
+  /// Appends a distance to the list, throwing if the custom value is zero/negative or if it is already present.
   func addDistance(_ distance: RaceDistance) throws {
+    if case .custom(let value) = distance.category, value <= 0 {
+      throw AppError.invalidDistance
+    }
     guard !distances.contains(distance) else { throw AppError.duplicateDistance }
     distances.append(distance)
   }

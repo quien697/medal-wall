@@ -63,4 +63,20 @@ struct UserNameTests {
 
     #expect(name.fullName == "Liu")
   }
+
+  @Test("User.userName bridges nil firstName to empty string")
+  func testUserNameBridgesNilFirstName() {
+    let user = User(uid: "u1", email: nil, firstName: nil, lastName: "Liu")
+
+    #expect(user.userName.firstName.isEmpty)
+    #expect(user.userName.lastName == "Liu")
+  }
+
+  @Test("User.userName bridges nil lastName to empty string")
+  func testUserNameBridgesNilLastName() {
+    let user = User(uid: "u1", email: nil, firstName: "Quien", lastName: nil)
+
+    #expect(user.userName.firstName == "Quien")
+    #expect(user.userName.lastName.isEmpty)
+  }
 }

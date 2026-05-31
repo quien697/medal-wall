@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AddDistanceView: View {
-  let onSave: (RaceDistance) -> Void
+  let onSave: (RaceDistance) throws -> Void
 
   var body: some View {
     EditDistanceView(

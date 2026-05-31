@@ -78,17 +78,23 @@ struct EditRaceEditionDateSection: View {
 }
 
 #Preview {
+  let calendar = Calendar.current
+  let jan1 = calendar.date(from: DateComponents(year: 2026, month: 1, day: 1))!
+  let jun15 = calendar.date(from: DateComponents(year: 2026, month: 6, day: 15))!
+  let dec31 = calendar.date(from: DateComponents(year: 2026, month: 12, day: 31))!
+  let yearRange = jan1...dec31
+
   Form {
     EditRaceEditionDateSection(
       isOneDay: true,
       year: .constant(2026),
-      startDate: .constant(Date()),
-      endDate: .constant(Date()),
+      startDate: .constant(jan1),
+      endDate: .constant(jan1),
       minYear: 1911,
       maxYear: 2060,
-      yearDateRange: Date()...Date(),
-      minEndDate: Date(),
-      maxEndDate: Date(),
+      yearDateRange: yearRange,
+      minEndDate: jan1,
+      maxEndDate: dec31,
       onToggleOneDay: {},
       onUpdateYear: { _ in },
       onUpdateStartDate: { _ in }
@@ -97,13 +103,13 @@ struct EditRaceEditionDateSection: View {
     EditRaceEditionDateSection(
       isOneDay: false,
       year: .constant(2026),
-      startDate: .constant(Date()),
-      endDate: .constant(Date()),
+      startDate: .constant(jan1),
+      endDate: .constant(jun15),
       minYear: 1911,
       maxYear: 2060,
-      yearDateRange: Date()...Date(),
-      minEndDate: Date(),
-      maxEndDate: Date(),
+      yearDateRange: yearRange,
+      minEndDate: jan1,
+      maxEndDate: dec31,
       onToggleOneDay: {},
       onUpdateYear: { _ in },
       onUpdateStartDate: { _ in }

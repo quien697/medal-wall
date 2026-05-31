@@ -187,11 +187,7 @@ struct EditRaceEditionView: View {
       )
       .sheet(isPresented: $isPresentingAddDistance) {
         AddDistanceView { newDistance in
-          do {
-            try viewModel.addDistance(newDistance)
-          } catch {
-            errorWrapper = ErrorWrapper(error: AppError.duplicateDistance)
-          }
+          try viewModel.addDistance(newDistance)
         }
         .presentationDetents([.medium])
       }

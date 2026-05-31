@@ -55,7 +55,11 @@ struct DraftRaceEdition: Identifiable {
 
   /// Creates a new draft with no Firestore backing.
   init(
-    year: Int, isOneDay: Bool, startDate: Date, endDate: Date, distances: [RaceDistance],
+    year: Int,
+    isOneDay: Bool,
+    startDate: Date,
+    endDate: Date,
+    distances: [RaceDistance],
     createdBy: String
   ) {
     self.id = UUID().uuidString
@@ -83,8 +87,8 @@ struct DraftRaceEdition: Identifiable {
   }
 
   var dateDisplayLabel: String {
-    let start = startDate.formatted(.dateTime.month().day())
-    let end = ", \(endDate.formatted(.dateTime.month().day()))"
+    let start = startDate.formattedMonthDay()
+    let end = ", \(endDate.formattedMonthDay())"
     return "\(start)\(isOneDay ? "" : end)"
   }
 }

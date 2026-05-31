@@ -7,7 +7,7 @@
 
 extension Race {
   var fullWebsiteUrl: String? {
-    guard let url = websiteUrl else { return nil }
+    guard let url = websiteUrl, !url.isEmpty else { return nil }
     return url.hasPrefix("http://") || url.hasPrefix("https://") ? url : "https://\(url)"
   }
 }

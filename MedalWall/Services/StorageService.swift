@@ -9,7 +9,7 @@
 import UIKit
 
 final class StorageService {
-  private let storage = Storage.storage()
+  private var storage: Storage { Storage.storage() }
 
   // MARK: - Paths
   private enum Path {

@@ -38,6 +38,7 @@ enum AppError: LocalizedError, Identifiable, Equatable {
   // Validation Errors
   case duplicateEdition
   case duplicateDistance
+  case invalidDistance
 
   // Media Errors
   case photoLoadFailed
@@ -80,6 +81,8 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "Duplicate Edition"
     case .duplicateDistance:
       "Duplicate Distance"
+    case .invalidDistance:
+      "Invalid Distance"
     case .photoLoadFailed:
       "Photo Load Failed"
     case .photoDataInvalid:
@@ -132,6 +135,8 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "An edition with the same year already exists."
     case .duplicateDistance:
       "This distance already exists."
+    case .invalidDistance:
+      "Distance must be greater than zero."
     case .photoLoadFailed:
       "We couldn't load this photo."
     case .photoDataInvalid:
@@ -173,6 +178,8 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "Please choose a different year or edit the existing edition."
     case .duplicateDistance:
       "Please try selecting a different distance or type."
+    case .invalidDistance:
+      "Please enter a distance greater than 0 km."
     case .photoLoadFailed:
       "Please try selecting the image again."
     case .photoDataInvalid:
