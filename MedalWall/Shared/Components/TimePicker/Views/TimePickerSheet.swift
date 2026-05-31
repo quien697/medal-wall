@@ -67,7 +67,7 @@ struct TimePickerSheet: View {
 
 #Preview {
   @Previewable @State var duration = HMSDuration(3 * 3600 + 20 * 60 + 44)
-  @Previewable @State var value: TimeInterval? = nil
+  @Previewable @State var value: TimeInterval?
   @Previewable @State var isPresenting = true
 
   TimePickerSheet(

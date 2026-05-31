@@ -26,7 +26,7 @@ struct EditMedalResultSection: View {
 }
 
 #Preview {
-  @Previewable @State var noTime: TimeInterval? = nil
+  @Previewable @State var noTime: TimeInterval?
   @Previewable @State var withTime: TimeInterval? = 5 * 3600 + 10 * 60 + 1
 
   Form {
