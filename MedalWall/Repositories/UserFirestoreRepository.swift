@@ -9,7 +9,7 @@ import FirebaseFirestore
 import Foundation
 
 final class UserFirestoreRepository {
-  private let db = Firestore.firestore()
+  private var db: Firestore { Firestore.firestore() }
   private let collection = "users"
 
   /// Fetches the user document. Returns nil if the document does not exist.
