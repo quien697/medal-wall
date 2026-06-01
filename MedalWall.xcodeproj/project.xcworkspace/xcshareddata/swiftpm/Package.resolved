@@ -1,5 +1,5 @@
 {
-  "originHash" : "fc056ca7916ed818ce8cf28eaf37caf5bd27786a890a91807960ad4069819601",
+  "originHash" : "2a06b3f4c2933209b1248da07734f4348e2843bcba4bdbdf7138affe3692368c",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "145104f5ea9d58ae21b60add007c33c1cc0c948e",
         "version" : "2.0.0"
+      }
+    },
+    {
+      "identity" : "cropimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/quien697/CropImage",
+      "state" : {
+        "revision" : "91eadf802d96df346a7cae450ee55051fc672ae1",
+        "version" : "1.0.0"
       }
     },
     {
