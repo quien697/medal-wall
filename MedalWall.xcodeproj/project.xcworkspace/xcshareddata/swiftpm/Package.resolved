@@ -1,5 +1,5 @@
 {
-  "originHash" : "2a06b3f4c2933209b1248da07734f4348e2843bcba4bdbdf7138affe3692368c",
+  "originHash" : "b13e49f236ef6fa9726de976252be5ffbbeda19afd687761208256667ddc705e",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -143,6 +143,15 @@
       "state" : {
         "revision" : "b7e1104502eca3a213b46303391ca4d3bc8ddec1",
         "version" : "2.30910.0"
+      }
+    },
+    {
+      "identity" : "photoviewer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/quien697/PhotoViewer",
+      "state" : {
+        "revision" : "a9d1bce93f577883638071f4453f81fc51edd479",
+        "version" : "1.0.0"
       }
     },
     {

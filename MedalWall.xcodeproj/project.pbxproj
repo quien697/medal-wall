@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		606AFD312FD425E000EF30D3 /* PhotoViewer in Frameworks */ = {isa = PBXBuildFile; productRef = 606AFD302FD425E000EF30D3 /* PhotoViewer */; };
 		60B195D52FA745CF0073D440 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 60B195D42FA745CF0073D440 /* GoogleSignIn */; };
 		60B195D72FA745CF0073D440 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 60B195D62FA745CF0073D440 /* GoogleSignInSwift */; };
 		60CEDF7A2FCDEA290036E0F2 /* CropImage in Frameworks */ = {isa = PBXBuildFile; productRef = 60CEDF792FCDEA290036E0F2 /* CropImage */; };
@@ -151,6 +152,7 @@
 				60D5AC0D2FA08AC7005D816E /* FirebasePerformance in Frameworks */,
 				60D5ABF72FA08AC7005D816E /* FirebaseCore in Frameworks */,
 				60D5ABEF2FA08AC7005D816E /* FirebaseAppCheck in Frameworks */,
+				606AFD312FD425E000EF30D3 /* PhotoViewer in Frameworks */,
 				60D5ABEB2FA08AC7005D816E /* FirebaseAnalyticsCore in Frameworks */,
 				60D5AC012FA08AC7005D816E /* FirebaseFunctions in Frameworks */,
 				60D5ABF32FA08AC7005D816E /* FirebaseAuth in Frameworks */,
@@ -235,6 +237,7 @@
 				60B195D42FA745CF0073D440 /* GoogleSignIn */,
 				60B195D62FA745CF0073D440 /* GoogleSignInSwift */,
 				60CEDF792FCDEA290036E0F2 /* CropImage */,
+				606AFD302FD425E000EF30D3 /* PhotoViewer */,
 			);
 			productName = MedalWall;
 			productReference = 60B570B02EA616C8000B3FDE /* MedalWall.app */;
@@ -295,6 +298,7 @@
 				60D5ABE32FA08AC7005D816E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				60B195D32FA745CF0073D440 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				60CEDF782FCDEA290036E0F2 /* XCRemoteSwiftPackageReference "CropImage" */,
+				606AFD2F2FD425E000EF30D3 /* XCRemoteSwiftPackageReference "PhotoViewer" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 60B570B12EA616C8000B3FDE /* Products */;
@@ -649,6 +653,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		606AFD2F2FD425E000EF30D3 /* XCRemoteSwiftPackageReference "PhotoViewer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/quien697/PhotoViewer";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		60B195D32FA745CF0073D440 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
@@ -676,6 +688,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		606AFD302FD425E000EF30D3 /* PhotoViewer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 606AFD2F2FD425E000EF30D3 /* XCRemoteSwiftPackageReference "PhotoViewer" */;
+			productName = PhotoViewer;
+		};
 		60B195D42FA745CF0073D440 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 60B195D32FA745CF0073D440 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;

@@ -5,6 +5,7 @@
 //  Created by Quien on 2026-04-07.
 //
 
+import PhotoViewer
 import SwiftUI
 
 struct MedalDetailEventPhotosSection: View {
