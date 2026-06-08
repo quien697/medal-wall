@@ -1,5 +1,5 @@
 {
-  "originHash" : "fc056ca7916ed818ce8cf28eaf37caf5bd27786a890a91807960ad4069819601",
+  "originHash" : "2f449467b3f46fdfa08980fde38fac38469cc1a069f2489c8afae1f03b6e93cb",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "145104f5ea9d58ae21b60add007c33c1cc0c948e",
         "version" : "2.0.0"
+      }
+    },
+    {
+      "identity" : "cropimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/quien697/CropImage",
+      "state" : {
+        "revision" : "91eadf802d96df346a7cae450ee55051fc672ae1",
+        "version" : "1.0.0"
       }
     },
     {
@@ -137,12 +146,30 @@
       }
     },
     {
+      "identity" : "photoviewer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/quien697/PhotoViewer",
+      "state" : {
+        "revision" : "a9d1bce93f577883638071f4453f81fc51edd479",
+        "version" : "1.0.0"
+      }
+    },
+    {
       "identity" : "promises",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/promises.git",
       "state" : {
         "revision" : "540318ecedd63d883069ae7f1ed811a2df00b6ac",
         "version" : "2.4.0"
+      }
+    },
+    {
+      "identity" : "timepicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/quien697/TimePicker",
+      "state" : {
+        "revision" : "cc0e57fa47f61d60ef3e725a7e2adf7d45687380",
+        "version" : "1.0.0"
       }
     }
   ],

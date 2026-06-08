@@ -5,6 +5,7 @@
 //  Created by Quien on 2026-03-24.
 //
 
+import CropImage
 import PhotosUI
 import SwiftUI
 

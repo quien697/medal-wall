@@ -7,9 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		606AFD312FD425E000EF30D3 /* PhotoViewer in Frameworks */ = {isa = PBXBuildFile; productRef = 606AFD302FD425E000EF30D3 /* PhotoViewer */; };
 		60B195D52FA745CF0073D440 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 60B195D42FA745CF0073D440 /* GoogleSignIn */; };
 		60B195D72FA745CF0073D440 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 60B195D62FA745CF0073D440 /* GoogleSignInSwift */; };
+		60CEDF7A2FCDEA290036E0F2 /* CropImage in Frameworks */ = {isa = PBXBuildFile; productRef = 60CEDF792FCDEA290036E0F2 /* CropImage */; };
 		60D2C09E2EA7CFEC000A6C4A /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 60D2C09D2EA7CFEC000A6C4A /* README.md */; };
+		60D4C5482FD6C40E008DFA1D /* TimePicker in Frameworks */ = {isa = PBXBuildFile; productRef = 60D4C5472FD6C40E008DFA1D /* TimePicker */; };
 		60D5ABE52FA08AC7005D816E /* FirebaseAI in Frameworks */ = {isa = PBXBuildFile; productRef = 60D5ABE42FA08AC7005D816E /* FirebaseAI */; };
 		60D5ABE72FA08AC7005D816E /* FirebaseAILogic in Frameworks */ = {isa = PBXBuildFile; productRef = 60D5ABE62FA08AC7005D816E /* FirebaseAILogic */; };
 		60D5ABE92FA08AC7005D816E /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 60D5ABE82FA08AC7005D816E /* FirebaseAnalytics */; };
@@ -138,17 +141,20 @@
 				60D5ABE52FA08AC7005D816E /* FirebaseAI in Frameworks */,
 				60D5ABF92FA08AC7005D816E /* FirebaseCrashlytics in Frameworks */,
 				60D5AC032FA08AC7005D816E /* FirebaseFunctionsCombine-Community in Frameworks */,
+				60D4C5482FD6C40E008DFA1D /* TimePicker in Frameworks */,
 				60D5AC132FA08AC7005D816E /* FirebaseStorageCombine-Community in Frameworks */,
 				60D5ABFB2FA08AC7005D816E /* FirebaseDatabase in Frameworks */,
 				60D5AC112FA08AC7005D816E /* FirebaseStorage in Frameworks */,
 				60D5AC0F2FA08AC7005D816E /* FirebaseRemoteConfig in Frameworks */,
 				60D5ABE92FA08AC7005D816E /* FirebaseAnalytics in Frameworks */,
+				60CEDF7A2FCDEA290036E0F2 /* CropImage in Frameworks */,
 				60B195D52FA745CF0073D440 /* GoogleSignIn in Frameworks */,
 				60D5AC0B2FA08AC7005D816E /* FirebaseMessaging in Frameworks */,
 				60D5AC092FA08AC7005D816E /* FirebaseMLModelDownloader in Frameworks */,
 				60D5AC0D2FA08AC7005D816E /* FirebasePerformance in Frameworks */,
 				60D5ABF72FA08AC7005D816E /* FirebaseCore in Frameworks */,
 				60D5ABEF2FA08AC7005D816E /* FirebaseAppCheck in Frameworks */,
+				606AFD312FD425E000EF30D3 /* PhotoViewer in Frameworks */,
 				60D5ABEB2FA08AC7005D816E /* FirebaseAnalyticsCore in Frameworks */,
 				60D5AC012FA08AC7005D816E /* FirebaseFunctions in Frameworks */,
 				60D5ABF32FA08AC7005D816E /* FirebaseAuth in Frameworks */,
@@ -232,6 +238,9 @@
 				60D5AC122FA08AC7005D816E /* FirebaseStorageCombine-Community */,
 				60B195D42FA745CF0073D440 /* GoogleSignIn */,
 				60B195D62FA745CF0073D440 /* GoogleSignInSwift */,
+				60CEDF792FCDEA290036E0F2 /* CropImage */,
+				606AFD302FD425E000EF30D3 /* PhotoViewer */,
+				60D4C5472FD6C40E008DFA1D /* TimePicker */,
 			);
 			productName = MedalWall;
 			productReference = 60B570B02EA616C8000B3FDE /* MedalWall.app */;
@@ -291,6 +300,9 @@
 			packageReferences = (
 				60D5ABE32FA08AC7005D816E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				60B195D32FA745CF0073D440 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				60CEDF782FCDEA290036E0F2 /* XCRemoteSwiftPackageReference "CropImage" */,
+				606AFD2F2FD425E000EF30D3 /* XCRemoteSwiftPackageReference "PhotoViewer" */,
+				60D4C5462FD6C40E008DFA1D /* XCRemoteSwiftPackageReference "TimePicker" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 60B570B12EA616C8000B3FDE /* Products */;
@@ -645,12 +657,36 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		606AFD2F2FD425E000EF30D3 /* XCRemoteSwiftPackageReference "PhotoViewer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/quien697/PhotoViewer";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		60B195D32FA745CF0073D440 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 9.1.0;
+			};
+		};
+		60CEDF782FCDEA290036E0F2 /* XCRemoteSwiftPackageReference "CropImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/quien697/CropImage";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		60D4C5462FD6C40E008DFA1D /* XCRemoteSwiftPackageReference "TimePicker" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/quien697/TimePicker";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
 			};
 		};
 		60D5ABE32FA08AC7005D816E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
@@ -664,6 +700,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		606AFD302FD425E000EF30D3 /* PhotoViewer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 606AFD2F2FD425E000EF30D3 /* XCRemoteSwiftPackageReference "PhotoViewer" */;
+			productName = PhotoViewer;
+		};
 		60B195D42FA745CF0073D440 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 60B195D32FA745CF0073D440 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
@@ -673,6 +714,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 60B195D32FA745CF0073D440 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
+		};
+		60CEDF792FCDEA290036E0F2 /* CropImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 60CEDF782FCDEA290036E0F2 /* XCRemoteSwiftPackageReference "CropImage" */;
+			productName = CropImage;
+		};
+		60D4C5472FD6C40E008DFA1D /* TimePicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 60D4C5462FD6C40E008DFA1D /* XCRemoteSwiftPackageReference "TimePicker" */;
+			productName = TimePicker;
 		};
 		60D5ABE42FA08AC7005D816E /* FirebaseAI */ = {
 			isa = XCSwiftPackageProductDependency;
