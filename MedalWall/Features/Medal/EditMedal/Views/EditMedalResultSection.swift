@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TimePicker
 
 struct EditMedalResultSection: View {
   @Binding var finishTime: TimeInterval?
@@ -14,13 +15,12 @@ struct EditMedalResultSection: View {
     Section("Result") {
       TimePicker(
         "Finish Time",
-        fontColor: Color.Gold.primary,
-        fontWeight: .bold,
         selection: $finishTime
       ) {
         Text("Finish Time")
           .fromLabelStyle()
       }
+      .timePickerStyle(accentColor: Color.Gold.primary, fontWeight: .bold)
     }
   }
 }

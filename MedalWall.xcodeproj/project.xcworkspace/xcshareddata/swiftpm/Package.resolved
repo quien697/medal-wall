@@ -1,5 +1,5 @@
 {
-  "originHash" : "b13e49f236ef6fa9726de976252be5ffbbeda19afd687761208256667ddc705e",
+  "originHash" : "2f449467b3f46fdfa08980fde38fac38469cc1a069f2489c8afae1f03b6e93cb",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -161,6 +161,15 @@
       "state" : {
         "revision" : "540318ecedd63d883069ae7f1ed811a2df00b6ac",
         "version" : "2.4.0"
+      }
+    },
+    {
+      "identity" : "timepicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/quien697/TimePicker",
+      "state" : {
+        "revision" : "cc0e57fa47f61d60ef3e725a7e2adf7d45687380",
+        "version" : "1.0.0"
       }
     }
   ],
