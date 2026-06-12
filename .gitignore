@@ -93,8 +93,8 @@ iOSInjectionProject/
 .firebase/
 
 # AI Agent
-.claude/
 CLAUDE.local.md
+.claude/**/*.local.*
 
 # Secrets
 GoogleService-Info.plist

@@ -1,0 +1,26 @@
+{
+  "enabledPlugins": {
+    "swift-lsp@claude-plugins-official": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(xcodebuild test *)",
+      "Bash(xcodebuild build *)",
+      "Bash(xcodebuild -project *)",
+      "Bash(xcodebuild -scheme *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_TOOL_INPUT_FILE_PATH\" == *.swift ]]; then swiftlint lint --quiet \"$CLAUDE_TOOL_INPUT_FILE_PATH\"; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
