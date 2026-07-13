@@ -95,6 +95,7 @@ iOSInjectionProject/
 # AI Agent
 CLAUDE.local.md
 .claude/**/*.local.*
+.superpowers/
 
 # Secrets
 GoogleService-Info.plist
