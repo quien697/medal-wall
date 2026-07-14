@@ -60,6 +60,11 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Features/Medal/EditMedal/ViewModels/EditMedalViewModel.swift,
+				Managers/UserManager.swift,
+				Repositories/UserFirestoreRepository.swift,
+				Services/AuthService.swift,
+				Models/Achievement/AchievementProgress.swift,
+				Models/Achievement/AchievementTier.swift,
 				Features/Medal/MedalDetail/ViewModels/MedalDetailViewModel.swift,
 				Features/Medal/Models/DraftEventPhoto.swift,
 				Features/Profile/EditProfile/ViewModels/EditProfileViewModel.swift,
