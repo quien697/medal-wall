@@ -61,6 +61,32 @@ class UserManager {
     self.currentUser = updatedUser
   }
 
+  /// Ratchets the user's persisted milestone counts upward based on live medal
+  /// counts, never decreasing an already-earned tier. Call after a medal is
+  /// created or edited; never after a delete.
+  func refreshAchievementMilestones(medals: [Medal]) async {
+    guard let user = currentUser else { return }
+
+    let newFullMilestone = AchievementProgress.ratchetedMilestone(
+      persisted: user.highestFullMilestone ?? 0, liveCount: medals.fullCount)
+    let newHalfMilestone = AchievementProgress.ratchetedMilestone(
+      persisted: user.highestHalfMilestone ?? 0, liveCount: medals.halfCount)
+
+    guard
+      newFullMilestone != (user.highestFullMilestone ?? 0)
+        || newHalfMilestone != (user.highestHalfMilestone ?? 0)
+    else { return }
+
+    var updated = user
+    updated.highestFullMilestone = newFullMilestone
+    updated.highestHalfMilestone = newHalfMilestone
+
+    do {
+      try await repository.updateUser(updated)
+      self.currentUser = updated
+    } catch {}
+  }
+
   // MARK: - Private Functions
   /// Registers a Firebase Auth state listener; called once on init.
   private func addAuthListener() {
