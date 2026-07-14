@@ -124,7 +124,7 @@ struct EditMedalView: View {
 
               Task {
                 do {
-                  try await viewModel.save(by: userID)
+                  try await viewModel.save(by: userID, userManager: userManager)
                   dismiss()
                 } catch {
                   shouldDismiss = true
