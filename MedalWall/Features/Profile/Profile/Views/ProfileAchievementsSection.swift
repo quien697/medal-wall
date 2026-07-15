@@ -8,19 +8,23 @@
 import SwiftUI
 
 struct ProfileAchievementsSection: View {
+  let fullMarathonProgress: AchievementProgress
+  let halfMarathonProgress: AchievementProgress
+
   var body: some View {
     SectionContainer(title: "achievements") {
       VStack(spacing: 15) {
-        ProfileAchievementRow()
+        ProfileAchievementRow(trackName: "Full Marathon", progress: fullMarathonProgress)
 
-        ProfileAchievementRow()
-
-        ProfileAchievementRow()
+        ProfileAchievementRow(trackName: "Half Marathon", progress: halfMarathonProgress)
       }
     }
   }
 }
 
 #Preview {
-  ProfileAchievementsSection()
+  ProfileAchievementsSection(
+    fullMarathonProgress: AchievementProgress.compute(persistedMilestone: 10, liveCount: 10),
+    halfMarathonProgress: AchievementProgress.compute(persistedMilestone: 0, liveCount: 2)
+  )
 }
