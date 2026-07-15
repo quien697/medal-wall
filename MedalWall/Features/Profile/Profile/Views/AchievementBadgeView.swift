@@ -26,14 +26,14 @@ struct AchievementBadgeView: View {
       ForEach(0..<ringCount, id: \.self) { index in
         Circle()
           .strokeBorder(tintColor, lineWidth: 2)
-          .padding(CGFloat(index * 5))
+          .padding(CGFloat(index * 4))
       }  // ForEach
 
       Image(systemName: tier == nil ? "star" : "star.fill")
         .font(.title2)
         .foregroundStyle(tintColor)
     }  // ZStack
-    .frame(width: 56, height: 56)
+    .frame(width: 64, height: 64)
   }
 }
 
@@ -45,7 +45,7 @@ struct AchievementBadgeView: View {
   AchievementBadgeView(tier: .firstFinish)
 }
 
-#Preview("Tier 4 - Quarter Century") {
+#Preview("Tier 5 - Quarter Century") {
   AchievementBadgeView(tier: .quarterCentury)
 }
 
