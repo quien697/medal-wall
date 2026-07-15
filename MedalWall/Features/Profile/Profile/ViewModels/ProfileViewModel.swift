@@ -27,4 +27,16 @@ final class ProfileViewModel {
   func loadMedals(userId: String) async {
     medals = (try? await repository.fetchMedals(userId: userId)) ?? []
   }
+
+  /// Computes Full Marathon achievement progress from the loaded medals and the given user's persisted milestone.
+  func fullMarathonProgress(user: User?) -> AchievementProgress {
+    AchievementProgress.compute(
+      persistedMilestone: user?.highestFullMilestone ?? 0, liveCount: fullCount)
+  }
+
+  /// Computes Half Marathon achievement progress from the loaded medals and the given user's persisted milestone.
+  func halfMarathonProgress(user: User?) -> AchievementProgress {
+    AchievementProgress.compute(
+      persistedMilestone: user?.highestHalfMilestone ?? 0, liveCount: halfCount)
+  }
 }
