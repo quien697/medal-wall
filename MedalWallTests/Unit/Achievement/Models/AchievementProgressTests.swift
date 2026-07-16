@@ -67,6 +67,35 @@ struct AchievementProgressTests {
     #expect(progress.currentCount == 12)
   }
 
+  @Test("compute clamps negative inputs to zero")
+  func testComputeClampsNegativeInputs() {
+    let progress = AchievementProgress.compute(persistedMilestone: -5, liveCount: -3)
+
+    #expect(progress.unlockedTier == nil)
+    #expect(progress.nextTier == .firstFinish)
+    #expect(progress.currentCount == 0)
+    #expect(progress.isMaxed == false)
+  }
+
+  @Test("compute clamps a negative live count while keeping the persisted tier")
+  func testComputeClampsNegativeLiveCount() {
+    let progress = AchievementProgress.compute(persistedMilestone: 10, liveCount: -3)
+
+    #expect(progress.unlockedTier == .perfectTen)
+    #expect(progress.nextTier == .quarterCentury)
+    #expect(progress.currentCount == 0)
+  }
+
+  @Test("compute past the max tier keeps the live count and stays maxed")
+  func testComputeAboveMaxKeepsCount() {
+    let progress = AchievementProgress.compute(persistedMilestone: 100, liveCount: 120)
+
+    #expect(progress.unlockedTier == .centurion)
+    #expect(progress.nextTier == nil)
+    #expect(progress.currentCount == 120)
+    #expect(progress.isMaxed == true)
+  }
+
   // MARK: - ratchetedMilestone
   @Test("ratchetedMilestone never decreases the persisted value")
   func testRatchetNeverDecreases() {
@@ -92,6 +121,13 @@ struct AchievementProgressTests {
   @Test("ratchetedMilestone is zero when there are no medals yet")
   func testRatchetZeroMedals() {
     let result = AchievementProgress.ratchetedMilestone(persisted: 0, liveCount: 0)
+
+    #expect(result == 0)
+  }
+
+  @Test("ratchetedMilestone clamps negative inputs to zero")
+  func testRatchetClampsNegativeInputs() {
+    let result = AchievementProgress.ratchetedMilestone(persisted: -5, liveCount: -3)
 
     #expect(result == 0)
   }

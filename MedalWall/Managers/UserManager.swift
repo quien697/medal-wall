@@ -68,9 +68,13 @@ class UserManager {
     guard let user = currentUser else { return }
 
     let newFullMilestone = AchievementProgress.ratchetedMilestone(
-      persisted: user.highestFullMilestone ?? 0, liveCount: medals.fullCount)
+      persisted: user.highestFullMilestone ?? 0,
+      liveCount: medals.fullCount
+    )
     let newHalfMilestone = AchievementProgress.ratchetedMilestone(
-      persisted: user.highestHalfMilestone ?? 0, liveCount: medals.halfCount)
+      persisted: user.highestHalfMilestone ?? 0,
+      liveCount: medals.halfCount
+    )
 
     guard
       newFullMilestone != (user.highestFullMilestone ?? 0)

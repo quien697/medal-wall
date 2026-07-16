@@ -13,7 +13,7 @@ struct ProfileAchievementRow: View {
 
   var body: some View {
     HStack {
-      AchievementBadgeView(tier: progress.unlockedTier)
+      AchievementBadge(tier: progress.unlockedTier)
 
       VStack(alignment: .leading) {
         Text(trackName)
@@ -28,6 +28,12 @@ struct ProfileAchievementRow: View {
           ProgressView(value: Double(progress.currentCount), total: Double(nextTier.threshold))
 
           Text("\(progress.currentCount) of \(nextTier.threshold) \u{2192} \(nextTier.name)")
+            .font(.caption)
+            .foregroundStyle(Color.Text.tertiary)
+        } else if let unlockedTier = progress.unlockedTier {
+          ProgressView(value: Double(progress.currentCount), total: Double(unlockedTier.threshold))
+
+          Text("\(progress.currentCount) of \(unlockedTier.threshold)")
             .font(.caption)
             .foregroundStyle(Color.Text.tertiary)
         }
@@ -57,6 +63,6 @@ struct ProfileAchievementRow: View {
 #Preview("Maxed") {
   ProfileAchievementRow(
     trackName: "Full Marathon",
-    progress: AchievementProgress.compute(persistedMilestone: 100, liveCount: 100)
+    progress: AchievementProgress.compute(persistedMilestone: 100, liveCount: 120)
   )
 }

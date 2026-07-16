@@ -23,14 +23,16 @@ extension AchievementProgress {
   /// persisted value alone is what protects a tier against later medal
   /// deletion. Progress toward the next tier always uses the live count.
   nonisolated static func compute(persistedMilestone: Int, liveCount: Int) -> AchievementProgress {
-    let effectiveMilestone = max(persistedMilestone, liveCount)
+    let safeMilestone = max(0, persistedMilestone)
+    let safeCount = max(0, liveCount)
+    let effectiveMilestone = max(safeMilestone, safeCount)
     let unlockedTier = AchievementTier.allCases.last { $0.threshold <= effectiveMilestone }
     let nextTier = AchievementTier.allCases.first { $0.threshold > effectiveMilestone }
 
     return AchievementProgress(
       unlockedTier: unlockedTier,
       nextTier: nextTier,
-      currentCount: liveCount,
+      currentCount: safeCount,
       isMaxed: nextTier == nil
     )
   }

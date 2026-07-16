@@ -1,5 +1,5 @@
 //
-//  AchievementBadgeView.swift
+//  AchievementBadge.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-07-14.
@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Renders an evolving badge for an achievement tier — one more ring appears
 /// per successive tier. A nil tier renders the locked (not-yet-unlocked) state.
-struct AchievementBadgeView: View {
+struct AchievementBadge: View {
   let tier: AchievementTier?
 
   private var ringCount: Int {
@@ -38,17 +38,17 @@ struct AchievementBadgeView: View {
 }
 
 #Preview("Locked") {
-  AchievementBadgeView(tier: nil)
+  AchievementBadge(tier: nil)
 }
 
 #Preview("Tier 1 - First Finish") {
-  AchievementBadgeView(tier: .firstFinish)
+  AchievementBadge(tier: .firstFinish)
 }
 
 #Preview("Tier 5 - Quarter Century") {
-  AchievementBadgeView(tier: .quarterCentury)
+  AchievementBadge(tier: .quarterCentury)
 }
 
 #Preview("Tier 7 - Centurion") {
-  AchievementBadgeView(tier: .centurion)
+  AchievementBadge(tier: .centurion)
 }
