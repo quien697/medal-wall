@@ -19,6 +19,8 @@ struct User: Codable {
   var birthday: Date?
   let createdAt: Date
   var updatedAt: Date?
+  var highestFullMilestone: Int?
+  var highestHalfMilestone: Int?
 
   /// Creates a new User from Firebase Auth on first sign-in.
   /// firstName/lastName are seeded separately from the provider via UserDefaults.
@@ -33,6 +35,8 @@ struct User: Codable {
     birthday = nil
     createdAt = Date()
     updatedAt = nil
+    highestFullMilestone = nil
+    highestHalfMilestone = nil
   }
 
   /// Creates a User with explicit field values for use in previews and tests.
@@ -46,7 +50,9 @@ struct User: Codable {
     gender: Gender? = nil,
     birthday: Date? = nil,
     createdAt: Date = .now,
-    updatedAt: Date? = nil
+    updatedAt: Date? = nil,
+    highestFullMilestone: Int? = nil,
+    highestHalfMilestone: Int? = nil
   ) {
     self.uid = uid
     self.email = email
@@ -58,5 +64,7 @@ struct User: Codable {
     self.birthday = birthday
     self.createdAt = createdAt
     self.updatedAt = updatedAt
+    self.highestFullMilestone = highestFullMilestone
+    self.highestHalfMilestone = highestHalfMilestone
   }
 }

@@ -8,31 +8,61 @@
 import SwiftUI
 
 struct ProfileAchievementRow: View {
+  let trackName: String
+  let progress: AchievementProgress
+
   var body: some View {
     HStack {
-      Image(systemName: "star")
-        .font(.title2)
+      AchievementBadge(tier: progress.unlockedTier)
 
       VStack(alignment: .leading) {
-        Text("Top 6")
+        Text(trackName)
           .font(.headline)
           .fontWeight(.bold)
 
-        Text("The 6 World Marathon Majors")
+        Text(progress.unlockedTier?.name ?? "Not started")
           .font(.footnote)
           .foregroundStyle(Color.Text.tertiary)
-      }
+
+        if let nextTier = progress.nextTier {
+          ProgressView(value: Double(progress.currentCount), total: Double(nextTier.threshold))
+
+          Text("\(progress.currentCount) of \(nextTier.threshold) \u{2192} \(nextTier.name)")
+            .font(.caption)
+            .foregroundStyle(Color.Text.tertiary)
+        } else if let unlockedTier = progress.unlockedTier {
+          ProgressView(value: Double(progress.currentCount), total: Double(unlockedTier.threshold))
+
+          Text("\(progress.currentCount) of \(unlockedTier.threshold)")
+            .font(.caption)
+            .foregroundStyle(Color.Text.tertiary)
+        }
+      }  // VStack
 
       Spacer()
-
-      Image(systemName: "checkmark.circle.fill")
-        .font(.title2)
-    }
+    }  // HStack
     .frame(maxWidth: .infinity)
     .surfaceStyle()
   }
 }
 
-#Preview {
-  ProfileAchievementRow()
+#Preview("Locked") {
+  ProfileAchievementRow(
+    trackName: "Full Marathon",
+    progress: AchievementProgress.compute(persistedMilestone: 0, liveCount: 0)
+  )
+}
+
+#Preview("In progress") {
+  ProfileAchievementRow(
+    trackName: "Half Marathon",
+    progress: AchievementProgress.compute(persistedMilestone: 5, liveCount: 7)
+  )
+}
+
+#Preview("Maxed") {
+  ProfileAchievementRow(
+    trackName: "Full Marathon",
+    progress: AchievementProgress.compute(persistedMilestone: 100, liveCount: 120)
+  )
 }

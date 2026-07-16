@@ -120,8 +120,9 @@ final class EditMedalViewModel {
     district = selection.race.location.district ?? ""
   }
 
-  /// Saves the medal to Firestore, uploading any new photos to Firebase Storage first.
-  func save(by userID: String) async throws {
+  /// Saves the medal to Firestore, uploading any new photos to Firebase Storage first,
+  /// then ratchets the user's achievement milestones based on the updated medal list.
+  func save(by userID: String, userManager: UserManager) async throws {
     isLoading = true
     defer { isLoading = false }
     let location = GeoLocation(
@@ -178,6 +179,11 @@ final class EditMedalViewModel {
       )
       try await repository.createMedal(newMedal)
     }
+
+    do {
+      let medals = try await repository.fetchMedals(userId: userID)
+      await userManager.refreshAchievementMilestones(medals: medals)
+    } catch {}
   }
 
   /// Returns the final cover photo URL — uploads a new image if one was selected, otherwise reuses the existing URL.
