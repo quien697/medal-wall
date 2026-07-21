@@ -1,7 +1,9 @@
 # races Specification
 
 ## Purpose
-TBD - created by archiving change baseline-current-capabilities. Update Purpose after archive.
+Let a signed-in user manage races and their per-year editions — full CRUD over `Race`
+and its `RaceEdition` subcollection — including manually cascading edition deletes, since
+Firestore does not cascade-delete subcollections.
 ## Requirements
 ### Requirement: Race Management
 The system SHALL allow a signed-in user to create, read, update, and delete a `Race`,

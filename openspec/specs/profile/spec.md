@@ -1,7 +1,8 @@
 # profile Specification
 
 ## Purpose
-TBD - created by archiving change baseline-current-capabilities. Update Purpose after archive.
+Let a signed-in user view and edit their personal profile, and surface race statistics
+computed on the fly from their medal list rather than stored on the `User` record.
 ## Requirements
 ### Requirement: Editable Profile
 The system SHALL allow a signed-in user to view and edit their profile: first name,

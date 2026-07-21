@@ -1,7 +1,8 @@
 # settings Specification
 
 ## Purpose
-TBD - created by archiving change baseline-current-capabilities. Update Purpose after archive.
+Hold the user's app-level preferences — currently the appearance mode (system/light/dark),
+applied immediately and stored locally on-device rather than synced.
 ## Requirements
 ### Requirement: Appearance Preference
 The system SHALL allow a user to choose an appearance mode — system, light, or dark —

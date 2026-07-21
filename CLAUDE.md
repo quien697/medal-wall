@@ -8,6 +8,14 @@
 - MVVM — Views → ViewModels → Repositories → Firebase
 - Firestore for all data; Firebase Storage for images (stored as download URLs on models)
 
+## Development Workflow
+Features and non-trivial fixes follow the combined OpenSpec + Superpowers loop:
+brainstorm → OpenSpec change (`proposal` + `design` + spec delta + `tasks`) → implement
+each task with TDD → verify → archive the change into `openspec/specs/`. OpenSpec owns
+the planning artifacts (one set per change, no parallel `docs/superpowers/` copy);
+Superpowers provides the discipline (brainstorming, TDD, verification). Skip OpenSpec
+for trivial changes. Full details: `docs/development-workflow.md`.
+
 ## Project Structure
 - `MedalWall/Features/` — self-contained feature folders, each with `Views/` and `ViewModels/`
 - `MedalWall/Models/` — `Codable` structs serialized to/from Firestore

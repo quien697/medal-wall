@@ -1,7 +1,9 @@
 # auth Specification
 
 ## Purpose
-TBD - created by archiving change baseline-current-capabilities. Update Purpose after archive.
+Authenticate users into MedalWall through multiple Firebase-backed sign-in methods
+(email link, Google, Apple), keep the local session honest by validating it against the
+server, and let users sign out.
 ## Requirements
 ### Requirement: Email Link Sign-In
 The system SHALL allow a user to sign in by requesting a sign-in link sent to their

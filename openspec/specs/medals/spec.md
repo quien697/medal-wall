@@ -1,7 +1,9 @@
 # medals Specification
 
 ## Purpose
-TBD - created by archiving change baseline-current-capabilities. Update Purpose after archive.
+Let a signed-in user record and manage their race medals — full CRUD over a `Medal`'s
+race details, results, photos, and event photo gallery — with every medal kept private
+to its owner.
 ## Requirements
 ### Requirement: Medal Record Management
 The system SHALL allow a signed-in user to create, read, update, and delete a `Medal`
