@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6035ADC63010B8C800551F72 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 6035ADC53010B8C800551F72 /* CachedAsyncImage */; };
 		606AFD312FD425E000EF30D3 /* PhotoViewer in Frameworks */ = {isa = PBXBuildFile; productRef = 606AFD302FD425E000EF30D3 /* PhotoViewer */; };
 		60B195D52FA745CF0073D440 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 60B195D42FA745CF0073D440 /* GoogleSignIn */; };
 		60B195D72FA745CF0073D440 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 60B195D62FA745CF0073D440 /* GoogleSignInSwift */; };
@@ -156,6 +157,7 @@
 				60B195D52FA745CF0073D440 /* GoogleSignIn in Frameworks */,
 				60D5AC0B2FA08AC7005D816E /* FirebaseMessaging in Frameworks */,
 				60D5AC092FA08AC7005D816E /* FirebaseMLModelDownloader in Frameworks */,
+				6035ADC63010B8C800551F72 /* CachedAsyncImage in Frameworks */,
 				60D5AC0D2FA08AC7005D816E /* FirebasePerformance in Frameworks */,
 				60D5ABF72FA08AC7005D816E /* FirebaseCore in Frameworks */,
 				60D5ABEF2FA08AC7005D816E /* FirebaseAppCheck in Frameworks */,
@@ -246,6 +248,7 @@
 				60CEDF792FCDEA290036E0F2 /* CropImage */,
 				606AFD302FD425E000EF30D3 /* PhotoViewer */,
 				60D4C5472FD6C40E008DFA1D /* TimePicker */,
+				6035ADC53010B8C800551F72 /* CachedAsyncImage */,
 			);
 			productName = MedalWall;
 			productReference = 60B570B02EA616C8000B3FDE /* MedalWall.app */;
@@ -308,6 +311,7 @@
 				60CEDF782FCDEA290036E0F2 /* XCRemoteSwiftPackageReference "CropImage" */,
 				606AFD2F2FD425E000EF30D3 /* XCRemoteSwiftPackageReference "PhotoViewer" */,
 				60D4C5462FD6C40E008DFA1D /* XCRemoteSwiftPackageReference "TimePicker" */,
+				6035ADC43010B8C800551F72 /* XCLocalSwiftPackageReference "../../../../../Libraries/iOS/CachedAsyncImage" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 60B570B12EA616C8000B3FDE /* Products */;
@@ -661,6 +665,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		6035ADC43010B8C800551F72 /* XCLocalSwiftPackageReference "../../../../../Libraries/iOS/CachedAsyncImage" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../../../../Libraries/iOS/CachedAsyncImage;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		606AFD2F2FD425E000EF30D3 /* XCRemoteSwiftPackageReference "PhotoViewer" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -705,6 +716,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		6035ADC53010B8C800551F72 /* CachedAsyncImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CachedAsyncImage;
+		};
 		606AFD302FD425E000EF30D3 /* PhotoViewer */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 606AFD2F2FD425E000EF30D3 /* XCRemoteSwiftPackageReference "PhotoViewer" */;
