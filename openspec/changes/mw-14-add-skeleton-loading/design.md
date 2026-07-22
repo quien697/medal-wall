@@ -4,7 +4,9 @@ Three shared components render remote images via `AsyncImage`: `RaceImage`, `Med
 and `AvatarImage`. Their loading (`.empty`) state is inconsistent — `RaceImage` and
 `AvatarImage` overlay a `ProgressView` spinner, while `MedalImage` shows its static gold
 icon. None of these match the final image's footprint, so the layout visibly shifts when
-the image arrives.
+the image arrives. A fourth surface, `MedalDetailEventPhotosSection`, renders event photos
+with its own inline `AsyncImage` whose loading state is a flat gray fill (no shimmer); it
+is not one of the shared components but gets the same treatment via `.shimmering()`.
 
 `ImageType` already encodes each image's `shape` (circle for avatar/medal, 16pt
 rounded-rect for race/event) and `size`, and the no-photo placeholder already fills with

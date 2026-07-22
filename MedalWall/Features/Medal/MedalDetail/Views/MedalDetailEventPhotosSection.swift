@@ -29,6 +29,9 @@ struct MedalDetailEventPhotosSection: View {
                 image
                   .resizable()
                   .aspectRatio(contentMode: .fill)
+              case .empty:
+                Color.Card.Background.tertiary
+                  .shimmering()
               default:
                 Color.gray.opacity(0.2)
               }

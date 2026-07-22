@@ -2,8 +2,8 @@
 
 ### Requirement: Shape-Matching Skeleton While Loading
 The system SHALL display, while a remote image is loading, a skeleton placeholder that
-matches the final image's shape and size, in place of a generic spinner. This applies to
-the race, medal, and avatar image components.
+matches the final image's shape and size, in place of a generic spinner or flat fill. This
+applies to the race, medal, and avatar image components and to medal event photos.
 
 #### Scenario: Race image loading
 - **WHEN** a race image is loading from a remote URL
@@ -18,6 +18,11 @@ the race, medal, and avatar image components.
 - **WHEN** an avatar image is loading from a remote URL
 - **THEN** the system shows a circular skeleton in the avatar's inner region, inside the
   avatar's existing gold ring
+
+#### Scenario: Medal event photo loading
+- **WHEN** a medal event photo is loading from a remote URL
+- **THEN** the system shows a rounded-rectangle skeleton at the event photo's thumbnail
+  size, in place of the flat gray fill
 
 ### Requirement: Animated Shimmer Treatment
 The system SHALL render the skeleton as a neutral fill with a highlight that sweeps across
