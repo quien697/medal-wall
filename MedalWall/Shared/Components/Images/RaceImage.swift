@@ -36,12 +36,14 @@ struct RaceImage: View {
         switch phase {
         case .success(let image):
           image.styled(as: imageType)
+        case .empty:
+          imageType.shape
+            .fill(Color.Card.Background.tertiary)
+            .frame(width: imageType.size.width, height: imageType.size.height)
+            .shimmering()
         default:
           Image(systemName: systemImageName)
             .placeholderStyled(as: imageType)
-            .overlay {
-              if case .empty = phase { ProgressView() }
-            }
         }
       }
     } else {

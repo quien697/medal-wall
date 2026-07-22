@@ -77,11 +77,13 @@ struct AvatarImage: View {
           } else if let urlString = photoUrl, let url = URL(string: urlString) {
             AsyncImage(url: url) { phase in
               switch phase {
-              case .empty:
-                ProgressView()
-                  .scaleEffect(imageType == .avatarThumbnail ? 0.6 : 1.0)
               case .success(let image):
                 image.styled(as: imageType)
+              case .empty:
+                imageType.shape
+                  .fill(Color.Card.Background.tertiary)
+                  .frame(width: imageType.size.width, height: imageType.size.height)
+                  .shimmering()
               default:
                 Image(systemName: systemImageName)
                   .font(.system(size: imageType.size.width / 2, weight: .semibold))

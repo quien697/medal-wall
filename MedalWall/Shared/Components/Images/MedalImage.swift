@@ -81,6 +81,11 @@ struct MedalImage: View {
               .frame(width: size * 0.72, height: size * 0.72)
               .clipShape(imageType.shape)
               .shadow(radius: 6, x: 6, y: 6)
+          case .empty:
+            imageType.shape
+              .fill(Color.Card.Background.tertiary)
+              .frame(width: size * 0.72, height: size * 0.72)
+              .shimmering()
           default:
             placeholder
           }
