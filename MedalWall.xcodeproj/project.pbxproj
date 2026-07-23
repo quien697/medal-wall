@@ -38,6 +38,7 @@
 		60D5AC0F2FA08AC7005D816E /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 60D5AC0E2FA08AC7005D816E /* FirebaseRemoteConfig */; };
 		60D5AC112FA08AC7005D816E /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 60D5AC102FA08AC7005D816E /* FirebaseStorage */; };
 		60D5AC132FA08AC7005D816E /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 60D5AC122FA08AC7005D816E /* FirebaseStorageCombine-Community */; };
+		60F2FFB03011E1BA000A96A7 /* CachedAsyncImage in Frameworks */ = {isa = PBXBuildFile; productRef = 60F2FFAF3011E1BA000A96A7 /* CachedAsyncImage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -145,6 +146,7 @@
 				60D5ABED2FA08AC7005D816E /* FirebaseAnalyticsIdentitySupport in Frameworks */,
 				60D5AC052FA08AC7005D816E /* FirebaseInAppMessaging-Beta in Frameworks */,
 				60D5ABE52FA08AC7005D816E /* FirebaseAI in Frameworks */,
+				60F2FFB03011E1BA000A96A7 /* CachedAsyncImage in Frameworks */,
 				60D5ABF92FA08AC7005D816E /* FirebaseCrashlytics in Frameworks */,
 				60D5AC032FA08AC7005D816E /* FirebaseFunctionsCombine-Community in Frameworks */,
 				60D4C5482FD6C40E008DFA1D /* TimePicker in Frameworks */,
@@ -249,6 +251,7 @@
 				606AFD302FD425E000EF30D3 /* PhotoViewer */,
 				60D4C5472FD6C40E008DFA1D /* TimePicker */,
 				6035ADC53010B8C800551F72 /* CachedAsyncImage */,
+				60F2FFAF3011E1BA000A96A7 /* CachedAsyncImage */,
 			);
 			productName = MedalWall;
 			productReference = 60B570B02EA616C8000B3FDE /* MedalWall.app */;
@@ -311,7 +314,7 @@
 				60CEDF782FCDEA290036E0F2 /* XCRemoteSwiftPackageReference "CropImage" */,
 				606AFD2F2FD425E000EF30D3 /* XCRemoteSwiftPackageReference "PhotoViewer" */,
 				60D4C5462FD6C40E008DFA1D /* XCRemoteSwiftPackageReference "TimePicker" */,
-				6035ADC43010B8C800551F72 /* XCLocalSwiftPackageReference "../../../../../Libraries/iOS/CachedAsyncImage" */,
+				60F2FFAE3011E1BA000A96A7 /* XCRemoteSwiftPackageReference "CachedAsyncImage" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 60B570B12EA616C8000B3FDE /* Products */;
@@ -665,13 +668,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		6035ADC43010B8C800551F72 /* XCLocalSwiftPackageReference "../../../../../Libraries/iOS/CachedAsyncImage" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../../../Libraries/iOS/CachedAsyncImage;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		606AFD2F2FD425E000EF30D3 /* XCRemoteSwiftPackageReference "PhotoViewer" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -711,6 +707,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 12.12.1;
+			};
+		};
+		60F2FFAE3011E1BA000A96A7 /* XCRemoteSwiftPackageReference "CachedAsyncImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/quien697/CachedAsyncImage";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -864,6 +868,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 60D5ABE32FA08AC7005D816E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = "FirebaseStorageCombine-Community";
+		};
+		60F2FFAF3011E1BA000A96A7 /* CachedAsyncImage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 60F2FFAE3011E1BA000A96A7 /* XCRemoteSwiftPackageReference "CachedAsyncImage" */;
+			productName = CachedAsyncImage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

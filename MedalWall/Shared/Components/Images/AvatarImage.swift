@@ -5,11 +5,12 @@
 //  Created by Quien on 2026-01-08.
 //
 
+import CachedAsyncImage
 import SwiftUI
 
 /// Circular avatar component with a gold gradient border.
 /// Use `init(photo:)` for a local `UIImage` (e.g. edit profile draft),
-/// or `init(photoUrl:)` for a remote URL loaded via `AsyncImage`.
+/// or `init(photoUrl:)` for a remote URL loaded via `CachedAsyncImage`.
 /// Falls back to a person placeholder when no image is available.
 struct AvatarImage: View {
   private let systemImageName: String = "person.fill"
@@ -75,7 +76,7 @@ struct AvatarImage: View {
             Image(uiImage: uiImage)
               .styled(as: imageType)
           } else if let urlString = photoUrl, let url = URL(string: urlString) {
-            AsyncImage(url: url) { phase in
+            CachedAsyncImage(url: url, targetSize: imageType.size) { phase in
               switch phase {
               case .empty:
                 ProgressView()

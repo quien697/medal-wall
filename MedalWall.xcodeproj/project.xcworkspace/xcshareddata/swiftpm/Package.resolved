@@ -1,5 +1,5 @@
 {
-  "originHash" : "2f449467b3f46fdfa08980fde38fac38469cc1a069f2489c8afae1f03b6e93cb",
+  "originHash" : "6e4471868c722708bd5aa1adc8004f60c32ecbdca6fdb935cd3d63d08ac21084",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "145104f5ea9d58ae21b60add007c33c1cc0c948e",
         "version" : "2.0.0"
+      }
+    },
+    {
+      "identity" : "cachedasyncimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/quien697/CachedAsyncImage",
+      "state" : {
+        "revision" : "6b9090d3b02fb5cdd0dd18c6b1b5d240fa2834c1",
+        "version" : "1.0.0"
       }
     },
     {

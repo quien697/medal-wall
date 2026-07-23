@@ -5,6 +5,7 @@
 //  Created by Quien on 2026-04-07.
 //
 
+import CachedAsyncImage
 import PhotoViewer
 import SwiftUI
 
@@ -23,7 +24,10 @@ struct MedalDetailEventPhotosSection: View {
       ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 12) {
           ForEach(Array(sortedPhotoUrls.enumerated()), id: \.offset) { index, urlString in
-            AsyncImage(url: URL(string: urlString)) { phase in
+            CachedAsyncImage(
+              url: URL(string: urlString),
+              targetSize: CGSize(width: 140, height: 110)
+            ) { phase in
               switch phase {
               case .success(let image):
                 image
