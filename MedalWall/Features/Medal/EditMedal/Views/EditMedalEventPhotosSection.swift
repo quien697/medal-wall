@@ -5,6 +5,7 @@
 //  Created by Quien on 2026-04-17.
 //
 
+import CachedAsyncImage
 import SwiftUI
 
 struct EditMedalEventPhotosSection: View {
@@ -56,7 +57,7 @@ struct EditMedalEventPhotosSection: View {
         .resizable()
         .aspectRatio(contentMode: .fill)
     } else if let urlString = photo.imageUrl, let url = URL(string: urlString) {
-      AsyncImage(url: url) { phase in
+      CachedAsyncImage(url: url, targetSize: CGSize(width: 100, height: 80)) { phase in
         switch phase {
         case .success(let image):
           image.resizable().aspectRatio(contentMode: .fill)

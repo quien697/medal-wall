@@ -5,6 +5,7 @@
 //  Created by Quien on 2025-12-30.
 //
 
+import CachedAsyncImage
 import SwiftUI
 
 struct MedalImage: View {
@@ -72,7 +73,10 @@ struct MedalImage: View {
           .clipShape(imageType.shape)
           .shadow(radius: 6, x: 6, y: 6)
       } else if let urlString, let url = URL(string: urlString) {
-        AsyncImage(url: url) { phase in
+        CachedAsyncImage(
+          url: url,
+          targetSize: CGSize(width: size * 0.72, height: size * 0.72)
+        ) { phase in
           switch phase {
           case .success(let image):
             image

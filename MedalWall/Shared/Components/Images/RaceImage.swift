@@ -5,6 +5,7 @@
 //  Created by Quien on 2026-04-17.
 //
 
+import CachedAsyncImage
 import SwiftUI
 
 struct RaceImage: View {
@@ -32,7 +33,7 @@ struct RaceImage: View {
       Image(uiImage: photo)
         .styled(as: imageType)
     } else if let urlString, let url = URL(string: urlString) {
-      AsyncImage(url: url) { phase in
+      CachedAsyncImage(url: url, targetSize: imageType.size) { phase in
         switch phase {
         case .success(let image):
           image.styled(as: imageType)
