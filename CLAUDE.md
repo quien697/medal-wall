@@ -4,7 +4,6 @@
 - Swift 6, iOS 26, SwiftUI
 - `@Observable` macro (Swift Observation — not legacy `ObservableObject` / Combine)
 - Swift Testing framework (`@Test`, `#expect`) — not XCTest
-- Firebase iOS SDK: Auth, Firestore, Storage; GoogleSignIn-iOS
 - MVVM — Views → ViewModels → Repositories → Firebase
 - Firestore for all data; Firebase Storage for images (stored as download URLs on models)
 
@@ -15,15 +14,6 @@ each task with TDD → verify → archive the change into `openspec/specs/`. Ope
 the planning artifacts (one set per change, no parallel `docs/superpowers/` copy);
 Superpowers provides the discipline (brainstorming, TDD, verification). Skip OpenSpec
 for trivial changes. Full details: `docs/development-workflow.md`.
-
-## Project Structure
-- `MedalWall/Features/` — self-contained feature folders, each with `Views/` and `ViewModels/`
-- `MedalWall/Models/` — `Codable` structs serialized to/from Firestore
-- `MedalWall/Repositories/` — async Firestore wrappers (`UserFirestoreRepository`, `RaceFirestoreRepository`, `MedalFirestoreRepository`)
-- `MedalWall/Services/` — `AuthService` (Firebase Auth), `StorageService` (Firebase Storage)
-- `MedalWall/Managers/` — `UserManager` (global auth + user state, injected via `@Environment`)
-- `MedalWall/Shared/` — reusable components, modifiers, extensions, error types
-- `MedalWallTests/Unit/` — unit tests organized by domain (Medal, Race, Shared, User)
 
 ## Architecture
 - All models are `Codable` structs; there is no SwiftData.
