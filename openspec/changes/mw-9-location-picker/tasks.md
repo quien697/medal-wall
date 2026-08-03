@@ -1,7 +1,7 @@
 ## 1. Spike — confirm what the APIs actually return
 
-- [ ] 1.1 In a simulator, run `MKLocalSearchCompleter` → `MKLocalSearch` for `Fuxing`, `Taoyuan`, `Portland`, and `Vancouver`. Record, for each resolved `MKMapItem`: `placemark.isoCountryCode`, `placemark.locality`, `placemark.administrativeArea`, and `addressRepresentations.cityWithContext`. Confirm Taiwanese results yield `TW` with an empty or meaningless `administrativeArea`.
-- [ ] 1.2 Write the findings into `design.md` → Open Questions, resolving both entries (whether `region` is simply `nil` for Taiwan, and how often `locality` is absent). Do not start task 2 until this is answered — the display and fallback behaviour depend on it.
+- [x] 1.1 Probed `MKLocalSearch` on the macOS 26.5.2 host — same MapKit backend as iOS, and far quicker than standing up a simulator app — for Fuxing, Taoyuan, Taipei, Portland, and Vancouver. Full table in `design.md` → Spike Findings. `isoCountryCode` reliable (`TW`/`US`/`CA`); `cityWithContext` **empty** for every Taiwanese result; `administrativeArea` and `locality` swap meaning between Taiwan and the US/Canada. *Not covered:* `MKLocalSearchCompleter` itself, which needs a run loop — its suggestion titles get verified when the picker is built in 3.2 and 5.1.
+- [x] 1.2 Folded the findings into `design.md` (new Spike Findings section; D1, D3, D4 and D7 amended; both Open Questions resolved; a cross-provider divergence risk added) and corrected `specs/location-entry/spec.md`, whose "Region omitted where it carries no meaning" scenario the spike disproved.
 
 ## 2. GeoLocation reshape (TDD — pure, offline, no MapKit)
 
@@ -9,12 +9,12 @@
 - [ ] 2.2 Write failing tests decoding a captured **legacy** JSON payload (`country`/`province`/`city`/`district`) — asserting `city` → `city`, `province` → `region`, country name → ISO code, coordinates absent. Then implement the lenient `init(from:)`.
 - [ ] 2.3 Write a failing test for a legacy country name that resolves to no code — the record still decodes and the other fields stay intact. Then implement the fallback.
 - [ ] 2.4 Write failing tests for coordinate guards: latitude outside −90…90 and longitude outside −180…180 each decode as `nil` while the location stays usable. Then implement the validation.
-- [ ] 2.5 Write failing tests for computed `formatted`: `TW` with no region renders city + localized country; a US location renders city + region + country; an absent region leaves no empty separator. Then implement `formatted`.
+- [ ] 2.5 Write failing tests for computed `formatted` using the spike's real values — `("Fuxing District", "Taoyuan City", TW)` → `"Fuxing District, Taoyuan City, Taiwan"`; `("", "Taipei City", TW)` → `"Taipei City, Taiwan"` (an absent city must leave no empty separator); `("Portland", "OR", US)` → `"Portland, OR, United States"`; `("Vancouver", "BC", CA)` → `"Vancouver, BC, Canada"`. Then implement `formatted`.
 
 ## 3. PlaceSearchService — the MapKit seam
 
 - [ ] 3.1 Define `PlaceSuggestion` (`id`, `title`, `subtitle` — no MapKit types) and the `PlaceSearchService` protocol (`suggestions(for:)` → `AsyncStream<[PlaceSuggestion]>`, `resolve(suggestionID:)` → `GeoLocation`).
-- [ ] 3.2 Implement `MapKitPlaceSearchService` as a `@MainActor final class`: bridge `MKLocalSearchCompleterDelegate` callbacks into an `AsyncStream`, retain completions internally keyed by id, and resolve a selection into `GeoLocation` using the fields confirmed in task 1.1, with a `Locale` name→code reverse lookup when `isoCountryCode` is absent. Throw `AppError` on failure. This is the **only** file importing MapKit or CoreLocation; it is not unit tested (network).
+- [ ] 3.2 Implement `MapKitPlaceSearchService` as a `@MainActor final class`: bridge `MKLocalSearchCompleterDelegate` callbacks into an `AsyncStream`, retain completions internally keyed by id, and resolve a selection into `GeoLocation` by mapping `isoCountryCode` → `countryCode`, `locality` → `city`, and `administrativeArea` → `region` **verbatim, with no per-country branching** (see design Spike Findings 3–4), with a `Locale` name→code reverse lookup when `isoCountryCode` is absent. Throw `AppError` on failure. This is the **only** file importing MapKit or CoreLocation; it is not unit tested (network).
 
 ## 4. LocationPickerViewModel (TDD against a stub)
 

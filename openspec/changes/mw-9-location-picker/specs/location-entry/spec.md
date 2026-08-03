@@ -1,21 +1,23 @@
 ## ADDED Requirements
 
 ### Requirement: Canonical Location Representation
-The system SHALL represent a location as an ISO 3166-1 alpha-2 country code, a city name,
-an optional region, and optional coordinates. The country code SHALL be the canonical key
-for grouping locations by country. The representation SHALL NOT depend on the display
-strings of any particular map or geocoding provider, so that records written by different
-client platforms for the same place remain comparable.
+The system SHALL represent a location as an ISO 3166-1 alpha-2 country code, a city name, an
+optional region, and optional coordinates. The country code and the coordinates SHALL be the
+canonical values, and SHALL be the only ones used to group, filter, or compare locations,
+because they are defined independently of any map or geocoding provider. The city and region
+SHALL be treated as display values only, since providers divide administrative levels
+differently for the same place and therefore disagree on which value is the city.
 
 #### Scenario: Country stored as a code rather than a name
 - **WHEN** a location is recorded from any place-search provider
 - **THEN** the system stores an ISO 3166-1 alpha-2 country code rather than a country name,
   so records created by different clients for the same country share one value
 
-#### Scenario: Region omitted where it carries no meaning
-- **WHEN** a location is recorded in a country whose administrative region is not part of a
-  conventional address, such as Taiwan
-- **THEN** the system stores no region at all, rather than an empty or placeholder value
+#### Scenario: Locations are compared only by provider-independent values
+- **WHEN** locations recorded by different client platforms for the same place are grouped or
+  compared
+- **THEN** the system uses only the country code and the coordinates, and never the city or
+  region values, which may legitimately differ between providers for that same place
 
 ### Requirement: Place Search and Selection
 The system SHALL allow a user to record a location by searching for a place by name and
@@ -64,10 +66,10 @@ in the viewer's own language.
 - **THEN** the system shows the country name localized for the viewer, so one stored record
   reads correctly in any language
 
-#### Scenario: Region included only when present
-- **WHEN** a location that has a region is displayed, and separately one that has none
-- **THEN** the display includes the region when present and omits it entirely when absent,
-  leaving no empty separators
+#### Scenario: Absent components are omitted from the display
+- **WHEN** a location missing a region is displayed, and separately one missing a city
+- **THEN** the display omits each absent component entirely, leaving no empty separators and
+  no placeholder text
 
 ### Requirement: Reading Previously Stored Locations
 The system SHALL read locations written in the previous four-field shape — country name,
