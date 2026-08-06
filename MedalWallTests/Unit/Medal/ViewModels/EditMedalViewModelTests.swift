@@ -24,8 +24,8 @@ struct EditMedalViewModelTests {
   func testIsFormValidTrueWithRequiredFields() {
     let viewModel = EditMedalViewModel(mode: .add)
     viewModel.name = "Taipei Marathon 2019"
-    viewModel.country = "Taiwan"
-    viewModel.city = "Taipei"
+    viewModel.place.countryCode = "TW"
+    viewModel.place.city = "Taipei"
 
     #expect(viewModel.isFormValid == true)
   }
@@ -34,8 +34,8 @@ struct EditMedalViewModelTests {
   func testIsFormValidFalseEmptyName() {
     let viewModel = EditMedalViewModel(mode: .add)
     viewModel.name = ""
-    viewModel.country = "Taiwan"
-    viewModel.city = "Taipei"
+    viewModel.place.countryCode = "TW"
+    viewModel.place.city = "Taipei"
 
     #expect(viewModel.isFormValid == false)
   }
@@ -44,8 +44,8 @@ struct EditMedalViewModelTests {
   func testIsFormValidFalseWhitespaceName() {
     let viewModel = EditMedalViewModel(mode: .add)
     viewModel.name = "   "
-    viewModel.country = "Taiwan"
-    viewModel.city = "Taipei"
+    viewModel.place.countryCode = "TW"
+    viewModel.place.city = "Taipei"
 
     #expect(viewModel.isFormValid == false)
   }
@@ -54,8 +54,8 @@ struct EditMedalViewModelTests {
   func testIsFormValidFalseEmptyCountry() {
     let viewModel = EditMedalViewModel(mode: .add)
     viewModel.name = "Taipei Marathon 2019"
-    viewModel.country = ""
-    viewModel.city = "Taipei"
+    viewModel.place.countryCode = ""
+    viewModel.place.city = "Taipei"
 
     #expect(viewModel.isFormValid == false)
   }
@@ -64,8 +64,8 @@ struct EditMedalViewModelTests {
   func testIsFormValidFalseEmptyCity() {
     let viewModel = EditMedalViewModel(mode: .add)
     viewModel.name = "Taipei Marathon 2019"
-    viewModel.country = "Taiwan"
-    viewModel.city = ""
+    viewModel.place.countryCode = "TW"
+    viewModel.place.city = ""
 
     #expect(viewModel.isFormValid == false)
   }
@@ -74,8 +74,8 @@ struct EditMedalViewModelTests {
   func testIsFormValidFalseWhitespaceCountry() {
     let viewModel = EditMedalViewModel(mode: .add)
     viewModel.name = "Taipei Marathon 2019"
-    viewModel.country = "   "
-    viewModel.city = "Taipei"
+    viewModel.place.countryCode = "   "
+    viewModel.place.city = "Taipei"
 
     #expect(viewModel.isFormValid == false)
   }
@@ -84,8 +84,8 @@ struct EditMedalViewModelTests {
   func testIsFormValidFalseWhitespaceCity() {
     let viewModel = EditMedalViewModel(mode: .add)
     viewModel.name = "Taipei Marathon 2019"
-    viewModel.country = "Taiwan"
-    viewModel.city = "   "
+    viewModel.place.countryCode = "TW"
+    viewModel.place.city = "   "
 
     #expect(viewModel.isFormValid == false)
   }
@@ -94,8 +94,8 @@ struct EditMedalViewModelTests {
   func testIsFormValidFalseCustomDistanceZero() {
     let viewModel = EditMedalViewModel(mode: .add)
     viewModel.name = "Taipei Marathon 2019"
-    viewModel.country = "Taiwan"
-    viewModel.city = "Taipei"
+    viewModel.place.countryCode = "TW"
+    viewModel.place.city = "Taipei"
     viewModel.distance = RaceDistance(category: .custom(0), type: .inPerson)
 
     #expect(viewModel.isFormValid == false)
@@ -105,8 +105,8 @@ struct EditMedalViewModelTests {
   func testIsFormValidFalseCustomDistanceNegative() {
     let viewModel = EditMedalViewModel(mode: .add)
     viewModel.name = "Taipei Marathon 2019"
-    viewModel.country = "Taiwan"
-    viewModel.city = "Taipei"
+    viewModel.place.countryCode = "TW"
+    viewModel.place.city = "Taipei"
     viewModel.distance = RaceDistance(category: .custom(-1), type: .inPerson)
 
     #expect(viewModel.isFormValid == false)
@@ -116,8 +116,8 @@ struct EditMedalViewModelTests {
   func testIsFormValidTrueCustomDistancePositive() {
     let viewModel = EditMedalViewModel(mode: .add)
     viewModel.name = "Taipei Marathon 2019"
-    viewModel.country = "Taiwan"
-    viewModel.city = "Taipei"
+    viewModel.place.countryCode = "TW"
+    viewModel.place.city = "Taipei"
     viewModel.distance = RaceDistance(category: .custom(5.0), type: .inPerson)
 
     #expect(viewModel.isFormValid == true)
@@ -158,7 +158,7 @@ struct EditMedalViewModelTests {
   }
 
   // MARK: - autoFill
-  @Test("autoFill populates name, country, city, and distance from the selection")
+  @Test("autoFill copies the whole place, name, and distance from the selection")
   func testAutoFillPopulatesFields() {
     let viewModel = EditMedalViewModel(mode: .add)
     let race = Race.sampleData.first!
@@ -169,8 +169,7 @@ struct EditMedalViewModelTests {
     viewModel.autoFill(from: selection)
 
     #expect(viewModel.name == "\(race.name) \(edition.year)")
-    #expect(viewModel.country == race.location.country)
-    #expect(viewModel.city == race.location.city)
+    #expect(viewModel.place == race.place)
     #expect(viewModel.distance == distance)
   }
 
@@ -182,7 +181,7 @@ struct EditMedalViewModelTests {
       name: "Test Race 2025",
       date: someDate,
       bibNumber: "42",
-      location: GeoLocation(country: "Japan", province: "Tokyo", city: "Shinjuku"),
+      place: Place(countryCode: "JP", city: "Shinjuku", region: "Tokyo"),
       distance: RaceDistance(category: .full, type: .inPerson),
       finishTime: 12624,
       note: "Great race",
@@ -192,9 +191,9 @@ struct EditMedalViewModelTests {
     let viewModel = EditMedalViewModel(mode: .edit, medal: medal)
 
     #expect(viewModel.name == "Test Race 2025")
-    #expect(viewModel.country == "Japan")
-    #expect(viewModel.province == "Tokyo")
-    #expect(viewModel.city == "Shinjuku")
+    #expect(viewModel.place.countryCode == "JP")
+    #expect(viewModel.place.region == "Tokyo")
+    #expect(viewModel.place.city == "Shinjuku")
     #expect(viewModel.finishTime == 12624)
     #expect(viewModel.note == "Great race")
     #expect(viewModel.tags == ["fun"])

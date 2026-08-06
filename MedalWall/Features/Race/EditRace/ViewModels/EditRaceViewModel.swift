@@ -12,10 +12,7 @@ final class EditRaceViewModel {
   // MARK: - Data
   var name: String = ""
   var photo: UIImage?
-  var country: String = ""
-  var province: String = ""
-  var city: String = ""
-  var district: String = ""
+  var place = Place(countryCode: "", city: "")
   var websiteUrl: String = ""
 
   // MARK: - State
@@ -43,10 +40,7 @@ final class EditRaceViewModel {
 
     if let race, mode == .edit {
       self.name = race.name
-      self.country = race.location.country
-      self.province = race.location.province ?? ""
-      self.city = race.location.city
-      self.district = race.location.district ?? ""
+      self.place = race.place
       self.websiteUrl = race.websiteUrl ?? ""
     }
   }
@@ -61,9 +55,7 @@ final class EditRaceViewModel {
   }
 
   var isFormValid: Bool {
-    !name.trimmingCharacters(in: .whitespaces).isEmpty
-      && !country.trimmingCharacters(in: .whitespaces).isEmpty
-      && !city.trimmingCharacters(in: .whitespaces).isEmpty
+    !name.trimmingCharacters(in: .whitespaces).isEmpty && place.isValid
   }
 
   // MARK: - Functions
@@ -127,12 +119,7 @@ final class EditRaceViewModel {
       do {
         var newRace = Race(
           name: name,
-          location: GeoLocation(
-            country: country,
-            province: province.isEmpty ? nil : province,
-            city: city,
-            district: district.isEmpty ? nil : district
-          ),
+          place: place,
           websiteUrl: websiteUrl.isEmpty ? nil : websiteUrl,
           createdBy: userID
         )
@@ -148,12 +135,7 @@ final class EditRaceViewModel {
     case .edit:
       guard var race else { return }
       race.name = name
-      race.location = GeoLocation(
-        country: country,
-        province: province.isEmpty ? nil : province,
-        city: city,
-        district: district.isEmpty ? nil : district
-      )
+      race.place = place
       race.websiteUrl = websiteUrl.isEmpty ? nil : websiteUrl
       if isPhotoChanged {
         if let photo {

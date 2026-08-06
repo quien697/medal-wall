@@ -10,7 +10,7 @@ import SwiftUI
 struct RaceDetailHeroSection: View {
   let photoUrl: String?
   let name: String
-  let location: String
+  let place: String
   let url: String?
 
   var body: some View {
@@ -25,7 +25,7 @@ struct RaceDetailHeroSection: View {
         .fontWeight(.bold)
         .foregroundStyle(Color.Text.primary)
 
-      Label(location, systemImage: "mappin.and.ellipse")
+      Label(place, systemImage: "mappin.and.ellipse")
         .font(.caption)
         .foregroundStyle(Color.Text.secondary)
 
@@ -48,7 +48,7 @@ struct RaceDetailHeroSection: View {
     RaceDetailHeroSection(
       photoUrl: race.photoUrl,
       name: race.name,
-      location: race.location.formatted,
+      place: race.place.formatted,
       url: race.websiteUrl
     )
   }

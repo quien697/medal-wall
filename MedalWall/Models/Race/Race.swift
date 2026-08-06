@@ -11,7 +11,7 @@ struct Race: Codable, Identifiable {
   let id: String
   var name: String
   var photoUrl: String?
-  var location: GeoLocation
+  var place: Place
   var websiteUrl: String?
   var editionCount: Int
   var createdBy: String
@@ -22,7 +22,7 @@ struct Race: Codable, Identifiable {
     id: String = UUID().uuidString,
     name: String,
     photoUrl: String? = nil,
-    location: GeoLocation,
+    place: Place,
     websiteUrl: String? = nil,
     editionCount: Int = 0,
     createdBy: String,
@@ -32,7 +32,7 @@ struct Race: Codable, Identifiable {
     self.id = id
     self.name = name
     self.photoUrl = photoUrl
-    self.location = location
+    self.place = place
     self.websiteUrl = websiteUrl
     self.editionCount = editionCount
     self.createdBy = createdBy

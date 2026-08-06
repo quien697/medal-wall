@@ -13,7 +13,7 @@ struct Medal: Codable, Identifiable {
   var date: Date
   var bibNumber: String
   var photoUrl: String?
-  var location: GeoLocation
+  var place: Place
   var distance: RaceDistance
   var finishTime: TimeInterval?
   var overallPlacement: Int?
@@ -36,7 +36,7 @@ struct Medal: Codable, Identifiable {
     date: Date,
     bibNumber: String,
     photoUrl: String? = nil,
-    location: GeoLocation,
+    place: Place,
     distance: RaceDistance,
     finishTime: TimeInterval? = nil,
     overallPlacement: Int? = nil,
@@ -58,7 +58,7 @@ struct Medal: Codable, Identifiable {
     self.date = date
     self.bibNumber = bibNumber
     self.photoUrl = photoUrl
-    self.location = location
+    self.place = place
     self.distance = distance
     self.finishTime = finishTime
     self.overallPlacement = overallPlacement

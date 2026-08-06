@@ -10,11 +10,11 @@ import Testing
 @testable import MedalWall
 
 struct RaceComputedTests {
-  private let location = GeoLocation(country: "Canada", city: "Vancouver")
+  private let place = Place(countryCode: "CA", city: "Vancouver")
 
   @Test("fullWebsiteUrl is nil when websiteUrl is nil")
   func testFullWebsiteUrlNil() {
-    let race = Race(name: "Test Race", location: location, createdBy: "user1")
+    let race = Race(name: "Test Race", place: place, createdBy: "user1")
 
     #expect(race.fullWebsiteUrl == nil)
   }
@@ -22,7 +22,7 @@ struct RaceComputedTests {
   @Test("fullWebsiteUrl returns url unchanged when it already has https scheme")
   func testFullWebsiteUrlAlreadyHttps() {
     let race = Race(
-      name: "Test Race", location: location, websiteUrl: "https://example.com", createdBy: "user1")
+      name: "Test Race", place: place, websiteUrl: "https://example.com", createdBy: "user1")
 
     #expect(race.fullWebsiteUrl == "https://example.com")
   }
@@ -30,7 +30,7 @@ struct RaceComputedTests {
   @Test("fullWebsiteUrl returns url unchanged when it already has http scheme")
   func testFullWebsiteUrlAlreadyHttp() {
     let race = Race(
-      name: "Test Race", location: location, websiteUrl: "http://example.com", createdBy: "user1")
+      name: "Test Race", place: place, websiteUrl: "http://example.com", createdBy: "user1")
 
     #expect(race.fullWebsiteUrl == "http://example.com")
   }
@@ -38,14 +38,14 @@ struct RaceComputedTests {
   @Test("fullWebsiteUrl prepends https when url has no scheme")
   func testFullWebsiteUrlPrependsHttps() {
     let race = Race(
-      name: "Test Race", location: location, websiteUrl: "example.com", createdBy: "user1")
+      name: "Test Race", place: place, websiteUrl: "example.com", createdBy: "user1")
 
     #expect(race.fullWebsiteUrl == "https://example.com")
   }
 
   @Test("fullWebsiteUrl is nil when websiteUrl is an empty string")
   func testFullWebsiteUrlEmptyString() {
-    let race = Race(name: "Test Race", location: location, websiteUrl: "", createdBy: "user1")
+    let race = Race(name: "Test Race", place: place, websiteUrl: "", createdBy: "user1")
 
     #expect(race.fullWebsiteUrl == nil)
   }

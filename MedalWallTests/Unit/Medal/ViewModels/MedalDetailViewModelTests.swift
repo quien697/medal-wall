@@ -27,7 +27,7 @@ struct MedalDetailViewModelTests {
       name: "Test",
       date: .now,
       bibNumber: "1",
-      location: GeoLocation(country: "Canada", city: "Vancouver"),
+      place: Place(countryCode: "CA", city: "Vancouver"),
       distance: distance,
       finishTime: finishTime,
       overallPlacement: overallPlacement,

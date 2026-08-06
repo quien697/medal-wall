@@ -44,6 +44,10 @@ enum AppError: LocalizedError, Identifiable, Equatable {
   case photoLoadFailed
   case photoDataInvalid
 
+  // Place Errors
+  case placeSearchFailed(String)
+  case placeNotResolved
+
   // Unknown
   case unknown
 
@@ -87,6 +91,10 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "Photo Load Failed"
     case .photoDataInvalid:
       "Photo Data Invalid"
+    case .placeSearchFailed:
+      "Place Search Failed"
+    case .placeNotResolved:
+      "Place Unavailable"
     case .sendEmailSignInLinkFailed:
       "Send Email Sign-in Link Failed"
     case .noInternetConnection:
@@ -141,6 +149,10 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "We couldn't load this photo."
     case .photoDataInvalid:
       "We couldn't process the selected image."
+    case .placeSearchFailed(let description):
+      "We couldn't search for places. \(description)"
+    case .placeNotResolved:
+      "We couldn't get the details for that place."
     case .invalidCredential:
       "Failed to get Apple ID credential."
     case .missingNonce:
@@ -184,6 +196,8 @@ enum AppError: LocalizedError, Identifiable, Equatable {
       "Please try selecting the image again."
     case .photoDataInvalid:
       "Please try choosing a different image."
+    case .placeSearchFailed, .placeNotResolved:
+      "Please check your connection and try again."
     case .sendEmailSignInLinkFailed:
       "Please check your email address and try again."
     case .noInternetConnection:
