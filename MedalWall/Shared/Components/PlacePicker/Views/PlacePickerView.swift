@@ -28,21 +28,37 @@ struct PlacePickerView: View {
   // MARK: - Body
   var body: some View {
     NavigationStack {
-      List(viewModel.suggestions) { suggestion in
-        Button {
-          Task { await viewModel.select(suggestion) }
-        } label: {
-          VStack(alignment: .leading, spacing: 2) {
-            Text(suggestion.title)
-              .foregroundStyle(.textPrimary)
-            Text(suggestion.subtitle)
-              .font(.caption)
-              .foregroundStyle(.textSecondary)
-          }  // VStack
-        }  // Button
+      List {
+        switch viewModel.status {
+        case .results(let suggestions):
+          ForEach(suggestions) { suggestion in
+            Button {
+              Task { await viewModel.select(suggestion) }
+            } label: {
+              VStack(alignment: .leading, spacing: 2) {
+                Text(suggestion.title)
+                  .foregroundStyle(.textPrimary)
+                Text(suggestion.subtitle)
+                  .font(.caption)
+                  .foregroundStyle(.textSecondary)
+              }  // VStack
+            }  // Button
+          }  // ForEach
+
+        case .searching:
+          HStack {
+            Spacer()
+            ProgressView()
+            Spacer()
+          }  // HStack
+          .listRowBackground(Color.clear)
+
+        case .idle, .noResults:
+          EmptyView()
+        }
       }  // List
       .overlay {
-        if viewModel.hasNoResults {
+        if viewModel.status == .noResults {
           ContentUnavailableView.search(text: viewModel.query)
         }
       }

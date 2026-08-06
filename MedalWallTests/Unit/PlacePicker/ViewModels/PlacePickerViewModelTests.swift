@@ -39,7 +39,7 @@ struct PlacePickerViewModelTests {
 
     await search("taipei", on: viewModel)
 
-    #expect(viewModel.suggestions == [taipei, fuxing])
+    #expect(viewModel.status == .results([taipei, fuxing]))
     #expect(stub.lastQuery == "taipei")
   }
 
@@ -69,8 +69,7 @@ struct PlacePickerViewModelTests {
 
     await search("   ", on: viewModel)
 
-    #expect(viewModel.suggestions.isEmpty)
-    #expect(viewModel.hasNoResults == false)
+    #expect(viewModel.status == .idle)
     #expect(stub.queryCallCount == 0)
   }
 
@@ -83,8 +82,7 @@ struct PlacePickerViewModelTests {
 
     await search("nowhere at all", on: viewModel)
 
-    #expect(viewModel.suggestions.isEmpty)
-    #expect(viewModel.hasNoResults)
+    #expect(viewModel.status == .noResults)
     #expect(viewModel.selectedPlace == nil)
     #expect(viewModel.error == nil)
   }
@@ -102,7 +100,7 @@ struct PlacePickerViewModelTests {
     #expect(viewModel.selectedPlace == nil)
   }
 
-  @Test("A failed search does not show the empty-results state")
+  @Test("A failed search leaves the status idle, never noResults")
   func testSearchFailureIsNotEmptyState() async {
     let stub = StubPlaceSearchService()
     stub.searchOutcome = .failure(.placeSearchFailed("offline"))
@@ -110,7 +108,7 @@ struct PlacePickerViewModelTests {
 
     await search("taipei", on: viewModel)
 
-    #expect(viewModel.hasNoResults == false)
+    #expect(viewModel.status == .idle)
   }
 
   @Test("A failed resolve sets an AppError and leaves the place unchanged")

@@ -8,10 +8,32 @@
 import Foundation
 import MapKit
 
+/// Supplies place suggestions for a search query and resolves a chosen one into a
+/// `Place`.
+///
+/// The protocol exists so the picker can be tested without a network or a map framework:
+/// `MapKitPlaceSearchService` is the only implementation that talks to MapKit.
+@MainActor
+protocol PlaceSearchService {
+  /// Streams suggestions for `query`, emitting a new array each time results arrive.
+  /// Starting a new search finishes the previous stream.
+  ///
+  /// A query that simply matches nothing yields an empty array; the stream only fails when
+  /// the search itself does, so "no results" and "search broke" stay distinguishable.
+  /// - Throws: `AppError.placeSearchFailed` when the search fails.
+  func suggestions(for query: String) -> AsyncThrowingStream<[PlaceSuggestion], any Error>
+
+  /// Resolves a suggestion into a complete place.
+  /// - Throws: `AppError.placeNotResolved` when the suggestion is unknown or has no result,
+  ///   or `AppError.placeSearchFailed` when the lookup itself fails.
+  func resolve(suggestionID: PlaceSuggestion.ID) async throws -> Place
+}
+
+// MARK: - MapKit implementation
 /// `PlaceSearchService` backed by MapKit.
 ///
-/// **This is the only file in the app that imports MapKit**, and MapKit
-/// types never leave it: completions are retained internally and callers see only
+/// **This is the only file in the app that imports MapKit**, and MapKit types never
+/// leave it: completions are retained internally and callers see only
 /// `PlaceSuggestion` and `Place`. The containment is deliberate. The structured
 /// address fields read here are soft-deprecated on iOS 26 — the modern replacements return
 /// display strings with no `locality` equivalent — so when Apple removes them, only this
@@ -28,7 +50,10 @@ final class MapKitPlaceSearchService: NSObject, PlaceSearchService {
   override init() {
     super.init()
     completer.delegate = self
-    completer.resultTypes = [.address, .pointOfInterest]
+    // Places are recorded at city level, so points of interest are noise: searching
+    // "Taipei" should offer the city, not its restaurants.
+    completer.resultTypes = [.address]
+    completer.pointOfInterestFilter = .excludingAll
   }
 
   // MARK: - Functions

@@ -12,15 +12,13 @@ import Foundation
 final class PlacePickerViewModel {
   // MARK: - Data
   var query: String = ""
-  private(set) var suggestions: [PlaceSuggestion] = []
+  private(set) var status: PlaceSearchStatus = .idle
   private(set) var selectedPlace: Place?
 
   // MARK: - State
-  private(set) var isSearching = false
   /// Set once a suggestion resolves, so the presenting view can dismiss.
   private(set) var isFinished = false
   var error: AppError?
-  private var hasSearched = false
 
   /// The in-flight debounced search. Exposed so callers — and tests — can await it.
   @ObservationIgnored private(set) var searchTask: Task<Void, Never>?
@@ -40,13 +38,6 @@ final class PlacePickerViewModel {
     self.debounce = debounce
   }
 
-  // MARK: - Computed
-  /// Whether to show the "nothing matched" state. A failed search is not an empty result,
-  /// so an error suppresses it — otherwise a dropped connection would read as "no such place".
-  var hasNoResults: Bool {
-    hasSearched && suggestions.isEmpty && !isSearching && error == nil
-  }
-
   // MARK: - Functions
   /// Debounces the current `query` and searches for it, replacing any search in flight.
   func search() {
@@ -54,8 +45,7 @@ final class PlacePickerViewModel {
 
     let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !trimmed.isEmpty else {
-      suggestions = []
-      hasSearched = false
+      status = .idle
       error = nil
       searchTask = nil
       return
@@ -82,23 +72,25 @@ final class PlacePickerViewModel {
   }
 
   /// Consumes the suggestion stream until it finishes or a newer query supersedes it.
+  ///
+  /// A failure returns the status to `.idle` rather than `.noResults`: the search never
+  /// completed, so claiming nothing matched would be untrue.
   private func runSearch(_ text: String) async {
-    isSearching = true
+    status = .searching
     error = nil
-    defer { isSearching = false }
 
     do {
-      for try await results in service.suggestions(for: text) {
-        suggestions = results
-        hasSearched = true
-        isSearching = false
+      for try await suggestions in service.suggestions(for: text) {
+        status = suggestions.isEmpty ? .noResults : .results(suggestions)
       }
     } catch is CancellationError {
       // Superseded by a newer query — not a failure worth showing.
     } catch let appError as AppError {
       error = appError
+      status = .idle
     } catch {
       self.error = .placeSearchFailed(error.localizedDescription)
+      status = .idle
     }
   }
 }
