@@ -121,10 +121,15 @@ English one `"Taiwan"`, so two records for one country would stop matching.
 District`) and the least consistent across providers — Apple's `subLocality`, Google's
 `sublocality`, and Mapbox's `neighborhood` routinely disagree on both meaning and presence.
 
-Removing the dedicated field loses nothing, because the spike showed a provider's `locality`
-already returns that level. 田中馬拉松 is the clearest case: everyone calls it the "田中"
-marathon, but it is held in 彰化縣. It stores as `city: "田中鎮"`, `region: "彰化縣"` — so both
-the name people use and the county it sits in survive, in two fields rather than three.
+Removing the dedicated field lost nothing *when this was decided*, because the spike showed a
+provider's `locality` already returns that level.
+
+**Superseded in part by D12.** Once places were normalized to city level, the district stopped
+surviving at all in the countries whose hierarchy MapKit inverts. 田中馬拉松 is the clearest
+case: everyone calls it the "田中" marathon, but it is held in 田中鎮 of 彰化縣, and the record
+now stores `city: "彰化縣"` with no region — 田中鎮 is discarded, as `PlaceNormalizationTests`
+pins. The familiar name survives in the race's own name rather than in its place, which is
+what the place-entry spec states.
 
 An earlier draft justified this differently, arguing that a stored coordinate would supersede
 the district string. The spike disproved the premise: nothing was lost that needed
@@ -177,11 +182,16 @@ ViewModel debounces the query (~300 ms) before handing it to the service.
 ### D7 — iOS fills the structured fields from the soft-deprecated `CLPlacemark`
 
 Since the modern API cannot yield `countryCode`, `city`, or `region`, the adapter reads
-`isoCountryCode`, `locality`, and `administrativeArea` from the resolved `MKMapItem`'s
-placemark, falling back to a `Locale`-based name→code reverse lookup if `isoCountryCode` is
-absent. The spike confirmed `isoCountryCode` is dependable — `TW`, `US`, and `CA` all
-correct — so the fallback is genuinely an edge case rather than the common path. The mapping
-is applied verbatim, with no per-country branching (see Spike Findings). This is deliberate, contained debt: it is soft-deprecated rather than removed, and it
+`isoCountryCode`, `locality`, `subAdministrativeArea`, and `administrativeArea` from the
+resolved `MKMapItem`'s placemark. The spike confirmed `isoCountryCode` is dependable — `TW`,
+`US`, and `CA` all correct.
+
+**Two later changes overtook the rest of this section.** 7e removed the `Locale`-based
+name→code fallback for an absent `isoCountryCode`; the code is now `isoCountryCode ?? ""`, and
+a place without one fails `isValid` and cannot be saved. And the fields are no longer mapped
+verbatim — D12 added the country-sensitive normalization this section originally ruled out.
+
+The placemark read is deliberate, contained debt: it is soft-deprecated rather than removed, and it
 lives behind D6's seam. When Apple removes it, one Swift file changes and **the Firestore
 schema does not move**, so web and Android clients are never disturbed by an Apple
 deprecation. Bending the shared schema to Apple's current API would have inverted that.
@@ -294,14 +304,16 @@ reversible if the case turns out to be real.
   direction is readable: the new build cannot read old records either (D8), so the three
   existing records are updated by hand as part of shipping.
 - **`isoCountryCode` or `locality` may be absent for sparse results** (remote trailheads,
-  water bodies) → Country code falls back to a `Locale` reverse lookup on the country name;
-  an absent city leaves the field empty and the user completes it via the manual fallback,
-  which is why the fallback is a requirement rather than a convenience.
-- **A legacy country name may not resolve to a code** (misspelled or non-English) → The
-  record still decodes, with the remaining fields intact, rather than failing the whole
-  document. Covered by an explicit scenario.
-- **Search requires the network** → The manual fallback keeps location entry possible
-  offline; failures surface as `AppError` through the existing `ErrorWrapper` bridge.
+  water bodies) → After 7e there is no fallback: the country code is `isoCountryCode ?? ""`,
+  and a place missing either field fails `Place.isValid`, which both edit forms gate their
+  save on — so a half-empty record cannot be written. D12's normalization already covers the
+  common absent-`locality` case by promoting the administrative area.
+- ~~**A legacy country name may not resolve to a code**~~ → **Moot.** 7e dropped the
+  compatibility path entirely (D8), so no legacy record is decoded and no country name is
+  ever parsed. The scenario that covered this was removed from the spec delta.
+- **Search requires the network** → Accepted and unmitigated. The manual fallback that once
+  covered this was removed by D13, so a place cannot be set offline at all; failures surface
+  as `AppError` through the existing `ErrorWrapper` bridge.
 - ~~**`cityWithContext` behaviour for Taiwan is inferred, not observed**~~ → **Resolved by
   the task-1 spike.** It returns an empty string for Taiwan, which is why display is composed
   from structured fields rather than taken from MapKit. See D4.

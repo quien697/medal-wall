@@ -7,11 +7,12 @@ Firestore does not cascade-delete subcollections.
 ## Requirements
 ### Requirement: Race Management
 The system SHALL allow a signed-in user to create, read, update, and delete a `Race`,
-identified by name, location (country, optional province, city, optional district),
-an optional photo, and an optional website URL.
+identified by name, place, an optional photo, and an optional website URL. A race's place
+SHALL follow the shape defined by the `place-entry` capability, which owns the representation
+of a place and how one is chosen.
 
 #### Scenario: Create a race
-- **WHEN** a user submits a new race with a name and location
+- **WHEN** a user submits a new race with a name and place
 - **THEN** the system creates a `Race` record and it appears in the race list
 
 #### Scenario: Delete a race removes its editions

@@ -90,7 +90,10 @@
 
 ## 8. Verify
 
-- [ ] 8.1 Full test suite green: `xcodebuild test -project MedalWall.xcodeproj -scheme MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro'`.
-- [ ] 8.2 App builds and SwiftLint is clean.
-- [ ] 8.3 Simulator check: pick a location for a race and for a medal; confirm the row shows the resolved location before saving, that a Taiwanese district search resolves to its city (搜尋 復興 → 桃園市), that a failed search surfaces an error rather than an empty-results state, and that the three hand-updated records load correctly.
-- [ ] 8.4 Bump `MARKETING_VERSION` — build 1.1.0 cannot read records written in the new shape, so this must not ship as a silent update.
+- [x] 8.1 Full test suite green: **240 tests passed, 0 failures** (`xcodebuild test`, iPhone 17 Pro simulator). Matches the 240 expected after 7e.3 trimmed the suite from 263.
+- [x] 8.2 Clean build succeeds and SwiftLint is clean. The clean build emits **exactly one** project warning — `MapKitPlaceSearchService.swift:95` `'placemark' was deprecated in iOS 26.0` — which is the intended early-warning signal from design D7, not a defect. An incremental build was checked first and reported nothing; it recompiled no sources, so only the clean build actually verifies this.
+- [x] 8.3 Verified by the author on a physical iPhone 15 Pro after hand-updating the three Firestore records from `location` to `place`. Migration Plan step 1 is therefore complete.
+- [x] 8.4 `MARKETING_VERSION` bumped `1.1.0` → **`1.2.0`** on the app target (Debug and Release). The test target's unrelated `1.0` is left alone.
+
+- [x] 8.5 *(not in the original plan)* Corrected three passages in `design.md` that later scope changes had left stale, found while assessing the spec sync at archive time: D3 still claimed 田中馬拉松 stores `city: 田中鎮, region: 彰化縣`, which D12's city-level normalization had already made false; D7 still described the `Locale` name→code fallback deleted in 7e and claimed the mapping was verbatim; and two Risks bullets still offered the manual fallback removed in 7c/D13 as the mitigation for sparse results and for offline entry.
+- [x] 8.6 *(not in the original plan)* Added the missing `specs/medals/spec.md` delta. Tasks 6.2 and 7f.1 renamed `Medal.location` → `place`, and `races` received a delta for the identical rename, but `medals` never did — so `openspec/specs/medals/spec.md` would have kept the old four-field wording forever once this change archived.

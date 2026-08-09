@@ -1,10 +1,5 @@
-# medals Specification
+## MODIFIED Requirements
 
-## Purpose
-Let a signed-in user record and manage their race medals — full CRUD over a `Medal`'s
-race details, results, photos, and event photo gallery — with every medal kept private
-to its owner.
-## Requirements
 ### Requirement: Medal Record Management
 The system SHALL allow a signed-in user to create, read, update, and delete a `Medal`
 record, scoped to that user only, recording race name, date, bib number, place,
@@ -21,13 +16,3 @@ capability, which owns the representation of a place and how one is chosen.
 #### Scenario: Medals are private to their owner
 - **WHEN** any user's medal list is fetched
 - **THEN** the system only returns medals belonging to the requesting user's uid
-
-### Requirement: Event Photo Gallery
-The system SHALL allow a medal to have zero or more additional event photos, separate
-from its single cover photo.
-
-#### Scenario: Add event photos to a medal
-- **WHEN** a user adds one or more event photos to a medal
-- **THEN** the system stores them as an ordered list on that medal, distinct from the
-  medal's cover photo
-
