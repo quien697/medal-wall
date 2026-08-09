@@ -11,7 +11,7 @@ import Testing
 @testable import MedalWall
 
 struct EditRaceViewModelTests {
-  private let location = GeoLocation(country: "Canada", city: "Vancouver")
+  private let place = Place(countryCode: "CA", city: "Vancouver")
 
   private func makeDraft(startDate: Date = Date(timeIntervalSinceReferenceDate: 0))
     -> DraftRaceEdition
@@ -27,8 +27,8 @@ struct EditRaceViewModelTests {
   @Test("isFormValid is false when name is empty")
   func testIsFormValidEmptyName() {
     let viewModel = EditRaceViewModel(mode: .add, race: nil)
-    viewModel.country = "Canada"
-    viewModel.city = "Vancouver"
+    viewModel.place.countryCode = "CA"
+    viewModel.place.city = "Vancouver"
 
     #expect(viewModel.isFormValid == false)
   }
@@ -37,7 +37,7 @@ struct EditRaceViewModelTests {
   func testIsFormValidEmptyCountry() {
     let viewModel = EditRaceViewModel(mode: .add, race: nil)
     viewModel.name = "Boston Marathon"
-    viewModel.city = "Vancouver"
+    viewModel.place.city = "Vancouver"
 
     #expect(viewModel.isFormValid == false)
   }
@@ -46,7 +46,7 @@ struct EditRaceViewModelTests {
   func testIsFormValidEmptyCity() {
     let viewModel = EditRaceViewModel(mode: .add, race: nil)
     viewModel.name = "Boston Marathon"
-    viewModel.country = "Canada"
+    viewModel.place.countryCode = "CA"
 
     #expect(viewModel.isFormValid == false)
   }
@@ -55,8 +55,8 @@ struct EditRaceViewModelTests {
   func testIsFormValidAllFilled() {
     let viewModel = EditRaceViewModel(mode: .add, race: nil)
     viewModel.name = "Boston Marathon"
-    viewModel.country = "Canada"
-    viewModel.city = "Vancouver"
+    viewModel.place.countryCode = "CA"
+    viewModel.place.city = "Vancouver"
 
     #expect(viewModel.isFormValid == true)
   }
@@ -65,8 +65,8 @@ struct EditRaceViewModelTests {
   func testIsFormValidWhitespaceName() {
     let viewModel = EditRaceViewModel(mode: .add, race: nil)
     viewModel.name = "   "
-    viewModel.country = "Canada"
-    viewModel.city = "Vancouver"
+    viewModel.place.countryCode = "CA"
+    viewModel.place.city = "Vancouver"
 
     #expect(viewModel.isFormValid == false)
   }
@@ -75,8 +75,8 @@ struct EditRaceViewModelTests {
   func testIsFormValidWhitespaceCountry() {
     let viewModel = EditRaceViewModel(mode: .add, race: nil)
     viewModel.name = "Boston Marathon"
-    viewModel.country = "   "
-    viewModel.city = "Vancouver"
+    viewModel.place.countryCode = "   "
+    viewModel.place.city = "Vancouver"
 
     #expect(viewModel.isFormValid == false)
   }
@@ -85,8 +85,8 @@ struct EditRaceViewModelTests {
   func testIsFormValidWhitespaceCity() {
     let viewModel = EditRaceViewModel(mode: .add, race: nil)
     viewModel.name = "Boston Marathon"
-    viewModel.country = "Canada"
-    viewModel.city = "   "
+    viewModel.place.countryCode = "CA"
+    viewModel.place.city = "   "
 
     #expect(viewModel.isFormValid == false)
   }
@@ -96,16 +96,16 @@ struct EditRaceViewModelTests {
   func testEditModePrePopulates() {
     let race = Race(
       name: "Boston Marathon",
-      location: GeoLocation(country: "USA", province: "MA", city: "Boston"),
+      place: Place(countryCode: "US", city: "Boston", region: "MA"),
       websiteUrl: "baa.org",
       createdBy: "user-1"
     )
     let viewModel = EditRaceViewModel(mode: .edit, race: race)
 
     #expect(viewModel.name == "Boston Marathon")
-    #expect(viewModel.country == "USA")
-    #expect(viewModel.province == "MA")
-    #expect(viewModel.city == "Boston")
+    #expect(viewModel.place.countryCode == "US")
+    #expect(viewModel.place.region == "MA")
+    #expect(viewModel.place.city == "Boston")
     #expect(viewModel.websiteUrl == "baa.org")
   }
 
@@ -114,26 +114,25 @@ struct EditRaceViewModelTests {
     let viewModel = EditRaceViewModel(mode: .add, race: nil)
 
     #expect(viewModel.name.isEmpty)
-    #expect(viewModel.country.isEmpty)
-    #expect(viewModel.city.isEmpty)
+    #expect(viewModel.place.countryCode.isEmpty)
+    #expect(viewModel.place.city.isEmpty)
   }
 
-  @Test("init in edit mode maps nil province and district to empty strings")
-  func testEditModeNilOptionalFieldsFallToEmpty() {
+  @Test("init in edit mode leaves an absent region absent, with empty editable text")
+  func testEditModeAbsentRegion() {
     let race = Race(
       name: "Test Race",
-      location: GeoLocation(country: "Canada", province: nil, city: "Vancouver", district: nil),
+      place: Place(countryCode: "CA", city: "Vancouver"),
       createdBy: "user-1"
     )
     let viewModel = EditRaceViewModel(mode: .edit, race: race)
 
-    #expect(viewModel.province.isEmpty)
-    #expect(viewModel.district.isEmpty)
+    #expect(viewModel.place.region == nil)
   }
 
   @Test("init in edit mode maps nil websiteUrl to empty string")
   func testEditModeNilWebsiteUrlFallsToEmpty() {
-    let race = Race(name: "Test Race", location: location, createdBy: "user-1")
+    let race = Race(name: "Test Race", place: place, createdBy: "user-1")
     let viewModel = EditRaceViewModel(mode: .edit, race: race)
 
     #expect(viewModel.websiteUrl.isEmpty)

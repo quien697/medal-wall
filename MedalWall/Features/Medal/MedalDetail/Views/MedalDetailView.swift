@@ -30,7 +30,7 @@ struct MedalDetailView: View {
         name: viewModel.medal.name,
         raceDistance: viewModel.medal.distance.category.description,
         raceDistanceType: viewModel.medal.distance.type.displayName,
-        location: viewModel.medal.location.formatted,
+        place: viewModel.medal.place.formatted,
         date: viewModel.medal.date.formattedMonthDayYear(),
         bib: viewModel.medal.bibNumber
       )

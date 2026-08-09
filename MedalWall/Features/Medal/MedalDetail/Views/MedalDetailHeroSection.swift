@@ -12,7 +12,7 @@ struct MedalDetailHeroSection: View {
   let name: String
   let raceDistance: String
   let raceDistanceType: String
-  let location: String
+  let place: String
   let date: String
   let bib: String
 
@@ -36,7 +36,7 @@ struct MedalDetailHeroSection: View {
         .frame(maxWidth: .infinity, alignment: .leading)
 
       VStack(alignment: .leading, spacing: 8) {
-        Label(location, systemImage: "mappin.and.ellipse")
+        Label(place, systemImage: "mappin.and.ellipse")
         Label(date, systemImage: "calendar")
         Label("Bib \(bib)", systemImage: "number")
       }  // VStack
@@ -54,7 +54,7 @@ struct MedalDetailHeroSection: View {
     name: medal.name,
     raceDistance: medal.distance.category.description,
     raceDistanceType: medal.distance.type.displayName,
-    location: medal.location.formatted,
+    place: medal.place.formatted,
     date: medal.date.formattedMonthDayYear(),
     bib: medal.bibNumber
   )

@@ -10,7 +10,7 @@ import SwiftUI
 struct RaceRow: View {
   let photoUrl: String?
   let name: String
-  let location: String
+  let place: String
   let editionCount: Int
 
   var body: some View {
@@ -25,7 +25,7 @@ struct RaceRow: View {
           .font(.headline)
           .foregroundStyle(Color.Text.primary)
 
-        Text(location)
+        Text(place)
           .font(.subheadline)
           .foregroundStyle(Color.Text.secondary)
 
@@ -42,14 +42,14 @@ struct RaceRow: View {
     RaceRow(
       photoUrl: nil,
       name: "Taipei Marathon",
-      location: "Taipei, Taiwan",
+      place: "Taipei, Taiwan",
       editionCount: 2
     )
 
     RaceRow(
       photoUrl: nil,
       name: "BMO Vancouver Marathon",
-      location: "Vancouver, BC, Canada",
+      place: "Vancouver, BC, Canada",
       editionCount: 0
     )
   }

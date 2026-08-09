@@ -27,7 +27,7 @@ struct RaceEntryList: View {
               .font(.headline)
               .foregroundStyle(Color.Text.primary)
 
-            Text(race.location.formatted)
+            Text(race.place.formatted)
               .font(.subheadline)
               .foregroundStyle(Color.Text.secondary)
 

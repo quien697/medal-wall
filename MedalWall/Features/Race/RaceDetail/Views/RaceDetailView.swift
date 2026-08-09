@@ -28,7 +28,7 @@ struct RaceDetailView: View {
       RaceDetailHeroSection(
         photoUrl: viewModel.race.photoUrl,
         name: viewModel.race.name,
-        location: viewModel.race.location.formatted,
+        place: viewModel.race.place.formatted,
         url: viewModel.race.fullWebsiteUrl
       )
 

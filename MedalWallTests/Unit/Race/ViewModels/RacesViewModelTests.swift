@@ -10,10 +10,10 @@ import Testing
 @testable import MedalWall
 
 struct RacesViewModelTests {
-  private let location = GeoLocation(country: "Canada", city: "Vancouver")
+  private let place = Place(countryCode: "CA", city: "Vancouver")
 
   private func makeRace(name: String) -> Race {
-    Race(name: name, location: location, createdBy: "user-1")
+    Race(name: name, place: place, createdBy: "user-1")
   }
 
   // MARK: - filteredRaces

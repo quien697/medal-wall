@@ -12,10 +12,7 @@ final class EditMedalViewModel {
   var date: Date = .now
   var bibNumber: String = ""
   var photo: UIImage?
-  var country: String = ""
-  var province: String = ""
-  var city: String = ""
-  var district: String = ""
+  var place = Place(countryCode: "", city: "")
   var distance: RaceDistance = .default
   var finishTime: TimeInterval?
   var overallPlacement: Int?
@@ -50,10 +47,7 @@ final class EditMedalViewModel {
       self.name = medal.name
       self.date = medal.date
       self.bibNumber = medal.bibNumber
-      self.country = medal.location.country
-      self.province = medal.location.province ?? ""
-      self.city = medal.location.city
-      self.district = medal.location.district ?? ""
+      self.place = medal.place
       self.distance = medal.distance
       self.finishTime = medal.finishTime
       self.overallPlacement = medal.overallPlacement
@@ -79,8 +73,7 @@ final class EditMedalViewModel {
     }()
 
     return customDistanceValid && !name.trimmingCharacters(in: .whitespaces).isEmpty
-      && !country.trimmingCharacters(in: .whitespaces).isEmpty
-      && !city.trimmingCharacters(in: .whitespaces).isEmpty
+      && place.isValid
   }
 
   // MARK: - Functions
@@ -114,10 +107,7 @@ final class EditMedalViewModel {
     name = "\(selection.race.name) \(selection.edition.year)"
     date = selection.edition.startDate
     distance = selection.distance
-    country = selection.race.location.country
-    province = selection.race.location.province ?? ""
-    city = selection.race.location.city
-    district = selection.race.location.district ?? ""
+    place = selection.race.place
   }
 
   /// Saves the medal to Firestore, uploading any new photos to Firebase Storage first,
@@ -125,12 +115,6 @@ final class EditMedalViewModel {
   func save(by userID: String, userManager: UserManager) async throws {
     isLoading = true
     defer { isLoading = false }
-    let location = GeoLocation(
-      country: country,
-      province: province.isEmpty ? nil : province,
-      city: city,
-      district: district.isEmpty ? nil : district
-    )
 
     let photoUrl = try await resolvedPhotoUrl(userId: userID)
     let eventPhotos = try await resolvedEventPhotos(userId: userID)
@@ -141,7 +125,7 @@ final class EditMedalViewModel {
       updated.date = date
       updated.bibNumber = bibNumber
       updated.photoUrl = photoUrl
-      updated.location = location
+      updated.place = place
       updated.distance = distance
       updated.finishTime = finishTime
       updated.overallPlacement = overallPlacement
@@ -162,7 +146,7 @@ final class EditMedalViewModel {
         date: date,
         bibNumber: bibNumber,
         photoUrl: photoUrl,
-        location: location,
+        place: place,
         distance: distance,
         finishTime: finishTime,
         overallPlacement: overallPlacement,

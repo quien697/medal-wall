@@ -20,6 +20,7 @@ struct EditMedalView: View {
   @State private var isPresentingDistancePicker: Bool = false
   @State private var isPresentingCropImageView: Bool = false
   @State private var isPresentingRaceEntryPicker: Bool = false
+  @State private var isPresentingPlacePicker: Bool = false
   @State private var shouldDismiss: Bool = false
   // Medal photo picker
   @State private var isPresentingPhotoPicker: Bool = false
@@ -69,12 +70,9 @@ struct EditMedalView: View {
           }
         )
 
-        EditMedalLocationSection(
-          country: $viewModel.country,
-          province: $viewModel.province,
-          city: $viewModel.city,
-          district: $viewModel.district
-        )
+        EditPlaceSection(place: viewModel.place) {
+          isPresentingPlacePicker = true
+        }
 
         EditMedalPlacementSection(
           overallPlacement: $viewModel.overallPlacement,
@@ -211,6 +209,9 @@ struct EditMedalView: View {
           }
         )
         .presentationDetents([.medium])
+      }
+      .sheet(isPresented: $isPresentingPlacePicker) {
+        PlacePickerView { viewModel.place = $0 }
       }
       .sheet(isPresented: $isPresentingRaceEntryPicker) {
         RaceEntryPicker { selection in

@@ -13,7 +13,7 @@ extension Medal {
       name: "Sample \(Race.taipei.name) \(RaceEdition.taipei2019.year)",
       date: RaceEdition.taipei2019.startDate,
       bibNumber: "00001",
-      location: Race.taipei.location,
+      place: Race.taipei.place,
       distance: RaceEdition.taipei2019.distances[0],
       finishTime: 3 * 3600 + 30 * 60 + 24,
       overallPlacement: 1058,
@@ -32,7 +32,7 @@ extension Medal {
       name: "Sample \(Race.vancouver.name) \(RaceEdition.vancouver2022.year)",
       date: RaceEdition.vancouver2022.startDate,
       bibNumber: "2814",
-      location: Race.vancouver.location,
+      place: Race.vancouver.place,
       distance: RaceEdition.vancouver2022.distances.first!,
       userID: "preview"
     )

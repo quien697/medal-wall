@@ -15,7 +15,10 @@ extension Race {
   static let taipei = Race(
     id: "race-taipei",
     name: "Taipei Marathon",
-    location: GeoLocation(country: "Taiwan", city: "Taipei"),
+    place: Place(
+      countryCode: "TW",
+      city: "Taipei City"
+    ),
     websiteUrl: "taipeicitymarathon.com",
     createdBy: "preview"
   )
@@ -23,7 +26,11 @@ extension Race {
   static let vancouver = Race(
     id: "race-vancouver",
     name: "BMO Vancouver Marathon",
-    location: GeoLocation(country: "Canada", province: "BC", city: "Vancouver"),
+    place: Place(
+      countryCode: "CA",
+      city: "Vancouver",
+      region: "BC"
+    ),
     websiteUrl: "bmovanmarathon.ca",
     createdBy: "preview"
   )
@@ -31,7 +38,10 @@ extension Race {
   static let tokyo = Race(
     id: "race-tokyo",
     name: "Tokyo Marathon",
-    location: GeoLocation(country: "Japan", city: "Tokyo"),
+    place: Place(
+      countryCode: "JP",
+      city: "Tokyo"
+    ),
     websiteUrl: "marathon.tokyo",
     createdBy: "preview"
   )
@@ -39,7 +49,11 @@ extension Race {
   static let boston = Race(
     id: "race-boston",
     name: "Boston Marathon",
-    location: GeoLocation(country: "United States", province: "MA", city: "Boston"),
+    place: Place(
+      countryCode: "US",
+      city: "Boston",
+      region: "MA"
+    ),
     websiteUrl: "baa.org/races/boston-marathon",
     createdBy: "preview"
   )

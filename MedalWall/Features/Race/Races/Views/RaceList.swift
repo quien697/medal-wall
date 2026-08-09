@@ -26,7 +26,7 @@ struct RaceList: View {
             RaceRow(
               photoUrl: race.photoUrl,
               name: race.name,
-              location: race.location.formatted,
+              place: race.place.formatted,
               editionCount: race.editionCount
             )
           }  // NavigationLink

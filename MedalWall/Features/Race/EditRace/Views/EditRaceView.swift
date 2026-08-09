@@ -20,6 +20,7 @@ struct EditRaceView: View {
   @State private var isPresentingPhotoPicker: Bool = false
   @State private var isPresentingCropImageView: Bool = false
   @State private var isPresentingAddEdition = false
+  @State private var isPresentingPlacePicker = false
   @State private var selectedEdition: DraftRaceEdition?
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var rawPickedImage: UIImage?
@@ -59,12 +60,9 @@ struct EditRaceView: View {
           url: $viewModel.websiteUrl
         )
 
-        EditRaceLocationSection(
-          country: $viewModel.country,
-          province: $viewModel.province,
-          city: $viewModel.city,
-          district: $viewModel.district
-        )
+        EditPlaceSection(place: viewModel.place) {
+          isPresentingPlacePicker = true
+        }
 
         if viewModel.mode == .edit, let raceId = viewModel.raceId {
           EditRaceEditionSection(
@@ -156,6 +154,9 @@ struct EditRaceView: View {
           }
         }
       )
+      .sheet(isPresented: $isPresentingPlacePicker) {
+        PlacePickerView { viewModel.place = $0 }
+      }
       .sheet(isPresented: $isPresentingAddEdition) {
         if let raceId = viewModel.raceId {
           EditRaceEditionView(

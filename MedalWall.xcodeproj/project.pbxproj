@@ -85,7 +85,7 @@
 				Models/Race/RaceDistanceCategory.swift,
 				Models/Race/RaceDistanceType.swift,
 				Models/Race/RaceEdition.swift,
-				Models/Shared/GeoLocation.swift,
+				Models/Shared/Place.swift,
 				Models/User/Gender.swift,
 				Models/User/User.swift,
 				"Models/User/User+Computed.swift",
@@ -96,7 +96,11 @@
 				"Resources/SampleData/Medal+SampleData.swift",
 				"Resources/SampleData/Race+SampleData.swift",
 				Services/AuthService.swift,
+				Services/MapKitPlaceSearchService.swift,
 				Services/StorageService.swift,
+				Shared/Components/PlacePicker/Models/PlaceSearchStatus.swift,
+				Shared/Components/PlacePicker/Models/PlaceSuggestion.swift,
+				Shared/Components/PlacePicker/ViewModels/PlacePickerViewModel.swift,
 				Shared/Errors/AppError.swift,
 				Shared/Errors/ErrorWrapper.swift,
 				"Shared/Extensions/Date+Extensions.swift",
@@ -536,7 +540,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tsung-hsun-liu.medalwall";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -574,7 +578,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tsung-hsun-liu.medalwall";
 				PRODUCT_NAME = "$(TARGET_NAME)";
