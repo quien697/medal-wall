@@ -104,7 +104,9 @@
 				Shared/Errors/AppError.swift,
 				Shared/Errors/ErrorWrapper.swift,
 				"Shared/Extensions/Date+Extensions.swift",
+				"Shared/Extensions/String+Localization.swift",
 				"Shared/Extensions/UIImage+Extensions.swift",
+				Shared/UIModels/AppLanguage.swift,
 				Shared/UIModels/ItemEditMode.swift,
 			);
 			target = 60B570BE2EA616CA000B3FDE /* MedalWallTests */;
@@ -306,6 +308,7 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-TW",
 			);
 			mainGroup = 60B570A72EA616C8000B3FDE;
 			minimizedProjectReferenceProxies = 1;

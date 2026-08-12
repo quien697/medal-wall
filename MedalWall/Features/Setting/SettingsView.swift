@@ -14,6 +14,7 @@ struct SettingsView: View {
 
   // MARK: - State
   @AppStorage("appTheme") private var appTheme: AppTheme = .system
+  @AppStorage(AppLanguage.storageKey) private var appLanguage: AppLanguage = .system
 
   // MARK: - Body
   var body: some View {
@@ -21,6 +22,8 @@ struct SettingsView: View {
       List {
         Section {
           AppearancePicker(appTheme: $appTheme)
+
+          LanguagePicker(appLanguage: $appLanguage)
         } header: {
           Text("Preferences")
             .sectionTitleStyle()
