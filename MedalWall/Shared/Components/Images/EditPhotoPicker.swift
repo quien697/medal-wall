@@ -33,7 +33,11 @@ struct EditPhotoPicker<Preview: View>: View {
 
   // MARK: - Computed
   private var displayHint: String {
-    hint ?? (photo == nil ? "Tap to add a photo" : "Tap to update the photo")
+    if let hint { return hint }
+
+    return photo == nil
+      ? .appLocalized("Tap to add a photo")
+      : .appLocalized("Tap to update the photo")
   }
 
   // MARK: - Body

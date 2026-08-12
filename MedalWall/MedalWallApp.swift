@@ -15,6 +15,7 @@ struct MedalWallApp: App {
   @Environment(\.scenePhase) private var scenePhase
   @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
   @AppStorage("appTheme") private var appTheme: AppTheme = .system
+  @AppStorage(AppLanguage.storageKey) private var appLanguage: AppLanguage = .system
   @State private var userManager: UserManager?
 
   var body: some Scene {
@@ -31,6 +32,8 @@ struct MedalWallApp: App {
         }
       }  // Group
       .environment(userManager)
+      .environment(\.locale, appLanguage.resolvedLocale)
+      .id(appLanguage)
       .preferredColorScheme(appTheme.colorScheme)
       .onOpenURL { url in
         GIDSignIn.sharedInstance.handle(url)

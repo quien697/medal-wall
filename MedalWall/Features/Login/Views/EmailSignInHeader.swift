@@ -9,8 +9,8 @@ import SwiftUI
 
 struct EmailSignInHeader: View {
   // MARK: - Properties
-  let title: String
-  let subTitle: String
+  let title: LocalizedStringKey
+  let subTitle: LocalizedStringKey
 
   // MARK: - Body
   var body: some View {

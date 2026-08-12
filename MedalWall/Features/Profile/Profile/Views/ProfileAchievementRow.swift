@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProfileAchievementRow: View {
-  let trackName: String
+  let trackName: LocalizedStringKey
   let progress: AchievementProgress
 
   var body: some View {
@@ -20,7 +20,7 @@ struct ProfileAchievementRow: View {
           .font(.headline)
           .fontWeight(.bold)
 
-        Text(progress.unlockedTier?.name ?? "Not started")
+        Text(progress.unlockedTier?.name ?? .appLocalized("Not started"))
           .font(.footnote)
           .foregroundStyle(Color.Text.tertiary)
 

@@ -10,7 +10,7 @@ import SwiftUI
 struct StatCard: View {
   let title: String
   let titleFont: Font
-  let subTitle: String
+  let subTitle: LocalizedStringKey
   let titleColor: Color
   let vPadding: CGFloat
   let hPadding: CGFloat
@@ -18,7 +18,7 @@ struct StatCard: View {
   init(
     title: String,
     titleFont: Font? = nil,
-    subTitle: String,
+    subTitle: LocalizedStringKey,
     titleColor: Color? = nil,
     vPadding: CGFloat? = nil,
     hPadding: CGFloat? = nil

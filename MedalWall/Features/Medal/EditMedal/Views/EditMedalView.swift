@@ -98,7 +98,7 @@ struct EditMedalView: View {
 
         EditMedalTagsSection(tags: $viewModel.tags)
       }  // Form
-      .navigationTitle("\(viewModel.mode == .add ? "New" : "Edit") Medal")
+      .navigationTitle("\(viewModel.mode.displayName) Medal")
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
       .background(Color.Background.primary)

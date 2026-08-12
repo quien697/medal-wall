@@ -23,7 +23,7 @@ struct EditPlaceSection: View {
     Section("Place") {
       Button(action: onTap) {
         LabeledContent {
-          Text(place.formatted.isEmpty ? "Choose a place" : place.formatted)
+          Text(place.formatted.isEmpty ? .appLocalized("Choose a place") : place.formatted)
             .multilineTextAlignment(.trailing)
             .foregroundStyle(place.formatted.isEmpty ? .secondary : .primary)
         } label: {

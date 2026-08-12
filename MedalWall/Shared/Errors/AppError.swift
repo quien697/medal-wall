@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum AppError: LocalizedError, Identifiable, Equatable {
+nonisolated enum AppError: LocalizedError, Identifiable, Equatable {
   // Auth, Login Errors
   case invalidCredential
   case missingNonce
@@ -56,161 +56,161 @@ enum AppError: LocalizedError, Identifiable, Equatable {
   var title: String {
     switch self {
     case .contextNotAttached:
-      "Context hasn't attached yet"
+      .appLocalized("Context hasn't attached yet")
     case .raceFetchFailed:
-      "Failed to Load Races"
+      .appLocalized("Failed to Load Races")
     case .raceSaveFailed:
-      "Race Save Failed"
+      .appLocalized("Race Save Failed")
     case .raceDeleteFailed:
-      "Race Delete Failed"
+      .appLocalized("Race Delete Failed")
     case .editionSaveFailed:
-      "Edition Save Failed"
+      .appLocalized("Edition Save Failed")
     case .editionDeleteFailed:
-      "Edition Delete Failed"
+      .appLocalized("Edition Delete Failed")
     case .medalFetchFailed:
-      "Failed to Load Medals"
+      .appLocalized("Failed to Load Medals")
     case .medalSaveFailed:
-      "Medal Save Failed"
+      .appLocalized("Medal Save Failed")
     case .medalDeleteFailed:
-      "Medal Delete Failed"
+      .appLocalized("Medal Delete Failed")
     case .eventPhotoSaveFailed:
-      "Photo Save Failed"
+      .appLocalized("Photo Save Failed")
     case .eventPhotoDeleteFailed:
-      "Photo Delete Failed"
+      .appLocalized("Photo Delete Failed")
     case .userSaveFailed:
-      "User Save Failed"
+      .appLocalized("User Save Failed")
     case .userLoadFailed:
-      "User Load Failed"
+      .appLocalized("User Load Failed")
     case .duplicateEdition:
-      "Duplicate Edition"
+      .appLocalized("Duplicate Edition")
     case .duplicateDistance:
-      "Duplicate Distance"
+      .appLocalized("Duplicate Distance")
     case .invalidDistance:
-      "Invalid Distance"
+      .appLocalized("Invalid Distance")
     case .photoLoadFailed:
-      "Photo Load Failed"
+      .appLocalized("Photo Load Failed")
     case .photoDataInvalid:
-      "Photo Data Invalid"
+      .appLocalized("Photo Data Invalid")
     case .placeSearchFailed:
-      "Place Search Failed"
+      .appLocalized("Place Search Failed")
     case .placeNotResolved:
-      "Place Unavailable"
+      .appLocalized("Place Unavailable")
     case .sendEmailSignInLinkFailed:
-      "Send Email Sign-in Link Failed"
+      .appLocalized("Send Email Sign-in Link Failed")
     case .noInternetConnection:
-      "No Internet Connection"
+      .appLocalized("No Internet Connection")
     case .invalidCredential,
       .missingNonce,
       .missingIdentityToken,
       .nonceFailed,
       .tokenSerializationFailed,
       .signInFailed:
-      "Sign In Failed"
+      .appLocalized("Sign In Failed")
     case .unknown:
-      "Unexpected Error"
+      .appLocalized("Unexpected Error")
     }
   }
 
   var message: String {
     switch self {
     case .contextNotAttached:
-      "Internal error: Data context not available."
+      .appLocalized("Internal error: Data context not available.")
     case .raceFetchFailed(let description):
-      "We couldn't load your races. \(description)"
+      .appLocalized("We couldn't load your races. \(description)")
     case .raceSaveFailed:
-      "We couldn't save your race event."
+      .appLocalized("We couldn't save your race event.")
     case .raceDeleteFailed:
-      "We couldn't delete this race event. Please try again."
+      .appLocalized("We couldn't delete this race event. Please try again.")
     case .editionSaveFailed:
-      "We couldn't save this edition."
+      .appLocalized("We couldn't save this edition.")
     case .editionDeleteFailed:
-      "We couldn't delete this edition. Please try again."
+      .appLocalized("We couldn't delete this edition. Please try again.")
     case .medalFetchFailed(let description):
-      "We couldn't load your medals. \(description)"
+      .appLocalized("We couldn't load your medals. \(description)")
     case .medalSaveFailed:
-      "We couldn't save this medal."
+      .appLocalized("We couldn't save this medal.")
     case .medalDeleteFailed:
-      "We couldn't delete this medal. Please try again."
+      .appLocalized("We couldn't delete this medal. Please try again.")
     case .eventPhotoSaveFailed:
-      "We couldn't save this photo."
+      .appLocalized("We couldn't save this photo.")
     case .eventPhotoDeleteFailed:
-      "We couldn't delete this photo. Please try again."
+      .appLocalized("We couldn't delete this photo. Please try again.")
     case .userSaveFailed:
-      "We couldn't save your user information."
+      .appLocalized("We couldn't save your user information.")
     case .userLoadFailed:
-      "We couldn't load your user profile."
+      .appLocalized("We couldn't load your user profile.")
     case .duplicateEdition:
-      "An edition with the same year already exists."
+      .appLocalized("An edition with the same year already exists.")
     case .duplicateDistance:
-      "This distance already exists."
+      .appLocalized("This distance already exists.")
     case .invalidDistance:
-      "Distance must be greater than zero."
+      .appLocalized("Distance must be greater than zero.")
     case .photoLoadFailed:
-      "We couldn't load this photo."
+      .appLocalized("We couldn't load this photo.")
     case .photoDataInvalid:
-      "We couldn't process the selected image."
+      .appLocalized("We couldn't process the selected image.")
     case .placeSearchFailed(let description):
-      "We couldn't search for places. \(description)"
+      .appLocalized("We couldn't search for places. \(description)")
     case .placeNotResolved:
-      "We couldn't get the details for that place."
+      .appLocalized("We couldn't get the details for that place.")
     case .invalidCredential:
-      "Failed to get Apple ID credential."
+      .appLocalized("Failed to get Apple ID credential.")
     case .missingNonce:
-      "Sign-in session expired."
+      .appLocalized("Sign-in session expired.")
     case .missingIdentityToken:
-      "Failed to fetch identity token from Apple."
+      .appLocalized("Failed to fetch identity token from Apple.")
     case .nonceFailed(let status):
-      "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(status)."
+      .appLocalized("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(status).")
     case .tokenSerializationFailed(let description):
-      "Failed to serialize token string from data: \(description)."
+      .appLocalized("Failed to serialize token string from data: \(description).")
     case .sendEmailSignInLinkFailed(let description):
-      "We couldn't send the sign-in link to your email. \(description)"
+      .appLocalized("We couldn't send the sign-in link to your email. \(description)")
     case .noInternetConnection:
-      "You're not connected to the internet."
+      .appLocalized("You're not connected to the internet.")
     case .signInFailed:
-      "We couldn't sign you in."
+      .appLocalized("We couldn't sign you in.")
     case .unknown:
-      "Something unexpected happened."
+      .appLocalized("Something unexpected happened.")
     }
   }
 
   var guidance: String {
     switch self {
     case .contextNotAttached:
-      "Please restart the app. If the problem continues, contact support."
+      .appLocalized("Please restart the app. If the problem continues, contact support.")
     case .raceFetchFailed, .medalFetchFailed:
-      "Please check your connection and try again."
+      .appLocalized("Please check your connection and try again.")
     case .raceSaveFailed, .raceDeleteFailed, .editionSaveFailed, .editionDeleteFailed,
       .medalSaveFailed, .medalDeleteFailed, .eventPhotoSaveFailed, .eventPhotoDeleteFailed,
       .userSaveFailed:
-      "Please try it again."
+      .appLocalized("Please try it again.")
     case .userLoadFailed:
-      "Please restart the app. If the problem continues, you may need to reinstall."
+      .appLocalized("Please restart the app. If the problem continues, you may need to reinstall.")
     case .duplicateEdition:
-      "Please choose a different year or edit the existing edition."
+      .appLocalized("Please choose a different year or edit the existing edition.")
     case .duplicateDistance:
-      "Please try selecting a different distance or type."
+      .appLocalized("Please try selecting a different distance or type.")
     case .invalidDistance:
-      "Please enter a distance greater than 0 km."
+      .appLocalized("Please enter a distance greater than 0 km.")
     case .photoLoadFailed:
-      "Please try selecting the image again."
+      .appLocalized("Please try selecting the image again.")
     case .photoDataInvalid:
-      "Please try choosing a different image."
+      .appLocalized("Please try choosing a different image.")
     case .placeSearchFailed, .placeNotResolved:
-      "Please check your connection and try again."
+      .appLocalized("Please check your connection and try again.")
     case .sendEmailSignInLinkFailed:
-      "Please check your email address and try again."
+      .appLocalized("Please check your email address and try again.")
     case .noInternetConnection:
-      "Please check your connection and try again."
+      .appLocalized("Please check your connection and try again.")
     case .invalidCredential,
       .missingNonce,
       .missingIdentityToken,
       .nonceFailed,
       .tokenSerializationFailed,
       .signInFailed:
-      "Please try signing in again."
+      .appLocalized("Please try signing in again.")
     case .unknown:
-      "Please try again later."
+      .appLocalized("Please try again later.")
     }
   }
 }

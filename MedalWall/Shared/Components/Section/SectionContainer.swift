@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct SectionContainer<Content: View>: View {
-  private let title: String?
+  private let title: LocalizedStringKey?
   private let content: Content
 
   init(
-    title: String? = nil,
+    title: LocalizedStringKey? = nil,
     @ViewBuilder content: () -> Content
   ) {
     self.title = title
