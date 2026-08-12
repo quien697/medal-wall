@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EditMedalPlacementRow: View {
-  let label: String
+  let label: LocalizedStringKey
   @Binding var placement: Int?
   @Binding var total: Int?
 

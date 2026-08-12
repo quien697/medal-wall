@@ -57,8 +57,9 @@ final class EditRaceEditionViewModel {
 
   // MARK: - Computed
   var photoHint: String {
-    let action = photo == nil ? "add a new" : "update the"
-    return "Tap to \(action) edition photo,\nor leave empty to use the race logo."
+    photo == nil
+      ? .appLocalized("Tap to add a new edition photo,\nor leave empty to use the race logo.")
+      : .appLocalized("Tap to update the edition photo,\nor leave empty to use the race logo.")
   }
 
   var isFormValid: Bool {

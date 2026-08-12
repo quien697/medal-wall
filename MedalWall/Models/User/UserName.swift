@@ -22,6 +22,6 @@ struct UserName {
   nonisolated var fullName: String {
     let parts = [trimmedFirstName, trimmedLastName].filter { !$0.isEmpty }
     let name = parts.joined(separator: " ")
-    return name.isEmpty ? "Runner" : name
+    return name.isEmpty ? .appLocalized("Runner") : name
   }
 }

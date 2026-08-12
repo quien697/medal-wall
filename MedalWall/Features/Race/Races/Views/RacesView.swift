@@ -67,7 +67,7 @@ struct RacesView: View {
       }  // toolbar
       .alert(isPresented: $isPresentingDeleteConfirm) {
         .deleteConfirmation(
-          name: selectedRace?.name ?? "Race",
+          name: selectedRace?.name ?? .appLocalized("Race"),
           onDelete: {
             if let race = selectedRace {
               Task { await viewModel.deleteRace(race) }

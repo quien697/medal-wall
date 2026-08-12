@@ -7,14 +7,14 @@
 
 import SwiftUI
 
-enum AppTheme: String, CaseIterable {
+nonisolated enum AppTheme: String, CaseIterable {
   case system, light, dark
 
   var label: String {
     switch self {
-    case .system: "System"
-    case .light: "Light"
-    case .dark: "Dark"
+    case .system: .appLocalized("System")
+    case .light: .appLocalized("Light")
+    case .dark: .appLocalized("Dark")
     }
   }
 

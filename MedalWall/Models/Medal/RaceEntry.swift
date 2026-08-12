@@ -13,6 +13,6 @@ struct RaceEntry {
   let distance: RaceDistance
 
   var selectionLabel: String {
-    "\(race.name) \(edition.year) (\(distance.displayLabel)) selected"
+    .appLocalized("\(race.name) \(String(edition.year)) (\(distance.displayLabel)) selected")
   }
 }

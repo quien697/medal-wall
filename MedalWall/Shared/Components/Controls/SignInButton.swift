@@ -10,14 +10,14 @@ import SwiftUI
 struct SignInButton: View {
   // MARK: - Properties
   private let icon: Image?
-  private let title: String
+  private let title: LocalizedStringKey
   private let isLoading: Bool
   private let action: () async -> Void
 
   // MARK: - Init
   init(
     icon: Image? = nil,
-    title: String,
+    title: LocalizedStringKey,
     isLoading: Bool = false,
     action: @escaping () async -> Void
   ) {

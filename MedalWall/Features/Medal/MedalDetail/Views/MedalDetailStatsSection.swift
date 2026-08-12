@@ -39,7 +39,7 @@ struct MedalDetailStatsSection: View {
         )
 
         MedalDetailStatsGridItem(
-          title: "Avg Pace",
+          title: "AVG Pace",
           headline: averagePace,
         )
 

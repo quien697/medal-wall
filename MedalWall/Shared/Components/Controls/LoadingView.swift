@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LoadingView: View {
-  let text: String
+  let text: LocalizedStringKey
 
   var body: some View {
     VStack(spacing: 16) {

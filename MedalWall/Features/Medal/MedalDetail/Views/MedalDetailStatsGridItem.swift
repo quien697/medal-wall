@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct MedalDetailStatsGridItem: View {
-  let title: String
+  let title: LocalizedStringKey
   let headline: String
   let subHeadLine: String?
   let headLineColor: Color?
 
   // MARK: - Init
   init(
-    title: String,
+    title: LocalizedStringKey,
     headline: String,
     subHeadLine: String? = nil,
     headLineColor: Color? = nil

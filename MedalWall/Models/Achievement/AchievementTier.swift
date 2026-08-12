@@ -21,13 +21,13 @@ enum AchievementTier: Int, CaseIterable {
   /// Display name shown in the achievement row.
   nonisolated var name: String {
     switch self {
-    case .firstFinish: return "First Finish"
-    case .hatTrick: return "Hat Trick"
-    case .highFive: return "High Five"
-    case .perfectTen: return "Perfect Ten"
-    case .quarterCentury: return "Quarter Century"
-    case .halfCentury: return "Half Century"
-    case .centurion: return "Centurion"
+    case .firstFinish: return .appLocalized("First Finish")
+    case .hatTrick: return .appLocalized("Hat Trick")
+    case .highFive: return .appLocalized("High Five")
+    case .perfectTen: return .appLocalized("Perfect Ten")
+    case .quarterCentury: return .appLocalized("Quarter Century")
+    case .halfCentury: return .appLocalized("Half Century")
+    case .centurion: return .appLocalized("Centurion")
     }
   }
 

@@ -38,7 +38,7 @@ final class MedalDetailViewModel {
 
   var totalParticipantsText: String {
     guard let total = medal.totalParticipants else { return "" }
-    return "of \(total)"
+    return .appLocalized("of \(String(total))")
   }
 
   var divisionText: String {
@@ -53,7 +53,7 @@ final class MedalDetailViewModel {
 
   var divisionTotalText: String {
     guard let total = medal.divisionTotal else { return "" }
-    return "of \(total)"
+    return .appLocalized("of \(String(total))")
   }
 
   var genderPlacementText: String {
@@ -63,7 +63,7 @@ final class MedalDetailViewModel {
 
   var genderTotalText: String {
     guard let total = medal.genderTotal else { return "" }
-    return "of \(total)"
+    return .appLocalized("of \(String(total))")
   }
 
   // MARK: - Functions

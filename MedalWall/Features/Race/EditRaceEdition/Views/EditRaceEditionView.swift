@@ -138,7 +138,7 @@ struct EditRaceEditionView: View {
         await viewModel.loadExistingPhoto()
       }
       .alert(isPresented: $isPresentingDeleteConfirm) {
-        .deleteConfirmation(name: "Edition") {
+        .deleteConfirmation(name: .appLocalized("Edition")) {
           if let onDelete {
             onDelete()
             dismiss()

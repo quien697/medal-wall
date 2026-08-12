@@ -5,13 +5,15 @@
 //  Created by Quien on 2026-04-15.
 //
 
-enum ItemEditMode {
+import Foundation
+
+nonisolated enum ItemEditMode {
   case add, edit
 
   var displayName: String {
     switch self {
-    case .add: return "New"
-    case .edit: return "Edit"
+    case .add: return .appLocalized("New")
+    case .edit: return .appLocalized("Edit")
     }
   }
 }

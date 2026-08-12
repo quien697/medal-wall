@@ -127,5 +127,5 @@ class UserManager {
 // MARK: - Convenience
 extension UserManager {
   var currentUserID: String? { firebaseUser?.uid }
-  var currentUserName: String { currentUser?.name ?? "Runner" }
+  var currentUserName: String { currentUser?.name ?? .appLocalized("Runner") }
 }
