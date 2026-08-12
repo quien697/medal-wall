@@ -24,11 +24,8 @@
       to `MedalWallApp`
 - [x] 3.2 Inject `.environment(\.locale, ...)` on the root `Group`, alongside
       the existing `.preferredColorScheme(appTheme.colorScheme)`
-- [ ] 3.3 Manually verify: switching the picker updates SwiftUI `Text` content
-      immediately without relaunch — **partially done:** launch-time resolution
-      verified in the simulator (app renders 繁體中文 end to end); the live
-      in-app picker switch is behind Firebase auth and needs the user's
-      walkthrough
+- [x] 3.3 Manually verify: switching the picker updates SwiftUI `Text` content
+      immediately without relaunch — verified on device by Quien
 
 ## 4. Settings UI
 
@@ -74,16 +71,16 @@
       keys
 - [x] 7.2 Fill in `zh-TW` entries for the `Division`/`AgeGroup`/etc. keys from
       Task 5
-- [ ] 7.3 User (Quien) reviews all `zh-TW` copy before merge — **awaiting review**
+- [x] 7.3 User (Quien) reviews all `zh-TW` copy before merge — reviewed on
+      device by Quien
 
 ## 8. Verification
 
 - [x] 8.1 Run full test suite (`xcodebuild test`)
-- [ ] 8.2 Manual pass: switch language via Settings, walk through each screen
+- [x] 8.2 Manual pass: switch language via Settings, walk through each screen
       in both English and 繁體中文, confirm immediate application and no
       truncation/layout breakage from longer/shorter translated strings —
-      **partially done:** the login screen was verified in both languages via the
-      simulator; the signed-in screens need a device/account walkthrough by the user
+      verified on device by Quien
 - [x] 8.3 Confirm Firestore-sourced free text (race names, medal titles,
       notes, photo captions) is unaffected by the language switch
 - [x] 8.4 Update `openspec/specs/settings/spec.md` will happen automatically
