@@ -112,7 +112,7 @@
 - [x] 7.3 Build and manually verify each unit end to end: preset badges, detail
       hero, custom entry, pace, and the picker rows, in both units and both
       languages — verified on a physical device by Quien
-- [ ] 7.4 At archive time, extend the `settings` capability `Purpose` sentence,
+- [x] 7.4 At archive time, extend the `settings` capability `Purpose` sentence,
       which currently enumerates only the appearance mode and the app language, to
       include the distance unit — the archive skill only prompts on a `TBD` Purpose,
       so this would otherwise go stale silently
