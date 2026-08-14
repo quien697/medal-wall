@@ -69,10 +69,11 @@ one giant change for a whole roadmap.
 
 ## Tooling
 
-- The `openspec` **CLI is not installed**. We run the workflow through the Skills:
-  `openspec-propose` / `openspec-update-change` / `openspec-apply-change` /
-  `openspec-sync-specs` / `openspec-archive-change` (and their `opsx:*` aliases).
+- The `openspec` **CLI is installed** (via npm; `which openspec` to confirm). The Skills
+  drive it: `openspec-propose` / `openspec-update-change` / `openspec-apply-change` /
+  `openspec-sync-specs` / `openspec-archive-change` (and their `opsx:*` aliases). Useful
+  commands directly: `openspec new change <name>`, `openspec status --change <name>`,
+  `openspec instructions <artifact> --change <name>`, `openspec validate <name>`.
 - Project context for OpenSpec generation lives in `openspec/config.yaml` (`context:`
   and `rules:`). Keep it aligned with `CLAUDE.md`.
-- To enable the `openspec validate`/`list`/`archive` **CLI** commands later:
-  `npm install -g openspec`. Optional; only if the skills prove insufficient.
+- If the CLI ever goes missing on a new machine: `npm install -g openspec`.
