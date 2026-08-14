@@ -94,8 +94,8 @@ struct LocalizedDisplayStringTests {
 
   @Test("Race distance label composes a type with a numeric distance")
   func testRaceDistanceDisplayLabel() {
-    #expect(RaceDistance(category: .half, type: .virtual).displayLabel == "Virtual 21km")
-    #expect(RaceDistance(category: .full, type: .inPerson).displayLabel == "42km")
+    #expect(RaceDistance(category: .half, type: .virtual).displayLabel == "Virtual Half")
+    #expect(RaceDistance(category: .full, type: .inPerson).displayLabel == "Full")
   }
 
   // MARK: - AchievementTier

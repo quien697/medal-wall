@@ -8,9 +8,11 @@ Tracked in Jira [MW-20](https://quien.atlassian.net/browse/MW-20).
 ## What Changes
 
 - Add a "Distance" row to `SettingsView`'s Preferences section, next to `LanguagePicker`:
-  System / Kilometers / Miles. Selecting a unit applies it immediately.
-- Resolve the System option from the **device region's** measurement system, so Canada
-  and Taiwan get kilometres and the USA gets miles without the user touching the setting.
+  Kilometers / Miles. Selecting a unit applies it immediately.
+- Seed the initial value from the **device region's** measurement system, so Canada and
+  Taiwan get kilometres and the USA gets miles without the user touching the setting. The
+  picker deliberately has no System option, unlike Appearance and Language: only a
+  concrete unit is ever stored, so the value is unambiguous on any device or client.
 - **BREAKING (display only):** preset distances stop rendering as numbers on cards and
   badges. `42km` / `21km` / `10km` / `5km` become `Full` / `Half` / `10K` / `5K` in both
   units — the names runners actually use, and the only labels that read correctly in
@@ -27,14 +29,15 @@ Tracked in Jira [MW-20](https://quien.atlassian.net/browse/MW-20).
 
 ### New Capabilities
 - `distance-units`: How a distance value becomes displayed text — the stored unit
-  preference and how System resolves, the kilometre-canonical storage rule, conversion
+  preference and how the device seeds it, the kilometre-canonical storage rule, conversion
   and formatting precision, the naming rule that presets are names rather than converted
   numbers, and which surfaces carry a unit.
 
 ### Modified Capabilities
-- `settings`: Adds a Distance Unit preference (System / Kilometers / Miles) alongside the
-  existing Appearance and Language preferences — same storage/apply/sync-scope pattern:
-  stored locally via `@AppStorage`, applied immediately, not synced across devices.
+- `settings`: Adds a Distance Unit preference (Kilometers / Miles) alongside the existing
+  Appearance and Language preferences — same storage/apply/sync-scope pattern: stored
+  locally via `@AppStorage`, applied immediately, not synced across devices. Unlike those
+  two it has no System option; the device seeds the initial value instead.
 - `races`: Custom distances in a race edition are entered in the user's active unit and
   converted to kilometres for storage, with an unedited field saving its original value
   untouched. Adds the rule that a near-preset custom distance is never snapped or

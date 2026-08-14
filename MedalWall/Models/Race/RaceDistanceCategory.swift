@@ -16,19 +16,26 @@ enum RaceDistanceCategory: CustomStringConvertible, Hashable {
   case fiveKM
   case custom(Double)
 
-  /// Defines display name for UI
+  /// The label shown in the UI, resolved against the stored distance unit preference.
   nonisolated var description: String {
+    label(in: DistanceUnit.resolved())
+  }
+
+  /// The label for this category in a given unit.
+  ///
+  /// Presets are named rather than measured, identically in both units — converting them
+  /// would produce labels no runner uses, since a 10K is never a "6.2mi race". Only a
+  /// custom distance carries a measurement.
+  nonisolated func label(
+    in unit: DistanceUnit,
+    defaults: UserDefaults = .standard
+  ) -> String {
     switch self {
-    case .full: return "42km"
-    case .half: return "21km"
-    case .tenKM: return "10km"
-    case .fiveKM: return "5km"
-    case .custom(let value):
-      if value.truncatingRemainder(dividingBy: 1) == 0 {
-        return "\(Int(value))km"
-      } else {
-        return "\(value)km"
-      }
+    case .full: .appLocalized("Full", defaults: defaults)
+    case .half: .appLocalized("Half", defaults: defaults)
+    case .tenKM: .appLocalized("10K", defaults: defaults)
+    case .fiveKM: .appLocalized("5K", defaults: defaults)
+    case .custom(let value): unit.formatted(kilometers: value, defaults: defaults)
     }
   }
 

@@ -5,51 +5,97 @@
 //  Created by Quien on 2026-05-28.
 //
 
+import Foundation
 import Testing
 
 @testable import MedalWall
 
 struct RaceDistanceCategoryTests {
 
+  // MARK: - Support
+  /// A throwaway `UserDefaults` suite pinning English, so number formatting does not
+  /// vary with the simulator's region and `.standard` is never mutated.
+  private static func makeDefaults(function: String = #function) -> UserDefaults {
+    let suiteName = "RaceDistanceCategoryTests.\(function).\(UUID().uuidString)"
+    guard let defaults = UserDefaults(suiteName: suiteName) else {
+      fatalError("Unable to create UserDefaults suite")
+    }
+    defaults.removePersistentDomain(forName: suiteName)
+    defaults.set(AppLanguage.english.rawValue, forKey: AppLanguage.storageKey)
+
+    return defaults
+  }
+
+  private static func label(
+    _ category: RaceDistanceCategory,
+    in unit: DistanceUnit,
+    function: String = #function
+  ) -> String {
+    category.label(in: unit, defaults: makeDefaults(function: function))
+  }
+
+  // MARK: - label presets
+  @Test("Full marathon is named, not measured, in both units")
+  func testFullLabel() {
+    #expect(Self.label(.full, in: .kilometers) == "Full")
+    #expect(Self.label(.full, in: .miles) == "Full")
+  }
+
+  @Test("Half marathon is named, not measured, in both units")
+  func testHalfLabel() {
+    #expect(Self.label(.half, in: .kilometers) == "Half")
+    #expect(Self.label(.half, in: .miles) == "Half")
+  }
+
+  @Test("10K keeps its name in both units — never 6.2mi")
+  func testTenKMLabel() {
+    #expect(Self.label(.tenKM, in: .kilometers) == "10K")
+    #expect(Self.label(.tenKM, in: .miles) == "10K")
+  }
+
+  @Test("5K keeps its name in both units — never 3.1mi")
+  func testFiveKMLabel() {
+    #expect(Self.label(.fiveKM, in: .kilometers) == "5K")
+    #expect(Self.label(.fiveKM, in: .miles) == "5K")
+  }
+
+  // MARK: - label custom
+  @Test("Custom whole-number distance omits the decimal")
+  func testCustomWholeNumberLabel() {
+    #expect(Self.label(.custom(100), in: .kilometers) == "100 km")
+  }
+
+  @Test("Custom decimal distance keeps one fraction digit")
+  func testCustomDecimalLabel() {
+    #expect(Self.label(.custom(3.5), in: .kilometers) == "3.5 km")
+  }
+
+  @Test("A mile-entered custom distance reads back as the number that was typed")
+  func testCustomMilesLabel() {
+    #expect(Self.label(.custom(16.09344), in: .miles) == "10 mi")
+    #expect(Self.label(.custom(16.09344), in: .kilometers) == "16.1 km")
+  }
+
+  @Test("Custom zero distance labels without a malformed value")
+  func testCustomZeroLabel() {
+    #expect(Self.label(.custom(0), in: .kilometers) == "0 km")
+  }
+
+  @Test("Custom negative distance labels without crashing")
+  func testCustomNegativeLabel() {
+    #expect(Self.label(.custom(-5), in: .kilometers) == "-5 km")
+  }
+
   // MARK: - description
-  @Test("Full marathon description is 42km")
-  func testFullDescription() {
-    #expect(RaceDistanceCategory.full.description == "42km")
-  }
+  @Test("description delegates to label using the stored preference")
+  func testDescriptionDelegates() {
+    let resolved = DistanceUnit.resolved()
 
-  @Test("Half marathon description is 21km")
-  func testHalfDescription() {
-    #expect(RaceDistanceCategory.half.description == "21km")
-  }
-
-  @Test("10KM description is 10km")
-  func testTenKMDescription() {
-    #expect(RaceDistanceCategory.tenKM.description == "10km")
-  }
-
-  @Test("5KM description is 5km")
-  func testFiveKMDescription() {
-    #expect(RaceDistanceCategory.fiveKM.description == "5km")
-  }
-
-  @Test("Custom whole-number distance description omits decimal")
-  func testCustomWholeNumberDescription() {
-    #expect(RaceDistanceCategory.custom(100).description == "100km")
-  }
-
-  @Test("Custom decimal distance description includes decimal")
-  func testCustomDecimalDescription() {
-    #expect(RaceDistanceCategory.custom(3.5).description == "3.5km")
-  }
-
-  @Test("Custom zero distance description is 0km")
-  func testCustomZeroDescription() {
-    #expect(RaceDistanceCategory.custom(0).description == "0km")
-  }
-
-  @Test("Custom negative distance description is -5km")
-  func testCustomNegativeDescription() {
-    #expect(RaceDistanceCategory.custom(-5).description == "-5km")
+    #expect(RaceDistanceCategory.full.description == RaceDistanceCategory.full.label(in: resolved))
+    #expect(
+      RaceDistanceCategory.custom(16.09344).description
+        == RaceDistanceCategory.custom(16.09344).label(in: resolved)
+    )
   }
 
   // MARK: - value

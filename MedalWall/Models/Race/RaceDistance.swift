@@ -18,7 +18,7 @@ struct RaceDistance: Identifiable, Hashable, Comparable, Codable {
     RaceDistance(category: .full, type: .inPerson)
   }
 
-  /// `"42km"` for in-person, `"Virtual 21km"` for other types.
+  /// `"Full"` for in-person, `"Virtual Half"` for other types.
   var displayLabel: String {
     if type == .inPerson {
       return category.description

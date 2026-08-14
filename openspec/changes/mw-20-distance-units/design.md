@@ -44,25 +44,41 @@ data that every future client would have to honour.
 
 ## Decisions
 
-**1. `DistanceUnit` mirrors `AppLanguage` rather than inventing a pattern.**
+**1. `DistanceUnit` has two cases, and the device seeds rather than persists.**
 ```swift
 nonisolated enum DistanceUnit: String, CaseIterable {
-  case system, kilometers, miles
+  case kilometers, miles
   static let storageKey = "distanceUnit"
-  static func stored(in defaults: UserDefaults = .standard) -> DistanceUnit
+  static var deviceDefault: DistanceUnit
+  static func stored(in defaults: UserDefaults = .standard) -> DistanceUnit?
   static func resolved(from defaults: UserDefaults = .standard) -> DistanceUnit
 }
 ```
-`resolved` never returns `.system` — it collapses to `.kilometers` or `.miles`, so every
-call site downstream handles two cases, not three. The `defaults:` parameter exists for
-the same reason `AppLanguage` has one: Swift Testing runs tests in parallel, so a test
-that mutates `UserDefaults.standard` to check the other unit is a flake waiting to happen.
+`stored` is optional — `nil` means the user has never chosen — and `resolved` is
+`stored ?? deviceDefault`. Every case is concrete, so conversion and formatting handle two
+cases with no sentinel to unwrap first. The `defaults:` parameter exists for the same
+reason `AppLanguage` has one: Swift Testing runs tests in parallel, so a test that mutates
+`UserDefaults.standard` to check the other unit is a flake waiting to happen.
 
-*Alternative considered:* storing a `Bool` (`usesMiles`). Rejected — it has no way to
-express "follow the device", which is the case that makes the feature work without user
-action.
+*Corrected after review:* this originally mirrored `AppLanguage` exactly, with a third
+`.system` case shown in the picker. Two arguments retired it. First, `"system"` is an
+ambiguous *stored* value — it renders kilometres on a Taipei device and miles on a Denver
+one, so the same preference means different things per device, and would mean different
+things per client if the preference were ever synced to Firestore. `"kilometers"` and
+`"miles"` are unambiguous anywhere. Second, a measurement system is not a live OS setting
+users toggle the way they toggle dark mode or system language, so a standing "follow the
+device" mode earns less than it costs — a one-time seed captures essentially all of its
+value. Appearance and Language keep their System option; Distance is deliberately the odd
+one out in Settings, and the specs say so.
 
-**2. `.system` resolves from `Locale.autoupdatingCurrent.measurementSystem`, not from the
+The device-follows behaviour is not lost, only bounded: until the user picks, the app
+derives from the device region, so a US user still gets miles on first launch with no
+action. That was the whole point of the ticket and it survives intact.
+
+*Alternative considered:* storing a `Bool` (`usesMiles`). Rejected — a raw-value enum reads
+better at call sites and leaves room for a third unit without a migration.
+
+**2. The device default reads `Locale.autoupdatingCurrent.measurementSystem`, not the
 app's language preference.**
 This is the decision most likely to be got wrong by a later edit, so it is worth stating
 plainly: `AppLanguage.resolvedLocale` returns `Locale(identifier: "en")` when the user
@@ -70,10 +86,15 @@ pins English. That locale carries **no region**, so its `measurementSystem` is n
 meaningful answer for a US user — it would silently hand them kilometres. The unit follows
 the *device region*; the language follows the user's pick; they are independent.
 
-All three `Locale.MeasurementSystem` cases are handled explicitly — `.metric` → km,
+All three `Locale.MeasurementSystem` values are handled explicitly — `.metric` → km,
 `.us` → mi, `.uk` → mi. `.uk` is mixed in general (metric groceries, mile road signs), but
-UK road running is miles, so it maps to miles. Not defaulting the switch means a future
-fourth case surfaces as a compile error rather than as silent kilometres.
+UK road running is miles, so it maps to miles.
+
+*Corrected during implementation:* the plan called for an exhaustive switch with no
+`default`, so that a future fourth value would surface as a compile error.
+`Locale.MeasurementSystem` is a **struct** with static members rather than an enum, so the
+switch cannot be exhaustive and a `default` is required by the compiler. It falls back to
+kilometres — the world's majority case — and the three known values stay explicit above it.
 
 **3. Presets become names; only measurements carry a unit.**
 Converting the presets numerically produces `6.2mi` for a 10K and `3.1mi` for a 5K, which
@@ -106,8 +127,12 @@ with the trailing zero dropped (`42.195 → "42.2 km"`, `10 → "10 km"`, `16.09
 storage never rounds, which is what makes a mile-entered distance round-trip exactly.
 
 **5. Pure `label(in:)` alongside the preference-reading `description`.**
-`RaceDistanceCategory` gains `nonisolated func label(in unit: DistanceUnit) -> String`;
+`RaceDistanceCategory` gains
+`nonisolated func label(in unit: DistanceUnit, defaults: UserDefaults = .standard) -> String`;
 `description` stays as the convenience that resolves the stored preference and delegates.
+The `defaults:` parameter is there for the same reason Decision 4's formatter takes one —
+a custom distance's label formats a number under the *language* preference, so a test must
+be able to pin that without mutating `.standard`.
 `MedalDetailViewModel` gets the same split for pace. Tests drive the pure function and
 never touch global state; production code keeps its existing ergonomics.
 
@@ -125,7 +150,14 @@ Miles → kilometres round-trips exactly because storage keeps full precision. T
 does not: a km-entered `16.09` shown in miles rounds to `10` in the field, and converting
 that back yields `16.09344`. Race editions live in the global `races/{id}/editions`
 collection and are read by every user, so a save that the user did not intend as an edit
-must not rewrite the value. The editor therefore compares the draft against its initial
+must not rewrite the value.
+
+The rule is precisely *untouched*, not *unchanged in appearance*: a user who taps into the
+field and retypes the same `16.1` commits `16.1`, because they did edit it. Only a field
+left alone preserves the original. Field seeding follows the same one-decimal rounding the
+app displays everywhere else, so the field always agrees with the labels around it.
+
+The editor therefore compares the draft against its initial
 value and writes only when they differ.
 
 **8. No snapping, no prompt — fix it at entry instead.**

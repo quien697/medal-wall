@@ -76,7 +76,7 @@ struct MedalDetailStatsSection: View {
   ScrollView {
     MedalDetailStatsSection(
       finishTime: "5:10:10",
-      averagePace: "5:31 / km",
+      averagePace: "5'31\" /km",
       overallPlacement: "5000",
       totalParticipants: "of 7000",
       division: "M30-40",

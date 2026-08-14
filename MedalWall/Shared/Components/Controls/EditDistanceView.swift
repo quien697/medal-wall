@@ -19,6 +19,11 @@ struct EditDistanceView: View {
   // MARK: - Properties
   let mode: ItemEditMode
   let onAction: (RaceDistance) throws -> Void
+  /// The active unit. `customValue` is expressed in it; `draftDistance.category` is always
+  /// kilometre-canonical, and the two are bridged only through `DistanceUnit`.
+  private let unit: DistanceUnit
+  /// The kilometres this distance was opened with, so an unedited field saves unchanged.
+  private let originalCustomKilometers: Double?
 
   // MARK: - Init
   init(
@@ -26,13 +31,45 @@ struct EditDistanceView: View {
     distance: RaceDistance,
     onAction: @escaping (RaceDistance) throws -> Void
   ) {
+    let unit = DistanceUnit.resolved()
+    let originalCustomKilometers: Double? = {
+      if case .custom(let value) = distance.category { return value }
+      return nil
+    }()
+
     self.mode = mode
     self.draftDistance = distance
-    self.customValue = {
-      if case .custom(let value) = distance.category { return value }
-      return 0
-    }()
+    self.unit = unit
+    self.originalCustomKilometers = originalCustomKilometers
+    self.customValue = originalCustomKilometers.map(unit.roundedDisplayValue) ?? 0
     self.onAction = onAction
+  }
+
+  // MARK: - Computed
+  /// The field's value converted back to canonical kilometres, preserving the original
+  /// when the field has not been edited.
+  private var customKilometers: Double {
+    unit.customKilometers(
+      displayValue: customValue,
+      originalKilometers: originalCustomKilometers
+    )
+  }
+
+  /// A preset row showing its measurement in the active unit, so a user looking for a
+  /// number they know finds it here rather than typing it into Custom.
+  private func presetRow(
+    _ name: LocalizedStringKey,
+    _ category: RaceDistanceCategory
+  ) -> some View {
+    HStack {
+      Text(name)
+
+      Spacer()
+
+      Text(unit.formatted(kilometers: category.value))
+        .foregroundStyle(Color.Text.secondary)
+    }  // HStack
+    .tag(category)
   }
 
   // MARK: - Body
@@ -41,19 +78,19 @@ struct EditDistanceView: View {
       Form {
         Section("Distance") {
           Picker("Distance", selection: $draftDistance.category) {
-            Text("Full Marathon").tag(RaceDistanceCategory.full)
-            Text("Half Marathon").tag(RaceDistanceCategory.half)
-            Text("10K").tag(RaceDistanceCategory.tenKM)
-            Text("5K").tag(RaceDistanceCategory.fiveKM)
-            Text("Custom").tag(RaceDistanceCategory.custom(customValue))
+            presetRow("Full Marathon", .full)
+            presetRow("Half Marathon", .half)
+            presetRow("10K", .tenKM)
+            presetRow("5K", .fiveKM)
+            Text("Custom").tag(RaceDistanceCategory.custom(customKilometers))
           }
           .pickerStyle(.navigationLink)
 
           if case .custom = draftDistance.category {
-            TextField("Custom distance (km)", value: $customValue, format: .number)
+            TextField(unit.customFieldLabel(), value: $customValue, format: .number)
               .keyboardType(.decimalPad)
-              .onChange(of: customValue) { _, newValue in
-                draftDistance.category = .custom(newValue)
+              .onChange(of: customValue) { _, _ in
+                draftDistance.category = .custom(customKilometers)
               }
           }
         }  // Section

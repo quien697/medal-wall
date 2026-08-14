@@ -1,30 +1,44 @@
 ## ADDED Requirements
 
 ### Requirement: Distance Unit Resolution
-The system SHALL offer three distance unit options — System, Kilometers, and Miles — and
-SHALL resolve System from the **device region's** measurement system rather than from the
-app's language preference. A pinned app language carries no region, so it MUST NOT be used
-to infer a measurement system. All three measurement systems SHALL be handled explicitly:
-metric resolves to kilometres, US resolves to miles, and UK resolves to miles.
+The system SHALL offer exactly two distance unit options — Kilometers and Miles. Until the
+user has chosen one, the app SHALL derive the unit from the **device region's** measurement
+system rather than from the app's language preference. A pinned app language carries no
+region, so it MUST NOT be used to infer a measurement system. All three measurement systems
+SHALL be handled explicitly: metric derives kilometres, US derives miles, and UK derives
+miles.
 
-#### Scenario: System resolves to kilometres in a metric region
-- **WHEN** the unit preference is System and the device region uses the metric
+Once the user chooses, a **concrete** unit SHALL be stored. The system SHALL NOT persist a
+"follow the device" sentinel, so a stored preference means the same thing on every device
+and on every client that may later read it.
+
+#### Scenario: Derives kilometres in a metric region before any choice
+- **WHEN** the user has never chosen a unit and the device region uses the metric
   measurement system (e.g. Canada, Taiwan)
 - **THEN** the app displays distances in kilometres
 
-#### Scenario: System resolves to miles in the US
-- **WHEN** the unit preference is System and the device region uses the US measurement
+#### Scenario: Derives miles in the US before any choice
+- **WHEN** the user has never chosen a unit and the device region uses the US measurement
   system
-- **THEN** the app displays distances in miles
+- **THEN** the app displays distances in miles, without the user opening Settings
 
-#### Scenario: System resolves to miles in the UK
-- **WHEN** the unit preference is System and the device region uses the UK measurement
+#### Scenario: Derives miles in the UK before any choice
+- **WHEN** the user has never chosen a unit and the device region uses the UK measurement
   system
 - **THEN** the app displays distances in miles, matching UK road-running convention
 
+#### Scenario: An explicit choice outranks the device
+- **WHEN** a user in a metric region selects Miles
+- **THEN** the app displays miles, and continues to do so regardless of the device region
+
+#### Scenario: Only a concrete unit is ever stored
+- **WHEN** a user selects either option in the distance picker
+- **THEN** the persisted value is `kilometers` or `miles` — never a sentinel meaning
+  "whatever this device says"
+
 #### Scenario: Language preference does not affect the unit
 - **WHEN** the user pins the app language to English while the device region is Taiwan,
-  and the unit preference is System
+  and has not chosen a unit
 - **THEN** the app displays distances in kilometres, because the unit follows the device
   region and not the pinned language
 
@@ -71,9 +85,10 @@ String Catalog so they localize (`全馬` / `半馬` under `zh-TW`).
 ### Requirement: Measured Distance Display
 The system SHALL display a distance measured in the active unit on exactly three
 surfaces: the preset rows of the distance picker, the medal detail hero, and every custom
-distance wherever it appears. The medal detail hero SHALL always show both the preset name
-and the measurement, with no conditional suppression, so the rule holds without exception
-even where the two restate each other (`10K · 10 km`).
+distance wherever it appears. For a **preset** distance the medal detail hero SHALL always
+show both the name and the measurement, with no conditional suppression, so the rule holds
+without exception even where the two restate each other (`10K · 10 km`). A **custom**
+distance is already a measurement, so the hero SHALL show it once rather than repeating it.
 
 Measured values SHALL be formatted to at most one fraction digit with a trailing zero
 dropped, using the locale resolved from the app's language preference, and paired with a
@@ -91,6 +106,11 @@ String Catalog abbreviation (`km` / `mi`) rather than a Foundation-supplied unit
 #### Scenario: Redundant measurement is still shown
 - **WHEN** the active unit is kilometres and a user opens a 10K medal's detail screen
 - **THEN** the hero reads `10K · 10 km`
+
+#### Scenario: A custom distance is not repeated on the hero
+- **WHEN** the active unit is miles and a user opens the detail screen of a medal whose
+  distance is a custom `16.09344` kilometres
+- **THEN** the hero reads `10 mi`, not `10 mi · 10 mi`
 
 #### Scenario: Trailing zero is dropped
 - **WHEN** a distance of exactly 10 kilometres is displayed in kilometres

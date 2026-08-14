@@ -25,10 +25,41 @@ final class MedalDetailViewModel {
   }
 
   var averagePaceText: String {
-    guard let pace = medal.averagePace else { return "--'-- \"" }
-    let minutes = Int(pace)
-    let seconds = Int((pace - Double(minutes)) * 60)
-    return String(format: "%d'%02d\" /km", minutes, seconds)
+    Self.paceText(minutesPerKilometer: medal.averagePace, in: DistanceUnit.resolved())
+  }
+
+  var distanceText: String {
+    Self.heroDistanceText(for: medal.distance.category, in: DistanceUnit.resolved())
+  }
+
+  /// A pace in minutes per kilometre, rendered per the given unit — `5'41" /km` or
+  /// `9'08" /mi`. Seconds are truncated, which is the app's long-standing behaviour.
+  nonisolated static func paceText(
+    minutesPerKilometer pace: Double?,
+    in unit: DistanceUnit,
+    defaults: UserDefaults = .standard
+  ) -> String {
+    guard let pace else { return "--'-- \"" }
+    let converted = unit.pace(fromMinutesPerKilometer: pace)
+    let minutes = Int(converted)
+    let seconds = Int((converted - Double(minutes)) * 60)
+
+    return String(
+      format: "%d'%02d\" /%@", minutes, seconds, unit.abbreviation(defaults: defaults))
+  }
+
+  /// The hero's distance line. A preset pairs its name with the measurement
+  /// (`Full · 26.2 mi`); a custom distance already *is* the measurement, so it is shown
+  /// once rather than repeated.
+  nonisolated static func heroDistanceText(
+    for category: RaceDistanceCategory,
+    in unit: DistanceUnit,
+    defaults: UserDefaults = .standard
+  ) -> String {
+    let label = category.label(in: unit, defaults: defaults)
+    if case .custom = category { return label }
+
+    return "\(label) · \(unit.formatted(kilometers: category.value, defaults: defaults))"
   }
 
   var overallPlacementText: String {

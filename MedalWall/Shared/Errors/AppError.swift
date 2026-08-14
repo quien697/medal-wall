@@ -191,7 +191,7 @@ nonisolated enum AppError: LocalizedError, Identifiable, Equatable {
     case .duplicateDistance:
       .appLocalized("Please try selecting a different distance or type.")
     case .invalidDistance:
-      .appLocalized("Please enter a distance greater than 0 km.")
+      .appLocalized("Please enter a distance greater than 0.")
     case .photoLoadFailed:
       .appLocalized("Please try selecting the image again.")
     case .photoDataInvalid:
