@@ -52,7 +52,10 @@ struct MedalDetailHeroSection: View {
   MedalDetailHeroSection(
     photoUrl: medal.photoUrl,
     name: medal.name,
-    raceDistance: medal.distance.category.description,
+    raceDistance: MedalDetailViewModel.heroDistanceText(
+      for: medal.distance.category,
+      in: DistanceUnit.resolved()
+    ),
     raceDistanceType: medal.distance.type.displayName,
     place: medal.place.formatted,
     date: medal.date.formattedMonthDayYear(),

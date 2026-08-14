@@ -17,21 +17,21 @@ struct RaceDistanceTests {
   func testDisplayLabelInPerson() {
     let distance = RaceDistance(category: .full, type: .inPerson)
 
-    #expect(distance.displayLabel == "42km")
+    #expect(distance.displayLabel == "Full")
   }
 
   @Test("Virtual label prefixes type name before category description")
   func testDisplayLabelVirtual() {
     let distance = RaceDistance(category: .full, type: .virtual)
 
-    #expect(distance.displayLabel == "Virtual 42km")
+    #expect(distance.displayLabel == "Virtual Full")
   }
 
   @Test("Wheelchair label prefixes type name before category description")
   func testDisplayLabelWheelChair() {
     let distance = RaceDistance(category: .half, type: .wheelChair)
 
-    #expect(distance.displayLabel == "Wheel Chair 21km")
+    #expect(distance.displayLabel == "Wheel Chair Half")
   }
 
   // MARK: - Equality

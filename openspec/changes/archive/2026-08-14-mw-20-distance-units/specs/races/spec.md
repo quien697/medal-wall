@@ -1,38 +1,4 @@
-# races Specification
-
-## Purpose
-Let a signed-in user manage races and their per-year editions — full CRUD over `Race`
-and its `RaceEdition` subcollection — including manually cascading edition deletes, since
-Firestore does not cascade-delete subcollections.
-## Requirements
-### Requirement: Race Management
-The system SHALL allow a signed-in user to create, read, update, and delete a `Race`,
-identified by name, place, an optional photo, and an optional website URL. A race's place
-SHALL follow the shape defined by the `place-entry` capability, which owns the representation
-of a place and how one is chosen.
-
-#### Scenario: Create a race
-- **WHEN** a user submits a new race with a name and place
-- **THEN** the system creates a `Race` record and it appears in the race list
-
-#### Scenario: Delete a race removes its editions
-- **WHEN** a user deletes a race that has one or more editions
-- **THEN** the system deletes all of that race's editions before deleting the race
-  itself, since Firestore does not cascade-delete subcollections
-
-### Requirement: Race Edition Management
-The system SHALL allow a signed-in user to create, read, update, and delete a
-`RaceEdition` belonging to a `Race`, recording a year, a start date, an end date, an
-optional photo, and a list of distances offered for that edition.
-
-#### Scenario: Add an edition to a race
-- **WHEN** a user adds an edition with a year, start date, end date, and at least one
-  distance to an existing race
-- **THEN** the system creates a `RaceEdition` in that race's editions subcollection
-
-#### Scenario: One-day edition display
-- **WHEN** an edition's start date and end date fall on the same calendar day
-- **THEN** the system displays a single date rather than a date range
+## ADDED Requirements
 
 ### Requirement: Custom Distance Entry In The Active Unit
 The system SHALL accept a custom race distance in the user's active distance unit, label

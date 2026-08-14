@@ -28,7 +28,7 @@ struct MedalDetailView: View {
       MedalDetailHeroSection(
         photoUrl: viewModel.medal.photoUrl,
         name: viewModel.medal.name,
-        raceDistance: viewModel.medal.distance.category.description,
+        raceDistance: viewModel.distanceText,
         raceDistanceType: viewModel.medal.distance.type.displayName,
         place: viewModel.medal.place.formatted,
         date: viewModel.medal.date.formattedMonthDayYear(),

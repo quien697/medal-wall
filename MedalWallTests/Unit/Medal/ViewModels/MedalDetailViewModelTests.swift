@@ -12,6 +12,19 @@ import Testing
 
 struct MedalDetailViewModelTests {
 
+  /// A throwaway `UserDefaults` suite pinning English, so number formatting does not
+  /// vary with the simulator's region and `.standard` is never mutated.
+  private static func makeDefaults(function: String = #function) -> UserDefaults {
+    let suiteName = "MedalDetailViewModelTests.\(function).\(UUID().uuidString)"
+    guard let defaults = UserDefaults(suiteName: suiteName) else {
+      fatalError("Unable to create UserDefaults suite")
+    }
+    defaults.removePersistentDomain(forName: suiteName)
+    defaults.set(AppLanguage.english.rawValue, forKey: AppLanguage.storageKey)
+
+    return defaults
+  }
+
   private func makeMedal(
     distance: RaceDistance = RaceDistance(category: .full, type: .inPerson),
     finishTime: TimeInterval? = nil,
@@ -66,12 +79,90 @@ struct MedalDetailViewModelTests {
     #expect(viewModel.averagePaceText == "--'-- \"")
   }
 
-  @Test("averagePaceText formats pace as M'SS\" /km for a full marathon")
+  @Test("averagePaceText formats pace as M'SS\" for a full marathon")
   func testAveragePaceTextFormatted() {
     // 12624s over 42.195km → pace ≈ 4.9864 min/km → "4'59\" /km"
     let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: 12624))
+    let expected = MedalDetailViewModel.paceText(
+      minutesPerKilometer: 12624 / 60 / 42.195,
+      in: DistanceUnit.resolved()
+    )
 
-    #expect(viewModel.averagePaceText == "4'59\" /km")
+    #expect(viewModel.averagePaceText == expected)
+  }
+
+  @Test("Pace is expressed per kilometre in kilometres mode")
+  func testPaceTextKilometers() {
+    let pace = 5 + 41.0 / 60
+
+    #expect(
+      MedalDetailViewModel.paceText(
+        minutesPerKilometer: pace,
+        in: .kilometers,
+        defaults: Self.makeDefaults()
+      ) == "5'41\" /km"
+    )
+  }
+
+  @Test("Pace is expressed per mile in miles mode")
+  func testPaceTextMiles() {
+    let pace = 5 + 41.0 / 60
+
+    #expect(
+      MedalDetailViewModel.paceText(
+        minutesPerKilometer: pace,
+        in: .miles,
+        defaults: Self.makeDefaults()
+      ) == "9'08\" /mi"
+    )
+  }
+
+  @Test("Pace is the placeholder when there is no pace to show")
+  func testPaceTextNil() {
+    #expect(
+      MedalDetailViewModel.paceText(
+        minutesPerKilometer: nil,
+        in: .miles,
+        defaults: Self.makeDefaults()
+      ) == "--'-- \""
+    )
+  }
+
+  // MARK: - distanceText
+  @Test("Hero shows a preset's name and measurement in kilometres")
+  func testDistanceTextPresetKilometers() {
+    #expect(Self.heroText(.full, in: .kilometers) == "Full · 42.2 km")
+    #expect(Self.heroText(.half, in: .kilometers) == "Half · 21.1 km")
+  }
+
+  @Test("Hero shows a preset's name and measurement in miles")
+  func testDistanceTextPresetMiles() {
+    #expect(Self.heroText(.full, in: .miles) == "Full · 26.2 mi")
+    #expect(Self.heroText(.tenKM, in: .miles) == "10K · 6.2 mi")
+  }
+
+  @Test("Hero keeps the redundant measurement for a 10K in kilometres")
+  func testDistanceTextRedundant() {
+    #expect(Self.heroText(.tenKM, in: .kilometers) == "10K · 10 km")
+    #expect(Self.heroText(.fiveKM, in: .kilometers) == "5K · 5 km")
+  }
+
+  @Test("Hero shows a custom distance once, not twice")
+  func testDistanceTextCustomNotRepeated() {
+    #expect(Self.heroText(.custom(16.09344), in: .miles) == "10 mi")
+    #expect(Self.heroText(.custom(16.09344), in: .kilometers) == "16.1 km")
+  }
+
+  private static func heroText(
+    _ category: RaceDistanceCategory,
+    in unit: DistanceUnit,
+    function: String = #function
+  ) -> String {
+    MedalDetailViewModel.heroDistanceText(
+      for: category,
+      in: unit,
+      defaults: makeDefaults(function: function)
+    )
   }
 
   // MARK: - overallPlacementText

@@ -72,7 +72,7 @@ struct MedalDetailStatsGridItem: View {
 
     MedalDetailStatsGridItem(
       title: "AVG Pace",
-      headline: "5.31 /km"
+      headline: "5'31\" /km"
     )
 
     MedalDetailStatsGridItem(

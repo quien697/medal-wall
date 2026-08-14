@@ -49,7 +49,7 @@ extension View {
 
 #Preview {
   VStack {
-    Text("42km")
+    Text("Full")
       .surfaceStyle()
   }
 }

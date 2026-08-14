@@ -366,12 +366,12 @@
         }
       }
     },
-    "Custom distance (km)" : {
+    "Custom distance (%@)" : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "自訂距離（公里）"
+            "value" : "自訂距離（%@）"
           }
         }
       }
@@ -896,6 +896,26 @@
         }
       }
     },
+    "Kilometers" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "公里"
+          }
+        }
+      }
+    },
+    "km" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "公里"
+          }
+        }
+      }
+    },
     "Language" : {
       "localizations" : {
         "zh-TW" : {
@@ -995,6 +1015,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "獎牌"
+          }
+        }
+      }
+    },
+    "mi" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "英里"
+          }
+        }
+      }
+    },
+    "Miles" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "英里"
           }
         }
       }
@@ -1369,12 +1409,12 @@
         }
       }
     },
-    "Please enter a distance greater than 0 km." : {
+    "Please enter a distance greater than 0." : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請輸入大於 0 公里的距離。"
+            "value" : "請輸入大於 0 的距離。"
           }
         }
       }

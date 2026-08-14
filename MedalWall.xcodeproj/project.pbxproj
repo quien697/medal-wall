@@ -107,6 +107,7 @@
 				"Shared/Extensions/String+Localization.swift",
 				"Shared/Extensions/UIImage+Extensions.swift",
 				Shared/UIModels/AppLanguage.swift,
+				Shared/UIModels/DistanceUnit.swift,
 				Shared/UIModels/ItemEditMode.swift,
 			);
 			target = 60B570BE2EA616CA000B3FDE /* MedalWallTests */;
