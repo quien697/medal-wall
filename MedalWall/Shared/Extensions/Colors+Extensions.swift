@@ -28,10 +28,16 @@ extension Color {
     static let primary = Color("TextPrimary")
     static let secondary = Color("TextSecondary")
     static let tertiary = Color("TextTertiary")
+    static let placeholder = Color("TextPlaceholder")
   }
 
   struct Gold {
     static let primary = Color.accentColor
     static let secondary = Color("GoldSecondary")
+  }
+
+  struct Status {
+    static let success = Color("StatusSuccess")
+    static let error = Color("StatusError")
   }
 }
