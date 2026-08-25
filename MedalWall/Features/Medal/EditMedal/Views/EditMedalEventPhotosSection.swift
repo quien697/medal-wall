@@ -21,7 +21,7 @@ struct EditMedalEventPhotosSection: View {
             ZStack(alignment: .topTrailing) {
               photoThumbnail(for: photo)
                 .frame(width: 100, height: 80)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: .Radius.image))
 
               Button {
                 onRemove(photo.id)

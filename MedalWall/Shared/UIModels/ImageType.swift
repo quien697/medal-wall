@@ -28,7 +28,7 @@ extension ImageType {
     case .avatarThumbnail, .avatar, .medal:
       return AnyShape(Circle())
     case .raceThumbnail, .raceHero, .eventThumbnail, .event:
-      return AnyShape(.rect(cornerRadius: 16))
+      return AnyShape(.rect(cornerRadius: .Radius.image))
     }
   }
 

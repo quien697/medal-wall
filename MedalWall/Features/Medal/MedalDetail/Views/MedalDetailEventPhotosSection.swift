@@ -38,7 +38,7 @@ struct MedalDetailEventPhotosSection: View {
               }
             }
             .frame(width: 140, height: 110)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: .Radius.image))
             .onTapGesture {
               selectedPhotoIndex = index
               isPresentingPhotoViewer = true

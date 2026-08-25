@@ -1,5 +1,5 @@
 //
-//  Fonts+Extensions.swift
+//  Font+Extensions.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-08-25.
@@ -8,6 +8,7 @@
 import SwiftUI
 
 extension Font {
+  
   struct TypeScale {
     static let display = Font.system(size: 32, weight: .black)
     static let title1 = Font.system(size: 26, weight: .heavy)
