@@ -39,12 +39,11 @@ struct SettingsView: View {
             Text("Sign out")
               .frame(maxWidth: .infinity)
           }
-          .goldOutLineButtonStyle(vPadding: 12)
+          .actionStyle(.secondary)
         }  // Section
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
-        .listSectionSpacing(16)
-        .listRowInsets(.all, 0)
+        .listRowInsets(.all, 3)
       }  // List
       .navigationTitle("Settings")
       .toolbarTitleDisplayMode(.inline)

@@ -45,10 +45,7 @@ struct RaceDetailEditionsSection: View {
               FlowLayout(spacing: 10) {
                 ForEach(edition.distances.sorted()) { distance in
                   Text(distance.displayLabel)
-                    .secondaryButtonStyle(
-                      vPadding: 6,
-                      hPadding: 10
-                    )
+                    .tagStyle(.neutral)
                 }
               }  // FlowLayout
 

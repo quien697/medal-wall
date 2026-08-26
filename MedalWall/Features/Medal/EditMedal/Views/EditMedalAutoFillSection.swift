@@ -31,7 +31,7 @@ struct EditMedalAutoFillSection: View {
           Text("Select")
         }
         .buttonStyle(.plain)
-        .goldFillButtonStyle()
+        .actionStyle(.tertiary, vPadding: 8, hPadding: 12)
       }  // HStack
     }  // Section
     .listRowBackground(Color.Gold.primary.opacity(0.1))

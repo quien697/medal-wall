@@ -37,7 +37,6 @@ struct SignInButton: View {
       HStack(spacing: 10) {
         if isLoading {
           ProgressView()
-            .tint(Color.Text.primary)
             .frame(width: 20, height: 20)
         } else if let icon {
           icon
@@ -50,11 +49,7 @@ struct SignInButton: View {
       }  // HStack
       .frame(maxWidth: .infinity)
     }  // label
-    .primaryButtonStyle(
-      font: .default,
-      fontWeight: .semibold,
-      vPadding: 16,
-    )
+    .actionStyle(.primary, font: .default, vPadding: 16)
   }
 }
 

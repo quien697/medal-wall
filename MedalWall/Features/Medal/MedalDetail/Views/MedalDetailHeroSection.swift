@@ -22,10 +22,10 @@ struct MedalDetailHeroSection: View {
     } infoContent: {
       HStack(spacing: 6) {
         Text(raceDistance)
-          .goldOutLineButtonStyle(font: .caption, vPadding: 4, hPadding: 8)
+          .tagStyle(.neutral)
 
         Text(raceDistanceType)
-          .secondaryButtonStyle(font: .caption, vPadding: 4, hPadding: 8)
+          .tagStyle(.neutral)
       }  // HStack
 
       Text(name)

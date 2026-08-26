@@ -8,6 +8,9 @@
 import SwiftUI
 
 extension Color {
+  /// Every control — bar actions, buttons, links, focus. Gold is never tappable,
+  /// so `Record` only ever describes something the user earned.
+  static let interactive = Color.accentColor
 
   struct Background {
     static let primary = Color("BackgroundPrimary")
@@ -47,10 +50,13 @@ extension Color {
   struct Record {
     static let primary = Color("RecordPrimary")
     static let champagne = Color("RecordChampagne")
+    static let ink = Color("RecordInk")
   }
 
   struct Status {
     static let success = Color("StatusSuccess")
+    static let successSurface = Color("StatusSuccessSurface")
     static let error = Color("StatusError")
+    static let errorSurface = Color("StatusErrorSurface")
   }
 }

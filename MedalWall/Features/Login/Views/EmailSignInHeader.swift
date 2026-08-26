@@ -17,7 +17,7 @@ struct EmailSignInHeader: View {
     VStack(spacing: 16) {
       Image(systemName: "envelope.fill")
         .font(.system(size: 50))
-        .foregroundStyle(Color.Gold.primary)
+        .foregroundStyle(Color.Text.primary)
 
       Text(title)
         .font(.title)

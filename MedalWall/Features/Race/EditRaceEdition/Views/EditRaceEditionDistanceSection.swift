@@ -29,17 +29,14 @@ struct EditRaceEditionDistanceSection: View {
             }
             .buttonStyle(.plain)
           }
-          .secondaryButtonStyle(
-            vPadding: 6,
-            hPadding: 10
-          )
+          .tagStyle(.neutral)
         }
 
         Button {
           onAdd()
         } label: {
           Image(systemName: "plus")
-            .goldOutLineButtonStyle()
+            .actionStyle(.tertiary, vPadding: 6, hPadding: 10)
         }
         .buttonStyle(.plain)
       }  // FlowLayout

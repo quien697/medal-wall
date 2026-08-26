@@ -15,7 +15,7 @@ struct MedalDetailTagsSection: View {
       FlowLayout(spacing: 6) {
         ForEach(tags, id: \.self) { tag in
           Text(tag)
-            .secondaryButtonStyle(vPadding: 5, hPadding: 10)
+            .tagStyle(.neutral)
         }  // ForEach
       }  // FlowLayout
     }  // SectionContainer

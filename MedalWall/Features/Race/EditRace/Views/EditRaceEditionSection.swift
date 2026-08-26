@@ -37,11 +37,7 @@ struct EditRaceEditionSection: View {
           } label: {
             Label("Add Edition", systemImage: "plus")
               .labelStyle(.titleAndIcon)
-              .goldOutLineButtonStyle(
-                fontWeight: .heavy,
-                vPadding: 12,
-                hPadding: 20
-              )
+              .actionStyle(.tertiary)
           }
           .buttonStyle(.plain)
           .padding(.top, 15)
@@ -75,12 +71,7 @@ struct EditRaceEditionSection: View {
                   HStack {
                     ForEach(edition.distances.sorted()) { distance in
                       Text(distance.displayLabel)
-                        .secondaryButtonStyle(
-                          font: .caption,
-                          fgColor: Color.Text.tertiary,
-                          vPadding: 6,
-                          hPadding: 10
-                        )
+                        .tagStyle(.neutral)
                     }
                   }  // HStack
                 }  // ScrollView
@@ -102,11 +93,7 @@ struct EditRaceEditionSection: View {
         } label: {
           Label("Add Another Edition", systemImage: "plus")
             .labelStyle(.titleAndIcon)
-            .goldOutLineButtonStyle(
-              fontWeight: .heavy,
-              vPadding: 12,
-              hPadding: 20
-            )
+            .actionStyle(.tertiary)
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
