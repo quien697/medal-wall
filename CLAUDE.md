@@ -7,6 +7,21 @@
 - MVVM — Views → ViewModels → Repositories → Firebase
 - Firestore for all data; Firebase Storage for images (stored as download URLs on models)
 
+## Design System
+The visual baseline lives outside this repo, in `../../documents/Design System/`
+(absolute: `~/Code/Personal/Projects/medal-wall/documents/Design System/`):
+- **`Medal Wall Design System v*.html`** — the source of truth for colour, type,
+  spacing/radius/elevation, components, and the `color.*` token list.
+- **`Medal Wall iOS v*.html`** — iOS screen mockups (login, medal wall, medal detail,
+  races) showing how those tokens compose per screen.
+
+Filenames are versioned and get renamed, so glob the folder rather than hardcoding a
+name, and check the newest version before treating anything as current. Tokens are
+platform-neutral by design (iOS asset catalog / Android `colors.xml` / CSS) — keep them
+that way. Code-side tokens: `Colors+Extensions.swift`, `Fonts+Extensions.swift`,
+`CGFloat+Extensions.swift` (`.Radius`), `ControlStyleViewModifier.swift`
+(`ActionStyle` / `ChipStyle`), `ElevationViewModifier.swift`.
+
 ## Development Workflow
 Features and non-trivial fixes follow the combined OpenSpec + Superpowers loop:
 brainstorm → OpenSpec change (`proposal` + `design` + spec delta + `tasks`) → implement
