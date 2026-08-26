@@ -13,7 +13,7 @@ struct ProfileAchievementRow: View {
 
   var body: some View {
     HStack {
-      AchievementBadge(tier: progress.unlockedTier)
+      TierBadge(tier: progress.unlockedTier)
 
       VStack(alignment: .leading) {
         Text(trackName)

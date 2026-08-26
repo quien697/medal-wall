@@ -17,10 +17,13 @@ struct LoginView: View {
       Color.Background.primary.ignoresSafeArea()
 
       VStack {
-        Image(systemName: "medal.fill")
-          .font(.system(size: 100))
-          .foregroundStyle(Color.Gold.primary)
-          .padding(.bottom, 16)
+        RingSeal(.record, size: .hero) {
+          Text(verbatim: "MW")
+            .font(.system(size: 28, weight: .black))
+            .tracking(-1.12)
+            .foregroundStyle(Color.Record.primary)
+        }  // RingSeal
+        .padding(.bottom, 16)
 
         Text("Medal Wall")
           .font(.largeTitle)
