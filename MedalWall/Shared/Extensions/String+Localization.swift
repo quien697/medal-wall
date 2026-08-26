@@ -8,6 +8,7 @@
 import Foundation
 
 extension String {
+
   /// Looks a String Catalog key up using the app's stored language preference.
   ///
   /// For display strings built outside a SwiftUI `body` — model and ViewModel computed
