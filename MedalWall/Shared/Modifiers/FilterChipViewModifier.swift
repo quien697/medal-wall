@@ -17,14 +17,14 @@ enum FilterChipStyle {
 
   fileprivate var foreground: Color {
     switch self {
-    case .selected: Color.Background.primary
+    case .selected: Color.Pigment.paper
     case .unselected: Color.Text.secondary
     }
   }
 
   fileprivate var background: Color {
     switch self {
-    case .selected: Color.interactive
+    case .selected: Color.Pigment.inkNavy
     case .unselected: Color.Surface.primary
     }
   }

@@ -34,8 +34,8 @@ enum TagStyle {
     switch self {
     case .record: Color.Record.champagne
     case .neutral: Color.Surface.tertiary
-    case .success: Color.Status.successSurface
-    case .error: Color.Status.errorSurface
+    case .success: Color.Status.success.opacity(0.2)
+    case .error: Color.Status.error.opacity(0.2)
     }
   }
 }

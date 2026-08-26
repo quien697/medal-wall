@@ -21,14 +21,14 @@ enum ActionStyle {
   fileprivate var foreground: Color {
     switch self {
     case .primary: Color.Background.primary
-    case .secondary, .tertiary, .plain: Color.interactive
+    case .secondary, .tertiary, .plain: Color.Pigment.inkNavy
     case .destructive: Color.Status.error
     }
   }
 
   fileprivate var background: Color {
     switch self {
-    case .primary: Color.interactive
+    case .primary: Color.Pigment.inkNavy
     case .secondary, .tertiary: Color.Surface.primary
     case .plain, .destructive: .clear
     }
@@ -37,7 +37,7 @@ enum ActionStyle {
   fileprivate var border: Color {
     switch self {
     case .primary, .plain: .clear
-    case .secondary: Color.interactive
+    case .secondary: Color.Pigment.inkNavy
     case .tertiary: Color.Border.primary
     case .destructive: Color.Status.error
     }
