@@ -58,8 +58,7 @@ struct FilterChipViewModifier: ViewModifier {
   // MARK: - Body
   func body(content: Content) -> some View {
     content
-      .font(.caption)
-      .fontWeight(.bold)
+      .font(.TypeScale.overline)
       .foregroundStyle(resolvedForeground)
       .padding(.vertical, 8)
       .padding(.horizontal, 14)
