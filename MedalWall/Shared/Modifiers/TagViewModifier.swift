@@ -64,7 +64,7 @@ extension View {
   /// Applies the design system's tag appearance for `style`.
   func tagStyle(
     _ style: TagStyle,
-    font: Font = .TypeScale.label,
+    font: Font = .TypeScale.overline,
     vPadding: CGFloat = 5,
     hPadding: CGFloat = 9
   ) -> some View {
