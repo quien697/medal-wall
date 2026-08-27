@@ -49,7 +49,7 @@ struct SignInButton: View {
       }  // HStack
       .frame(maxWidth: .infinity)
     }  // label
-    .actionStyle(.primary, font: .default, vPadding: 16)
+    .actionStyle(.tertiary, vPadding: 16)
   }
 }
 

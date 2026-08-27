@@ -22,14 +22,16 @@ struct EmailInputSection: View {
         subTitle: "Enter your email address and we'll send you a sign-in link. No password needed."
       )
 
-      TextField("you@example.com", text: $email)
-        .keyboardType(.emailAddress)
-        .textInputAutocapitalization(.never)
-        .autocorrectionDisabled()
-        .padding()
-        .background(Color.Card.Background.tertiary)
-        .clipShape(.rect(cornerRadius: 12))
-        .tint(Color.Text.primary)
+      TextField(text: $email) {
+        Text("<you>@example.com")
+      }
+      .keyboardType(.emailAddress)
+      .textInputAutocapitalization(.never)
+      .autocorrectionDisabled()
+      .padding()
+      .background(Color.Surface.tertiary)
+      .clipShape(.rect(cornerRadius: .Radius.field))
+      .tint(Color.Pigment.inkNavy)
 
       Button {
         Task {
@@ -39,15 +41,13 @@ struct EmailInputSection: View {
         Group {
           if isSendingEmail {
             ProgressView()
-              .tint(.white)
           } else {
             Text("Send Sign-in Link")
           }
         }  // Group
         .frame(maxWidth: .infinity)
       }  // Button
-      .buttonStyle(.borderedProminent)
-      .controlSize(.large)
+      .actionStyle(.primary)
       .disabled(!isEmailValid || isSendingEmail)
 
       Spacer()

@@ -26,13 +26,13 @@ struct LoginView: View {
         .padding(.bottom, 16)
 
         Text("Medal Wall")
-          .font(.largeTitle)
+          .font(.TypeScale.display)
+          .tracking(-1.12)
           .foregroundStyle(Color.Text.primary)
-          .fontWeight(.heavy)
           .padding(.bottom, 8)
 
         Text("Sign up or log in to start collecting your medals")
-          .font(.subheadline)
+          .font(.TypeScale.callout)
           .foregroundStyle(Color.Text.secondary)
           .multilineTextAlignment(.center)
 

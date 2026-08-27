@@ -70,7 +70,6 @@ struct ActionStyleViewModifier: ViewModifier {
   // MARK: - Properties
   let style: ActionStyle
   let font: Font
-  let fontWeight: Font.Weight
   let vPadding: CGFloat?
   let hPadding: CGFloat
 
@@ -91,7 +90,6 @@ struct ActionStyleViewModifier: ViewModifier {
   func body(content: Content) -> some View {
     content
       .font(font)
-      .fontWeight(fontWeight)
       .foregroundStyle(resolvedForeground)
       .tint(resolvedForeground)
       .padding(.vertical, vPadding ?? style.vPadding)
@@ -110,8 +108,7 @@ extension View {
   /// Applies the design system's button appearance for `style`.
   func actionStyle(
     _ style: ActionStyle,
-    font: Font = .subheadline,
-    fontWeight: Font.Weight = .bold,
+    font: Font = .TypeScale.headline,
     vPadding: CGFloat? = nil,
     hPadding: CGFloat = 20
   ) -> some View {
@@ -119,7 +116,6 @@ extension View {
       ActionStyleViewModifier(
         style: style,
         font: font,
-        fontWeight: fontWeight,
         vPadding: vPadding,
         hPadding: hPadding
       ))

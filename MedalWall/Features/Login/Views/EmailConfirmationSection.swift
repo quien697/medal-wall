@@ -30,8 +30,7 @@ struct EmailConfirmationSection: View {
         Text("Close")
           .frame(maxWidth: .infinity)
       }  // Button
-      .buttonStyle(.borderedProminent)
-      .controlSize(.large)
+      .actionStyle(.primary)
 
       Spacer()
     }  // VStack
