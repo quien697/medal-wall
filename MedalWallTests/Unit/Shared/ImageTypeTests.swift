@@ -9,6 +9,7 @@ import Testing
 
 @testable import MedalWall
 
+@MainActor
 struct ImageTypeTests {
 
   @Test("Each asset carries its own placeholder glyph")

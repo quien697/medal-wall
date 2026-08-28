@@ -48,10 +48,8 @@ struct EditRaceEditionView: View {
       VStack {
         EditPhotoPicker(
           photo: viewModel.photo,
+          imageType: .raceHero,
           hint: viewModel.photoHint,
-          photoView: {
-            PhotoImage(photo: viewModel.photo, as: .raceHero)
-          },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
           },

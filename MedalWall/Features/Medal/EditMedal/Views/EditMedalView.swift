@@ -39,10 +39,7 @@ struct EditMedalView: View {
       Form {
         EditPhotoPicker(
           photo: viewModel.photo,
-          photoView: {
-            PhotoImage(photo: viewModel.photo, as: .medal)
-              .recordRing()
-          },
+          imageType: .medal,
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
           },
@@ -52,7 +49,6 @@ struct EditMedalView: View {
             viewModel.clearPhoto()
           }
         )
-        .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
 
         EditMedalAutoFillSection {

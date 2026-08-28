@@ -45,7 +45,7 @@ extension ImageType {
   }
 
   /// The SF Symbol standing in for a missing image, one glyph per asset.
-  nonisolated var placeholderSymbol: String {
+  var placeholderSymbol: String {
     switch self {
     case .avatarThumbnail, .avatar: return "person.fill"
     case .raceThumbnail, .raceHero: return "figure.run"

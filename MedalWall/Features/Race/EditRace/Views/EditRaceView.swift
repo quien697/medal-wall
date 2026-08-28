@@ -40,9 +40,7 @@ struct EditRaceView: View {
       Form {
         EditPhotoPicker(
           photo: viewModel.photo,
-          photoView: {
-            PhotoImage(photo: viewModel.photo, as: .raceHero)
-          },
+          imageType: .raceHero,
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
           },

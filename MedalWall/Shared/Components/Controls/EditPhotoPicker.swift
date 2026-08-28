@@ -7,26 +7,26 @@
 
 import SwiftUI
 
-struct EditPhotoPicker<Preview: View>: View {
+struct EditPhotoPicker: View {
   // MARK: - State
   @State private var isPresentingConfirmation: Bool = false
   // MARK: - Properties
   let photo: UIImage?
+  let imageType: ImageType
   let hint: String?
-  @ViewBuilder let photoView: () -> Preview
   let onChooseFromLibrary: () -> Void
   let onRemove: () -> Void
 
   init(
     photo: UIImage?,
+    imageType: ImageType,
     hint: String? = nil,
-    @ViewBuilder photoView: @escaping () -> Preview,
     onChooseFromLibrary: @escaping () -> Void,
     onRemove: @escaping () -> Void
   ) {
     self.photo = photo
+    self.imageType = imageType
     self.hint = hint
-    self.photoView = photoView
     self.onChooseFromLibrary = onChooseFromLibrary
     self.onRemove = onRemove
   }
@@ -46,7 +46,7 @@ struct EditPhotoPicker<Preview: View>: View {
       isPresentingConfirmation = true
     } label: {
       VStack(spacing: 8) {
-        photoView()
+        photoView
           .confirmationDialog(
             "Edit Photo",
             isPresented: $isPresentingConfirmation,
@@ -68,4 +68,38 @@ struct EditPhotoPicker<Preview: View>: View {
     }  // Button
     .buttonStyle(.plain)
   }
+
+  /// The photo itself once there is one, and the slot inviting one until then.
+  @ViewBuilder
+  private var photoView: some View {
+    if let photo {
+      PhotoImage(photo: photo, as: imageType)
+    } else {
+      EmptyPhotoSlot(as: imageType)
+    }
+  }
+}
+
+#Preview("Empty") {
+  Form {
+    EditPhotoPicker(
+      photo: nil,
+      imageType: .medal,
+      onChooseFromLibrary: {},
+      onRemove: {}
+    )
+    .listRowBackground(Color.clear)
+  }  // Form
+}
+
+#Preview("With photo") {
+  Form {
+    EditPhotoPicker(
+      photo: UIImage(named: "bmo-vancouver-marathon"),
+      imageType: .medal,
+      onChooseFromLibrary: {},
+      onRemove: {}
+    )
+    .listRowBackground(Color.clear)
+  }  // Form
 }

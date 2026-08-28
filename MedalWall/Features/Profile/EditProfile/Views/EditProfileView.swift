@@ -34,9 +34,7 @@ struct EditProfileView: View {
       Form {
         EditPhotoPicker(
           photo: viewModel.photo,
-          photoView: {
-            PhotoImage(photo: viewModel.photo, as: .avatar)
-          },
+          imageType: .avatar,
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
           },
