@@ -29,8 +29,8 @@ struct EditRaceEditionSection: View {
       } else if editions.isEmpty {
         ContentUnavailableView {
           Text("No editions yet.")
-            .font(.subheadline)
-            .foregroundStyle(Color.Text.tertiary)
+            .font(.TypeScale.body)
+            .foregroundStyle(Color.Text.secondary)
 
           Button {
             onTapAddEdition()
@@ -58,12 +58,11 @@ struct EditRaceEditionSection: View {
               VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 10) {
                   Text(String(edition.year))
-                    .font(.title2)
-                    .fontWeight(.heavy)
-                    .foregroundStyle(Color.Gold.primary)
+                    .font(.TypeScale.Numeric.medium)
+                    .foregroundStyle(Color.Text.primary)
 
                   Text(edition.dateDisplayLabel)
-                    .font(.subheadline)
+                    .font(.TypeScale.caption)
                     .foregroundStyle(Color.Text.tertiary)
                 }
 
@@ -71,7 +70,7 @@ struct EditRaceEditionSection: View {
                   HStack {
                     ForEach(edition.distances.sorted()) { distance in
                       Text(distance.displayLabel)
-                        .tagStyle(.neutral)
+                        .tagStyle(.neutralInCard)
                     }
                   }  // HStack
                 }  // ScrollView

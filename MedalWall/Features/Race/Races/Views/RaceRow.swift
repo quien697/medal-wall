@@ -22,15 +22,15 @@ struct RaceRow: View {
 
       VStack(alignment: .leading) {
         Text(name)
-          .font(.headline)
+          .font(.TypeScale.headline)
           .foregroundStyle(Color.Text.primary)
 
         Text(place)
-          .font(.subheadline)
+          .font(.TypeScale.caption)
           .foregroundStyle(Color.Text.secondary)
 
         Text("\(editionCount) editions")
-          .font(.subheadline)
+          .font(.TypeScale.caption)
           .foregroundStyle(Color.Text.tertiary)
       }
     }  // HStack

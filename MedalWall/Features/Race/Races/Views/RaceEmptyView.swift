@@ -9,11 +9,15 @@ import SwiftUI
 
 struct RaceEmptyView: View {
   var body: some View {
-    ContentUnavailableView(
-      "No Race evnets",
-      systemImage: "tray",
-      description: Text("Tap the + button to add your first race event!")
-    )
+    ContentUnavailableView {
+      Label("No Race evnets", systemImage: "tray")
+        .font(.TypeScale.title2)
+        .foregroundStyle(Color.Text.primary)
+    } description: {
+      Text("Tap the + button to add your first race event!")
+        .font(.TypeScale.body)
+        .foregroundStyle(Color.Text.secondary)
+    }  // ContentUnavailableView
   }
 }
 

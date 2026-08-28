@@ -29,7 +29,7 @@ struct EmailInputSection: View {
       .textInputAutocapitalization(.never)
       .autocorrectionDisabled()
       .padding()
-      .background(Color.Surface.tertiary)
+      .background(Color.Surface.quaternary)
       .clipShape(.rect(cornerRadius: .Radius.field))
       .tint(Color.Pigment.inkNavy)
 

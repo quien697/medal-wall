@@ -43,7 +43,7 @@ struct EditRaceEditionDateSection: View {
       ) {
         ForEach((minYear...maxYear).reversed(), id: \.self) { year in
           Text(String(year))
-            .font(.body)
+            .font(.TypeScale.body)
             .tag(year)
         }
       } label: {

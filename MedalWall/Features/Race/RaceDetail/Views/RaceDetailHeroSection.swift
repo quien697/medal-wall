@@ -21,18 +21,17 @@ struct RaceDetailHeroSection: View {
       )
     } infoContent: {
       Text(name)
-        .font(.title2)
-        .fontWeight(.bold)
+        .font(.TypeScale.title2)
         .foregroundStyle(Color.Text.primary)
 
       Label(place, systemImage: "mappin.and.ellipse")
-        .font(.caption)
+        .font(.TypeScale.caption)
         .foregroundStyle(Color.Text.secondary)
 
       if let url = url, let urlObj = URL(string: url) {
         Link(destination: urlObj) {
           Label(url, systemImage: "link")
-            .font(.caption)
+            .font(.TypeScale.caption)
             .foregroundStyle(Color.Text.secondary)
             .underline(true, color: Color.Text.secondary)
         }

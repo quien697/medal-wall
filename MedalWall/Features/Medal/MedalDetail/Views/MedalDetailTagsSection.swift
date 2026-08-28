@@ -15,7 +15,7 @@ struct MedalDetailTagsSection: View {
       FlowLayout(spacing: 6) {
         ForEach(tags, id: \.self) { tag in
           Text(tag)
-            .tagStyle(.neutral)
+            .tagStyle(.neutralOnPage)
         }  // ForEach
       }  // FlowLayout
     }  // SectionContainer

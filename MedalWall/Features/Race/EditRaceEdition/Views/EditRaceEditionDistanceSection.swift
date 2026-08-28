@@ -14,7 +14,7 @@ struct EditRaceEditionDistanceSection: View {
 
   var body: some View {
     Section("Distances") {
-      FlowLayout(spacing: 10) {
+      FlowLayout(spacing: 6) {
         ForEach(distances.sorted()) { distance in
           HStack(spacing: 6) {
             Text(distance.displayLabel)
@@ -29,14 +29,14 @@ struct EditRaceEditionDistanceSection: View {
             }
             .buttonStyle(.plain)
           }
-          .tagStyle(.neutral)
+          .tagStyle(.neutralInCard)
         }
 
         Button {
           onAdd()
         } label: {
           Image(systemName: "plus")
-            .actionStyle(.tertiary, vPadding: 6, hPadding: 10)
+            .tagStyle(.neutralInCard)
         }
         .buttonStyle(.plain)
       }  // FlowLayout

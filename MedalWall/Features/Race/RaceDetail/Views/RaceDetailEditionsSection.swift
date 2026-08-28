@@ -15,12 +15,12 @@ struct RaceDetailEditionsSection: View {
       if editions.isEmpty {
         ContentUnavailableView {
           Label("No Editions", systemImage: "tray")
-            .font(.subheadline)
+            .font(.TypeScale.headline)
             .foregroundStyle(Color.Text.secondary)
 
           Text("Add editions to track your race history.")
-            .font(.subheadline)
-            .foregroundStyle(Color.Text.tertiary)
+            .font(.TypeScale.body)
+            .foregroundStyle(Color.Text.secondary)
         }
         .surfaceStyle()
       } else {
@@ -28,24 +28,23 @@ struct RaceDetailEditionsSection: View {
           VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
               Text(String(edition.year))
-                .font(.title)
-                .fontWeight(.heavy)
-                .foregroundStyle(Color.Gold.primary)
+                .font(.TypeScale.Numeric.medium)
+                .foregroundStyle(Color.Text.primary)
 
               Text(edition.dateDisplayLabel)
-                .font(.subheadline)
+                .font(.TypeScale.caption)
                 .foregroundStyle(Color.Text.tertiary)
 
               Spacer()
             }  // HStack
 
-            HStack(alignment: .top, spacing: 20) {
+            HStack(alignment: .top, spacing: 14) {
               PhotoImage(urlString: edition.photoUrl, as: .raceThumbnail)
 
-              FlowLayout(spacing: 10) {
+              FlowLayout(spacing: 6) {
                 ForEach(edition.distances.sorted()) { distance in
                   Text(distance.displayLabel)
-                    .tagStyle(.neutral)
+                    .tagStyle(.neutralInCard)
                 }
               }  // FlowLayout
 
