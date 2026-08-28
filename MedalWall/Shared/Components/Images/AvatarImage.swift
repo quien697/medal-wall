@@ -8,7 +8,7 @@
 import CachedAsyncImage
 import SwiftUI
 
-/// Circular avatar component with a gold gradient border.
+/// Circular avatar component.
 /// Use `init(photo:)` for a local `UIImage` (e.g. edit profile draft),
 /// or `init(photoUrl:)` for a remote URL loaded via `CachedAsyncImage`.
 /// Falls back to a person placeholder when no image is available.
@@ -31,71 +31,35 @@ struct AvatarImage: View {
   }
 
   var body: some View {
-    ZStack {
-      // Outer ring/border
-      Circle()
-        .fill(
-          LinearGradient(
-            colors: [
-              Color.Gold.primary,
-              Color.Gold.secondary
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-          )
-        )
-        .frame(
-          width: imageType.size.width * 1.1,
-          height: imageType.size.height * 1.1
-        )
-
-      // Inner circle
-      Circle()
-        .fill(
-          LinearGradient(
-            colors: [
-              Color.Gold.primary,
-              Color.Gold.secondary
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-          )
-        )
-        .frame(
-          width: imageType.size.width,
-          height: imageType.size.height
-        )
-        .shadow(
-          color: Color.Gold.primary.opacity(0.5),
-          radius: 8,
-          x: 0,
-          y: 10
-        )
-        .overlay {
-          if let uiImage = photo {
-            Image(uiImage: uiImage)
-              .styled(as: imageType)
-          } else if let urlString = photoUrl, let url = URL(string: urlString) {
-            CachedAsyncImage(url: url, targetSize: imageType.size) { phase in
-              switch phase {
-              case .empty:
-                ProgressView()
-                  .scaleEffect(imageType == .avatarThumbnail ? 0.6 : 1.0)
-              case .success(let image):
-                image.styled(as: imageType)
-              default:
-                Image(systemName: systemImageName)
-                  .font(.system(size: imageType.size.width / 2, weight: .semibold))
-                  .foregroundColor(.white)
-              }
-            }
-          } else {
-            Image(systemName: systemImageName)
-              .font(.system(size: imageType.size.width / 2, weight: .semibold))
-              .foregroundColor(.white)
-          }
+    if let uiImage = photo {
+      Image(uiImage: uiImage)
+        .styled(as: imageType)
+    } else if let urlString = photoUrl, let url = URL(string: urlString) {
+      CachedAsyncImage(url: url, targetSize: imageType.size) { phase in
+        switch phase {
+        case .empty:
+          ProgressView()
+            .scaleEffect(imageType == .avatarThumbnail ? 0.6 : 1.0)
+            .frame(width: imageType.size.width, height: imageType.size.height)
+        case .success(let image):
+          image.styled(as: imageType)
+        default:
+          placeholder
         }
+      }
+    } else {
+      placeholder
     }
+  }
+
+  private var placeholder: some View {
+    Image(systemName: systemImageName)
+      .font(.system(size: imageType.size.width / 2, weight: .semibold))
+      .foregroundStyle(Color.Text.secondary)
+      .frame(width: imageType.size.width, height: imageType.size.height)
+      .background(Color.Surface.tertiary)
+      .clipShape(imageType.shape)
+      .overlay(imageType.shape.stroke(Color.Pigment.pewter, lineWidth: 1.5))
   }
 }
 
