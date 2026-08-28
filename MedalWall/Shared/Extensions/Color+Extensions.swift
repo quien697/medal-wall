@@ -22,6 +22,7 @@ extension Color {
     static let porcelain = Color("Porcelain")
     static let bone = Color("Bone")
     static let stone = Color("Stone")
+    static let granite = Color("Granite")
     static let ash = Color("Ash")
     static let pewter = Color("Pewter")
     static let inkNavy = Color("InkNavy")
@@ -45,7 +46,8 @@ extension Color {
   struct Surface {
     static let primary = Pigment.porcelain
     static let secondary = Pigment.bone
-    static let tertiary = Pigment.stone
+    static let tertiary = Pigment.granite
+    static let quaternary = Pigment.stone
   }
 
   struct Border {
