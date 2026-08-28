@@ -68,7 +68,7 @@ struct PhotoImage: View {
 #Preview {
   VStack(spacing: 20) {
     PhotoImage(photo: UIImage(named: "bmo-vancouver-marathon"), as: .medal)
-      .recordRing()
+      .medalRing()
 
     PhotoImage(photo: UIImage(named: "taipei-marathon"), as: .raceHero)
 

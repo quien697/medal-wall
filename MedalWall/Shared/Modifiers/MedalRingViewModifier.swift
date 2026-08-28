@@ -1,5 +1,5 @@
 //
-//  RecordRingViewModifier.swift
+//  MedalRingViewModifier.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-08-28.
@@ -11,7 +11,7 @@ import SwiftUI
 ///
 /// The ring tracks *earned*, never *photographed* — it is applied by the caller that
 /// knows the record was set, so an image never wears gold on its own.
-struct RecordRingViewModifier: ViewModifier {
+struct MedalRingViewModifier: ViewModifier {
   private let ringWidth: CGFloat = 3
 
   func body(content: Content) -> some View {
@@ -25,18 +25,18 @@ struct RecordRingViewModifier: ViewModifier {
 extension View {
 
   /// Wraps the view in the design system's earned gold ring.
-  func recordRing() -> some View {
-    modifier(RecordRingViewModifier())
+  func medalRing() -> some View {
+    modifier(MedalRingViewModifier())
   }
 }
 
 #Preview {
   VStack(spacing: 40) {
     PhotoImage(photo: UIImage(named: "bmo-vancouver-marathon"), as: .medal)
-      .recordRing()
+      .medalRing()
 
     PhotoImage(photo: nil, as: .medal)
-      .recordRing()
+      .medalRing()
   }  // VStack
   .padding(40)
   .background(Color.Background.primary)
