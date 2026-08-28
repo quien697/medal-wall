@@ -24,7 +24,7 @@ struct StatCard: View {
     hPadding: CGFloat? = nil
   ) {
     self.title = title
-    self.titleFont = titleFont ?? .largeTitle
+    self.titleFont = titleFont ?? .TypeScale.Numeric.large
     self.subTitle = subTitle
     self.titleColor = titleColor ?? Color.Text.primary
     self.vPadding = vPadding ?? 16
@@ -35,13 +35,14 @@ struct StatCard: View {
     VStack {
       Text(title)
         .font(titleFont)
-        .fontWeight(.heavy)
         .foregroundStyle(titleColor)
         .lineLimit(1)
         .minimumScaleFactor(0.5)
 
       Text(subTitle)
-        .font(.caption)
+        .font(.TypeScale.microLabel)
+        .tracking(1.4)
+        .textCase(.uppercase)
         .foregroundStyle(Color.Text.tertiary)
         .lineLimit(1)
         .minimumScaleFactor(0.5)
@@ -86,13 +87,13 @@ struct StatCard: View {
   LazyVGrid(columns: twoColumns, spacing: 8) {
     StatCard(
       title: "03:30:10",
-      titleFont: .title,
+      titleFont: .TypeScale.Numeric.medium,
       subTitle: "Best Full"
     )
 
     StatCard(
       title: "--:--:--",
-      titleFont: .title,
+      titleFont: .TypeScale.Numeric.medium,
       subTitle: "Best Half"
     )
   }

@@ -19,14 +19,14 @@ struct ProfileHeaderSection: View {
 
         VStack(alignment: .leading, spacing: 8) {
           Text("\(userName)")
-            .font(.title)
-            .fontWeight(.bold)
+            .font(.TypeScale.title2)
+            .foregroundStyle(Color.Text.primary)
             .lineLimit(1)
             .minimumScaleFactor(0.5)
 
           if let bio = bio, !bio.isEmpty {
             Text(bio)
-              .font(.headline)
+              .font(.TypeScale.body)
               .foregroundStyle(Color.Text.secondary)
           }
         }

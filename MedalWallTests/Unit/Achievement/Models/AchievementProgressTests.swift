@@ -131,4 +131,40 @@ struct AchievementProgressTests {
 
     #expect(result == 0)
   }
+
+  // MARK: - progressFraction
+  @Test("progressFraction measures the live count against the next tier")
+  func testFractionTowardNextTier() {
+    let progress = AchievementProgress.compute(persistedMilestone: 0, liveCount: 7)
+
+    #expect(progress.progressFraction == 0.7)
+  }
+
+  @Test("progressFraction is zero before the first medal")
+  func testFractionNotStarted() {
+    let progress = AchievementProgress.compute(persistedMilestone: 0, liveCount: 0)
+
+    #expect(progress.progressFraction == 0)
+  }
+
+  @Test("progressFraction is full once a maxed track is reached")
+  func testFractionMaxed() {
+    let progress = AchievementProgress.compute(persistedMilestone: 100, liveCount: 100)
+
+    #expect(progress.progressFraction == 1)
+  }
+
+  @Test("progressFraction clamps a count past the final threshold to one")
+  func testFractionClampsPastFinalThreshold() {
+    let progress = AchievementProgress.compute(persistedMilestone: 100, liveCount: 120)
+
+    #expect(progress.progressFraction == 1)
+  }
+
+  @Test("progressFraction clamps a negative live count to zero")
+  func testFractionClampsNegativeCount() {
+    let progress = AchievementProgress.compute(persistedMilestone: 0, liveCount: -3)
+
+    #expect(progress.progressFraction == 0)
+  }
 }

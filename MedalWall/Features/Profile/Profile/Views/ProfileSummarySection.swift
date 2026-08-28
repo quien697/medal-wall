@@ -35,12 +35,12 @@ struct ProfileSummarySection: View {
       LazyVGrid(columns: twoColumns, spacing: 8) {
         StatCard(
           title: bestFullTime,
-          titleFont: .title2,
+          titleFont: .TypeScale.Numeric.medium,
           subTitle: "Best Full"
         )
         StatCard(
           title: bestHalfTime,
-          titleFont: .title2,
+          titleFont: .TypeScale.Numeric.medium,
           subTitle: "Best Half"
         )
       }

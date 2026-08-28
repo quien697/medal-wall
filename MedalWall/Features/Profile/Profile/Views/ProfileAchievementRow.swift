@@ -17,25 +17,25 @@ struct ProfileAchievementRow: View {
 
       VStack(alignment: .leading) {
         Text(trackName)
-          .font(.headline)
-          .fontWeight(.bold)
+          .font(.TypeScale.headline)
+          .foregroundStyle(Color.Text.primary)
 
         Text(progress.unlockedTier?.name ?? .appLocalized("Not started"))
-          .font(.footnote)
-          .foregroundStyle(Color.Text.tertiary)
+          .font(.TypeScale.caption)
+          .foregroundStyle(Color.Text.secondary)
 
         if let nextTier = progress.nextTier {
-          ProgressView(value: Double(progress.currentCount), total: Double(nextTier.threshold))
+          meter
 
           Text("\(progress.currentCount) of \(nextTier.threshold) \u{2192} \(nextTier.name)")
-            .font(.caption)
-            .foregroundStyle(Color.Text.tertiary)
+            .font(.TypeScale.caption)
+            .foregroundStyle(Color.Text.secondary)
         } else if let unlockedTier = progress.unlockedTier {
-          ProgressView(value: Double(progress.currentCount), total: Double(unlockedTier.threshold))
+          meter
 
           Text("\(progress.currentCount) of \(unlockedTier.threshold)")
-            .font(.caption)
-            .foregroundStyle(Color.Text.tertiary)
+            .font(.TypeScale.caption)
+            .foregroundStyle(Color.Text.secondary)
         }
       }  // VStack
 
@@ -43,6 +43,21 @@ struct ProfileAchievementRow: View {
     }  // HStack
     .frame(maxWidth: .infinity)
     .surfaceStyle()
+  }
+
+  /// The track's progress toward its next tier — gold, because a tier is earned.
+  private var meter: some View {
+    GeometryReader { proxy in
+      ZStack(alignment: .leading) {
+        Capsule()
+          .fill(Color.Surface.tertiary)
+
+        Capsule()
+          .fill(Color.Record.primary)
+          .frame(width: proxy.size.width * progress.progressFraction)
+      }  // ZStack
+    }  // GeometryReader
+    .frame(height: 8)
   }
 }
 
