@@ -16,7 +16,8 @@ struct MedalCard: View {
 
   var body: some View {
     VStack {
-      MedalImage(urlString: photoUrl)
+      PhotoImage(urlString: photoUrl, as: .medal)
+        .recordRing()
 
       VStack(alignment: .leading, spacing: 2) {
         Text("\(distance)")

@@ -15,9 +15,9 @@ struct RaceDetailHeroSection: View {
 
   var body: some View {
     DetailHeroSection {
-      RaceImage(
+      PhotoImage(
         urlString: photoUrl,
-        imageType: .raceHero
+        as: .raceHero
       )
     } infoContent: {
       Text(name)

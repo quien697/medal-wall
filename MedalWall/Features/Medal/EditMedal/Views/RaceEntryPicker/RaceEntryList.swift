@@ -17,9 +17,9 @@ struct RaceEntryList: View {
       let raceEditions = editions[race.id] ?? []
       VStack(alignment: .leading) {
         HStack(alignment: .top) {
-          RaceImage(
+          PhotoImage(
             urlString: race.photoUrl,
-            imageType: .raceThumbnail
+            as: .raceThumbnail
           )
 
           VStack(alignment: .leading) {

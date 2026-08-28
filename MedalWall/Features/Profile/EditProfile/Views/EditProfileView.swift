@@ -35,7 +35,7 @@ struct EditProfileView: View {
         EditPhotoPicker(
           photo: viewModel.photo,
           photoView: {
-            AvatarImage(photo: viewModel.photo)
+            PhotoImage(photo: viewModel.photo, as: .avatar)
           },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
@@ -46,7 +46,6 @@ struct EditProfileView: View {
             viewModel.clearPhoto()
           }
         )
-        .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
 
         EditProfileInfoSection(

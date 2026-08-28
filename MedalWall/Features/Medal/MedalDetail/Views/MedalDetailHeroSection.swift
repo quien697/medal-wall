@@ -18,7 +18,8 @@ struct MedalDetailHeroSection: View {
 
   var body: some View {
     DetailHeroSection {
-      MedalImage(urlString: photoUrl)
+      PhotoImage(urlString: photoUrl, as: .medal)
+        .recordRing()
     } infoContent: {
       HStack(spacing: 6) {
         Text(raceDistance)

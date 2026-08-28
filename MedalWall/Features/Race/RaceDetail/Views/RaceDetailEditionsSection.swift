@@ -40,7 +40,7 @@ struct RaceDetailEditionsSection: View {
             }  // HStack
 
             HStack(alignment: .top, spacing: 20) {
-              RaceImage(urlString: edition.photoUrl, imageType: .raceThumbnail)
+              PhotoImage(urlString: edition.photoUrl, as: .raceThumbnail)
 
               FlowLayout(spacing: 10) {
                 ForEach(edition.distances.sorted()) { distance in

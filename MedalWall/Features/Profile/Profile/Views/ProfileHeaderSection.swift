@@ -15,7 +15,7 @@ struct ProfileHeaderSection: View {
   var body: some View {
     SectionContainer {
       HStack(alignment: .top) {
-        AvatarImage(photoUrl: photoUrl)
+        PhotoImage(urlString: photoUrl, as: .avatar)
 
         VStack(alignment: .leading, spacing: 8) {
           Text("\(userName)")

@@ -50,7 +50,7 @@ struct EditRaceEditionView: View {
           photo: viewModel.photo,
           hint: viewModel.photoHint,
           photoView: {
-            RaceImage(photo: viewModel.photo, imageType: .raceHero)
+            PhotoImage(photo: viewModel.photo, as: .raceHero)
           },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true

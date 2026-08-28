@@ -15,9 +15,9 @@ struct RaceRow: View {
 
   var body: some View {
     HStack {
-      RaceImage(
+      PhotoImage(
         urlString: photoUrl,
-        imageType: .raceThumbnail
+        as: .raceThumbnail
       )
 
       VStack(alignment: .leading) {

@@ -50,9 +50,9 @@ struct EditRaceEditionSection: View {
           } label: {
             HStack(alignment: .top, spacing: 10) {
               if let photo = edition.displayPhoto {
-                RaceImage(photo: photo, imageType: .raceThumbnail)
+                PhotoImage(photo: photo, as: .raceThumbnail)
               } else {
-                RaceImage(urlString: edition.displayPhotoUrl, imageType: .raceThumbnail)
+                PhotoImage(urlString: edition.displayPhotoUrl, as: .raceThumbnail)
               }
 
               VStack(alignment: .leading, spacing: 5) {

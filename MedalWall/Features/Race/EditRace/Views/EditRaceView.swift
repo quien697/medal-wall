@@ -41,7 +41,7 @@ struct EditRaceView: View {
         EditPhotoPicker(
           photo: viewModel.photo,
           photoView: {
-            RaceImage(photo: viewModel.photo, imageType: .raceHero)
+            PhotoImage(photo: viewModel.photo, as: .raceHero)
           },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
@@ -52,7 +52,6 @@ struct EditRaceView: View {
             viewModel.clearPhoto()
           }
         )
-        .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
 
         EditRaceInfoSection(

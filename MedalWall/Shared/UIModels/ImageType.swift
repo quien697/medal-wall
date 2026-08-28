@@ -2,7 +2,7 @@
 //  ImageType.swift
 //  MedalWall
 //
-//  Created by Quien on 2026-01-20.
+//  Created by Quien on 2026-04-17.
 //
 
 import SwiftUI
@@ -43,35 +43,14 @@ extension ImageType {
     case .event: return CGSize(width: 140, height: 110)
     }
   }
-}
 
-extension Image {
-
-  func styled(as type: ImageType) -> some View {
-    self
-      .resizable()
-      .scaledToFill()
-      .frame(width: type.size.width, height: type.size.height)
-      .clipShape(type.shape)
-  }
-
-  func placeholderStyled(
-    as type: ImageType,
-    fgColor: Color = Color.Text.tertiary,
-    bgColor: Color = Color.Card.Background.tertiary,
-    borderColor: Color = Color.Border.gray
-  ) -> some View {
-    self
-      .resizable()
-      .scaledToFit()
-      .frame(width: type.size.width * 0.4)
-      .foregroundStyle(fgColor)
-      .frame(width: type.size.width, height: type.size.height)
-      .background(bgColor)
-      .clipShape(type.shape)
-      .overlay(
-        type.shape
-          .stroke(borderColor, style: StrokeStyle(lineWidth: 2, dash: [10, 2]))
-      )
+  /// The SF Symbol standing in for a missing image, one glyph per asset.
+  nonisolated var placeholderSymbol: String {
+    switch self {
+    case .avatarThumbnail, .avatar: return "person.fill"
+    case .raceThumbnail, .raceHero: return "figure.run"
+    case .medal: return "medal.fill"
+    case .eventThumbnail, .event: return "photo"
+    }
   }
 }

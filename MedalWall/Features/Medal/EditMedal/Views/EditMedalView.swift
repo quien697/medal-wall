@@ -40,7 +40,8 @@ struct EditMedalView: View {
         EditPhotoPicker(
           photo: viewModel.photo,
           photoView: {
-            MedalImage(photo: viewModel.photo)
+            PhotoImage(photo: viewModel.photo, as: .medal)
+              .recordRing()
           },
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
