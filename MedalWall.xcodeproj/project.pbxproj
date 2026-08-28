@@ -69,6 +69,8 @@
 				Features/Race/Models/DraftRaceEdition.swift,
 				Features/Race/RaceDetail/ViewModels/RaceDetailViewModel.swift,
 				Features/Race/Races/ViewModels/RacesViewModel.swift,
+				Localization/AppLanguage.swift,
+				"Localization/String+Localization.swift",
 				Managers/UserManager.swift,
 				Models/Achievement/AchievementProgress.swift,
 				Models/Achievement/AchievementTier.swift,
@@ -104,9 +106,7 @@
 				Shared/Errors/AppError.swift,
 				Shared/Errors/ErrorWrapper.swift,
 				"Shared/Extensions/Date+Extensions.swift",
-				"Shared/Extensions/String+Localization.swift",
 				"Shared/Extensions/UIImage+Extensions.swift",
-				Shared/UIModels/AppLanguage.swift,
 				Shared/UIModels/DistanceUnit.swift,
 				Shared/UIModels/ItemEditMode.swift,
 			);
