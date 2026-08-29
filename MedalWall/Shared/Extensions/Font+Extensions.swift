@@ -19,7 +19,11 @@ extension Font {
     static let caption = Font.system(size: 13, weight: .medium)
     static let overline = Font.system(size: 11, weight: .bold)
     static let microLabel = Font.system(size: 10, weight: .bold)
-    static let fieldValue = Font.system(size: 14, weight: .semibold)
+
+    struct Field {
+      static let label = Font.system(size: 15, weight: .bold)
+      static let value = Font.system(size: 15, weight: .semibold).monospacedDigit()
+    }
 
     struct Numeric {
       static let large = Font.system(size: 32, weight: .bold).monospacedDigit()

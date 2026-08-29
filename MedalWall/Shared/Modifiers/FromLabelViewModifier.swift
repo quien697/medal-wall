@@ -11,7 +11,7 @@ struct FromLabelViewModifier: ViewModifier {
 
   func body(content: Content) -> some View {
     content
-      .fontWeight(.bold)
+      .font(.TypeScale.Field.label)
       .foregroundStyle(Color.Text.tertiary)
   }
 }
