@@ -21,8 +21,7 @@ struct EditMedalTagsSection: View {
               tags.removeAll { $0 == tag }
             } label: {
               Image(systemName: "xmark")
-                .font(.caption2)
-                .fontWeight(.bold)
+                .font(.TypeScale.overline)
             }
           }
           .tagStyle(.neutralInCard)
@@ -32,6 +31,7 @@ struct EditMedalTagsSection: View {
 
       HStack {
         TextField("Add tag", text: $input)
+          .font(.TypeScale.Field.value)
 
         if !input.trimmingCharacters(in: .whitespaces).isEmpty {
           Button {

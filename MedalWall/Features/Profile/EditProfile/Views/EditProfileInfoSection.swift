@@ -26,6 +26,7 @@ struct EditProfileInfoSection: View {
 
       LabeledContent {
         TextField("Last Name", text: $lastName)
+          .font(.TypeScale.Field.value)
           .multilineTextAlignment(.trailing)
       } label: {
         Text("Last Name")
@@ -34,9 +35,12 @@ struct EditProfileInfoSection: View {
 
       Picker(selection: $gender) {
         Text("Not Set").tag(Gender?.none)
+          .font(.TypeScale.Field.value)
 
         ForEach(Gender.allCases, id: \.self) { genderCase in
-          Text(genderCase.displayName).tag(Gender?.some(genderCase))
+          Text(genderCase.displayName)
+            .font(.TypeScale.Field.value)
+            .tag(Gender?.some(genderCase))
         }
       } label: {
         Text("Gender")
@@ -62,6 +66,7 @@ struct EditProfileInfoSection: View {
           Button("Not Set") {
             isBirthdaySet = true
           }
+          .font(.TypeScale.Field.value)
           .foregroundStyle(Color.Text.primary)
           .buttonStyle(.bordered)
         }

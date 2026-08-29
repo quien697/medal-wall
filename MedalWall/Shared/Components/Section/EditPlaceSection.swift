@@ -24,6 +24,7 @@ struct EditPlaceSection: View {
       Button(action: onTap) {
         LabeledContent {
           Text(place.formatted.isEmpty ? .appLocalized("Choose a place") : place.formatted)
+            .font(.TypeScale.Field.value)
             .multilineTextAlignment(.trailing)
             .foregroundStyle(place.formatted.isEmpty ? .secondary : .primary)
         } label: {

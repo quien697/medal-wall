@@ -16,22 +16,22 @@ struct EditRaceInfoSection: View {
     Section("Info") {
       LabeledContent {
         TextField("e.g. Taipei Marathon", text: $name)
-          .font(.TypeScale.fieldValue)
+          .font(.TypeScale.Field.value)
           .multilineTextAlignment(.trailing)
       } label: {
         Text("Name")
-          .font(.TypeScale.callout)
-          .foregroundStyle(Color.Text.secondary)
+          .font(.TypeScale.Field.label)
+          .foregroundStyle(Color.Text.tertiary)
       }
 
       LabeledContent {
         TextField("optional", text: $url)
-          .font(.TypeScale.fieldValue)
+          .font(.TypeScale.Field.value)
           .multilineTextAlignment(.trailing)
       } label: {
         Text("WebSite")
-          .font(.TypeScale.callout)
-          .foregroundStyle(Color.Text.secondary)
+          .font(.TypeScale.Field.label)
+          .foregroundStyle(Color.Text.tertiary)
       }
     }  // Section
   }

@@ -15,11 +15,11 @@ struct EditMedalAutoFillSection: View {
       HStack {
         VStack(alignment: .leading) {
           Text("Fill from race event")
-            .font(.headline)
-            .fontWeight(.bold)
+            .font(.TypeScale.headline)
+            .foregroundStyle(Color.Text.primary)
 
           Text("Pick a race event to auto-fill fields")
-            .font(.subheadline)
+            .font(.TypeScale.caption)
             .foregroundStyle(Color.Text.tertiary)
         }
 

@@ -60,7 +60,7 @@ struct EditPhotoPicker: View {
           }  // confirmationDialog
 
         Text(displayHint)
-          .font(.subheadline)
+          .font(.TypeScale.caption)
           .multilineTextAlignment(.center)
           .foregroundStyle(Color.Text.tertiary)
       }  // VStack

@@ -14,13 +14,12 @@ struct RaceEntrySubTitle: View {
     Group {
       if let selection {
         Text(selection.selectionLabel)
-          .font(.subheadline)
+          .font(.TypeScale.callout)
           .foregroundStyle(Color.Gold.primary)
-          .fontWeight(.semibold)
           .frame(maxWidth: .infinity, alignment: .leading)
       } else {
         Text("Tap a distance to select the race entry.")
-          .font(.subheadline)
+          .font(.TypeScale.callout)
           .foregroundStyle(Color.Text.tertiary)
           .frame(maxWidth: .infinity, alignment: .leading)
       }

@@ -18,6 +18,7 @@ struct EditMedalInfoSection: View {
     Section("Info") {
       LabeledContent {
         TextField("e.g. Taipei Marathon 2025", text: $name)
+          .font(.TypeScale.Field.value)
           .multilineTextAlignment(.trailing)
       } label: {
         Text("Name")
@@ -34,6 +35,7 @@ struct EditMedalInfoSection: View {
 
       LabeledContent {
         TextField("e.g. 4291 (Optional)", text: $bib)
+          .font(.TypeScale.Field.value)
           .multilineTextAlignment(.trailing)
       } label: {
         Text("Bib")
@@ -50,6 +52,7 @@ struct EditMedalInfoSection: View {
           onEditDistance()
         } label: {
           Text(distance)
+            .font(.TypeScale.Field.value)
             .foregroundStyle(Color.Text.primary)
         }
         .buttonStyle(.bordered)

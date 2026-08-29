@@ -37,9 +37,10 @@ struct PlacePickerView: View {
             } label: {
               VStack(alignment: .leading, spacing: 2) {
                 Text(suggestion.title)
+                  .font(.TypeScale.headline)
                   .foregroundStyle(Color.Text.primary)
                 Text(suggestion.subtitle)
-                  .font(.caption)
+                  .font(.TypeScale.caption)
                   .foregroundStyle(Color.Text.secondary)
               }  // VStack
             }  // Button

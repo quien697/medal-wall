@@ -13,6 +13,7 @@ struct EditProfileBioSection: View {
   var body: some View {
     Section("Bio") {
       TextEditor(text: $bio)
+        .font(.TypeScale.body)
         .frame(minHeight: 100)
     }
   }

@@ -13,6 +13,7 @@ struct EditMedalNoteSection: View {
   var body: some View {
     Section("Notes") {
       TextEditor(text: $note)
+        .font(.TypeScale.body)
         .frame(minHeight: 100)
     }  // Section
   }
