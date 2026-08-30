@@ -11,11 +11,15 @@ struct LanguagePicker: View {
   @Binding var appLanguage: AppLanguage
 
   var body: some View {
-    Picker("Language", selection: $appLanguage) {
+    Picker(selection: $appLanguage) {
       ForEach(AppLanguage.allCases, id: \.self) { language in
         Text(language.label)
+          .font(.TypeScale.Field.value)
           .tag(language)
       }  // ForEach
+    } label: {
+      Text("Language")
+        .font(.TypeScale.Field.label)
     }  // Picker
     .pickerStyle(.navigationLink)
   }

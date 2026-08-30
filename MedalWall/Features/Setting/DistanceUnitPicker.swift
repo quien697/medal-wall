@@ -11,11 +11,15 @@ struct DistanceUnitPicker: View {
   @Binding var distanceUnit: DistanceUnit
 
   var body: some View {
-    Picker("Distance", selection: $distanceUnit) {
+    Picker(selection: $distanceUnit) {
       ForEach(DistanceUnit.allCases, id: \.self) { unit in
         Text(unit.label)
+          .font(.TypeScale.Field.value)
           .tag(unit)
       }  // ForEach
+    } label: {
+      Text("Distance")
+        .font(.TypeScale.Field.label)
     }  // Picker
     .pickerStyle(.navigationLink)
   }

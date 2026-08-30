@@ -31,22 +31,22 @@ struct SettingsView: View {
           Text("Preferences")
             .sectionTitleStyle()
         }  // Section
+        .listRowBackground(Color.Surface.primary)
 
         Section {
-          Button {
+          Button("Sign out") {
             try? userManager.signOut()
-          } label: {
-            Text("Sign out")
-              .frame(maxWidth: .infinity)
           }
-          .actionStyle(.secondary)
+          .frame(maxWidth: .infinity)
+          .actionStyle(.plain)
         }  // Section
-        .listRowBackground(Color.clear)
-        .listRowSeparator(.hidden)
-        .listRowInsets(.all, 3)
+        .listRowBackground(Color.Surface.primary)
+        .listRowInsets(.all, 0)
       }  // List
       .navigationTitle("Settings")
       .toolbarTitleDisplayMode(.inline)
+      .scrollContentBackground(.hidden)
+      .background(Color.Background.primary)
     }
   }
 }
