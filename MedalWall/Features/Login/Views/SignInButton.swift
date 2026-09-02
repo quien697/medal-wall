@@ -9,14 +9,14 @@ import SwiftUI
 
 struct SignInButton: View {
   // MARK: - Properties
-  private let icon: Image?
+  private let icon: String?
   private let title: LocalizedStringKey
   private let isLoading: Bool
   private let action: () async -> Void
 
   // MARK: - Init
   init(
-    icon: Image? = nil,
+    icon: String? = nil,
     title: LocalizedStringKey,
     isLoading: Bool = false,
     action: @escaping () async -> Void
@@ -39,7 +39,7 @@ struct SignInButton: View {
           ProgressView()
             .frame(width: 20, height: 20)
         } else if let icon {
-          icon
+          Image(systemName: icon)
             .resizable()
             .scaledToFit()
             .frame(width: 20, height: 20)
@@ -47,19 +47,22 @@ struct SignInButton: View {
 
         Text(title)
       }  // HStack
-      .frame(maxWidth: .infinity)
     }  // label
-    .actionStyle(.tertiary, vPadding: 16)
+    .actionStyle(
+      .tertiary,
+      shape: .roundedRectangle,
+      vPadding: 16
+    )
   }
 }
 
 #Preview {
   VStack(spacing: 12) {
-    SignInButton(icon: Image(systemName: "apple.logo"), title: "Continue with Apple") {}
+    SignInButton(icon: "apple.logo", title: "Continue with Apple") {}
     SignInButton(
-      icon: Image(systemName: "apple.logo"), title: "Continue with Apple", isLoading: true
+      icon: "apple.logo", title: "Continue with Apple", isLoading: true
     ) {}
-    SignInButton(icon: Image(systemName: "envelope"), title: "Continue with Email") {}
+    SignInButton(icon: "envelope", title: "Continue with Email") {}
   }  // VStack
   .padding()
 }

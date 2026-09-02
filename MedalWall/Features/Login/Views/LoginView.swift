@@ -38,7 +38,7 @@ struct LoginView: View {
 
         VStack(spacing: 16) {
           SignInButton(
-            icon: Image(systemName: "apple.logo"),
+            icon: "apple.logo",
             title: "Continue with Apple",
             isLoading: viewModel.activeSignIn == .apple
           ) {
@@ -46,7 +46,7 @@ struct LoginView: View {
           }
 
           SignInButton(
-            icon: Image("google-icon"),
+            icon: "google-icon",
             title: "Continue with Google",
             isLoading: viewModel.activeSignIn == .google
           ) {
@@ -54,7 +54,7 @@ struct LoginView: View {
           }
 
           SignInButton(
-            icon: Image(systemName: "envelope"),
+            icon: "envelope",
             title: "Continue with Email"
           ) {
             await viewModel.signInWithEmailLink()
