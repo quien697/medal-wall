@@ -11,11 +11,15 @@ struct EditProfileBioSection: View {
   @Binding var bio: String
 
   var body: some View {
-    Section("Bio") {
+    Section {
       TextEditor(text: $bio)
         .font(.TypeScale.body)
         .frame(minHeight: 100)
-    }
+    } header: {
+      Text("Bio")
+        .sectionTitleStyle()
+    }  // Section
+    .listRowBackground(Color.Surface.primary)
   }
 }
 
