@@ -37,8 +37,10 @@ struct SettingsView: View {
           Button("Sign out") {
             try? userManager.signOut()
           }
-          .frame(maxWidth: .infinity)
-          .actionStyle(.plain)
+          .actionStyle(
+            .plain,
+            shape: .roundedRectangle
+          )
         }  // Section
         .listRowBackground(Color.Surface.primary)
         .listRowInsets(.all, 0)

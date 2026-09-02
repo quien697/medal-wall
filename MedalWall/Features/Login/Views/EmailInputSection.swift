@@ -45,9 +45,8 @@ struct EmailInputSection: View {
             Text("Send Sign-in Link")
           }
         }  // Group
-        .frame(maxWidth: .infinity)
       }  // Button
-      .actionStyle(.primary)
+      .actionStyle(.primary, shape: .roundedRectangle)
       .disabled(!isEmailValid || isSendingEmail)
 
       Spacer()
