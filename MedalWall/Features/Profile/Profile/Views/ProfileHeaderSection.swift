@@ -13,7 +13,7 @@ struct ProfileHeaderSection: View {
   let bio: String?
 
   var body: some View {
-    SectionContainer {
+    PageSection {
       HStack(alignment: .top) {
         PhotoImage(urlString: photoUrl, as: .avatar)
 
@@ -41,8 +41,6 @@ struct ProfileHeaderSection: View {
   VStack {
     ProfileHeaderSection(
       photoUrl: nil, userName: "Tsung-Hsun Liu", bio: "I am here to cross the finish line.")
-    ProfileHeaderSection(
-      photoUrl: nil, userName: "Tsung-Hsun Liu", bio: "Fake it till you make it.")
   }
   .background(Color.Background.primary)
 }

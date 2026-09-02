@@ -14,7 +14,7 @@ struct MedalGridSection: View {
   let namespace: Namespace.ID
 
   var body: some View {
-    SectionContainer {
+    PageSection {
       LazyVGrid(columns: columns, spacing: spacing) {
         ForEach(medals, id: \.id) { medal in
           NavigationLink {
@@ -33,7 +33,7 @@ struct MedalGridSection: View {
           .buttonStyle(.plain)
         }
       }  // LazyVGrid
-    }  // SectionContainer
+    }  // PageSection
   }
 }
 

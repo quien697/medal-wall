@@ -13,7 +13,7 @@ struct MedalStatsSection: View {
   let halfCount: Int
 
   var body: some View {
-    SectionContainer {
+    PageSection {
       HStack(spacing: 16) {
         StatCard(
           title: "\(totalCount)",
@@ -34,7 +34,7 @@ struct MedalStatsSection: View {
           vPadding: 8
         )
       }  // HStack
-    }  // SectionContainer
+    }  // PageSection
   }
 }
 

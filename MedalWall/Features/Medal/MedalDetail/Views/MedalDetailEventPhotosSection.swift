@@ -19,7 +19,7 @@ struct MedalDetailEventPhotosSection: View {
   }
 
   var body: some View {
-    SectionContainer(title: "Event Photos") {
+    PageSection(title: "Event Photos") {
       ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 12) {
           ForEach(Array(sortedPhotoUrls.enumerated()), id: \.offset) { index, urlString in
@@ -31,7 +31,7 @@ struct MedalDetailEventPhotosSection: View {
           }  // ForEach
         }  // HStack
       }  // ScrollView
-    }  // SectionContainer
+    }  // PageSection
     .fullScreenCover(isPresented: $isPresentingPhotoViewer) {
       PhotoViewer(
         photos: sortedPhotoUrls,

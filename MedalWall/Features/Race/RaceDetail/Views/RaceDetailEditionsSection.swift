@@ -11,7 +11,7 @@ struct RaceDetailEditionsSection: View {
   let editions: [RaceEdition]
 
   var body: some View {
-    SectionContainer(title: "Editions") {
+    PageSection(title: "Editions") {
       if editions.isEmpty {
         ContentUnavailableView {
           Label("No Editions", systemImage: "tray")
@@ -54,7 +54,7 @@ struct RaceDetailEditionsSection: View {
           .surfaceStyle()
         }  // ForEach
       }
-    }  // SectionContainer
+    }  // PageSection
   }
 }
 
