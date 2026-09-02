@@ -25,13 +25,13 @@ struct ProfileAchievementRow: View {
           .foregroundStyle(Color.Text.secondary)
 
         if let nextTier = progress.nextTier {
-          meter
+          TierProgressBar(fraction: progress.progressFraction)
 
           Text("\(progress.currentCount) of \(nextTier.threshold) \u{2192} \(nextTier.name)")
             .font(.TypeScale.caption)
             .foregroundStyle(Color.Text.secondary)
         } else if let unlockedTier = progress.unlockedTier {
-          meter
+          TierProgressBar(fraction: progress.progressFraction)
 
           Text("\(progress.currentCount) of \(unlockedTier.threshold)")
             .font(.TypeScale.caption)
@@ -43,21 +43,6 @@ struct ProfileAchievementRow: View {
     }  // HStack
     .frame(maxWidth: .infinity)
     .surfaceStyle()
-  }
-
-  /// The track's progress toward its next tier — gold, because a tier is earned.
-  private var meter: some View {
-    GeometryReader { proxy in
-      ZStack(alignment: .leading) {
-        Capsule()
-          .fill(Color.Surface.tertiary)
-
-        Capsule()
-          .fill(Color.Record.primary)
-          .frame(width: proxy.size.width * progress.progressFraction)
-      }  // ZStack
-    }  // GeometryReader
-    .frame(height: 8)
   }
 }
 
