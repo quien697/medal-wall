@@ -1,5 +1,5 @@
 //
-//  FilterChipViewModifier.swift
+//  ChipViewModifier.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-08-25.
