@@ -745,7 +745,7 @@
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "女子"
+            "value" : "女"
           }
         }
       }
@@ -975,7 +975,7 @@
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "男子"
+            "value" : "男"
           }
         }
       }

@@ -11,8 +11,7 @@ struct EditProfileInfoSection: View {
   @Binding var firstName: String
   @Binding var lastName: String
   @Binding var gender: Gender?
-  @Binding var birthday: Date
-  @Binding var isBirthdaySet: Bool
+  @Binding var birthday: Date?
 
   var body: some View {
     Section {
@@ -36,6 +35,9 @@ struct EditProfileInfoSection: View {
       }
 
       Picker(selection: $gender) {
+        Text("Not Set")
+          .tag(Gender?.none)
+
         ForEach(Gender.allCases, id: \.self) { genderCase in
           Text(genderCase.displayName)
             .tag(Gender?.some(genderCase))
@@ -47,32 +49,17 @@ struct EditProfileInfoSection: View {
       .pickerStyle(.menu)
 
       LabeledContent {
-        if isBirthdaySet {
-          HStack {
-            Button {
-              isBirthdaySet = false
-              birthday = .now
-            } label: {
-              Image(systemName: "xmark")
-            }
-            .actionStyle(
-              .neutral,
-              font: .TypeScale.caption,
-              vPadding: 6,
-              hPadding: 6
-            )
-
-            DatePicker("", selection: $birthday, displayedComponents: .date)
-              .labelsHidden()
-          }
+        if let selection = Binding($birthday) {
+          DatePicker("", selection: selection, in: ...Date.now, displayedComponents: .date)
+            .labelsHidden()
         } else {
           Button("Not Set") {
-            isBirthdaySet = true
+            birthday = .now
           }
           .actionStyle(
             .neutral,
-            font: .TypeScale.Field.button,
-            vPadding: 6,
+            font: .TypeScale.Field.value,
+            vPadding: 8,
             hPadding: 12
           )
         }
@@ -88,14 +75,24 @@ struct EditProfileInfoSection: View {
   }
 }
 
-#Preview {
+#Preview("Birthday Not Set") {
+  Form {
+    EditProfileInfoSection(
+      firstName: .constant("John"),
+      lastName: .constant("Doe"),
+      gender: .constant(.none),
+      birthday: .constant(nil)
+    )
+  }
+}
+
+#Preview("Birthday Set") {
   Form {
     EditProfileInfoSection(
       firstName: .constant("John"),
       lastName: .constant("Doe"),
       gender: .constant(.male),
-      birthday: .constant(.now),
-      isBirthdaySet: .constant(true)
+      birthday: .constant(.now)
     )
   }
 }

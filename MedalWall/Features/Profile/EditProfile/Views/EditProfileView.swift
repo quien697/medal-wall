@@ -51,7 +51,6 @@ struct EditProfileView: View {
           lastName: $viewModel.userName.lastName,
           gender: $viewModel.gender,
           birthday: $viewModel.birthday,
-          isBirthdaySet: $viewModel.isBirthdaySet
         )
 
         EditProfileBioSection(bio: $viewModel.bio)
