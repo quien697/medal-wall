@@ -24,7 +24,7 @@ struct EditRaceEditionDateSection: View {
 
   // MARK: - Body
   var body: some View {
-    Section("Date") {
+    Section {
       Toggle(
         isOn: Binding(
           get: { isOneDay },
@@ -73,7 +73,11 @@ struct EditRaceEditionDateSection: View {
             .fromStyle(.label)
         }
       }
+    } header: {
+      Text("Date")
+        .sectionTitleStyle()
     }  // Section
+    .listRowBackground(Color.Surface.primary)
   }
 }
 

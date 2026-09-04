@@ -22,7 +22,7 @@ struct EditRaceEditionSection: View {
 
   // MARK: - Body
   var body: some View {
-    Section("Editions") {
+    Section {
       if isLoading && editions.isEmpty {
         ProgressView()
           .frame(maxWidth: .infinity, alignment: .center)
@@ -31,24 +31,13 @@ struct EditRaceEditionSection: View {
           Text("No editions yet.")
             .font(.TypeScale.body)
             .foregroundStyle(Color.Text.secondary)
-
-          Button {
-            onTapAddEdition()
-          } label: {
-            Label("Add Edition", systemImage: "plus")
-              .labelStyle(.titleAndIcon)
-              .actionStyle(.tertiary)
-          }
-          .buttonStyle(.plain)
-          .padding(.top, 15)
-          .matchedTransitionSource(id: transitionID, in: namespace)
         }  // ContentUnavailableView
       } else {
         ForEach(editions) { edition in
           Button {
             onTapEdition(edition)
           } label: {
-            HStack(alignment: .top, spacing: 10) {
+            HStack(spacing: 10) {
               if let photo = edition.displayPhoto {
                 PhotoImage(photo: photo, as: .raceThumbnail)
               } else {
@@ -76,7 +65,8 @@ struct EditRaceEditionSection: View {
                 }  // ScrollView
               }  // VStack
 
-              Spacer()
+              Image(systemName: "chevron.right")
+                .foregroundStyle(Color.Text.tertiary)
             }  // HStack
           }  // Button
           .buttonStyle(.plain)
@@ -86,29 +76,58 @@ struct EditRaceEditionSection: View {
             onDelete(editions[index].id)
           }
         }
+      }
+    } header: {
+      HStack {
+        Text("Editions")
+          .sectionTitleStyle()
+
+        Spacer()
 
         Button {
           onTapAddEdition()
         } label: {
-          Label("Add Another Edition", systemImage: "plus")
-            .labelStyle(.titleAndIcon)
-            .actionStyle(.tertiary)
+          Image(systemName: "plus")
+
+          Text("Edition")
         }
-        .buttonStyle(.plain)
-        .frame(maxWidth: .infinity)
+        .actionStyle(.primary, font: .TypeScale.sectionTitle, vPadding: 5, hPadding: 10)
         .matchedTransitionSource(id: transitionID, in: namespace)
       }
     }  // Section
+    .listRowBackground(Color.Surface.primary)
   }
 }
 
-#Preview {
+#Preview("Empty") {
   @Previewable @Namespace var namespace
 
   Form {
     EditRaceEditionSection(
       raceId: "race-taipei",
       editions: [],
+      isLoading: false,
+      namespace: namespace,
+      transitionID: "transitionID",
+      onTapAddEdition: {},
+      onTapEdition: { _ in },
+      onAdd: { _ in },
+      onUpdate: { _ in },
+      onDelete: { _ in }
+    )
+  }
+}
+
+#Preview("With Editions") {
+  @Previewable @Namespace var namespace
+
+  Form {
+    EditRaceEditionSection(
+      raceId: "race-taipei",
+      editions: [
+        DraftRaceEdition(from: .taipei2025),
+        DraftRaceEdition(from: .taipei2019)
+      ],
       isLoading: false,
       namespace: namespace,
       transitionID: "transitionID",

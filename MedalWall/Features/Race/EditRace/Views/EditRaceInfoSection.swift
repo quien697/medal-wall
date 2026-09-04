@@ -34,8 +34,8 @@ struct EditRaceInfoSection: View {
 
       LabeledContent {
         Text(place.formatted.isEmpty ? .appLocalized("Choose a place") : place.formatted)
-          .fromStyle(.value)
-          .foregroundStyle(place.formatted.isEmpty ? Color.Text.secondary : Color.Text.primary)
+          .font(.TypeScale.Field.value)
+          .foregroundStyle(place.formatted.isEmpty ? Color.Text.tertiary : Color.Text.primary)
           .onTapGesture {
             onEditPlace()
           }
@@ -47,6 +47,7 @@ struct EditRaceInfoSection: View {
       Text("Info")
         .sectionTitleStyle()
     }  // Section
+    .listRowBackground(Color.Surface.primary)
   }
 }
 

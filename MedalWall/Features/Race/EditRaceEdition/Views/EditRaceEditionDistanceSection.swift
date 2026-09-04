@@ -13,7 +13,7 @@ struct EditRaceEditionDistanceSection: View {
   var onAdd: () -> Void
 
   var body: some View {
-    Section("Distances") {
+    Section {
       FlowLayout(spacing: 6) {
         ForEach(distances.sorted()) { distance in
           HStack(spacing: 6) {
@@ -28,18 +28,29 @@ struct EditRaceEditionDistanceSection: View {
             }
             .buttonStyle(.plain)
           }
-          .tagStyle(.neutralInCard)
+          .chipStyle(.neutral)
         }
+      }  // FlowLayout
+    } header: {
+      HStack {
+        Text("Distances")
+          .sectionTitleStyle()
+
+        Spacer()
 
         Button {
           onAdd()
         } label: {
-          Image(systemName: "plus")
-            .tagStyle(.neutralInCard)
+          HStack {
+            Image(systemName: "plus")
+
+            Text("Distance")
+          }
+          .actionStyle(.primary, font: .TypeScale.sectionTitle, vPadding: 5, hPadding: 10)
         }
-        .buttonStyle(.plain)
-      }  // FlowLayout
-    }
+      }
+    }  // Section
+    .listRowBackground(Color.Surface.primary)
   }
 }
 

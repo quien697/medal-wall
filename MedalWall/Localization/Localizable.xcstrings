@@ -121,6 +121,7 @@
       }
     },
     "Add Another Edition" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
@@ -131,6 +132,7 @@
       }
     },
     "Add Edition" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
