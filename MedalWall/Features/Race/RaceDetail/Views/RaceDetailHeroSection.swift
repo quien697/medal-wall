@@ -40,9 +40,7 @@ struct RaceDetailHeroSection: View {
       }
       .frame(maxWidth: .infinity, alignment: .leading)
     }
-    .padding(.vertical)
-    .padding(.horizontal)
-    .frame(maxWidth: .infinity)
+    .padding(.horizontal, 16)
   }
 }
 
