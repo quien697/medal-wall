@@ -24,7 +24,7 @@ struct EditMedalTagsSection: View {
                 .font(.TypeScale.overline)
             }
           }
-          .tagStyle(.neutralInCard)
+          .chipStyle(.neutral)
           .buttonStyle(.plain)
         }  // ForEach
       }  // FlowLayout

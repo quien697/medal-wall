@@ -29,10 +29,10 @@ struct RaceEntryDistanceButton: View {
     } label: {
       if isSelected {
         Text(distance.displayLabel)
-          .filterChipStyle(.primary)
+          .chipStyle(.primary)
       } else {
         Text(distance.displayLabel)
-          .filterChipStyle(.secondary)
+          .chipStyle(.secondary)
       }
     }
     .buttonStyle(.plain)

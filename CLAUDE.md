@@ -35,9 +35,13 @@ Code-side tokens:
 - `CGFloat+Extensions.swift` — `.Radius` (tag, field, button, image, surface, sheet).
 - `ActionStyleViewModifier.swift` — `.actionStyle(.primary/.secondary/.tertiary/
   .plain/.destructive)`. Pressed and disabled are states, never cases.
-- `FilterChipViewModifier.swift` — `.filterChipStyle(.selected/.unselected)`, capsule,
-  for controls. `TagViewModifier.swift` — `.tagStyle(.record/.neutral/.success/.error)`,
-  6pt rect, for facts. Shape says whether it is tappable; never swap them.
+- `ChipViewModifier.swift` — `.chipStyle(.primary/.secondary/.neutral)`, capsule, for
+  things that *name* something: filters, and hashtags like `#taipei` (untappable for
+  now, but still capsules). `TagViewModifier.swift` —
+  `.tagStyle(.record/.neutralInCard/.neutralOnPage/.success/.error)`, 6pt rect, for
+  facts a user cannot change. Shape carries the distinction; never swap them. Gaining a
+  remove affordance moves a label across: a deletable distance is a chip, the same
+  distance read-only is a tag.
 - `ElevationViewModifier.swift` — `.elevation(.soft/.lifted/.ring)`.
 
 A fixed colour needs a fixed counterpart: anything sitting on `Record.champagne`
