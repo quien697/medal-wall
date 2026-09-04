@@ -12,34 +12,36 @@ import SwiftUI
 /// A filter chip is a control, so it is always a capsule — the shape is what
 /// tells the reader it can be tapped. Facts about a medal take a `TagStyle`.
 enum FilterChipStyle {
-  case selected
-  case unselected
+  case primary
+  case secondary
+  case neutral
 
   fileprivate var foreground: Color {
     switch self {
-    case .selected: Color.Pigment.paper
-    case .unselected: Color.Text.secondary
+    case .primary: Color.Pigment.paper
+    case .secondary: Color.Text.secondary
+    case .neutral: Color.Pigment.inkNavy
     }
   }
 
   fileprivate var background: Color {
     switch self {
-    case .selected: Color.Pigment.inkNavy
-    case .unselected: Color.Surface.primary
+    case .primary: Color.Pigment.inkNavy
+    case .secondary: Color.Surface.primary
+    case .neutral: Color.Surface.tertiary
     }
   }
 
   fileprivate var border: Color {
     switch self {
-    case .selected: .clear
-    case .unselected: Color.Border.primary
+    case .primary, .neutral: .clear
+    case .secondary: Color.Border.primary
     }
   }
 }
 
 /// A view modifier that paints a label as a filter chip.
 struct FilterChipViewModifier: ViewModifier {
-
   // MARK: - Environment
   @Environment(\.isEnabled) private var isEnabled
 
@@ -81,10 +83,10 @@ extension View {
 
 #Preview {
   HStack(spacing: 8) {
-    Text("All").filterChipStyle(.selected)
-    Text("2019").filterChipStyle(.unselected)
-    Text("全馬").filterChipStyle(.unselected)
-    Text("Taipei").filterChipStyle(.unselected)
+    Text("All").filterChipStyle(.primary)
+    Text("2019").filterChipStyle(.secondary)
+    Text("全馬").filterChipStyle(.secondary)
+    Text("Taipei").filterChipStyle(.neutral)
   }  // HStack
   .padding()
   .background(Color.Background.primary)
