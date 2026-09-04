@@ -54,12 +54,12 @@ struct EditRaceView: View {
 
         EditRaceInfoSection(
           name: $viewModel.name,
-          url: $viewModel.websiteUrl
+          url: $viewModel.websiteUrl,
+          place: viewModel.place,
+          onEditPlace: {
+            isPresentingPlacePicker = true
+          }
         )
-
-        EditPlaceSection(place: viewModel.place) {
-          isPresentingPlacePicker = true
-        }
 
         if viewModel.mode == .edit, let raceId = viewModel.raceId {
           EditRaceEditionSection(

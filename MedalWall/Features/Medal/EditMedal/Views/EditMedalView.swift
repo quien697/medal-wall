@@ -61,15 +61,15 @@ struct EditMedalView: View {
           name: $viewModel.name,
           date: $viewModel.date,
           bib: $viewModel.bibNumber,
+          place: viewModel.place,
           distance: viewModel.distance.displayLabel,
+          onEditPlace: {
+            isPresentingPlacePicker = true
+          },
           onEditDistance: {
             isPresentingDistancePicker = true
           }
         )
-
-        EditPlaceSection(place: viewModel.place) {
-          isPresentingPlacePicker = true
-        }
 
         EditMedalPlacementSection(
           overallPlacement: $viewModel.overallPlacement,

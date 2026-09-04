@@ -11,28 +11,41 @@ import SwiftUI
 struct EditRaceInfoSection: View {
   @Binding var name: String
   @Binding var url: String
+  let place: Place
+  var onEditPlace: () -> Void
 
   var body: some View {
-    Section("Info") {
+    Section {
       LabeledContent {
         TextField("e.g. Taipei Marathon", text: $name)
-          .font(.TypeScale.Field.value)
-          .multilineTextAlignment(.trailing)
+          .fromStyle(.value)
       } label: {
         Text("Name")
-          .font(.TypeScale.Field.label)
-          .foregroundStyle(Color.Text.tertiary)
-      }
+          .fromStyle(.label)
+      }  // LabeledContent
 
       LabeledContent {
         TextField("optional", text: $url)
-          .font(.TypeScale.Field.value)
-          .multilineTextAlignment(.trailing)
+          .fromStyle(.value)
       } label: {
         Text("WebSite")
-          .font(.TypeScale.Field.label)
-          .foregroundStyle(Color.Text.tertiary)
-      }
+          .fromStyle(.label)
+      }  // LabeledContent
+
+      LabeledContent {
+        Text(place.formatted.isEmpty ? .appLocalized("Choose a place") : place.formatted)
+          .fromStyle(.value)
+          .foregroundStyle(place.formatted.isEmpty ? Color.Text.secondary : Color.Text.primary)
+          .onTapGesture {
+            onEditPlace()
+          }
+      } label: {
+        Text("Place")
+          .fromStyle(.label)
+      }  // LabeledContent
+    } header: {
+      Text("Info")
+        .sectionTitleStyle()
     }  // Section
   }
 }
@@ -43,12 +56,16 @@ struct EditRaceInfoSection: View {
   Form {
     EditRaceInfoSection(
       name: .constant(race.name),
-      url: .constant(race.websiteUrl ?? "")
+      url: .constant(race.websiteUrl ?? ""),
+      place: race.place,
+      onEditPlace: {}
     )
 
     EditRaceInfoSection(
       name: .constant(race.name),
-      url: .constant("")
+      url: .constant(""),
+      place: Place(countryCode: "", city: ""),
+      onEditPlace: {}
     )
   }
 }
