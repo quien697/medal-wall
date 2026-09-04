@@ -14,29 +14,35 @@ struct RaceDetailHeroSection: View {
   let url: String?
 
   var body: some View {
-    DetailHeroSection {
+    HStack(alignment: .top, spacing: 16) {
       PhotoImage(
         urlString: photoUrl,
         as: .raceHero
       )
-    } infoContent: {
-      Text(name)
-        .font(.TypeScale.title2)
-        .foregroundStyle(Color.Text.primary)
 
-      Label(place, systemImage: "mappin.and.ellipse")
-        .font(.TypeScale.caption)
-        .foregroundStyle(Color.Text.secondary)
+      VStack(alignment: .leading, spacing: 8) {
+        Text(name)
+          .font(.TypeScale.title2)
+          .foregroundStyle(Color.Text.primary)
 
-      if let url = url, let urlObj = URL(string: url) {
-        Link(destination: urlObj) {
-          Label(url, systemImage: "link")
-            .font(.TypeScale.caption)
-            .foregroundStyle(Color.Text.secondary)
-            .underline(true, color: Color.Text.secondary)
+        Label(place, systemImage: "mappin.and.ellipse")
+          .font(.TypeScale.caption)
+          .foregroundStyle(Color.Text.secondary)
+
+        if let url = url, let urlObj = URL(string: url) {
+          Link(destination: urlObj) {
+            Label(url, systemImage: "link")
+              .font(.TypeScale.caption)
+              .foregroundStyle(Color.Text.secondary)
+              .underline(true, color: Color.Text.secondary)
+          }
         }
       }
-    }  // DetailHeroSection
+      .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    .padding(.vertical)
+    .padding(.horizontal)
+    .frame(maxWidth: .infinity)
   }
 }
 
