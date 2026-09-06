@@ -33,12 +33,19 @@ struct EditRaceInfoSection: View {
       }  // LabeledContent
 
       LabeledContent {
-        Text(place.formatted.isEmpty ? .appLocalized("Choose a place") : place.formatted)
-          .font(.TypeScale.Field.value)
-          .foregroundStyle(place.formatted.isEmpty ? Color.Text.tertiary : Color.Text.primary)
-          .onTapGesture {
-            onEditPlace()
-          }
+        HStack {
+          Text(place.formatted.isEmpty ? .appLocalized("Select") : place.formatted)
+            .font(.TypeScale.Field.value)
+
+          Image(systemName: "chevron.right")
+            .font(.TypeScale.overline)
+            .padding(.leading, -6)
+        }
+
+        .foregroundStyle(place.formatted.isEmpty ? Color.Text.tertiary : Color.Text.primary)
+        .onTapGesture {
+          onEditPlace()
+        }
       } label: {
         Text("Place")
           .fromStyle(.label)
