@@ -17,7 +17,7 @@ struct RaceEntryEditionRow: View {
       HStack {
         Text("\(edition.year)")
           .font(.TypeScale.Numeric.medium)
-          .foregroundStyle(Color.Gold.primary)
+          .foregroundStyle(Color.Record.primary)
 
         Text(edition.dateDisplayLabel)
           .font(.TypeScale.caption)

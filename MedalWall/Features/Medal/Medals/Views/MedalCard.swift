@@ -34,7 +34,7 @@ struct MedalCard: View {
         Text(finishTime)
           .font(.subheadline)
           .fontWeight(.heavy)
-          .foregroundStyle(Color.Gold.primary)
+          .foregroundStyle(Color.Record.primary)
 
         Text(date)
           .font(.caption)

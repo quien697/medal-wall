@@ -45,14 +45,14 @@ struct EditMedalTagsSection: View {
             input = ""
           } label: {
             Image(systemName: "plus.circle.fill")
-              .foregroundStyle(Color.Gold.primary)
+              .foregroundStyle(Color.Text.primary)
           }
           .buttonStyle(.plain)
         }
       }  // HStack
       .listRowSeparator(.hidden)
       .padding(8)
-      .background(Color.Card.Background.secondary)
+      .background(Color.Surface.secondary)
       .clipShape(.rect(cornerRadius: 8))
     }  // Section
   }

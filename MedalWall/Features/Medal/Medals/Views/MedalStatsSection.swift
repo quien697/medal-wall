@@ -18,7 +18,7 @@ struct MedalStatsSection: View {
         StatCard(
           title: "\(totalCount)",
           subTitle: "Total",
-          titleColor: Color.Gold.primary,
+          titleColor: Color.Record.primary,
           vPadding: 8
         )
 

@@ -10,7 +10,7 @@ import SwiftUI
 /// What a tag says about a medal.
 ///
 /// A tag states a fact and is never tappable, so it takes the small rect rather
-/// than a capsule — the shape is what separates it from a `FilterChipStyle`.
+/// than a capsule — the shape is what separates it from a `ChipStyle`.
 /// `record` is champagne and reserved for a personal record; distance and race
 /// type are facts rather than achievements, so they stay neutral.
 ///
@@ -37,8 +37,6 @@ enum TagStyle {
     }
   }
 
-  /// Status tags drop their tinted fill in dark and share `cardInset`,
-  /// carrying the status in the text only — the light tints go muddy there.
   fileprivate var background: Color {
     switch self {
     case .record: Color.Record.champagne
@@ -113,7 +111,7 @@ extension View {
     Text("42.195 km").tagStyle(.neutralInCard)
     Text("Synced").tagStyle(.success)
     Text("Draft").tagStyle(.error)
-  }  // HStack
+  }  // VStack
   .padding()
   .surfaceStyle()
   .padding()
@@ -126,7 +124,7 @@ extension View {
     Text("In-person").tagStyle(.neutralOnPage)
     Text("42.195 km").tagStyle(.neutralOnPage)
     Text("全馬").tagStyle(.neutralOnPage)
-  }  // HStack
+  }  // VStack
   .padding()
   .background(Color.Background.primary)
 }

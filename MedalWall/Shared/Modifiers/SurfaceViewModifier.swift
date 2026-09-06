@@ -32,7 +32,7 @@ struct SurfaceViewModifier: ViewModifier {
 extension View {
 
   func surfaceStyle(
-    bgColor: Color = Color.Card.Background.primary,
+    bgColor: Color = Color.Surface.primary,
     borderColor: Color? = nil,
     vPadding: CGFloat = 16,
     hPadding: CGFloat = 16

@@ -35,7 +35,7 @@ struct DetailHeroSection<ImageContent: View, InfoContent: View>: View {
     .frame(maxWidth: .infinity)
     .overlay(alignment: .bottom) {
       Rectangle()
-        .fill(Color.Border.gray)
+        .fill(Color.Border.primary)
         .frame(height: 1)
     }
   }

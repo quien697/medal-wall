@@ -34,7 +34,7 @@ struct EditMedalAutoFillSection: View {
         .actionStyle(.tertiary)
       }  // HStack
     }  // Section
-    .listRowBackground(Color.Gold.primary.opacity(0.1))
+    .listRowBackground(Color.Record.primary.opacity(0.1))
   }
 }
 

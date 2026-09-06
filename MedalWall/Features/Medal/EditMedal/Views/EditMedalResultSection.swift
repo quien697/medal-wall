@@ -20,7 +20,7 @@ struct EditMedalResultSection: View {
         Text("Finish Time")
           .fromStyle(.label)
       }
-      .timePickerStyle(accentColor: Color.Gold.primary, fontWeight: .bold)
+      .timePickerStyle(accentColor: Color.Record.primary, fontWeight: .bold)
     }
   }
 }

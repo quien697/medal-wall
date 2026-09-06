@@ -37,9 +37,9 @@ struct RaceDetailHeroSection: View {
               .underline(true, color: Color.Text.secondary)
           }
         }
-      }
+      }  // VStack
       .frame(maxWidth: .infinity, alignment: .leading)
-    }
+    }  // HStack
     .padding(.horizontal, 16)
   }
 }

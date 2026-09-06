@@ -39,7 +39,7 @@ struct EmptyPhotoSlot: View {
     EmptyPhotoSlot(as: .medal)
     EmptyPhotoSlot(as: .event)
     EmptyPhotoSlot(as: .raceHero)
-  }  // HStack
+  }  // VStack
   .padding(40)
   .background(Color.Background.primary)
 }

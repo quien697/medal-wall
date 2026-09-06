@@ -14,7 +14,7 @@ import SwiftUI
 /// Use `init(photo:as:)` for a locally held `UIImage` (e.g. an edit draft), or
 /// `init(urlString:as:)` for a remote URL loaded via `CachedAsyncImage`. The gold ring
 /// is not part of the image — a caller that knows the medal was earned adds it with
-/// `.recordRing()`.
+/// `.medalRing()`.
 struct PhotoImage: View {
   private let photo: UIImage?
   private let urlString: String?

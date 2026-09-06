@@ -29,7 +29,7 @@ struct EditMedalEventPhotosSection: View {
               } label: {
                 Image(systemName: "xmark.circle.fill")
                   .symbolRenderingMode(.palette)
-                  .foregroundStyle(.white, Color.Gold.primary)
+                  .foregroundStyle(.white, Color.Status.error)
                   .font(.system(size: 18))
               }
               .buttonStyle(.plain)

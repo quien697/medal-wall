@@ -59,12 +59,7 @@ enum RingSealSize {
     }
   }
 
-  fileprivate var innerStrokeWidth: CGFloat {
-    switch self {
-    case .hero: 2
-    case .tier: 2
-    }
-  }
+  fileprivate var innerStrokeWidth: CGFloat { 2 }
 }
 
 /// The double-ring seal — the app's signature mark. Two concentric rings frame

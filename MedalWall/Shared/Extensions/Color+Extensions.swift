@@ -52,7 +52,6 @@ extension Color {
 
   struct Border {
     static let primary = Pigment.ash
-    static let gray = Pigment.ash  // delete later
   }
 
   struct Text {
@@ -83,19 +82,5 @@ extension Color {
   struct Status {
     static let success = Pigment.laurel
     static let error = Pigment.cinnabar
-  }
-
-  // MARK: - Pending removal
-  struct Card {  // delete later
-    struct Background {
-      static let primary = Pigment.porcelain
-      static let secondary = Pigment.bone
-      static let tertiary = Pigment.stone
-    }
-  }
-
-  struct Gold {  // delete later
-    static let primary = Pigment.gilt
-    static let secondary = Pigment.champagne
   }
 }

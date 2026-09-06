@@ -53,7 +53,7 @@ struct EditRaceEditionSection: View {
                   Text(edition.dateDisplayLabel)
                     .font(.TypeScale.caption)
                     .foregroundStyle(Color.Text.tertiary)
-                }
+                }  // HStack
 
                 ScrollView(.horizontal, showsIndicators: false) {
                   HStack {
@@ -99,7 +99,7 @@ struct EditRaceEditionSection: View {
           hPadding: 0
         )
         .matchedTransitionSource(id: transitionID, in: namespace)
-      }
+      }  // HStack
     }  // Section
     .listRowBackground(Color.Surface.primary)
   }

@@ -35,7 +35,7 @@ struct MedalDetailStatsSection: View {
         MedalDetailStatsGridItem(
           title: "Finish Time",
           headline: finishTime,
-          headLineColor: Color.Gold.primary
+          headLineColor: Color.Record.primary
         )
 
         MedalDetailStatsGridItem(
@@ -47,7 +47,7 @@ struct MedalDetailStatsSection: View {
           title: "Overall",
           headline: overallPlacement,
           subHeadLine: totalParticipants,
-          headLineColor: Color.Gold.primary
+          headLineColor: Color.Record.primary
         )
 
         MedalDetailStatsGridItem(
