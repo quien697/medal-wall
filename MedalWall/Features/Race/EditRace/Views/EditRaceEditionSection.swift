@@ -89,9 +89,15 @@ struct EditRaceEditionSection: View {
         } label: {
           Image(systemName: "plus")
 
-          Text("Edition")
+          Text("Add")
+            .textCase(.uppercase)
         }
-        .actionStyle(.primary, font: .TypeScale.sectionTitle, vPadding: 5, hPadding: 10)
+        .actionStyle(
+          .plain,
+          font: .TypeScale.sectionTitle,
+          vPadding: 0,
+          hPadding: 0
+        )
         .matchedTransitionSource(id: transitionID, in: namespace)
       }
     }  // Section

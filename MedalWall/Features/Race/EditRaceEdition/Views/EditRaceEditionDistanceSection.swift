@@ -41,13 +41,17 @@ struct EditRaceEditionDistanceSection: View {
         Button {
           onAdd()
         } label: {
-          HStack {
-            Image(systemName: "plus")
+          Image(systemName: "plus")
 
-            Text("Distance")
-          }
-          .actionStyle(.primary, font: .TypeScale.sectionTitle, vPadding: 5, hPadding: 10)
+          Text("Add")
+            .textCase(.uppercase)
         }
+        .actionStyle(
+          .plain,
+          font: .TypeScale.sectionTitle,
+          vPadding: 0,
+          hPadding: 0
+        )
       }
     }  // Section
     .listRowBackground(Color.Surface.primary)
