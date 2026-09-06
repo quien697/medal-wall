@@ -92,7 +92,7 @@ extension View {
   func tagStyle(
     _ style: TagStyle,
     font: Font? = nil,
-    vPadding: CGFloat = 5,
+    vPadding: CGFloat = 4,
     hPadding: CGFloat = 8
   ) -> some View {
     modifier(

@@ -37,7 +37,6 @@ struct SignInButton: View {
       HStack(spacing: 10) {
         if isLoading {
           ProgressView()
-            .frame(width: 20, height: 20)
         } else if let icon {
           Image(systemName: icon)
             .resizable()
@@ -48,11 +47,7 @@ struct SignInButton: View {
         Text(title)
       }  // HStack
     }  // label
-    .actionStyle(
-      .tertiary,
-      shape: .roundedRectangle,
-      vPadding: 16
-    )
+    .actionStyle(.tertiary, shape: .roundedRectangle)
   }
 }
 

@@ -32,4 +32,46 @@ struct ActionShapeTests {
     #expect(fill.contains(CGPoint(x: 3, y: 8)) == false)  // not a 14pt corner
     #expect(fill.contains(CGPoint(x: 100, y: 26)))  // centre still filled
   }
+
+  @Test("each shape pads itself when the call site passes none")
+  func testShapePaddingIsTheDefault() {
+    let slab = Self.modifier(shape: .roundedRectangle)
+    let hug = Self.modifier(shape: .capsule)
+
+    #expect(slab.resolvedVPadding == 16)
+    #expect(slab.resolvedHPadding == 16)
+    #expect(hug.resolvedVPadding == 8)
+    #expect(hug.resolvedHPadding == 12)
+  }
+
+  @Test("a call site padding replaces the shape's own")
+  func testCallSitePaddingOverridesTheShape() {
+    let inline = Self.modifier(shape: .capsule, vPadding: 0, hPadding: 0)
+
+    #expect(inline.resolvedVPadding == 0)
+    #expect(inline.resolvedHPadding == 0)
+  }
+
+  @Test("one overridden axis leaves the other on the shape")
+  func testEachAxisResolvesOnItsOwn() {
+    let tall = Self.modifier(shape: .capsule, vPadding: 20)
+
+    #expect(tall.resolvedVPadding == 20)
+    #expect(tall.resolvedHPadding == 12)
+  }
+
+  // MARK: - Support
+  private static func modifier(
+    shape: ActionShape,
+    vPadding: CGFloat? = nil,
+    hPadding: CGFloat? = nil
+  ) -> ActionStyleViewModifier {
+    ActionStyleViewModifier(
+      style: .primary,
+      shape: shape,
+      font: .TypeScale.headline,
+      vPadding: vPadding,
+      hPadding: hPadding
+    )
+  }
 }

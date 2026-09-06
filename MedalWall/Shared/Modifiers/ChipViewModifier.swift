@@ -54,6 +54,9 @@ struct ChipViewModifier: ViewModifier {
 
   // MARK: - Properties
   let style: ChipStyle
+  let font: Font?
+  let vPadding: CGFloat
+  let hPadding: CGFloat
 
   // MARK: - Computed
   private var resolvedForeground: Color {
@@ -64,13 +67,18 @@ struct ChipViewModifier: ViewModifier {
     isEnabled ? style.background : Color.Surface.tertiary
   }
 
+  /// Internal so a test can read what a call site's `font` resolves to.
+  var resolvedFont: Font {
+    font ?? .TypeScale.caption
+  }
+
   // MARK: - Body
   func body(content: Content) -> some View {
     content
-      .font(.TypeScale.caption)
+      .font(resolvedFont)
       .foregroundStyle(resolvedForeground)
-      .padding(.vertical, 5)
-      .padding(.horizontal, 10)
+      .padding(.vertical, vPadding)
+      .padding(.horizontal, hPadding)
       .background(resolvedBackground)
       .clipShape(.capsule)
       .overlay(
@@ -83,8 +91,20 @@ struct ChipViewModifier: ViewModifier {
 extension View {
 
   /// Applies the design system's chip appearance for `style`.
-  func chipStyle(_ style: ChipStyle) -> some View {
-    modifier(ChipViewModifier(style: style))
+  func chipStyle(
+    _ style: ChipStyle,
+    font: Font? = nil,
+    vPadding: CGFloat = 5,
+    hPadding: CGFloat = 10
+  ) -> some View {
+    modifier(
+      ChipViewModifier(
+        style: style,
+        font: font,
+        vPadding: vPadding,
+        hPadding: hPadding
+      )
+    )
   }
 }
 

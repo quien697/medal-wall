@@ -53,12 +53,7 @@ struct EditProfileInfoSection: View {
           Button("Not Set") {
             birthday = .now
           }
-          .actionStyle(
-            .neutral,
-            font: .TypeScale.Field.value,
-            vPadding: 8,
-            hPadding: 12
-          )
+          .actionStyle(.neutral, font: .TypeScale.Field.value)
         }
       } label: {
         Text("Birthday")

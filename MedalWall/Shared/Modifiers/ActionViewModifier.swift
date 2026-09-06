@@ -98,11 +98,24 @@ enum ActionShape {
       Capsule().strokeBorder(color, lineWidth: lineWidth)
     }
   }
+
+  fileprivate var vPadding: CGFloat {
+    switch self {
+    case .roundedRectangle: 16
+    case .capsule: 8
+    }
+  }
+
+  fileprivate var hPadding: CGFloat {
+    switch self {
+    case .roundedRectangle: 16
+    case .capsule: 12
+    }
+  }
 }
 
 /// A view modifier that paints a label as a button.
 struct ActionStyleViewModifier: ViewModifier {
-
   // MARK: - Environment
   @Environment(\.isEnabled) private var isEnabled
 
@@ -111,7 +124,7 @@ struct ActionStyleViewModifier: ViewModifier {
   let shape: ActionShape
   let font: Font
   let vPadding: CGFloat?
-  let hPadding: CGFloat
+  let hPadding: CGFloat?
 
   // MARK: - Computed
   private var resolvedForeground: Color {
@@ -126,14 +139,24 @@ struct ActionStyleViewModifier: ViewModifier {
     isEnabled ? style.border : .clear
   }
 
+  /// Internal so a test can read what a call site's padding resolves to.
+  var resolvedVPadding: CGFloat {
+    vPadding ?? shape.vPadding
+  }
+
+  /// Internal so a test can read what a call site's padding resolves to.
+  var resolvedHPadding: CGFloat {
+    hPadding ?? shape.hPadding
+  }
+
   // MARK: - Body
   func body(content: Content) -> some View {
     content
       .font(font)
       .foregroundStyle(resolvedForeground)
       .tint(resolvedForeground)
-      .padding(.vertical, vPadding)
-      .padding(.horizontal, hPadding)
+      .padding(.vertical, resolvedVPadding)
+      .padding(.horizontal, resolvedHPadding)
       .frame(maxWidth: shape.maxWidth)
       .background(resolvedBackground)
       .clipShape(shape.clipShape)
@@ -144,12 +167,14 @@ struct ActionStyleViewModifier: ViewModifier {
 extension View {
 
   /// Applies the design system's button appearance for `style` and `shape`.
+  ///
+  /// Padding falls back to the shape's own when a call site passes none.
   func actionStyle(
     _ style: ActionStyle,
     shape: ActionShape = .capsule,
     font: Font = .TypeScale.headline,
-    vPadding: CGFloat = 13,
-    hPadding: CGFloat = 20
+    vPadding: CGFloat? = nil,
+    hPadding: CGFloat? = nil
   ) -> some View {
     modifier(
       ActionStyleViewModifier(
@@ -180,7 +205,7 @@ extension View {
     Text("Save medal").actionStyle(.primary, shape: .roundedRectangle)
     Text("Save medal").actionStyle(.tertiary, shape: .roundedRectangle)
     Text("Select").actionStyle(.tertiary)
-    Image(systemName: "plus").actionStyle(.primary, hPadding: 13)
+    Image(systemName: "plus").actionStyle(.primary)
   }  // VStack
   .padding()
   .background(Color.Background.primary)
