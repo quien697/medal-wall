@@ -37,6 +37,25 @@ extension Medal {
       userID: "preview"
     )
 
-    return [taipeiMedal2019, vancouverMedal]
+    let taipeiHalfMedal = Medal(
+      name: "Sample \(Race.taipei.name) Half \(RaceEdition.taipei2019.year)",
+      date: RaceEdition.taipei2019.startDate,
+      bibNumber: "00002",
+      place: Race.taipei.place,
+      distance: RaceEdition.taipei2019.distances[1],
+      finishTime: 1 * 3600 + 45 * 60 + 30,
+      overallPlacement: 142,
+      totalParticipants: 12450,
+      division: Division(gender: .male, ageGroup: .from30to34),
+      divisionPlacement: 71,
+      divisionTotal: 2890,
+      genderPlacement: 121,
+      genderTotal: 9120,
+      note: "Strong negative split.",
+      tags: ["Taipei", "台北", "Half Marathon", "半馬"],
+      userID: "preview"
+    )
+
+    return [taipeiMedal2019, taipeiHalfMedal, vancouverMedal]
   }()
 }
