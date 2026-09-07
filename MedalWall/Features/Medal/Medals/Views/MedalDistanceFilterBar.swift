@@ -15,12 +15,10 @@ import SwiftUI
 /// strip of filters stays visually light.
 struct MedalDistanceFilterBar: View {
   // MARK: - Properties
-  private let chipHeight: CGFloat = 34
-  private let rowHeight: CGFloat = 44
   let filters: [MedalDistanceFilter]
   let count: (MedalDistanceFilter) -> Int
 
-  // MARK: - Binding
+  // MARK: - State
   @Binding var selection: MedalDistanceFilter
 
   // MARK: - Body
@@ -38,19 +36,14 @@ struct MedalDistanceFilterBar: View {
                 .monospacedDigit()
             }  // HStack
             .textCase(.uppercase)
-            .frame(height: chipHeight)
-            .chipStyle(
-              selection == filter ? .primary : .secondary,
-              font: .TypeScale.microLabel,
-              vPadding: 0,
-              hPadding: .Space.row
-            )
-          }
-          .buttonStyle(.plain)
-          .frame(height: rowHeight)
+          }  // Button
+          .chipStyle(
+            selection == filter ? .primary : .secondary,
+            font: .TypeScale.microLabel)
         }
       }  // HStack
       .padding(.horizontal, .Space.gutter)
+      .padding(.vertical, .Space.stack)
     }  // ScrollView
     .scrollIndicators(.hidden)
   }

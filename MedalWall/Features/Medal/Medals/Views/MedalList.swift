@@ -12,7 +12,7 @@ import SwiftUI
 /// The screen has exactly one empty state — a collection with no medals — because the
 /// filter offers only distances the user owns, so a selection can never empty the list.
 struct MedalList: View {
-  // MARK: - Properties
+  // MARK: - State
   @Bindable var viewModel: MedalsViewModel
 
   // MARK: - Namespace
@@ -35,7 +35,6 @@ struct MedalList: View {
             }
           }  // LazyVStack
           .padding(.horizontal, .Space.gutter)
-          .padding(.vertical, .Space.row)
         }  // ScrollView
         .scrollIndicators(.hidden)
         .safeAreaInset(edge: .top) {

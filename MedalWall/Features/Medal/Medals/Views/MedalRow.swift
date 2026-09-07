@@ -50,7 +50,7 @@ struct MedalRow: View {
         if let finishTime {
           HStack(spacing: .Space.stack) {
             Text(finishTime)
-              .font(.TypeScale.Numeric.small)
+              .font(.TypeScale.Numeric.medium)
               .foregroundStyle(Color.Text.secondary)
 
             if isPersonalRecord {
@@ -58,14 +58,14 @@ struct MedalRow: View {
                 .tagStyle(.record)
             }
           }  // HStack
-          .padding(.top, 2)
+          .padding(.top, .Space.inline)
         } else {
           Text("No time recorded")
             .font(.TypeScale.microLabel)
             .tracking(metadataTracking)
             .textCase(.uppercase)
             .foregroundStyle(Color.Text.secondary)
-            .padding(.top, 2)
+            .padding(.top, .Space.inline)
         }
       }  // VStack
       .frame(maxWidth: .infinity, alignment: .leading)
