@@ -269,15 +269,15 @@ struct DistanceUnitTests {
     )
   }
 
-  @Test("A mile-entered near-preset distance is not snapped to the preset")
-  func testNearPresetIsNotSnapped() {
+  @Test("A mile-entered near-preset distance snaps onto the preset it measures")
+  func testNearPresetIsSnapped() {
     let saved = DistanceUnit.miles.customKilometers(
       displayValue: 26.2,
       originalKilometers: nil
     )
 
     #expect(saved == 42.1648128)
-    #expect(RaceDistanceCategory(value: saved) == .custom(42.1648128))
+    #expect(RaceDistanceCategory(value: saved) == .full)
   }
 
   /// Formats a canonical kilometre value under a pinned English locale, so number

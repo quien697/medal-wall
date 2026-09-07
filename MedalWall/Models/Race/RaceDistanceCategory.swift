@@ -53,13 +53,22 @@ enum RaceDistanceCategory: CustomStringConvertible, Hashable {
 
 extension RaceDistanceCategory {
   /// Reconstructs a category from its stored numeric value (kilometres).
+  ///
+  /// A small tolerance collapses values that round-trip across units onto the preset
+  /// they measure — a marathon persisted as 26.2 miles arrives as 42.16481 km and
+  /// would otherwise live as a separate chip from `.full`. 0.05 km is tight enough
+  /// to reject 42.0 (off by 0.195) while still accepting 42.16481 (off by 0.030).
   nonisolated init(value: Double) {
-    switch value {
-    case 42.195: self = .full
-    case 21.0975: self = .half
-    case 10: self = .tenKM
-    case 5: self = .fiveKM
-    default: self = .custom(value)
+    if abs(value - 42.195) < 0.05 {
+      self = .full
+    } else if abs(value - 21.0975) < 0.05 {
+      self = .half
+    } else if abs(value - 10) < 0.05 {
+      self = .tenKM
+    } else if abs(value - 5) < 0.05 {
+      self = .fiveKM
+    } else {
+      self = .custom(value)
     }
   }
 

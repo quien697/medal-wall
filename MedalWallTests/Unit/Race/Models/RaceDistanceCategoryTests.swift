@@ -150,6 +150,15 @@ struct RaceDistanceCategoryTests {
     #expect(RaceDistanceCategory(value: 42.0) == .custom(42.0))
   }
 
+  /// A marathon persisted as 26.2 miles arrives as 42.16481 km. Without tolerance
+  /// it would live as a separate chip alongside `.full`, splitting one distance
+  /// into two. The tolerance tight enough to reject 42.0 (off by 0.195 km) still
+  /// accepts 42.16481 (off by 0.030 km).
+  @Test("init(value:) collapses a miles-based marathon onto full within tolerance")
+  func testInitValueMilesMarathonCollapsesToFull() {
+    #expect(RaceDistanceCategory(value: 42.16481) == .full)
+  }
+
   // MARK: - standardCases
   @Test("standardCases contains exactly full, half, tenKM, fiveKM in order")
   func testStandardCases() {
