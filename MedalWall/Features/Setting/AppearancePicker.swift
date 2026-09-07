@@ -11,15 +11,19 @@ struct AppearancePicker: View {
   @Binding var appTheme: AppTheme
 
   var body: some View {
-    Picker("Appearance", selection: $appTheme) {
+    Picker(selection: $appTheme) {
       ForEach(AppTheme.allCases, id: \.self) { scheme in
         HStack {
           Image(systemName: scheme.icon)
 
           Text(scheme.label)
-        }
+            .font(.TypeScale.Field.value)
+        }  // HStack
         .tag(scheme)
       }  // ForEach
+    } label: {
+      Text("Appearance")
+        .font(.TypeScale.Field.label)
     }  // Picker
     .pickerStyle(.navigationLink)
   }

@@ -14,19 +14,14 @@ struct EmailSignInHeader: View {
 
   // MARK: - Body
   var body: some View {
-    VStack(spacing: 16) {
-      Image(systemName: "envelope.fill")
-        .font(.system(size: 50))
-        .foregroundStyle(Color.Gold.primary)
-
+    VStack(spacing: 8) {
       Text(title)
-        .font(.title)
-        .fontWeight(.bold)
+        .font(.TypeScale.title1)
         .foregroundStyle(Color.Text.primary)
 
       Text(subTitle)
-        .font(.body)
-        .foregroundStyle(.secondary)
+        .font(.TypeScale.callout)
+        .foregroundStyle(Color.Text.secondary)
         .multilineTextAlignment(.center)
     }  // VStack
   }

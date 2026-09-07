@@ -11,14 +11,14 @@ struct MedalDetailTagsSection: View {
   let tags: [String]
 
   var body: some View {
-    SectionContainer(title: "Tags") {
+    PageSection(title: "Tags") {
       FlowLayout(spacing: 6) {
         ForEach(tags, id: \.self) { tag in
           Text(tag)
-            .secondaryButtonStyle(vPadding: 5, hPadding: 10)
+            .tagStyle(.neutralOnPage)
         }  // ForEach
       }  // FlowLayout
-    }  // SectionContainer
+    }  // PageSection
   }
 }
 

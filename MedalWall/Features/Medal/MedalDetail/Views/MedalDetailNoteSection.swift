@@ -11,14 +11,14 @@ struct MedalDetailNoteSection: View {
   let note: String
 
   var body: some View {
-    SectionContainer(title: "Notes") {
+    PageSection(title: "Notes") {
       Text(note)
         .font(.body)
         .foregroundStyle(Color.Text.primary)
         .frame(maxWidth: .infinity, alignment: .leading)
         .lineLimit(3...)
         .surfaceStyle()
-    }  // SectionContainer
+    }  // PageSection
   }
 }
 

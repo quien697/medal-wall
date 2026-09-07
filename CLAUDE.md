@@ -7,6 +7,46 @@
 - MVVM — Views → ViewModels → Repositories → Firebase
 - Firestore for all data; Firebase Storage for images (stored as download URLs on models)
 
+## Design System
+The visual baseline lives outside this repo, in `../../documents/Design System/`
+(absolute: `~/Code/Personal/Projects/medal-wall/documents/Design System/`):
+- **`Medal Wall Design System v*.html`** — the source of truth for colour, type,
+  spacing/radius/elevation, components, and the `color.*` token list.
+- **`Medal Wall iOS v*.html`** — iOS screen mockups (login, medal wall, medal detail,
+  races) showing how those tokens compose per screen.
+
+Filenames are versioned and get renamed, so glob the folder rather than hardcoding a
+name, and check the newest version before treating anything as current. Tokens are
+platform-neutral by design (iOS asset catalog / Android `colors.xml` / CSS) — keep them
+that way.
+
+**When the token list (§04) and an iOS mockup disagree, the token list wins** — the
+mockups drift on exact sizes and hexes.
+
+Code-side tokens:
+- `Color+Extensions.swift` — `Pigment` (asset names, spelled once) then roles that
+  point at it: `Background`, `Surface`, `Border`, `Text`, `Record`, `Status`,
+  `TierBadge`. Reach for a role first; use a `Pigment` directly only where no role
+  fits (ink on a filled control, ink on champagne). Gold is never tappable — `Record`
+  only ever describes something earned.
+- `Font+Extensions.swift` — `Font.TypeScale`. Line height, tracking and uppercasing
+  are **not** in it (`Font` cannot carry them); apply `.tracking()` / `.textCase()`
+  at the call site.
+- `CGFloat+Extensions.swift` — `.Radius` (tag, field, button, image, surface, sheet).
+- `ActionStyleViewModifier.swift` — `.actionStyle(.primary/.secondary/.tertiary/
+  .plain/.destructive)`. Pressed and disabled are states, never cases.
+- `ChipViewModifier.swift` — `.chipStyle(.primary/.secondary/.neutral)`, capsule, for
+  things that *name* something: filters, and hashtags like `#taipei` (untappable for
+  now, but still capsules). `TagViewModifier.swift` —
+  `.tagStyle(.record/.neutralInCard/.neutralOnPage/.success/.error)`, 6pt rect, for
+  facts a user cannot change. Shape carries the distinction; never swap them. Gaining a
+  remove affordance moves a label across: a deletable distance is a chip, the same
+  distance read-only is a tag.
+- `ElevationViewModifier.swift` — `.elevation(.soft/.lifted/.ring)`.
+
+A fixed colour needs a fixed counterpart: anything sitting on `Record.champagne`
+(no dark slot) must use `Record.ink`, or it inverts out from under its background.
+
 ## Development Workflow
 Features and non-trivial fixes follow the combined OpenSpec + Superpowers loop:
 brainstorm → OpenSpec change (`proposal` + `design` + spec delta + `tasks`) → implement

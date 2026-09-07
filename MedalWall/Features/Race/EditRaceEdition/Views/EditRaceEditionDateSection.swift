@@ -24,7 +24,7 @@ struct EditRaceEditionDateSection: View {
 
   // MARK: - Body
   var body: some View {
-    Section("Date") {
+    Section {
       Toggle(
         isOn: Binding(
           get: { isOneDay },
@@ -32,7 +32,7 @@ struct EditRaceEditionDateSection: View {
         )
       ) {
         Text("One Day Event")
-          .fromLabelStyle()
+          .fromStyle(.label)
       }
 
       Picker(
@@ -43,12 +43,12 @@ struct EditRaceEditionDateSection: View {
       ) {
         ForEach((minYear...maxYear).reversed(), id: \.self) { year in
           Text(String(year))
-            .font(.body)
+            .font(.TypeScale.body)
             .tag(year)
         }
       } label: {
         Text("Year")
-          .fromLabelStyle()
+          .fromStyle(.label)
       }
 
       DatePicker(
@@ -60,7 +60,7 @@ struct EditRaceEditionDateSection: View {
         displayedComponents: [.date]
       ) {
         Text("Start Date")
-          .fromLabelStyle()
+          .fromStyle(.label)
       }
 
       if !isOneDay {
@@ -70,10 +70,14 @@ struct EditRaceEditionDateSection: View {
           displayedComponents: [.date]
         ) {
           Text("End Date")
-            .fromLabelStyle()
+            .fromStyle(.label)
         }
       }
+    } header: {
+      Text("Date")
+        .sectionTitleStyle()
     }  // Section
+    .listRowBackground(Color.Surface.primary)
   }
 }
 

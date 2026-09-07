@@ -24,14 +24,10 @@ struct EmailConfirmationSection: View {
           """
       )
 
-      Button {
+      Button("Close") {
         onDismiss()
-      } label: {
-        Text("Close")
-          .frame(maxWidth: .infinity)
       }  // Button
-      .buttonStyle(.borderedProminent)
-      .controlSize(.large)
+      .actionStyle(.primary, shape: .roundedRectangle)
 
       Spacer()
     }  // VStack

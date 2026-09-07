@@ -11,9 +11,9 @@ struct SectionTitleViewModifier: ViewModifier {
 
   func body(content: Content) -> some View {
     content
-      .font(.headline)
-      .fontWeight(.heavy)
+      .font(.TypeScale.sectionTitle)
       .textCase(.uppercase)
+      .tracking(1)
       .foregroundStyle(Color.Text.tertiary)
   }
 }

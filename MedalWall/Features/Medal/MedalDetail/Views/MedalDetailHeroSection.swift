@@ -18,14 +18,15 @@ struct MedalDetailHeroSection: View {
 
   var body: some View {
     DetailHeroSection {
-      MedalImage(urlString: photoUrl)
+      PhotoImage(urlString: photoUrl, as: .medal)
+        .medalRing()
     } infoContent: {
       HStack(spacing: 6) {
         Text(raceDistance)
-          .goldOutLineButtonStyle(font: .caption, vPadding: 4, hPadding: 8)
+          .tagStyle(.neutralOnPage)
 
         Text(raceDistanceType)
-          .secondaryButtonStyle(font: .caption, vPadding: 4, hPadding: 8)
+          .tagStyle(.neutralOnPage)
       }  // HStack
 
       Text(name)

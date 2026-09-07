@@ -16,12 +16,11 @@ struct RaceEntryEditionRow: View {
     VStack(alignment: .leading) {
       HStack {
         Text("\(edition.year)")
-          .font(.headline)
-          .fontWeight(.heavy)
-          .foregroundStyle(Color.Gold.primary)
+          .font(.TypeScale.Numeric.medium)
+          .foregroundStyle(Color.Record.primary)
 
         Text(edition.dateDisplayLabel)
-          .font(.subheadline)
+          .font(.TypeScale.caption)
           .foregroundStyle(Color.Text.tertiary)
       }  // HStack
 
@@ -38,7 +37,7 @@ struct RaceEntryEditionRow: View {
         }  // FlowLayout
       } else {
         Text("No Distances")
-          .fontWeight(.semibold)
+          .font(.TypeScale.callout)
           .foregroundStyle(Color.Text.secondary)
           .padding(.vertical, 6)
       }

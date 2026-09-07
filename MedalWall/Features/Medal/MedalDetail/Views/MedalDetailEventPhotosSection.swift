@@ -5,7 +5,6 @@
 //  Created by Quien on 2026-04-07.
 //
 
-import CachedAsyncImage
 import PhotoViewer
 import SwiftUI
 
@@ -20,33 +19,19 @@ struct MedalDetailEventPhotosSection: View {
   }
 
   var body: some View {
-    SectionContainer(title: "Event Photos") {
+    PageSection(title: "Event Photos") {
       ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 12) {
           ForEach(Array(sortedPhotoUrls.enumerated()), id: \.offset) { index, urlString in
-            CachedAsyncImage(
-              url: URL(string: urlString),
-              targetSize: CGSize(width: 140, height: 110)
-            ) { phase in
-              switch phase {
-              case .success(let image):
-                image
-                  .resizable()
-                  .aspectRatio(contentMode: .fill)
-              default:
-                Color.gray.opacity(0.2)
+            PhotoImage(urlString: urlString, as: .event)
+              .onTapGesture {
+                selectedPhotoIndex = index
+                isPresentingPhotoViewer = true
               }
-            }
-            .frame(width: 140, height: 110)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .onTapGesture {
-              selectedPhotoIndex = index
-              isPresentingPhotoViewer = true
-            }
           }  // ForEach
         }  // HStack
       }  // ScrollView
-    }  // SectionContainer
+    }  // PageSection
     .fullScreenCover(isPresented: $isPresentingPhotoViewer) {
       PhotoViewer(
         photos: sortedPhotoUrls,

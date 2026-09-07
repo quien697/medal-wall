@@ -23,11 +23,15 @@ struct RaceEntryPicker: View {
         Divider()
 
         if races.isEmpty {
-          ContentUnavailableView(
-            "No Race Events",
-            systemImage: "flag.fill",
-            description: Text("Add race events to use auto-fill")
-          )
+          ContentUnavailableView {
+            Label("No Race Events", systemImage: "flag.fill")
+              .font(.TypeScale.title2)
+              .foregroundStyle(Color.Text.primary)
+          } description: {
+            Text("Add race events to use auto-fill")
+              .font(.TypeScale.body)
+              .foregroundStyle(Color.Text.secondary)
+          }  // ContentUnavailableView
         } else {
           RaceEntryList(races: races, editions: editions, selection: $selection)
         }

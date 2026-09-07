@@ -25,7 +25,7 @@ struct ProfileSummarySection: View {
   let bestHalfTime: String
 
   var body: some View {
-    SectionContainer {
+    PageSection {
       LazyVGrid(columns: threeColumns, spacing: 8) {
         StatCard(title: "\(totalMedals)", subTitle: "Medals")
         StatCard(title: "\(fullCount)", subTitle: "Full")
@@ -35,16 +35,16 @@ struct ProfileSummarySection: View {
       LazyVGrid(columns: twoColumns, spacing: 8) {
         StatCard(
           title: bestFullTime,
-          titleFont: .title2,
+          titleFont: .TypeScale.Numeric.medium,
           subTitle: "Best Full"
         )
         StatCard(
           title: bestHalfTime,
-          titleFont: .title2,
+          titleFont: .TypeScale.Numeric.medium,
           subTitle: "Best Half"
         )
       }
-    }  // SectionContainer
+    }  // PageSection
   }
 }
 

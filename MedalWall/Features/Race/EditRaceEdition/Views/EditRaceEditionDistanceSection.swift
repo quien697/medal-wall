@@ -13,8 +13,8 @@ struct EditRaceEditionDistanceSection: View {
   var onAdd: () -> Void
 
   var body: some View {
-    Section("Distances") {
-      FlowLayout(spacing: 10) {
+    Section {
+      FlowLayout(spacing: 6) {
         ForEach(distances.sorted()) { distance in
           HStack(spacing: 6) {
             Text(distance.displayLabel)
@@ -23,27 +23,38 @@ struct EditRaceEditionDistanceSection: View {
               onRemove(distance)
             } label: {
               Image(systemName: "xmark")
-                .font(.caption2)
-                .fontWeight(.semibold)
+                .font(.TypeScale.overline)
                 .foregroundStyle(Color.Text.tertiary)
             }
             .buttonStyle(.plain)
           }
-          .secondaryButtonStyle(
-            vPadding: 6,
-            hPadding: 10
-          )
+          .chipStyle(.neutral)
         }
+      }  // FlowLayout
+    } header: {
+      HStack {
+        Text("Distances")
+          .sectionTitleStyle()
+
+        Spacer()
 
         Button {
           onAdd()
         } label: {
           Image(systemName: "plus")
-            .goldOutLineButtonStyle()
+
+          Text("Add")
+            .textCase(.uppercase)
         }
-        .buttonStyle(.plain)
-      }  // FlowLayout
-    }
+        .actionStyle(
+          .plain,
+          font: .TypeScale.sectionTitle,
+          vPadding: 0,
+          hPadding: 0
+        )
+      }
+    }  // Section
+    .listRowBackground(Color.Surface.primary)
   }
 }
 

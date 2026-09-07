@@ -11,76 +11,80 @@ struct EditProfileInfoSection: View {
   @Binding var firstName: String
   @Binding var lastName: String
   @Binding var gender: Gender?
-  @Binding var birthday: Date
-  @Binding var isBirthdaySet: Bool
+  @Binding var birthday: Date?
 
   var body: some View {
-    Section("Info") {
+    Section {
       LabeledContent {
         TextField("First Name", text: $firstName)
-          .multilineTextAlignment(.trailing)
+          .fromStyle(.value)
       } label: {
         Text("First Name")
-          .fromLabelStyle()
+          .fromStyle(.label)
       }
 
       LabeledContent {
         TextField("Last Name", text: $lastName)
-          .multilineTextAlignment(.trailing)
+          .fromStyle(.value)
       } label: {
         Text("Last Name")
-          .fromLabelStyle()
+          .fromStyle(.label)
       }
 
       Picker(selection: $gender) {
-        Text("Not Set").tag(Gender?.none)
+        Text("Not Set")
+          .tag(Gender?.none)
 
         ForEach(Gender.allCases, id: \.self) { genderCase in
-          Text(genderCase.displayName).tag(Gender?.some(genderCase))
+          Text(genderCase.displayName)
+            .tag(Gender?.some(genderCase))
         }
       } label: {
         Text("Gender")
-          .fromLabelStyle()
+          .fromStyle(.label)
       }
+      .pickerStyle(.menu)
 
       LabeledContent {
-        if isBirthdaySet {
-          HStack {
-            Button {
-              isBirthdaySet = false
-              birthday = .now
-            } label: {
-              Image(systemName: "xmark.circle.fill")
-            }
-            .foregroundStyle(.red)
-            .buttonStyle(.plain)
-
-            DatePicker("", selection: $birthday, displayedComponents: .date)
-              .labelsHidden()
-          }
+        if let selection = Binding($birthday) {
+          DatePicker("", selection: selection, in: ...Date.now, displayedComponents: .date)
+            .labelsHidden()
         } else {
           Button("Not Set") {
-            isBirthdaySet = true
+            birthday = .now
           }
-          .foregroundStyle(Color.Text.primary)
-          .buttonStyle(.bordered)
+          .actionStyle(.neutral, font: .TypeScale.Field.value)
         }
       } label: {
         Text("Birthday")
-          .fromLabelStyle()
+          .fromStyle(.label)
       }
-    }
+    } header: {
+      Text("Info")
+        .sectionTitleStyle()
+    }  // Section
+    .listRowBackground(Color.Surface.primary)
   }
 }
 
-#Preview {
+#Preview("Birthday Not Set") {
+  Form {
+    EditProfileInfoSection(
+      firstName: .constant("John"),
+      lastName: .constant("Doe"),
+      gender: .constant(.none),
+      birthday: .constant(nil)
+    )
+  }
+}
+
+#Preview("Birthday Set") {
   Form {
     EditProfileInfoSection(
       firstName: .constant("John"),
       lastName: .constant("Doe"),
       gender: .constant(.male),
-      birthday: .constant(.now),
-      isBirthdaySet: .constant(true)
+      birthday: .constant(.now)
     )
   }
 }

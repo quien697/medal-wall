@@ -12,7 +12,7 @@ struct ProfileAchievementsSection: View {
   let halfMarathonProgress: AchievementProgress
 
   var body: some View {
-    SectionContainer(title: "Achievements") {
+    PageSection(title: "Achievements") {
       VStack(spacing: 15) {
         ProfileAchievementRow(trackName: "Full Marathon", progress: fullMarathonProgress)
 

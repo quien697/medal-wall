@@ -11,17 +11,19 @@ struct EditMedalInfoSection: View {
   @Binding var name: String
   @Binding var date: Date
   @Binding var bib: String
+  let place: Place
   let distance: String
+  var onEditPlace: () -> Void
   var onEditDistance: () -> Void
 
   var body: some View {
     Section("Info") {
       LabeledContent {
         TextField("e.g. Taipei Marathon 2025", text: $name)
-          .multilineTextAlignment(.trailing)
+          .fromStyle(.value)
       } label: {
         Text("Name")
-          .fromLabelStyle()
+          .fromStyle(.label)
       }
 
       DatePicker(
@@ -29,20 +31,20 @@ struct EditMedalInfoSection: View {
         displayedComponents: .date
       ) {
         Text("Date")
-          .fromLabelStyle()
+          .fromStyle(.label)
       }
 
       LabeledContent {
         TextField("e.g. 4291 (Optional)", text: $bib)
-          .multilineTextAlignment(.trailing)
+          .fromStyle(.value)
       } label: {
         Text("Bib")
-          .fromLabelStyle()
+          .fromStyle(.label)
       }
 
       HStack {
         Text("Distance")
-          .fromLabelStyle()
+          .fromStyle(.label)
 
         Spacer()
 
@@ -50,10 +52,22 @@ struct EditMedalInfoSection: View {
           onEditDistance()
         } label: {
           Text(distance)
-            .foregroundStyle(Color.Text.primary)
+            .fromStyle(.value)
         }
         .buttonStyle(.bordered)
-      }
+      }  // HStack
+
+      LabeledContent {
+        Text(place.formatted.isEmpty ? .appLocalized("Choose a place") : place.formatted)
+          .fromStyle(.value)
+          .foregroundStyle(place.formatted.isEmpty ? .secondary : .primary)
+          .onTapGesture {
+            onEditPlace()
+          }
+      } label: {
+        Text("Place")
+          .fromStyle(.label)
+      }  // LabeledContent
     }  // Section
   }
 }
@@ -66,7 +80,9 @@ struct EditMedalInfoSection: View {
       name: .constant(medal.name),
       date: .constant(medal.date),
       bib: .constant(medal.bibNumber),
+      place: medal.place,
       distance: medal.distance.displayLabel,
+      onEditPlace: {},
       onEditDistance: {}
     )
   }

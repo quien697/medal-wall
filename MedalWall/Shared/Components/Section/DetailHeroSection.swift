@@ -35,7 +35,7 @@ struct DetailHeroSection<ImageContent: View, InfoContent: View>: View {
     .frame(maxWidth: .infinity)
     .overlay(alignment: .bottom) {
       Rectangle()
-        .fill(Color.Border.gray)
+        .fill(Color.Border.primary)
         .frame(height: 1)
     }
   }
@@ -44,8 +44,7 @@ struct DetailHeroSection<ImageContent: View, InfoContent: View>: View {
 #Preview {
   ScrollView {
     DetailHeroSection {
-      Image(systemName: "photo.fill")
-        .placeholderStyled(as: .raceHero)
+      PlaceholderImage(as: .raceHero)
     } infoContent: {
       Text("Race Name")
         .font(.title2)

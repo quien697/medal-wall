@@ -30,12 +30,12 @@ struct MedalDetailStatsSection: View {
 
   // MARK: - Body
   var body: some View {
-    SectionContainer(title: "Stats") {
+    PageSection(title: "Stats") {
       LazyVGrid(columns: columns, spacing: spacing) {
         MedalDetailStatsGridItem(
           title: "Finish Time",
           headline: finishTime,
-          headLineColor: Color.Gold.primary
+          headLineColor: Color.Record.primary
         )
 
         MedalDetailStatsGridItem(
@@ -47,7 +47,7 @@ struct MedalDetailStatsSection: View {
           title: "Overall",
           headline: overallPlacement,
           subHeadLine: totalParticipants,
-          headLineColor: Color.Gold.primary
+          headLineColor: Color.Record.primary
         )
 
         MedalDetailStatsGridItem(
@@ -68,7 +68,7 @@ struct MedalDetailStatsSection: View {
           subHeadLine: divisionTotal
         )
       }  // LazyVGrid
-    }  // SectionContainer
+    }  // PageSection
   }
 }
 

@@ -37,10 +37,11 @@ struct PlacePickerView: View {
             } label: {
               VStack(alignment: .leading, spacing: 2) {
                 Text(suggestion.title)
-                  .foregroundStyle(.textPrimary)
+                  .font(.TypeScale.headline)
+                  .foregroundStyle(Color.Text.primary)
                 Text(suggestion.subtitle)
-                  .font(.caption)
-                  .foregroundStyle(.textSecondary)
+                  .font(.TypeScale.caption)
+                  .foregroundStyle(Color.Text.secondary)
               }  // VStack
             }  // Button
           }  // ForEach

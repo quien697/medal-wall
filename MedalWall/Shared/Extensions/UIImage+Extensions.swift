@@ -8,6 +8,7 @@
 import UIKit
 
 extension UIImage {
+
   /// Downloads an image from the given URL string and returns it, or nil if loading fails.
   static func load(from urlString: String?) async -> UIImage? {
     guard let urlString,

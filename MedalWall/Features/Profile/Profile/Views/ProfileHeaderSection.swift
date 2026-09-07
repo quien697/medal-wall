@@ -13,20 +13,20 @@ struct ProfileHeaderSection: View {
   let bio: String?
 
   var body: some View {
-    SectionContainer {
+    PageSection {
       HStack(alignment: .top) {
-        AvatarImage(photoUrl: photoUrl)
+        PhotoImage(urlString: photoUrl, as: .avatar)
 
         VStack(alignment: .leading, spacing: 8) {
           Text("\(userName)")
-            .font(.title)
-            .fontWeight(.bold)
+            .font(.TypeScale.title2)
+            .foregroundStyle(Color.Text.primary)
             .lineLimit(1)
             .minimumScaleFactor(0.5)
 
           if let bio = bio, !bio.isEmpty {
             Text(bio)
-              .font(.headline)
+              .font(.TypeScale.body)
               .foregroundStyle(Color.Text.secondary)
           }
         }
@@ -41,8 +41,6 @@ struct ProfileHeaderSection: View {
   VStack {
     ProfileHeaderSection(
       photoUrl: nil, userName: "Tsung-Hsun Liu", bio: "I am here to cross the finish line.")
-    ProfileHeaderSection(
-      photoUrl: nil, userName: "Tsung-Hsun Liu", bio: "Fake it till you make it.")
   }
   .background(Color.Background.primary)
 }

@@ -34,9 +34,7 @@ struct EditProfileView: View {
       Form {
         EditPhotoPicker(
           photo: viewModel.photo,
-          photoView: {
-            AvatarImage(photo: viewModel.photo)
-          },
+          imageType: .avatar,
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
           },
@@ -46,7 +44,6 @@ struct EditProfileView: View {
             viewModel.clearPhoto()
           }
         )
-        .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
 
         EditProfileInfoSection(
@@ -54,7 +51,6 @@ struct EditProfileView: View {
           lastName: $viewModel.userName.lastName,
           gender: $viewModel.gender,
           birthday: $viewModel.birthday,
-          isBirthdaySet: $viewModel.isBirthdaySet
         )
 
         EditProfileBioSection(bio: $viewModel.bio)

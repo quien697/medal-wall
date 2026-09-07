@@ -15,8 +15,7 @@ final class EditProfileViewModel {
   private(set) var isPhotoChanged = false
   var bio: String
   var gender: Gender?
-  var birthday: Date
-  var isBirthdaySet: Bool
+  var birthday: Date?
 
   private let profile: User
 
@@ -30,13 +29,7 @@ final class EditProfileViewModel {
     )
     self.bio = profile.bio ?? ""
     self.gender = profile.gender
-    if let birthday = profile.birthday {
-      self.birthday = birthday
-      self.isBirthdaySet = true
-    } else {
-      self.birthday = .now
-      self.isBirthdaySet = false
-    }
+    self.birthday = profile.birthday
   }
 
   // MARK: - Computed
@@ -67,7 +60,7 @@ final class EditProfileViewModel {
     let updatedBio = bio.trimmingCharacters(in: .whitespacesAndNewlines)
     updated.bio = updatedBio.isEmpty ? nil : updatedBio
     updated.gender = gender
-    updated.birthday = isBirthdaySet ? birthday : nil
+    updated.birthday = birthday
     return updated
   }
 }

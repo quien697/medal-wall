@@ -63,10 +63,12 @@ struct EditDistanceView: View {
   ) -> some View {
     HStack {
       Text(name)
+        .font(.TypeScale.Field.label)
 
       Spacer()
 
       Text(unit.formatted(kilometers: category.value))
+        .font(.TypeScale.Field.value)
         .foregroundStyle(Color.Text.secondary)
     }  // HStack
     .tag(category)
@@ -82,12 +84,15 @@ struct EditDistanceView: View {
             presetRow("Half Marathon", .half)
             presetRow("10K", .tenKM)
             presetRow("5K", .fiveKM)
-            Text("Custom").tag(RaceDistanceCategory.custom(customKilometers))
+            Text("Custom")
+              .font(.TypeScale.Field.label)
+              .tag(RaceDistanceCategory.custom(customKilometers))
           }
           .pickerStyle(.navigationLink)
 
           if case .custom = draftDistance.category {
             TextField(unit.customFieldLabel(), value: $customValue, format: .number)
+              .font(.TypeScale.Field.value)
               .keyboardType(.decimalPad)
               .onChange(of: customValue) { _, _ in
                 draftDistance.category = .custom(customKilometers)

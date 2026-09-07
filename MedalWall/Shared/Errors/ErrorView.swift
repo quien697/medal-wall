@@ -20,14 +20,17 @@ struct ErrorView: View {
           .padding(.bottom, 10)
 
         Text(errorWrapper.error.title)
-          .font(.title.bold())
+          .font(.TypeScale.title2)
+          .foregroundStyle(Color.Text.primary)
 
         Text(errorWrapper.error.message)
-          .font(.body)
+          .font(.TypeScale.body)
+          .foregroundStyle(Color.Text.secondary)
           .multilineTextAlignment(.center)
 
         Text(errorWrapper.error.guidance)
-          .font(.body)
+          .font(.TypeScale.body)
+          .foregroundStyle(Color.Text.secondary)
           .multilineTextAlignment(.center)
 
         Button("Continue") {

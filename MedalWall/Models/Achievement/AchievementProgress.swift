@@ -37,6 +37,18 @@ extension AchievementProgress {
     )
   }
 
+  /// How far the live count has come toward the tier the meter shows: the next tier
+  /// while one remains, the unlocked tier once the track is maxed.
+  ///
+  /// Clamped to `0...1` — a persisted milestone protects a tier against later medal
+  /// deletion, so the live count can sit either side of the threshold it is measured
+  /// against, and neither end may overrun the track.
+  nonisolated var progressFraction: Double {
+    guard let target = nextTier ?? unlockedTier, target.threshold > 0 else { return 0 }
+
+    return min(1, max(0, Double(currentCount) / Double(target.threshold)))
+  }
+
   /// Ratchets a persisted milestone upward to match the live count, if the live
   /// count has crossed a new tier threshold. Never decreases the persisted value.
   nonisolated static func ratchetedMilestone(persisted: Int, liveCount: Int) -> Int {

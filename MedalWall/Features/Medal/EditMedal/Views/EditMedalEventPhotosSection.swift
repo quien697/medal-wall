@@ -5,7 +5,6 @@
 //  Created by Quien on 2026-04-17.
 //
 
-import CachedAsyncImage
 import SwiftUI
 
 struct EditMedalEventPhotosSection: View {
@@ -19,16 +18,18 @@ struct EditMedalEventPhotosSection: View {
         HStack(spacing: 10) {
           ForEach(photos) { photo in
             ZStack(alignment: .topTrailing) {
-              photoThumbnail(for: photo)
-                .frame(width: 100, height: 80)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+              if let image = photo.image {
+                PhotoImage(photo: image, as: .eventThumbnail)
+              } else {
+                PhotoImage(urlString: photo.imageUrl, as: .eventThumbnail)
+              }
 
               Button {
                 onRemove(photo.id)
               } label: {
                 Image(systemName: "xmark.circle.fill")
                   .symbolRenderingMode(.palette)
-                  .foregroundStyle(.white, Color.Gold.primary)
+                  .foregroundStyle(.white, Color.Status.error)
                   .font(.system(size: 18))
               }
               .buttonStyle(.plain)
@@ -39,8 +40,7 @@ struct EditMedalEventPhotosSection: View {
           Button {
             onChooseFromLibrary()
           } label: {
-            Image(systemName: "photo")
-              .placeholderStyled(as: .eventThumbnail)
+            EmptyPhotoSlot(as: .eventThumbnail)
           }
           .buttonStyle(.plain)
         }  // HStack
@@ -48,26 +48,6 @@ struct EditMedalEventPhotosSection: View {
       }  // ScrollView
       .listRowInsets(EdgeInsets())
     }  // Section
-  }
-
-  @ViewBuilder
-  private func photoThumbnail(for photo: DraftEventPhoto) -> some View {
-    if let image = photo.image {
-      Image(uiImage: image)
-        .resizable()
-        .aspectRatio(contentMode: .fill)
-    } else if let urlString = photo.imageUrl, let url = URL(string: urlString) {
-      CachedAsyncImage(url: url, targetSize: CGSize(width: 100, height: 80)) { phase in
-        switch phase {
-        case .success(let image):
-          image.resizable().aspectRatio(contentMode: .fill)
-        default:
-          Color.gray.opacity(0.2)
-        }
-      }
-    } else {
-      Color.gray.opacity(0.2)
-    }
   }
 }
 

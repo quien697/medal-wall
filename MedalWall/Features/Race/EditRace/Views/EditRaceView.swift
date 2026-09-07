@@ -40,9 +40,7 @@ struct EditRaceView: View {
       Form {
         EditPhotoPicker(
           photo: viewModel.photo,
-          photoView: {
-            RaceImage(photo: viewModel.photo, imageType: .raceHero)
-          },
+          imageType: .raceHero,
           onChooseFromLibrary: {
             isPresentingPhotoPicker = true
           },
@@ -52,17 +50,16 @@ struct EditRaceView: View {
             viewModel.clearPhoto()
           }
         )
-        .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
 
         EditRaceInfoSection(
           name: $viewModel.name,
-          url: $viewModel.websiteUrl
+          url: $viewModel.websiteUrl,
+          place: viewModel.place,
+          onEditPlace: {
+            isPresentingPlacePicker = true
+          }
         )
-
-        EditPlaceSection(place: viewModel.place) {
-          isPresentingPlacePicker = true
-        }
 
         if viewModel.mode == .edit, let raceId = viewModel.raceId {
           EditRaceEditionSection(

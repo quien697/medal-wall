@@ -15,11 +15,11 @@ struct EditMedalAutoFillSection: View {
       HStack {
         VStack(alignment: .leading) {
           Text("Fill from race event")
-            .font(.headline)
-            .fontWeight(.bold)
+            .font(.TypeScale.headline)
+            .foregroundStyle(Color.Text.primary)
 
           Text("Pick a race event to auto-fill fields")
-            .font(.subheadline)
+            .font(.TypeScale.caption)
             .foregroundStyle(Color.Text.tertiary)
         }
 
@@ -31,10 +31,10 @@ struct EditMedalAutoFillSection: View {
           Text("Select")
         }
         .buttonStyle(.plain)
-        .goldFillButtonStyle()
+        .actionStyle(.tertiary)
       }  // HStack
     }  // Section
-    .listRowBackground(Color.Gold.primary.opacity(0.1))
+    .listRowBackground(Color.Record.primary.opacity(0.1))
   }
 }
 

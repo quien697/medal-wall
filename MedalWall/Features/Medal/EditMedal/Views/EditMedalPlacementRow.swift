@@ -16,21 +16,22 @@ struct EditMedalPlacementRow: View {
     LabeledContent {
       HStack(spacing: 4) {
         TextField("Placement", value: $placement, format: .number)
-          .multilineTextAlignment(.trailing)
+          .fromStyle(.value)
           .keyboardType(.numberPad)
           .fixedSize()
 
         Text("of")
+          .font(.TypeScale.caption)
           .foregroundStyle(Color.Text.tertiary)
 
         TextField("Total", value: $total, format: .number)
-          .multilineTextAlignment(.trailing)
+          .fromStyle(.value)
           .keyboardType(.numberPad)
           .fixedSize()
       }  // HStack
     } label: {
       Text(label)
-        .fromLabelStyle()
+        .fromStyle(.label)
     }  // LabeledContent
   }
 }

@@ -13,12 +13,12 @@ struct MedalStatsSection: View {
   let halfCount: Int
 
   var body: some View {
-    SectionContainer {
+    PageSection {
       HStack(spacing: 16) {
         StatCard(
           title: "\(totalCount)",
           subTitle: "Total",
-          titleColor: Color.Gold.primary,
+          titleColor: Color.Record.primary,
           vPadding: 8
         )
 
@@ -34,7 +34,7 @@ struct MedalStatsSection: View {
           vPadding: 8
         )
       }  // HStack
-    }  // SectionContainer
+    }  // PageSection
   }
 }
 

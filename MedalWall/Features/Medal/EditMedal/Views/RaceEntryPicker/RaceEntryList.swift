@@ -17,22 +17,22 @@ struct RaceEntryList: View {
       let raceEditions = editions[race.id] ?? []
       VStack(alignment: .leading) {
         HStack(alignment: .top) {
-          RaceImage(
+          PhotoImage(
             urlString: race.photoUrl,
-            imageType: .raceThumbnail
+            as: .raceThumbnail
           )
 
           VStack(alignment: .leading) {
             Text(race.name)
-              .font(.headline)
+              .font(.TypeScale.headline)
               .foregroundStyle(Color.Text.primary)
 
             Text(race.place.formatted)
-              .font(.subheadline)
+              .font(.TypeScale.caption)
               .foregroundStyle(Color.Text.secondary)
 
             Text("\(raceEditions.count) editions")
-              .font(.subheadline)
+              .font(.TypeScale.caption)
               .foregroundStyle(Color.Text.tertiary)
           }  // VStack
         }  // HStack

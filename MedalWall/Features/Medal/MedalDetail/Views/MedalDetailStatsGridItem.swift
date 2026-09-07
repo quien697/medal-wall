@@ -67,7 +67,7 @@ struct MedalDetailStatsGridItem: View {
     MedalDetailStatsGridItem(
       title: "Finish Time",
       headline: "5:10:10",
-      headLineColor: Color.Gold.primary
+      headLineColor: Color.Record.primary
     )
 
     MedalDetailStatsGridItem(
@@ -79,7 +79,7 @@ struct MedalDetailStatsGridItem: View {
       title: "Overall",
       headline: "4000",
       subHeadLine: "of 7000",
-      headLineColor: Color.Gold.primary
+      headLineColor: Color.Record.primary
     )
 
     MedalDetailStatsGridItem(
@@ -101,5 +101,5 @@ struct MedalDetailStatsGridItem: View {
     )
   }
   .padding()
-  .background(Color.Card.Background.tertiary)
+  .background(Color.Surface.quaternary)
 }

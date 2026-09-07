@@ -44,8 +44,8 @@ struct LocalizedDisplayStringTests {
   func testGenderDisplayName() {
     #expect(Gender.male.displayName == "Male")
     #expect(Gender.female.displayName == "Female")
-    #expect(translated("Male") == "男子")
-    #expect(translated("Female") == "女子")
+    #expect(translated("Male") == "男")
+    #expect(translated("Female") == "女")
   }
 
   @Test("Gender short name is catalog-backed and translated")

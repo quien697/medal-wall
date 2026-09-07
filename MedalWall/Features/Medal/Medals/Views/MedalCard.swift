@@ -16,7 +16,8 @@ struct MedalCard: View {
 
   var body: some View {
     VStack {
-      MedalImage(urlString: photoUrl)
+      PhotoImage(urlString: photoUrl, as: .medal)
+        .medalRing()
 
       VStack(alignment: .leading, spacing: 2) {
         Text("\(distance)")
@@ -33,7 +34,7 @@ struct MedalCard: View {
         Text(finishTime)
           .font(.subheadline)
           .fontWeight(.heavy)
-          .foregroundStyle(Color.Gold.primary)
+          .foregroundStyle(Color.Record.primary)
 
         Text(date)
           .font(.caption)

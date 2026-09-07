@@ -18,9 +18,9 @@ struct EditMedalResultSection: View {
         selection: $finishTime
       ) {
         Text("Finish Time")
-          .fromLabelStyle()
+          .fromStyle(.label)
       }
-      .timePickerStyle(accentColor: Color.Gold.primary, fontWeight: .bold)
+      .timePickerStyle(accentColor: Color.Record.primary, fontWeight: .bold)
     }
   }
 }
