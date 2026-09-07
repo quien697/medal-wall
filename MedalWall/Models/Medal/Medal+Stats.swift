@@ -12,11 +12,17 @@ extension Array where Element == Medal {
   var halfCount: Int { filter { $0.distance.category == .half }.count }
 
   var bestFullTime: TimeInterval? {
-    filter { $0.distance.category == .full }.compactMap { $0.finishTime }.min()
+    filter { $0.distance.category == .full }
+      .compactMap { $0.finishTime }
+      .filter { $0 > 0 }
+      .min()
   }
 
   var bestHalfTime: TimeInterval? {
-    filter { $0.distance.category == .half }.compactMap { $0.finishTime }.min()
+    filter { $0.distance.category == .half }
+      .compactMap { $0.finishTime }
+      .filter { $0 > 0 }
+      .min()
   }
 }
 
@@ -51,9 +57,12 @@ extension Array where Element == Medal {
   /// The distance categories present in the collection, longest first.
   ///
   /// Categories are compared by measured distance, so a custom 42.195 collapses onto
-  /// `.full` rather than offering the same distance as a second option.
+  /// `.full` rather than offering the same distance as a second option. Non-finite
+  /// values (`NaN`, `±Inf`) are dropped before the sort — sorting a `Set<Double>` that
+  /// contains them violates strict weak ordering and traps.
   var distanceCategoriesOwned: [RaceDistanceCategory] {
-    let distances = Set(map { $0.distance.category.value })
+    let finiteValues = map { $0.distance.category.value }.filter(\.isFinite)
+    let distances = Set(finiteValues)
     return distances.sorted(by: >).map { RaceDistanceCategory(value: $0) }
   }
 

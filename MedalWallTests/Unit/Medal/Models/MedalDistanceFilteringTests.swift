@@ -111,6 +111,23 @@ struct MedalDistanceFilteringTests {
     #expect(medals.distanceCategoriesOwned.count == 1)
   }
 
+  /// CLAUDE.md `## Patterns`: "Guard numeric values against out-of-range inputs."
+  /// A corrupt Firestore write can deliver a non-finite distance; sorting a
+  /// `Set<Double>` that contains NaN or Inf traps, so non-finite values must be
+  /// dropped before the sort.
+  @Test("distanceCategoriesOwned drops non-finite values rather than trap")
+  func testCategoriesOwnedDropsNonFiniteValues() {
+    let medals = [
+      makeMedal(category: .full),
+      makeMedal(category: .custom(Double.nan)),
+      makeMedal(category: .custom(Double.infinity))
+    ]
+
+    let owned = medals.distanceCategoriesOwned.map(\.value)
+
+    #expect(owned == [RaceDistanceCategory.full.value])
+  }
+
   // MARK: - count(for:)
   @Test("count for all returns the whole collection count")
   func testCountForAll() {

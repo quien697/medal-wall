@@ -106,6 +106,26 @@ struct MedalStatsTests {
     #expect(medals.bestFullTime == 3600)
   }
 
+  @Test("bestFullTime ignores a zero or negative finish time")
+  func testBestFullTimeIgnoresZeroOrNegative() {
+    let medals: [Medal] = [
+      makeMedal(distance: RaceDistance(category: .full, type: .inPerson), finishTime: 0),
+      makeMedal(distance: RaceDistance(category: .full, type: .inPerson), finishTime: -100),
+      makeMedal(distance: RaceDistance(category: .full, type: .inPerson), finishTime: 3600)
+    ]
+
+    #expect(medals.bestFullTime == 3600)
+  }
+
+  @Test("bestFullTime is nil when the only finish time is zero")
+  func testBestFullTimeNilWhenOnlyZero() {
+    let medals: [Medal] = [
+      makeMedal(distance: RaceDistance(category: .full, type: .inPerson), finishTime: 0)
+    ]
+
+    #expect(medals.bestFullTime == nil)
+  }
+
   // MARK: - bestHalfTime
   @Test("bestHalfTime is nil when there are no half marathons")
   func testBestHalfTimeNilWhenNoHalfs() {
@@ -134,5 +154,25 @@ struct MedalStatsTests {
     ]
 
     #expect(medals.bestHalfTime == 1800)
+  }
+
+  @Test("bestHalfTime ignores a zero or negative finish time")
+  func testBestHalfTimeIgnoresZeroOrNegative() {
+    let medals: [Medal] = [
+      makeMedal(distance: RaceDistance(category: .half, type: .inPerson), finishTime: 0),
+      makeMedal(distance: RaceDistance(category: .half, type: .inPerson), finishTime: -100),
+      makeMedal(distance: RaceDistance(category: .half, type: .inPerson), finishTime: 1800)
+    ]
+
+    #expect(medals.bestHalfTime == 1800)
+  }
+
+  @Test("bestHalfTime is nil when the only finish time is zero")
+  func testBestHalfTimeNilWhenOnlyZero() {
+    let medals: [Medal] = [
+      makeMedal(distance: RaceDistance(category: .half, type: .inPerson), finishTime: 0)
+    ]
+
+    #expect(medals.bestHalfTime == nil)
   }
 }
