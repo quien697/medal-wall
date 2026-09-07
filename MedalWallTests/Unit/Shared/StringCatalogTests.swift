@@ -40,6 +40,26 @@ struct StringCatalogTests {
     }
   }
 
+  @Test("The medal list's zh-TW strings ship translated")
+  func testMedalListKeysAreTranslated() {
+    let keys = [
+      "Your Collection",
+      "All",
+      "No time recorded",
+      "PR",
+      "^[%lld medal](inflect: true)"
+    ]
+
+    for key in keys {
+      #expect(zhTWTable[key] != nil, "missing zh-TW entry for \(key)")
+    }
+  }
+
+  @Test("The retired medal list title is gone from the catalog")
+  func testRetiredTitleRemoved() {
+    #expect(zhTWTable["Your Rewards"] == nil)
+  }
+
   @Test("Every zh-TW entry keeps the format specifiers of its key")
   func testFormatSpecifiersArePreserved() {
     for (key, value) in zhTWTable {

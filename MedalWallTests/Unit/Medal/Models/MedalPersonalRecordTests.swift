@@ -214,6 +214,27 @@ struct MedalPersonalRecordTests {
     #expect(medals.personalRecordIDs == Set(medals.personalRecords.values.map(\.id)))
   }
 
+  // MARK: - Sample data
+  /// Guards what the previews and the running app actually show: the marker lands on the
+  /// medals that recorded a time, and nowhere else.
+  @Test("Sample data marks every timed medal and no untimed one")
+  func testSampleDataMarksOnlyTimedMedals() {
+    let medals = Medal.sampleData
+    let timed = medals.filter { ($0.finishTime ?? 0) > 0 }
+    let recordIDs = medals.personalRecordIDs
+
+    #expect(!timed.isEmpty, "sample data should carry at least one timed medal")
+    #expect(recordIDs.count == timed.count)
+
+    for medal in timed {
+      #expect(recordIDs.contains(medal.id), "timed medal \(medal.name) should hold a record")
+    }
+
+    for medal in medals where medal.finishTime == nil {
+      #expect(!recordIDs.contains(medal.id), "untimed medal \(medal.name) must not be marked")
+    }
+  }
+
   // MARK: - Scope
   /// Records describe the collection, so narrowing the view must not promote a medal.
   @Test("Filtering to a category marks the same medal as the whole collection does")

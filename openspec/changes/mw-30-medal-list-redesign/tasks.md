@@ -79,66 +79,66 @@
 
 ## 6. Row & Year Section
 
-- [ ] 6.1 Build `MedalRow` (`Features/Medal/Medals/Views/`) — 96pt `PhotoImage(as: .medal)`
+- [x] 6.1 Build `MedalRow` (`Features/Medal/Medals/Views/`) — 96pt `PhotoImage(as: .medal)`
       with an unconditional `.medalRing()`, beside date / race name / distance / finish
       time. Take `isPersonalRecord: Bool` rather than computing anything in the view
-- [ ] 6.2 Render the finish time with `Font.TypeScale.Numeric.small` and show
+- [x] 6.2 Render the finish time with `Font.TypeScale.Numeric.small` and show
       `No time recorded` in `microLabel` when `finishTime` is nil — not the current `-`
       placeholder (spec: Medals Without a Finish Time)
-- [ ] 6.3 Show the `PR` marker beside the finish time via `.tagStyle(.record)` when
+- [x] 6.3 Show the `PR` marker beside the finish time via `.tagStyle(.record)` when
       `isPersonalRecord` is true
-- [ ] 6.4 Apply the resolved type scale per design.md Decision 8 — `microLabel` with
+- [x] 6.4 Apply the resolved type scale per design.md Decision 8 — `microLabel` with
       `.tracking()` and `.textCase(.uppercase)` at the call site for row metadata,
       `headline` for the race name. Do not reproduce the mockup's off-scale 9px
-- [ ] 6.5 Build `MedalYearHeader` — year, spacer, medal count, with the rule beneath
-- [ ] 6.6 Build `MedalYearSection` composing `MedalYearHeader` with its `MedalRow`s,
+- [x] 6.5 Build `MedalYearHeader` — year, spacer, medal count, with the rule beneath
+- [x] 6.6 Build `MedalYearSection` composing `MedalYearHeader` with its `MedalRow`s,
       preserving the `NavigationLink` to `MedalDetailView` and the
       `matchedTransitionSource` / `.navigationTransition(.zoom(...))` pair that
       `MedalGridSection` has today
-- [ ] 6.7 Add a `#Preview` to each new view file per project convention, with named
+- [x] 6.7 Add a `#Preview` to each new view file per project convention, with named
       previews for the distinct row states (timed, untimed, personal record)
 
 ## 7. Filter Bar & List
 
-- [ ] 7.1 Build `MedalDistanceFilterBar` — a horizontally scrolling strip of chips, each
+- [x] 7.1 Build `MedalDistanceFilterBar` — a horizontally scrolling strip of chips, each
       showing its label and count, `.chipStyle(.primary)` when selected and
       `.chipStyle(.secondary)` when not (design.md Decision 8 — not the mockup's
       `#EAE7DF`)
-- [ ] 7.2 Give the chips a 34pt height inside a 44pt row per §04, so the strip stays
+- [x] 7.2 Give the chips a 34pt height inside a 44pt row per §04, so the strip stays
       visually light while the row carries the tap target
-- [ ] 7.3 Build `MedalList` replacing `MedalGrid` — `MedalEmptyView` when the collection
+- [x] 7.3 Build `MedalList` replacing `MedalGrid` — `MedalEmptyView` when the collection
       is empty, otherwise the filter bar above a `LazyVStack` of `MedalYearSection`s
-- [ ] 7.4 Add `#Preview`s for `MedalList` covering the empty collection, a single-year
+- [x] 7.4 Add `#Preview`s for `MedalList` covering the empty collection, a single-year
       collection, and a multi-year collection with an active filter
 
 ## 8. Screen Wiring & Removals
 
-- [ ] 8.1 Point `MedalsView` at `MedalList`, passing the view model through, and change the
+- [x] 8.1 Point `MedalsView` at `MedalList`, passing the view model through, and change the
       navigation title and `ExpandedNavigationTitle` from `Your Rewards` to
       `Your Collection`
-- [ ] 8.2 Delete `MedalGrid.swift`, `MedalGridSection.swift`, `MedalCard.swift`, and
+- [x] 8.2 Delete `MedalGrid.swift`, `MedalGridSection.swift`, `MedalCard.swift`, and
       `MedalStatsSection.swift`, and confirm by grep that nothing outside the medals
       feature referenced them — `StatCard` itself stays for `ProfileSummarySection`
-- [ ] 8.3 Verify the add-medal and error-presentation flows in `MedalsView` still work
+- [x] 8.3 Verify the add-medal and error-presentation flows in `MedalsView` still work
       unchanged, including the reload on `AddMedalView` dismissal
 
 ## 9. Localization
 
-- [ ] 9.1 Add `Your Collection`, `All`, `No time recorded`, and `PR` to
+- [x] 9.1 Add `Your Collection`, `All`, `No time recorded`, and `PR` to
       `Localizable.xcstrings` with `zh-TW` translations
-- [ ] 9.2 Add the per-year medal count as a plural-varied String Catalog entry so `1 medal`
+- [x] 9.2 Add the per-year medal count as a plural-varied String Catalog entry so `1 medal`
       and `2 medals` both read correctly, and confirm the `zh-TW` variant is right for a
       language without plural inflection
-- [ ] 9.3 Extend `StringCatalogTests` / `LocalizationTests` to cover the new keys
+- [x] 9.3 Extend `StringCatalogTests` / `LocalizationTests` to cover the new keys
 
 ## 10. Verification
 
-- [ ] 10.1 Run the full test suite — `xcodebuild test -project MedalWall.xcodeproj -scheme
+- [x] 10.1 Run the full test suite — `xcodebuild test -project MedalWall.xcodeproj -scheme
       MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro'` — and confirm it
       passes
 - [ ] 10.2 Build and check the screen against `Medal Wall iOS v4.3.html` in both light and
       dark appearance, confirming the deliberate divergences from design.md Decision 8 are
       the only ones
-- [ ] 10.3 Verify against the sample data that the PR marker lands on the fastest medal in
+- [x] 10.3 Verify against the sample data that the PR marker lands on the fastest medal in
       each category and nowhere else
-- [ ] 10.4 Confirm SwiftLint and swift-format pass on the changed files
+- [x] 10.4 Confirm SwiftLint and swift-format pass on the changed files
