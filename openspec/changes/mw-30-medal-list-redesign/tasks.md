@@ -1,80 +1,80 @@
 ## 1. Value Types
 
-- [ ] 1.1 Write failing tests for `MedalDistanceFilter`: `.all` and `.category(_)` are
+- [x] 1.1 Write failing tests for `MedalDistanceFilter`: `.all` and `.category(_)` are
       `Hashable` and carry distinct `id`s, and two `.category` cases built from the same
       distance value are equal (`.custom(42.195)` must equal `.full` — design.md
       Decision 4)
-- [ ] 1.2 Implement `MedalDistanceFilter` (`Features/Medal/Models/`) — `.all` /
+- [x] 1.2 Implement `MedalDistanceFilter` (`Features/Medal/Models/`) — `.all` /
       `.category(RaceDistanceCategory)`, `Hashable`, `Identifiable`, normalizing the
       category through `RaceDistanceCategory(value:)` so equality follows distance rather
       than case
-- [ ] 1.3 Write failing tests for `MedalYearGroup`: `id` is the year, and two groups with
+- [x] 1.3 Write failing tests for `MedalYearGroup`: `id` is the year, and two groups with
       the same year are equal
-- [ ] 1.4 Implement `MedalYearGroup` (`Features/Medal/Models/`) — `Identifiable` with
+- [x] 1.4 Implement `MedalYearGroup` (`Features/Medal/Models/`) — `Identifiable` with
       `var id: Int { year }`, holding `year` and `medals`
 
 ## 2. Ordering & Year Grouping
 
-- [ ] 2.1 Write failing tests for `sortedForDisplay`: most recent date first, and two
+- [x] 2.1 Write failing tests for `sortedForDisplay`: most recent date first, and two
       medals sharing a date order by `id` so the result is stable regardless of input
       order (spec: Deterministic Collection Ordering)
-- [ ] 2.2 Write failing tests for `groupedByYear`: years descending, medals within a group
+- [x] 2.2 Write failing tests for `groupedByYear`: years descending, medals within a group
       date-descending, gap years produce no group, an empty array produces no groups, and
       a single medal produces one group of one
-- [ ] 2.3 Implement `sortedForDisplay` and `groupedByYear` in `Medal+Stats.swift` as
+- [x] 2.3 Implement `sortedForDisplay` and `groupedByYear` in `Medal+Stats.swift` as
       `Array where Element == Medal` extensions, grouping on the calendar year of
       `medal.date`
 
 ## 3. Distance Filter Derivation
 
-- [ ] 3.1 Write failing tests for `distanceCategoriesOwned`: only categories present in
+- [x] 3.1 Write failing tests for `distanceCategoriesOwned`: only categories present in
       the array are returned, ordered by distance longest first, with no duplicates when
       several medals share a category
-- [ ] 3.2 Write failing tests covering a custom distance appearing as its own category,
+- [x] 3.2 Write failing tests covering a custom distance appearing as its own category,
       placed among the presets by its distance value
-- [ ] 3.3 Write failing tests for `count(for:)`: `.all` returns the full count, a
+- [x] 3.3 Write failing tests for `count(for:)`: `.all` returns the full count, a
       `.category` returns only that category's count, and a category absent from the
       collection returns zero
-- [ ] 3.4 Write failing tests for `filtered(by:)`: `.all` returns everything,
+- [x] 3.4 Write failing tests for `filtered(by:)`: `.all` returns everything,
       `.category` returns only matching medals, and every derived option selects at least
       one medal (spec: A Filter Selection Always Has Results)
-- [ ] 3.5 Implement `distanceCategoriesOwned`, `count(for:)` and `filtered(by:)` in
+- [x] 3.5 Implement `distanceCategoriesOwned`, `count(for:)` and `filtered(by:)` in
       `Medal+Stats.swift`, sorting by `category.value` descending — do not make
       `RaceDistanceCategory` `Comparable` for one sort (design.md Decision 5)
 
 ## 4. Personal Record Derivation
 
-- [ ] 4.1 Write failing tests for `personalRecords`: the fastest time in a category wins,
+- [x] 4.1 Write failing tests for `personalRecords`: the fastest time in a category wins,
       each category holds its own record independently, and a category whose medals are
       all untimed produces no entry
-- [ ] 4.2 Write failing tests for eligibility guards per the project's guard convention: a
+- [x] 4.2 Write failing tests for eligibility guards per the project's guard convention: a
       `nil` finish time is excluded, and a stored finish time of `0` or negative is
       excluded rather than winning as the minimum (design.md Decision 3)
-- [ ] 4.3 Write failing tests for tie-breaking: two medals sharing the fastest time in a
+- [x] 4.3 Write failing tests for tie-breaking: two medals sharing the fastest time in a
       category mark only the earlier-dated one, so exactly one medal per category is ever
       marked
-- [ ] 4.4 Write failing tests for `personalRecordIDs`: it contains exactly the ids of
+- [x] 4.4 Write failing tests for `personalRecordIDs`: it contains exactly the ids of
       `personalRecords.values`, and is empty for an empty or fully untimed collection
-- [ ] 4.5 Write a failing test that records are computed over the whole collection, not a
+- [x] 4.5 Write a failing test that records are computed over the whole collection, not a
       filtered subset — filtering to one category marks the same medal as `.all` does
       (spec: Filtering does not move a record)
-- [ ] 4.6 Implement `personalRecords` and `personalRecordIDs` in `Medal+Stats.swift`,
+- [x] 4.6 Implement `personalRecords` and `personalRecordIDs` in `Medal+Stats.swift`,
       deriving the id set from the dictionary so the rule is defined once (design.md
       Decision 2)
 
 ## 5. ViewModel
 
-- [ ] 5.1 Create `MedalWallTests/Unit/Medal/ViewModels/MedalsViewModelTests.swift` — none
+- [x] 5.1 Create `MedalWallTests/Unit/Medal/ViewModels/MedalsViewModelTests.swift` — none
       exists today — and write failing tests that `selectedFilter` defaults to `.all` and
       that setting it narrows the presented groups and their counts
-- [ ] 5.2 Write failing tests for stale-selection fallback: a `selectedFilter` naming a
+- [x] 5.2 Write failing tests for stale-selection fallback: a `selectedFilter` naming a
       category no longer present resolves to `.all` on read, while a still-present
       selection is kept (spec: Filter Selection Survives a Changed Collection)
-- [ ] 5.3 Add `selectedFilter` state to `MedalsViewModel` plus computed properties
+- [x] 5.3 Add `selectedFilter` state to `MedalsViewModel` plus computed properties
       delegating to the `Medal+Stats` extensions — `availableFilters`, `yearGroups`,
       `personalRecordIDs`, and `count(for:)`. Resolve the stale selection in the getter,
       not on reload (design.md Decision 6)
-- [ ] 5.4 Follow the project's ViewModel `// MARK:` order — `Data` → `State` →
+- [x] 5.4 Follow the project's ViewModel `// MARK:` order — `Data` → `State` →
       `Dependencies` → `Init` → `Computed` → `Functions`
 
 ## 6. Row & Year Section
