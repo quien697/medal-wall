@@ -10,7 +10,9 @@ import SwiftUI
 @Observable
 final class MedalsViewModel {
   // MARK: - Data
-  var medals: [Medal] = []
+  var medals: [Medal] = [] {
+    didSet { reconcileFilter() }
+  }
 
   // MARK: - State
   var isLoading = false
@@ -19,20 +21,12 @@ final class MedalsViewModel {
   // MARK: - Filter
   /// The distance the list is narrowed to.
   ///
-  /// Resolved on read rather than reconciled on load: a medal can be deleted or have its
-  /// distance edited elsewhere in the app, so a stored selection can name a category the
-  /// collection no longer holds. Falling back here keeps the invariant true however the
-  /// collection changed, with no reload hook to forget.
-  var selectedFilter: MedalDistanceFilter {
-    get {
-      guard case .category(let category) = storedFilter else { return .all }
-      let isStillOwned = medals.distanceCategoriesOwned.contains { $0.value == category.value }
-      return isStillOwned ? storedFilter : .all
-    }
-    set { storedFilter = newValue }
+  /// A stored property so the `@Bindable` projected value and `@Observable` write
+  /// tracking work directly. Reconciles on `medals` change so a deleted medal can
+  /// never leave the selection naming a category the collection no longer holds.
+  var selectedFilter: MedalDistanceFilter = .all {
+    didSet { reconcileFilter() }
   }
-
-  private var storedFilter: MedalDistanceFilter = .all
 
   // MARK: - Dependencies
   private let repository = MedalFirestoreRepository()
@@ -66,6 +60,15 @@ final class MedalsViewModel {
   /// How many medals `distanceFilter` selects.
   func count(for distanceFilter: MedalDistanceFilter) -> Int {
     medals.count(for: distanceFilter)
+  }
+
+  /// Falls a stored category selection back to `.all` if the collection no longer
+  /// owns it. Called whenever `medals` or `selectedFilter` changes.
+  private func reconcileFilter() {
+    guard case .category(let category) = selectedFilter else { return }
+    if !medals.distanceCategoriesOwned.contains(where: { $0.value == category.value }) {
+      selectedFilter = .all
+    }
   }
 
   /// Loads all medals for the given user from Firestore.
