@@ -1,10 +1,10 @@
 ## 1. Value Type
 
-- [ ] 1.1 Write failing tests for `MedalPersonalBest`: `id` is `category.value`, two
+- [x] 1.1 Write failing tests for `MedalPersonalBest`: `id` is `category.value`, two
       entries built from the same distance are equal in identity regardless of the medal
       they hold, and an entry built from `.custom(42.195)` shares an id with one built
       from `.full` (design.md Decision 2)
-- [ ] 1.2 Implement `MedalPersonalBest` (`Features/Medal/Models/`) — `Identifiable`,
+- [x] 1.2 Implement `MedalPersonalBest` (`Features/Medal/Models/`) — `Identifiable`,
       holding `category: RaceDistanceCategory` and `medal: Medal`, with
       `var id: Double { category.value }`
 
