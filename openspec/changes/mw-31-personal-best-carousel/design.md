@@ -95,15 +95,25 @@ card content.**
 makes the spec's independence-from-the-filter requirement true, and it is the same reading
 MW-30 Decision 7 made for `personalRecordIDs`.
 
-The formatting — `formattedHMS`, the pace string, `category.description` — happens in
-`MedalPersonalBestCarousel` as it builds each `MedalPersonalBestCard`, exactly as
-`MedalYearSection` formats a `Medal` into a `MedalRow`'s strings today. `CLAUDE.md`'s "no
-logic in views" rule is about derived *values*; a section view mapping its model onto its
-row component's parameters is this feature's established shape, and diverging from it here
-would mean two conventions in one folder.
+Every string the card shows, and every derived number it needs, comes from the ViewModel:
+`distanceText(for:)`, `raceNameText(for:)`, `finishTimeText(for:)`, `paceText(for:)`,
+`transitionID(for:)` and `personalBestPage(forScrolledID:)`. The carousel calls them and
+passes the results down; `MedalPersonalBestCard` holds only `let` inputs, a `body`, and one
+subview. Neither view owns a computed property or a function that derives anything.
 
-*Alternative — the ViewModel exposes pre-formatted card content structs:* a stricter
-reading of the same rule, and it would make `MedalYearSection` the odd one out.
+This is the strict reading of `CLAUDE.md`'s "no logic or computed properties in views", and
+it follows `MedalDetailViewModel`, which already exposes `finishTimeText`, `averagePaceText`
+and `distanceText` as per-model accessors. Per-model functions rather than a pre-formatted
+content struct: the accessor shape already exists in this codebase, so it adds no type.
+
+The carousel therefore takes `MedalsViewModel` rather than `[MedalPersonalBest]`, the way
+`MedalList` already does. Only `scrolledID` stays in the view, because a scroll offset is
+UI state rather than a derived value — and the ViewModel is what turns it into a page.
+
+*Alternative — the view maps the model, as `MedalYearSection` maps a `Medal` onto a
+`MedalRow`:* the shape this change shipped first, and the one the project rule argues
+against. `MedalYearSection` is now the odd one out, which is the correct direction to be
+inconsistent in.
 
 **4. Pace is formatted by calling `MedalDetailViewModel.paceText` where it stands.**
 
@@ -146,11 +156,14 @@ entirely at one record.
 The dots live **inside the card**, on the trailing end of the pace row, rather than in a
 row of their own beneath the carousel. Each card is handed `pageCount` and `currentPage`
 and draws them itself. This keeps the pinned chrome one element tall instead of two, and
-it puts the indicator inside the surface it describes. The clamp that resolves which dot
-lights is `MedalPersonalBestCard.litPage(currentPage:pageCount:)` — a `static func` so it
-is testable without a view, following `TierBadge.numeralFontSize(forThreshold:)`. A
-negative count would trap the `ForEach` range and an out-of-range page would leave every
-dot dimmed, so both are clamped and covered by tests per `CLAUDE.md`'s guard convention.
+it puts the indicator inside the surface it describes.
+
+Which dot lights is resolved by `MedalsViewModel.personalBestPage(forScrolledID:)`, not by
+the card. `scrollPosition` reports `nil` until the first scroll, and a stored position can
+name a distance the collection no longer holds; both resolve to the first page rather than
+to no page, which would leave every dot dimmed. Because that index comes from
+`firstIndex(where:)` it is always inside the array, and the dots are only ever built past
+one record, so the `ForEach` range needs no clamp of its own.
 
 *Alternative — a typographic indicator reading `FULL · HALF · 10K` with the current one
 emphasized:* more informative and closer to the design system's voice, and rejected on

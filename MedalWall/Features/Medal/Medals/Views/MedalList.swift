@@ -40,7 +40,7 @@ struct MedalList: View {
         .safeAreaInset(edge: .top) {
           VStack(spacing: .Space.inline) {
             MedalPersonalBestCarousel(
-              personalBests: viewModel.personalBests,
+              viewModel: viewModel,
               namespace: namespace
             )
 

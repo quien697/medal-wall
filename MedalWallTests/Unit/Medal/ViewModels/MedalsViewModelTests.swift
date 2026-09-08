@@ -268,4 +268,74 @@ struct MedalsViewModelTests {
     #expect(viewModel.personalBests.isEmpty)
     #expect(!viewModel.isEmpty)
   }
+
+  // MARK: - Personal best card content
+  @Test("A card states its distance, race, time and pace")
+  func testPersonalBestCardContent() throws {
+    let viewModel = MedalsViewModel()
+    viewModel.medals = [
+      makeMedal(id: "full", category: .full, finishTime: 12624)
+    ]
+    let personalBest = try #require(viewModel.personalBests.first)
+
+    #expect(viewModel.raceNameText(for: personalBest) == "Test")
+    #expect(viewModel.finishTimeText(for: personalBest) == "03:30:24")
+    #expect(viewModel.distanceText(for: personalBest) == RaceDistanceCategory.full.description)
+    #expect(viewModel.paceText(for: personalBest).contains("4'59\""))
+  }
+
+  /// The row below declares `medal.id`; two sources sharing one id in a namespace leave
+  /// the zoom transition with no way to choose.
+  @Test("A card's transition id is prefixed so it cannot collide with its row")
+  func testPersonalBestTransitionID() throws {
+    let viewModel = MedalsViewModel()
+    viewModel.medals = [makeMedal(id: "full", category: .full, finishTime: 12624)]
+    let personalBest = try #require(viewModel.personalBests.first)
+
+    #expect(viewModel.transitionID(for: personalBest) == "personalBest-full")
+    #expect(viewModel.transitionID(for: personalBest) != personalBest.medal.id)
+  }
+
+  // MARK: - Personal best paging
+  @Test("An unscrolled carousel reports the first page")
+  func testPersonalBestPageWithoutScrollPosition() {
+    let viewModel = MedalsViewModel()
+    viewModel.medals = [
+      makeMedal(id: "full", category: .full, finishTime: 12624),
+      makeMedal(id: "half", category: .half, finishTime: 6532)
+    ]
+
+    #expect(viewModel.personalBestPage(forScrolledID: nil) == 0)
+  }
+
+  @Test("Each scroll position reports its own page")
+  func testPersonalBestPagePerPosition() {
+    let viewModel = MedalsViewModel()
+    viewModel.medals = [
+      makeMedal(id: "full", category: .full, finishTime: 12624),
+      makeMedal(id: "half", category: .half, finishTime: 6532),
+      makeMedal(id: "tenKM", category: .tenKM, finishTime: 2700)
+    ]
+
+    #expect(viewModel.personalBestPage(forScrolledID: RaceDistanceCategory.full.value) == 0)
+    #expect(viewModel.personalBestPage(forScrolledID: RaceDistanceCategory.half.value) == 1)
+    #expect(viewModel.personalBestPage(forScrolledID: RaceDistanceCategory.tenKM.value) == 2)
+  }
+
+  /// A distance can leave the collection while its id is still the scroll position.
+  @Test("A scroll position naming no card falls back to the first page")
+  func testPersonalBestPageForUnknownPosition() {
+    let viewModel = MedalsViewModel()
+    viewModel.medals = [makeMedal(id: "full", category: .full, finishTime: 12624)]
+
+    #expect(viewModel.personalBestPage(forScrolledID: RaceDistanceCategory.half.value) == 0)
+  }
+
+  @Test("An empty collection reports the first page rather than a negative one")
+  func testPersonalBestPageWithoutCards() {
+    let viewModel = MedalsViewModel()
+
+    #expect(viewModel.personalBestPage(forScrolledID: nil) == 0)
+    #expect(viewModel.personalBestPage(forScrolledID: RaceDistanceCategory.full.value) == 0)
+  }
 }

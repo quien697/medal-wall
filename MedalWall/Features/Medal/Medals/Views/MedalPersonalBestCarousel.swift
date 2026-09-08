@@ -20,30 +20,17 @@ struct MedalPersonalBestCarousel: View {
   @State private var scrolledID: MedalPersonalBest.ID?
 
   // MARK: - Properties
-  let personalBests: [MedalPersonalBest]
+  let viewModel: MedalsViewModel
   let namespace: Namespace.ID
-
-  // MARK: - Computed
-  /// Which card is showing, for the dots each card draws.
-  ///
-  /// `scrollPosition` reports `nil` until the first scroll, so an unscrolled carousel
-  /// falls back to the first card rather than lighting no dot at all.
-  private var currentIndex: Int {
-    guard let scrolledID,
-      let index = personalBests.firstIndex(where: { $0.id == scrolledID })
-    else { return 0 }
-
-    return index
-  }
 
   // MARK: - Body
   var body: some View {
-    if personalBests.isEmpty {
+    if viewModel.personalBests.isEmpty {
       EmptyView()
     } else {
       ScrollView(.horizontal) {
         HStack(spacing: .Space.gutter) {
-          ForEach(personalBests) { personalBest in
+          ForEach(viewModel.personalBests) { personalBest in
             card(for: personalBest)
               .containerRelativeFrame(.horizontal, count: 1, spacing: .Space.gutter)
           }
@@ -60,45 +47,43 @@ struct MedalPersonalBestCarousel: View {
 
   // MARK: - Subviews
   /// One record, linked to the medal that set it.
-  ///
-  /// The transition source is prefixed because the same medal's row very likely carries
-  /// `matchedTransitionSource(id: medal.id)` further down the screen, and two sources
-  /// sharing an id in one namespace leave the zoom with no way to choose.
   private func card(for personalBest: MedalPersonalBest) -> some View {
     NavigationLink {
       MedalDetailView(medal: personalBest.medal)
         .navigationTransition(
-          .zoom(sourceID: "personalBest-\(personalBest.medal.id)", in: namespace)
+          .zoom(sourceID: viewModel.transitionID(for: personalBest), in: namespace)
         )
     } label: {
       MedalPersonalBestCard(
-        distance: personalBest.category.description,
-        finishTime: personalBest.medal.finishTime?.formattedHMS ?? "-",
-        raceName: personalBest.medal.name,
-        pace: MedalDetailViewModel.paceText(
-          minutesPerKilometer: personalBest.medal.averagePace,
-          in: DistanceUnit.resolved()
-        ),
-        pageCount: personalBests.count,
-        currentPage: currentIndex
+        distance: viewModel.distanceText(for: personalBest),
+        finishTime: viewModel.finishTimeText(for: personalBest),
+        raceName: viewModel.raceNameText(for: personalBest),
+        pace: viewModel.paceText(for: personalBest),
+        pageCount: viewModel.personalBests.count,
+        currentPage: viewModel.personalBestPage(forScrolledID: scrolledID)
       )
-      .matchedTransitionSource(id: "personalBest-\(personalBest.medal.id)", in: namespace)
+      .matchedTransitionSource(
+        id: viewModel.transitionID(for: personalBest),
+        in: namespace
+      )
     }
     .buttonStyle(.plain)
   }
 }
 
-/// Builds entries for the previews below — `#Preview` bodies are `ViewBuilder` closures,
-/// which take declarations and view expressions but not assignments.
-private func previewBests(limit: Int = .max) -> [MedalPersonalBest] {
-  Array(Medal.sampleData.personalBests.prefix(limit))
+/// Builds a view model for the previews below — `#Preview` bodies are `ViewBuilder`
+/// closures, which take declarations and view expressions but not assignments.
+private func previewViewModel(medals: [Medal] = Medal.sampleData) -> MedalsViewModel {
+  let viewModel = MedalsViewModel()
+  viewModel.medals = medals
+  return viewModel
 }
 
 #Preview("Several records") {
   @Previewable @Namespace var namespace
 
   NavigationStack {
-    MedalPersonalBestCarousel(personalBests: previewBests(), namespace: namespace)
+    MedalPersonalBestCarousel(viewModel: previewViewModel(), namespace: namespace)
       .background(Color.Background.primary)
   }  // NavigationStack
 }
@@ -107,8 +92,11 @@ private func previewBests(limit: Int = .max) -> [MedalPersonalBest] {
   @Previewable @Namespace var namespace
 
   NavigationStack {
-    MedalPersonalBestCarousel(personalBests: previewBests(limit: 1), namespace: namespace)
-      .background(Color.Background.primary)
+    MedalPersonalBestCarousel(
+      viewModel: previewViewModel(medals: Array(Medal.sampleData.prefix(1))),
+      namespace: namespace
+    )
+    .background(Color.Background.primary)
   }  // NavigationStack
 }
 
@@ -116,7 +104,7 @@ private func previewBests(limit: Int = .max) -> [MedalPersonalBest] {
   @Previewable @Namespace var namespace
 
   NavigationStack {
-    MedalPersonalBestCarousel(personalBests: [], namespace: namespace)
+    MedalPersonalBestCarousel(viewModel: previewViewModel(medals: []), namespace: namespace)
       .background(Color.Background.primary)
   }  // NavigationStack
 }

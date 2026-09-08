@@ -27,16 +27,6 @@ struct MedalPersonalBestCard: View {
   let pageCount: Int
   let currentPage: Int
 
-  // MARK: - Computed
-  /// The dots to draw, never fewer than none.
-  private var pages: Range<Int> {
-    0..<max(0, pageCount)
-  }
-
-  private var litPage: Int {
-    Self.litPage(currentPage: currentPage, pageCount: pageCount)
-  }
-
   // MARK: - Body
   var body: some View {
     VStack(alignment: .leading, spacing: .Space.inline) {
@@ -88,28 +78,17 @@ struct MedalPersonalBestCard: View {
 
   // MARK: - Subviews
   /// Which record of the set this card is, drawn on the card itself because a full-width
-  /// card leaves no part of its neighbours showing. Absent at one record, where there is
-  /// nothing to page to.
+  /// card leaves no part of its neighbours showing. Only ever built past one record, so
+  /// the range always holds at least two dots.
   private var pageDots: some View {
     HStack(spacing: .Space.stack) {
-      ForEach(pages, id: \.self) { page in
+      ForEach(0..<pageCount, id: \.self) { page in
         Circle()
           .fill(Color.Text.secondary)
-          .opacity(page == litPage ? 1 : dimmedDot)
+          .opacity(page == currentPage ? 1 : dimmedDot)
           .frame(width: dotSize, height: dotSize)
       }
     }  // HStack
-  }
-
-  // MARK: - Functions
-  /// The dot to light, clamped into the dots actually drawn.
-  ///
-  /// A page past the end would leave every dot dimmed, saying the card belongs to no
-  /// position at all, and a non-positive count has no dot to light.
-  static func litPage(currentPage: Int, pageCount: Int) -> Int {
-    guard pageCount > 0 else { return 0 }
-
-    return min(max(0, currentPage), pageCount - 1)
   }
 }
 
