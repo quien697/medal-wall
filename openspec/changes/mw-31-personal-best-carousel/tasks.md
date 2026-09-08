@@ -52,28 +52,28 @@
 
 ## 5. Carousel
 
-- [ ] 5.1 Build `MedalPersonalBestCarousel` (`Features/Medal/Medals/Views/`) taking
+- [x] 5.1 Build `MedalPersonalBestCarousel` (`Features/Medal/Medals/Views/`) taking
       `[MedalPersonalBest]` and a `Namespace.ID`, mapping each entry onto a
       `MedalPersonalBestCard` the way `MedalYearSection` maps a `Medal` onto a `MedalRow`
       (design.md Decision 3) — `finishTime` via `formattedHMS`, `distance` via
       `category.description`, `pace` via
       `MedalDetailViewModel.paceText(minutesPerKilometer:in:)` over `medal.averagePace`
       (design.md Decision 4)
-- [ ] 5.2 Lay the cards out full width: `.containerRelativeFrame(.horizontal)` on the card,
+- [x] 5.2 Lay the cards out full width: `.containerRelativeFrame(.horizontal)` on the card,
       `.scrollTargetLayout()` on the `HStack`, `.scrollTargetBehavior(.viewAligned)` and
       `.contentMargins(.horizontal, .Space.gutter, for: .scrollContent)` on the
       `ScrollView`
-- [ ] 5.3 Render nothing at all — no frame, no padding — when the entries are empty
+- [x] 5.3 Render nothing at all — no frame, no padding — when the entries are empty
       (spec: a collection with no records presents nothing)
-- [ ] 5.4 Wrap each card in a `NavigationLink` to `MedalDetailView(medal:)` with
+- [x] 5.4 Wrap each card in a `NavigationLink` to `MedalDetailView(medal:)` with
       `.navigationTransition(.zoom(sourceID:in:))` and
       `.matchedTransitionSource(id: "personalBest-\(medal.id)", in: namespace)` — the
       prefix is what keeps it from colliding with the same medal's row anchor
       (design.md Decision 7)
-- [ ] 5.5 Add the page indicator: dots in `Color.Text.secondary`, dimmed for pages that are
+- [x] 5.5 Add the page indicator: dots in `Color.Text.secondary`, dimmed for pages that are
       not current, tracked with `.scrollPosition()`, and omit the row entirely when there
       is one entry (spec: Multiple Personal Bests Are Discoverable)
-- [ ] 5.6 Add `#Preview`s for the carousel covering one record, several records, and none
+- [x] 5.6 Add `#Preview`s for the carousel covering one record, several records, and none
 
 ## 6. Screen Wiring
 
