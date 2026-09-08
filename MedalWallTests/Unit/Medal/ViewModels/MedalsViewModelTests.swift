@@ -217,4 +217,55 @@ struct MedalsViewModelTests {
 
     #expect(!viewModel.isEmpty)
   }
+
+  // MARK: - personalBests
+  /// The carousel describes the collection, never the current view of it.
+  @Test("personalBests is unchanged by a filter selection")
+  func testPersonalBestsIgnoreSelection() {
+    let viewModel = MedalsViewModel()
+    viewModel.medals = [
+      makeMedal(id: "fastFull", category: .full, finishTime: 12624),
+      makeMedal(id: "slowFull", category: .full, finishTime: 14000),
+      makeMedal(id: "fastHalf", category: .half, finishTime: 6532)
+    ]
+    let unfiltered = viewModel.personalBests.map(\.medal.id)
+    viewModel.selectedFilter = .category(.half)
+
+    #expect(viewModel.personalBests.map(\.medal.id) == unfiltered)
+    #expect(viewModel.personalBests.map(\.medal.id) == ["fastFull", "fastHalf"])
+  }
+
+  /// Narrowing the list must not narrow the carousel to the selected distance.
+  @Test("A filter selection keeps every entry, in the same order")
+  func testPersonalBestsKeepsEveryEntryWhenFiltered() {
+    let viewModel = MedalsViewModel()
+    viewModel.medals = [
+      makeMedal(id: "full", category: .full, finishTime: 12624),
+      makeMedal(id: "half", category: .half, finishTime: 6532),
+      makeMedal(id: "tenKM", category: .tenKM, finishTime: 2700)
+    ]
+    viewModel.selectedFilter = .category(.tenKM)
+
+    #expect(viewModel.personalBests.map(\.category) == [.full, .half, .tenKM])
+    #expect(viewModel.yearGroups.flatMap(\.medals).count == 1)
+  }
+
+  @Test("personalBests is empty when no medals are loaded")
+  func testPersonalBestsEmptyCollection() {
+    let viewModel = MedalsViewModel()
+
+    #expect(viewModel.personalBests.isEmpty)
+  }
+
+  @Test("personalBests is empty when no medal records an eligible time")
+  func testPersonalBestsEmptyWhenNoEligibleTime() {
+    let viewModel = MedalsViewModel()
+    viewModel.medals = [
+      makeMedal(category: .full, finishTime: nil),
+      makeMedal(category: .half, finishTime: 0)
+    ]
+
+    #expect(viewModel.personalBests.isEmpty)
+    #expect(!viewModel.isEmpty)
+  }
 }

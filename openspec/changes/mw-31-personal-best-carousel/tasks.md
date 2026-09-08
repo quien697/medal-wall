@@ -26,28 +26,28 @@
 
 ## 3. ViewModel
 
-- [ ] 3.1 Write a failing test in `MedalsViewModelTests` that `personalBests` is unchanged
+- [x] 3.1 Write a failing test in `MedalsViewModelTests` that `personalBests` is unchanged
       by `selectedFilter` — narrowing to one category returns the same entries in the same
       order as `.all` (spec: Personal Best Presentation Is Independent Of The Distance
       Filter)
-- [ ] 3.2 Write a failing test that `personalBests` is empty for an empty collection and
+- [x] 3.2 Write a failing test that `personalBests` is empty for an empty collection and
       for one where no medal has an eligible finish time
-- [ ] 3.3 Add `personalBests` to `MedalsViewModel` as a computed property delegating to
+- [x] 3.3 Add `personalBests` to `MedalsViewModel` as a computed property delegating to
       `medals.personalBests`, reading `medals` and never the filtered set (design.md
       Decision 3). Keep the project's `// MARK:` order
 
 ## 4. Card
 
-- [ ] 4.1 Build `MedalPersonalBestCard` (`Features/Medal/Medals/Views/`) taking formatted
+- [x] 4.1 Build `MedalPersonalBestCard` (`Features/Medal/Medals/Views/`) taking formatted
       strings only — `distance`, `finishTime`, `raceName`, `pace`. Header row is
       `Personal best` in `sectionTitle` with call-site `.tracking()` / `.textCase(.uppercase)`,
       a spacer, then the distance in `microLabel` treated the same way
-- [ ] 4.2 Render the finish time in `Font.TypeScale.Numeric.large` and the meta line —
+- [x] 4.2 Render the finish time in `Font.TypeScale.Numeric.large` and the meta line —
       race name, pace — in `microLabel`, per design.md Decision 8. Do not reproduce the
       mockup's off-scale 34px and 9px
-- [ ] 4.3 Show the `PR` marker on the meta line via `.tagStyle(.record)`, and give the card
+- [x] 4.3 Show the `PR` marker on the meta line via `.tagStyle(.record)`, and give the card
       `.surfaceStyle()` for its radius, padding and border
-- [ ] 4.4 Add `#Preview`s for the card: a long race name that must wrap, and a custom
+- [x] 4.4 Add `#Preview`s for the card: a long race name that must wrap, and a custom
       distance so the unit-resolved label is visible
 
 ## 5. Carousel

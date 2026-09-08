@@ -52,6 +52,15 @@ final class MedalsViewModel {
     medals.personalRecordIDs
   }
 
+  /// The record at each distance that has one, longest distance first.
+  ///
+  /// Reads `medals` rather than the filtered set: the carousel describes the collection,
+  /// not the current view of it, so selecting a distance narrows the list beneath it and
+  /// leaves the cards alone.
+  var personalBests: [MedalPersonalBest] {
+    medals.personalBests
+  }
+
   var isEmpty: Bool {
     medals.isEmpty
   }
