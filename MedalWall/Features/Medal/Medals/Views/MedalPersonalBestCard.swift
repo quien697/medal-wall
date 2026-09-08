@@ -16,22 +16,37 @@ import SwiftUI
 /// Everything arrives pre-formatted. The card decides nothing about what a record is.
 struct MedalPersonalBestCard: View {
   // MARK: - Properties
-  private let titleTracking: CGFloat = 2.2
+  private let titleTracking: CGFloat = 1
   private let metadataTracking: CGFloat = 1.4
+  private let dotSize: CGFloat = 6
+  private let dimmedDot: Double = 0.3
   let distance: String
   let finishTime: String
   let raceName: String
   let pace: String
+  let pageCount: Int
+  let currentPage: Int
+
+  // MARK: - Computed
+  /// The dots to draw, never fewer than none.
+  private var pages: Range<Int> {
+    0..<max(0, pageCount)
+  }
+
+  private var litPage: Int {
+    Self.litPage(currentPage: currentPage, pageCount: pageCount)
+  }
 
   // MARK: - Body
   var body: some View {
     VStack(alignment: .leading, spacing: .Space.inline) {
-      HStack(alignment: .firstTextBaseline, spacing: .Space.row) {
+      HStack(
+        alignment: .firstTextBaseline,
+        spacing: .Space.row
+      ) {
         Text("Personal best")
-          .font(.TypeScale.sectionTitle)
+          .tagStyle(.record)
           .tracking(titleTracking)
-          .textCase(.uppercase)
-          .foregroundStyle(Color.Text.secondary)
 
         Spacer()
 
@@ -42,33 +57,59 @@ struct MedalPersonalBestCard: View {
           .foregroundStyle(Color.Text.secondary)
       }  // HStack
 
+      Text(raceName)
+        .font(.TypeScale.callout)
+        .fontWeight(.bold)
+        .foregroundStyle(Color.Text.primary)
+        .lineLimit(1)
+
       Text(finishTime)
         .font(.TypeScale.Numeric.large)
+        .fontWeight(.heavy)
         .foregroundStyle(Color.Text.primary)
 
-      HStack(spacing: .Space.row) {
-        Text(raceName)
-          .font(.TypeScale.microLabel)
-          .tracking(metadataTracking)
-          .textCase(.uppercase)
-          .foregroundStyle(Color.Text.secondary)
-          .lineLimit(1)
-
+      HStack {
         Text(pace)
           .font(.TypeScale.microLabel)
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
-          .layoutPriority(1)
 
-        Text("PR")
-          .tagStyle(.record)
-          .layoutPriority(1)
+        Spacer()
+
+        if pageCount > 1 {
+          pageDots
+        }
       }  // HStack
-      .padding(.top, .Space.inline)
     }  // VStack
     .frame(maxWidth: .infinity, alignment: .leading)
     .surfaceStyle()
+  }
+
+  // MARK: - Subviews
+  /// Which record of the set this card is, drawn on the card itself because a full-width
+  /// card leaves no part of its neighbours showing. Absent at one record, where there is
+  /// nothing to page to.
+  private var pageDots: some View {
+    HStack(spacing: .Space.stack) {
+      ForEach(pages, id: \.self) { page in
+        Circle()
+          .fill(Color.Text.secondary)
+          .opacity(page == litPage ? 1 : dimmedDot)
+          .frame(width: dotSize, height: dotSize)
+      }
+    }  // HStack
+  }
+
+  // MARK: - Functions
+  /// The dot to light, clamped into the dots actually drawn.
+  ///
+  /// A page past the end would leave every dot dimmed, saying the card belongs to no
+  /// position at all, and a non-positive count has no dot to light.
+  static func litPage(currentPage: Int, pageCount: Int) -> Int {
+    guard pageCount > 0 else { return 0 }
+
+    return min(max(0, currentPage), pageCount - 1)
   }
 }
 
@@ -77,7 +118,9 @@ struct MedalPersonalBestCard: View {
     distance: "Full",
     finishTime: "03:30:24",
     raceName: "Taipei Marathon 2019",
-    pace: "4'59\" /km"
+    pace: "4'59\" /km",
+    pageCount: 3,
+    currentPage: 0
   )
   .padding()
   .background(Color.Background.primary)
@@ -88,7 +131,9 @@ struct MedalPersonalBestCard: View {
     distance: "Half",
     finishTime: "01:48:52",
     raceName: "BMO Vancouver Marathon Half Marathon 2022",
-    pace: "5'09\" /km"
+    pace: "5'09\" /km",
+    pageCount: 3,
+    currentPage: 1
   )
   .padding()
   .background(Color.Background.primary)
@@ -99,7 +144,9 @@ struct MedalPersonalBestCard: View {
     distance: "31.1 mi",
     finishTime: "05:12:07",
     raceName: "Sun Moon Lake Ultra",
-    pace: "10'02\" /mi"
+    pace: "10'02\" /mi",
+    pageCount: 1,
+    currentPage: 0
   )
   .padding()
   .background(Color.Background.primary)

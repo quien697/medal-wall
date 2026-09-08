@@ -9,9 +9,8 @@ import SwiftUI
 
 /// The records the collection holds, one full-width card per distance.
 ///
-/// A full-width card leaves no part of the next one showing, so the dots below are the
-/// only thing saying more records exist. They are absent at one record, where there is
-/// nothing to discover.
+/// A full-width card leaves no part of the next one showing, so each card draws the dots
+/// that say how many records there are and which one this is.
 ///
 /// The carousel describes the whole collection and never the filtered view of it, so a
 /// card can offer a medal whose row the distance filter is currently hiding — which is
@@ -21,16 +20,20 @@ struct MedalPersonalBestCarousel: View {
   @State private var scrolledID: MedalPersonalBest.ID?
 
   // MARK: - Properties
-  private let dotSize: CGFloat = 6
-  private let dimmedDot: Double = 0.3
   let personalBests: [MedalPersonalBest]
   let namespace: Namespace.ID
 
   // MARK: - Computed
-  /// The card the dots should mark. `scrollPosition` reports `nil` until the first
-  /// scroll, which would otherwise leave every dot dimmed on arrival.
-  private var currentID: MedalPersonalBest.ID? {
-    scrolledID ?? personalBests.first?.id
+  /// Which card is showing, for the dots each card draws.
+  ///
+  /// `scrollPosition` reports `nil` until the first scroll, so an unscrolled carousel
+  /// falls back to the first card rather than lighting no dot at all.
+  private var currentIndex: Int {
+    guard let scrolledID,
+      let index = personalBests.firstIndex(where: { $0.id == scrolledID })
+    else { return 0 }
+
+    return index
   }
 
   // MARK: - Body
@@ -38,25 +41,19 @@ struct MedalPersonalBestCarousel: View {
     if personalBests.isEmpty {
       EmptyView()
     } else {
-      VStack(spacing: .Space.stack) {
-        ScrollView(.horizontal) {
-          HStack(spacing: .Space.gutter) {
-            ForEach(personalBests) { personalBest in
-              card(for: personalBest)
-                .containerRelativeFrame(.horizontal, count: 1, spacing: .Space.gutter)
-            }
-          }  // HStack
-          .scrollTargetLayout()
-        }  // ScrollView
-        .scrollIndicators(.hidden)
-        .scrollTargetBehavior(.viewAligned)
-        .scrollPosition(id: $scrolledID)
-        .contentMargins(.horizontal, .Space.gutter, for: .scrollContent)
-
-        if personalBests.count > 1 {
-          pageIndicator
-        }
-      }  // VStack
+      ScrollView(.horizontal) {
+        HStack(spacing: .Space.gutter) {
+          ForEach(personalBests) { personalBest in
+            card(for: personalBest)
+              .containerRelativeFrame(.horizontal, count: 1, spacing: .Space.gutter)
+          }
+        }  // HStack
+        .scrollTargetLayout()
+      }  // ScrollView
+      .scrollIndicators(.hidden)
+      .scrollTargetBehavior(.viewAligned)
+      .scrollPosition(id: $scrolledID)
+      .contentMargins(.horizontal, .Space.gutter, for: .scrollContent)
       .padding(.top, .Space.row)
     }
   }
@@ -81,22 +78,13 @@ struct MedalPersonalBestCarousel: View {
         pace: MedalDetailViewModel.paceText(
           minutesPerKilometer: personalBest.medal.averagePace,
           in: DistanceUnit.resolved()
-        )
+        ),
+        pageCount: personalBests.count,
+        currentPage: currentIndex
       )
       .matchedTransitionSource(id: "personalBest-\(personalBest.medal.id)", in: namespace)
     }
     .buttonStyle(.plain)
-  }
-
-  private var pageIndicator: some View {
-    HStack(spacing: .Space.stack) {
-      ForEach(personalBests) { personalBest in
-        Circle()
-          .fill(Color.Text.secondary)
-          .opacity(personalBest.id == currentID ? 1 : dimmedDot)
-          .frame(width: dotSize, height: dotSize)
-      }
-    }  // HStack
   }
 }
 

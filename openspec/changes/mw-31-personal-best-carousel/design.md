@@ -140,8 +140,17 @@ gutter while still travelling edge to edge, plus `.scrollTargetLayout()` and
 `.scrollTargetBehavior(.viewAligned)` for the snap.
 
 A full-width card leaves no peek of the next one, so discoverability needs an indicator.
-It is dots — `Color.Text.secondary`, dimmed for the pages that are not current — and the
-row is absent entirely at one record.
+It is dots — `Color.Text.secondary`, dimmed for the pages that are not current — absent
+entirely at one record.
+
+The dots live **inside the card**, on the trailing end of the pace row, rather than in a
+row of their own beneath the carousel. Each card is handed `pageCount` and `currentPage`
+and draws them itself. This keeps the pinned chrome one element tall instead of two, and
+it puts the indicator inside the surface it describes. The clamp that resolves which dot
+lights is `MedalPersonalBestCard.litPage(currentPage:pageCount:)` — a `static func` so it
+is testable without a view, following `TierBadge.numeralFontSize(forThreshold:)`. A
+negative count would trap the `ForEach` range and an out-of-range page would leave every
+dot dimmed, so both are clamped and covered by tests per `CLAUDE.md`'s guard convention.
 
 *Alternative — a typographic indicator reading `FULL · HALF · 10K` with the current one
 emphasized:* more informative and closer to the design system's voice, and rejected on
