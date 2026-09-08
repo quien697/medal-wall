@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+/// The hashtags a user filed the medal under.
+///
+/// Capsules, not rect tags: shape is what separates a label that *names* something from a
+/// fact the user cannot change, and a hashtag is the former.
 struct MedalDetailTagsSection: View {
   let tags: [String]
 
@@ -15,7 +19,7 @@ struct MedalDetailTagsSection: View {
       FlowLayout(spacing: 6) {
         ForEach(tags, id: \.self) { tag in
           Text(tag)
-            .tagStyle(.neutralOnPage)
+            .chipStyle(.neutral)
         }  // ForEach
       }  // FlowLayout
     }  // PageSection

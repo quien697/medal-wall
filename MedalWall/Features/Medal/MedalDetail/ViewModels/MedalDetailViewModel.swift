@@ -98,6 +98,20 @@ final class MedalDetailViewModel {
     Self.totalText(medal.genderTotal, placement: medal.genderPlacement)
   }
 
+  /// What the user wrote about the day, or nothing when they wrote only whitespace.
+  var noteText: String? {
+    guard let note = medal.note?.trimmingCharacters(in: .whitespacesAndNewlines),
+      !note.isEmpty
+    else { return nil }
+
+    return note
+  }
+
+  /// Whether the user kept anything of the day — photos, a note, or both.
+  var hasDay: Bool {
+    !medal.eventPhotos.isEmpty || noteText != nil
+  }
+
   // MARK: - Functions
   /// A placement, or the unfilled marker when it was never recorded.
   private static func placementText(_ placement: Int?) -> String {

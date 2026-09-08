@@ -34,7 +34,9 @@ struct MedalDetailViewModelTests {
     divisionPlacement: Int? = nil,
     divisionTotal: Int? = nil,
     genderPlacement: Int? = nil,
-    genderTotal: Int? = nil
+    genderTotal: Int? = nil,
+    note: String? = nil,
+    eventPhotos: [EventPhoto] = []
   ) -> Medal {
     Medal(
       name: "Test",
@@ -50,8 +52,40 @@ struct MedalDetailViewModelTests {
       divisionTotal: divisionTotal,
       genderPlacement: genderPlacement,
       genderTotal: genderTotal,
+      note: note,
+      eventPhotos: eventPhotos,
       userID: "u1"
     )
+  }
+
+  // MARK: - The day
+  @Test("A blank note is no note at all")
+  func testNoteTextBlank() {
+    #expect(MedalDetailViewModel(medal: makeMedal(note: nil)).noteText == nil)
+    #expect(MedalDetailViewModel(medal: makeMedal(note: "")).noteText == nil)
+    #expect(MedalDetailViewModel(medal: makeMedal(note: "   ")).noteText == nil)
+  }
+
+  @Test("A written note is kept")
+  func testNoteTextWritten() {
+    let viewModel = MedalDetailViewModel(medal: makeMedal(note: "Strong negative split."))
+
+    #expect(viewModel.noteText == "Strong negative split.")
+  }
+
+  @Test("The day is present when there is a note, photos, or both")
+  func testHasDay() {
+    let photo = EventPhoto(imageUrl: "https://example.com/1.jpg", sortOrder: 0)
+
+    #expect(MedalDetailViewModel(medal: makeMedal(note: "Rained.")).hasDay)
+    #expect(MedalDetailViewModel(medal: makeMedal(eventPhotos: [photo])).hasDay)
+    #expect(MedalDetailViewModel(medal: makeMedal(note: "Rained.", eventPhotos: [photo])).hasDay)
+  }
+
+  @Test("The day is absent when the user kept nothing of it")
+  func testHasDayAbsent() {
+    #expect(!MedalDetailViewModel(medal: makeMedal(note: nil, eventPhotos: [])).hasDay)
+    #expect(!MedalDetailViewModel(medal: makeMedal(note: "  ", eventPhotos: [])).hasDay)
   }
 
   // MARK: - isPersonalRecord

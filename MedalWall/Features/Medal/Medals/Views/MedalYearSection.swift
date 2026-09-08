@@ -21,8 +21,11 @@ struct MedalYearSection: View {
 
       ForEach(group.medals) { medal in
         NavigationLink {
-          MedalDetailView(medal: medal)
-            .navigationTransition(.zoom(sourceID: medal.id, in: namespace))
+          MedalDetailView(
+            medal: medal,
+            isPersonalRecord: personalRecordIDs.contains(medal.id)
+          )
+          .navigationTransition(.zoom(sourceID: medal.id, in: namespace))
         } label: {
           MedalRow(
             photoUrl: medal.photoUrl,

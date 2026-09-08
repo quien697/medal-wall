@@ -62,25 +62,25 @@
 
 ## 5. The Day & Tags
 
-- [ ] 5.1 Build `MedalDetailDaySection` composing the existing event photo strip and note
+- [x] 5.1 Build `MedalDetailDaySection` composing the existing event photo strip and note
       under one `PageSection` titled `The day` (design.md Decision 7)
-- [ ] 5.2 Keep the photo strip's tap-to-open `PhotoViewer` behaviour and the note's
+- [x] 5.2 Keep the photo strip's tap-to-open `PhotoViewer` behaviour and the note's
       surface treatment exactly as they are today
-- [ ] 5.3 Render the band when the medal has photos, a note, or both, and omit it entirely
+- [x] 5.3 Render the band when the medal has photos, a note, or both, and omit it entirely
       when it has neither (spec: One without the other still reads as the day)
-- [ ] 5.4 Change `MedalDetailTagsSection` to `.chipStyle(.neutral)` capsules
+- [x] 5.4 Change `MedalDetailTagsSection` to `.chipStyle(.neutral)` capsules
       (spec: Tags Are Presented As Capsules)
-- [ ] 5.5 Add `#Preview`s for the day section covering photos only, note only, and both
+- [x] 5.5 Add `#Preview`s for the day section covering photos only, note only, and both
 
 ## 6. Screen Wiring
 
-- [ ] 6.1 Recompose `MedalDetailView` — hero, facts, result, day, tags — and add
+- [x] 6.1 Recompose `MedalDetailView` — hero, facts, result, day, tags — and add
       `isPersonalRecord` to its `init`, passing it to the view model
-- [ ] 6.2 Drop the inline navigation title so the race name is not stated twice, keeping
+- [x] 6.2 Drop the inline navigation title so the race name is not stated twice, keeping
       the back button's automatic title
-- [ ] 6.3 Pass `personalRecordIDs.contains(medal.id)` from `MedalYearSection` and `true`
+- [x] 6.3 Pass `personalRecordIDs.contains(medal.id)` from `MedalYearSection` and `true`
       from `MedalPersonalBestCarousel` (design.md Decision 1)
-- [ ] 6.4 Verify the edit sheet, delete confirmation, error presentation and
+- [x] 6.4 Verify the edit sheet, delete confirmation, error presentation and
       `reloadMedal()` on dismissal all still work unchanged
 
 ## 7. Localization

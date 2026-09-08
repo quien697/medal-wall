@@ -32,7 +32,7 @@ struct MedalPersonalBestCarousel: View {
         HStack(spacing: .Space.gutter) {
           ForEach(personalBests) { personalBest in
             NavigationLink {
-              MedalDetailView(medal: personalBest.medal)
+              MedalDetailView(medal: personalBest.medal, isPersonalRecord: true)
                 .navigationTransition(
                   .zoom(sourceID: Self.transitionID(for: personalBest), in: namespace)
                 )
