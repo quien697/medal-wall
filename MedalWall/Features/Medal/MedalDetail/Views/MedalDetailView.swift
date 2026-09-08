@@ -27,11 +27,14 @@ struct MedalDetailView: View {
     ScrollView {
       MedalDetailHeroSection(
         photoUrl: viewModel.medal.photoUrl,
-        name: viewModel.medal.name,
-        raceDistance: viewModel.distanceText,
-        raceDistanceType: viewModel.medal.distance.type.displayName,
-        place: viewModel.medal.place.formatted,
+        name: viewModel.medal.name
+      )
+
+      MedalDetailFactsSection(
+        location: viewModel.medal.place.formatted,
         date: viewModel.medal.date.formattedMonthDayYear(),
+        distance: viewModel.distanceText,
+        raceType: viewModel.medal.distance.type.displayName,
         bib: viewModel.medal.bibNumber
       )
 

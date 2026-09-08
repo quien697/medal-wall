@@ -47,17 +47,17 @@
 
 ## 4. Hero & Facts
 
-- [ ] 4.1 Rewrite `MedalDetailHeroSection` to lay itself out — centred
+- [x] 4.1 Rewrite `MedalDetailHeroSection` to lay itself out — centred
       `PhotoImage(as: .medal)` with `.medalRing()`, above the race name in `title1`
       uppercase, wrapping rather than truncating (spec: A long race name stays legible).
       Do not change `DetailHeroSection`, which `RaceDetailHeroSection` still uses
       (design.md Decision 6)
-- [ ] 4.2 Build `MedalDetailFactRow` — label left in `microLabel` uppercase with tracking,
+- [x] 4.2 Build `MedalDetailFactRow` — label left in `microLabel` uppercase with tracking,
       value right in `caption`, with an optional secondary line beneath the value for the
       race type
-- [ ] 4.3 Build `MedalDetailFactsSection` composing Location, Date, Distance (with race
+- [x] 4.3 Build `MedalDetailFactsSection` composing Location, Date, Distance (with race
       type) and Bib, with a hairline above every row but the first
-- [ ] 4.4 Add `#Preview`s for the hero (short name, long wrapping name) and the facts
+- [x] 4.4 Add `#Preview`s for the hero (short name, long wrapping name) and the facts
       section
 
 ## 5. The Day & Tags
