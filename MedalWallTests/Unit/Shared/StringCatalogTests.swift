@@ -56,6 +56,35 @@ struct StringCatalogTests {
     }
   }
 
+  @Test("The medal detail's zh-TW strings ship translated")
+  func testMedalDetailKeysAreTranslated() {
+    let keys = [
+      "The result",
+      "The day",
+      "Location",
+      "Date",
+      "Distance",
+      "Bib",
+      "Finish",
+      "Avg pace",
+      "Overall",
+      "Gender",
+      "Division",
+      "Division %@"
+    ]
+
+    for key in keys {
+      #expect(zhTWTable[key] != nil, "missing zh-TW entry for \(key)")
+    }
+  }
+
+  /// The division label is composed, so the translation must keep its placeholder or the
+  /// group silently vanishes from the label.
+  @Test("The composed division label keeps its placeholder in zh-TW")
+  func testDivisionLabelKeepsPlaceholder() {
+    #expect(zhTWTable["Division %@"]?.contains("%@") == true)
+  }
+
   @Test("The retired medal list title is gone from the catalog")
   func testRetiredTitleRemoved() {
     #expect(zhTWTable["Your Rewards"] == nil)

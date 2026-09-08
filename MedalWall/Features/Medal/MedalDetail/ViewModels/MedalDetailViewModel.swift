@@ -79,7 +79,7 @@ final class MedalDetailViewModel {
   /// read as one fact rather than two measurements.
   var divisionLabel: String {
     guard let division = medal.divisionEnum else { return .appLocalized("Division") }
-    return "\(String.appLocalized("Division")) \(division.displayName)"
+    return .appLocalized("Division \(division.displayName)")
   }
 
   var divisionPlacementText: String {

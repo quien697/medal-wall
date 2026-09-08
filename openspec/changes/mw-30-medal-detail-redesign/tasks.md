@@ -6,7 +6,7 @@
       a `nil` pace — the unfilled wording belongs to the caller, not to a unit
 - [x] 1.2 Write a failing test that `paceText` still returns value and abbreviation joined,
       so composing it from the new function changes nothing for its existing caller
-- [ ] 1.3 Add `paceValueText(minutesPerKilometer:)` to `DistanceUnit` and recompose
+- [x] 1.3 Add `paceValueText(minutesPerKilometer:)` to `DistanceUnit` and recompose
       `paceText` from it plus `abbreviation()`, so the pace format is written once
       (design.md Decision 5)
 
@@ -85,22 +85,22 @@
 
 ## 7. Localization
 
-- [ ] 7.1 Add `The result`, `The day`, `Location`, `Date`, `Distance`, `Bib`, `Finish`,
+- [x] 7.1 Add `The result`, `The day`, `Location`, `Date`, `Distance`, `Bib`, `Finish`,
       `Avg pace`, `Overall`, `Gender` and `Division` to `Localizable.xcstrings` with
       `zh-TW` translations
-- [ ] 7.2 Confirm the composed division label reads correctly in `zh-TW`, where the group
+- [x] 7.2 Confirm the composed division label reads correctly in `zh-TW`, where the group
       follows rather than precedes the stem
-- [ ] 7.3 Extend `StringCatalogTests` to cover the new keys
+- [x] 7.3 Extend `StringCatalogTests` to cover the new keys
 
 ## 8. Verification
 
-- [ ] 8.1 Run the full test suite — `xcodebuild test -project MedalWall.xcodeproj -scheme
+- [x] 8.1 Run the full test suite — `xcodebuild test -project MedalWall.xcodeproj -scheme
       MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro'` — and confirm it
       passes
-- [ ] 8.2 Check the screen against `Medal Wall iOS v4.3.html` in light, dark and `zh-TW`,
+- [x] 8.2 Check the screen against `Medal Wall iOS v4.3.html` in light, dark and `zh-TW`,
       confirming the design.md Decision 8 divergences are the only ones
-- [ ] 8.3 Check a `1058 / 7373` medal on device for the crowding risk design.md names, and
+- [x] 8.3 Check a `1058 / 7373` medal on device for the crowding risk design.md names, and
       a medal with only a finish time for the always-present grid
-- [ ] 8.4 Verify the `PR` marker appears when opened from a record-holding row and from the
+- [x] 8.4 Verify the `PR` marker appears when opened from a record-holding row and from the
       carousel, and is absent on a non-record medal
-- [ ] 8.5 Confirm SwiftLint and swift-format pass on the changed files
+- [x] 8.5 Confirm SwiftLint and swift-format pass on the changed files
