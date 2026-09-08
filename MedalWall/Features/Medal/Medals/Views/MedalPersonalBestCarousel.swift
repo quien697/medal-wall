@@ -20,19 +20,39 @@ struct MedalPersonalBestCarousel: View {
   @State private var scrolledID: MedalPersonalBest.ID?
 
   // MARK: - Properties
-  let viewModel: MedalsViewModel
+  let personalBests: [MedalPersonalBest]
   let namespace: Namespace.ID
 
   // MARK: - Body
   var body: some View {
-    if viewModel.personalBests.isEmpty {
+    if personalBests.isEmpty {
       EmptyView()
     } else {
       ScrollView(.horizontal) {
         HStack(spacing: .Space.gutter) {
-          ForEach(viewModel.personalBests) { personalBest in
-            card(for: personalBest)
-              .containerRelativeFrame(.horizontal, count: 1, spacing: .Space.gutter)
+          ForEach(personalBests) { personalBest in
+            NavigationLink {
+              MedalDetailView(medal: personalBest.medal)
+                .navigationTransition(
+                  .zoom(sourceID: Self.transitionID(for: personalBest), in: namespace)
+                )
+            } label: {
+              MedalPersonalBestCard(
+                distance: personalBest.category.description,
+                finishTime: personalBest.medal.finishTime?.formattedHMS ?? "-",
+                raceName: personalBest.medal.name,
+                pace: DistanceUnit.resolved().paceText(
+                  minutesPerKilometer: personalBest.medal.averagePace
+                ),
+                pageCount: personalBests.count,
+                currentPage: currentPage
+              )
+              .matchedTransitionSource(
+                id: Self.transitionID(for: personalBest),
+                in: namespace
+              )
+            }
+            .containerRelativeFrame(.horizontal, count: 1, spacing: .Space.gutter)
           }
         }  // HStack
         .scrollTargetLayout()
@@ -41,49 +61,46 @@ struct MedalPersonalBestCarousel: View {
       .scrollTargetBehavior(.viewAligned)
       .scrollPosition(id: $scrolledID)
       .contentMargins(.horizontal, .Space.gutter, for: .scrollContent)
-      .padding(.top, .Space.row)
+      .padding(.vertical, .Space.row)
     }
   }
 
-  // MARK: - Subviews
-  /// One record, linked to the medal that set it.
-  private func card(for personalBest: MedalPersonalBest) -> some View {
-    NavigationLink {
-      MedalDetailView(medal: personalBest.medal)
-        .navigationTransition(
-          .zoom(sourceID: viewModel.transitionID(for: personalBest), in: namespace)
-        )
-    } label: {
-      MedalPersonalBestCard(
-        distance: viewModel.distanceText(for: personalBest),
-        finishTime: viewModel.finishTimeText(for: personalBest),
-        raceName: viewModel.raceNameText(for: personalBest),
-        pace: viewModel.paceText(for: personalBest),
-        pageCount: viewModel.personalBests.count,
-        currentPage: viewModel.personalBestPage(forScrolledID: scrolledID)
-      )
-      .matchedTransitionSource(
-        id: viewModel.transitionID(for: personalBest),
-        in: namespace
-      )
-    }
-    .buttonStyle(.plain)
+  // MARK: - Computed
+  /// Which card the scroll position is showing, for the dots the card draws.
+  ///
+  /// `scrollPosition` reports `nil` until the first scroll, and a stored position can name
+  /// a distance the collection no longer holds. Both resolve to the first card rather than
+  /// to no card at all, which would leave every dot dimmed.
+  private var currentPage: Int {
+    guard let scrolledID,
+      let page = personalBests.firstIndex(where: { $0.id == scrolledID })
+    else { return 0 }
+
+    return page
+  }
+
+  // MARK: - Functions
+  /// The zoom transition source for a record's card.
+  ///
+  /// Prefixed because the same medal's row declares `matchedTransitionSource(id: medal.id)`
+  /// further down the screen, and two sources sharing an id in one namespace leave the
+  /// transition with no way to choose.
+  private static func transitionID(for personalBest: MedalPersonalBest) -> String {
+    "personalBest-\(personalBest.medal.id)"
   }
 }
 
-/// Builds a view model for the previews below — `#Preview` bodies are `ViewBuilder`
+/// Builds a record set for the previews below — `#Preview` bodies are `ViewBuilder`
 /// closures, which take declarations and view expressions but not assignments.
-private func previewViewModel(medals: [Medal] = Medal.sampleData) -> MedalsViewModel {
-  let viewModel = MedalsViewModel()
-  viewModel.medals = medals
-  return viewModel
+private func previewPersonalBests(medals: [Medal] = Medal.sampleData) -> [MedalPersonalBest] {
+  medals.personalBests
 }
 
 #Preview("Several records") {
   @Previewable @Namespace var namespace
 
   NavigationStack {
-    MedalPersonalBestCarousel(viewModel: previewViewModel(), namespace: namespace)
+    MedalPersonalBestCarousel(personalBests: previewPersonalBests(), namespace: namespace)
       .background(Color.Background.primary)
   }  // NavigationStack
 }
@@ -93,7 +110,7 @@ private func previewViewModel(medals: [Medal] = Medal.sampleData) -> MedalsViewM
 
   NavigationStack {
     MedalPersonalBestCarousel(
-      viewModel: previewViewModel(medals: Array(Medal.sampleData.prefix(1))),
+      personalBests: previewPersonalBests(medals: Array(Medal.sampleData.prefix(1))),
       namespace: namespace
     )
     .background(Color.Background.primary)
@@ -104,7 +121,7 @@ private func previewViewModel(medals: [Medal] = Medal.sampleData) -> MedalsViewM
   @Previewable @Namespace var namespace
 
   NavigationStack {
-    MedalPersonalBestCarousel(viewModel: previewViewModel(medals: []), namespace: namespace)
+    MedalPersonalBestCarousel(personalBests: previewPersonalBests(medals: []), namespace: namespace)
       .background(Color.Background.primary)
   }  // NavigationStack
 }

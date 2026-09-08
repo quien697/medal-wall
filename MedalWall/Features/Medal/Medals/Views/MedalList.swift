@@ -40,13 +40,13 @@ struct MedalList: View {
         .safeAreaInset(edge: .top) {
           VStack(spacing: .Space.inline) {
             MedalPersonalBestCarousel(
-              viewModel: viewModel,
+              personalBests: viewModel.medals.personalBests,
               namespace: namespace
             )
 
             MedalDistanceFilterBar(
               filters: viewModel.availableFilters,
-              count: viewModel.count(for:),
+              count: viewModel.medals.count(for:),
               selection: $viewModel.selectedFilter
             )
           }  // VStack

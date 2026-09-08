@@ -52,71 +52,11 @@ final class MedalsViewModel {
     medals.personalRecordIDs
   }
 
-  /// The record at each distance that has one, longest distance first.
-  ///
-  /// Reads `medals` rather than the filtered set: the carousel describes the collection,
-  /// not the current view of it, so selecting a distance narrows the list beneath it and
-  /// leaves the cards alone.
-  var personalBests: [MedalPersonalBest] {
-    medals.personalBests
-  }
-
   var isEmpty: Bool {
     medals.isEmpty
   }
 
   // MARK: - Functions
-  /// How many medals `distanceFilter` selects.
-  func count(for distanceFilter: MedalDistanceFilter) -> Int {
-    medals.count(for: distanceFilter)
-  }
-
-  /// The distance a record was set at, in the user's chosen unit.
-  func distanceText(for personalBest: MedalPersonalBest) -> String {
-    personalBest.category.description
-  }
-
-  /// The race a record was set at.
-  func raceNameText(for personalBest: MedalPersonalBest) -> String {
-    personalBest.medal.name
-  }
-
-  /// The record time. A personal best is only ever built from a medal with an eligible
-  /// time, so the placeholder is unreachable rather than a state the card can show.
-  func finishTimeText(for personalBest: MedalPersonalBest) -> String {
-    personalBest.medal.finishTime?.formattedHMS ?? "-"
-  }
-
-  /// The pace that record time represents, in the user's chosen unit.
-  func paceText(for personalBest: MedalPersonalBest) -> String {
-    MedalDetailViewModel.paceText(
-      minutesPerKilometer: personalBest.medal.averagePace,
-      in: DistanceUnit.resolved()
-    )
-  }
-
-  /// The zoom transition source for a record's card.
-  ///
-  /// Prefixed because the same medal's row very likely declares
-  /// `matchedTransitionSource(id: medal.id)` further down the screen, and two sources
-  /// sharing an id in one namespace leave the transition with no way to choose.
-  func transitionID(for personalBest: MedalPersonalBest) -> String {
-    "personalBest-\(personalBest.medal.id)"
-  }
-
-  /// Which card a scroll position is showing, for the dots the card draws.
-  ///
-  /// `scrollPosition` reports `nil` until the first scroll, and a stored position can name
-  /// a distance the collection no longer holds. Both resolve to the first card rather than
-  /// to no card at all, which would leave every dot dimmed.
-  func personalBestPage(forScrolledID scrolledID: MedalPersonalBest.ID?) -> Int {
-    guard let scrolledID,
-      let page = personalBests.firstIndex(where: { $0.id == scrolledID })
-    else { return 0 }
-
-    return page
-  }
-
   /// Falls a stored category selection back to `.all` if the collection no longer
   /// owns it. Called whenever `medals` or `selectedFilter` changes.
   private func reconcileFilter() {
