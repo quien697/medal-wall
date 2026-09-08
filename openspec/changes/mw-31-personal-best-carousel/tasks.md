@@ -88,17 +88,17 @@
 
 ## 7. Localization
 
-- [ ] 7.1 Add `Personal best` to `Localizable.xcstrings` with its `zh-TW` translation
-- [ ] 7.2 Extend `StringCatalogTests` / `LocalizationTests` to cover the new key
+- [x] 7.1 Add `Personal best` to `Localizable.xcstrings` with its `zh-TW` translation
+- [x] 7.2 Extend `StringCatalogTests` / `LocalizationTests` to cover the new key
 
 ## 8. Verification
 
-- [ ] 8.1 Run the full test suite — `xcodebuild test -project MedalWall.xcodeproj -scheme
+- [x] 8.1 Run the full test suite — `xcodebuild test -project MedalWall.xcodeproj -scheme
       MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro'` — and confirm it
       passes
-- [ ] 8.2 Check the screen against `Medal Wall iOS v4.3.html` in both light and dark
+- [x] 8.2 Check the screen against `Medal Wall iOS v4.3.html` in both light and dark
       appearance, confirming the design.md Decision 8 divergences are the only ones
-- [ ] 8.3 Verify against the sample data that each card names the same medal its row wears
+- [x] 8.3 Verify against the sample data that each card names the same medal its row wears
       the `PR` tag on, and that paging a card leaves the filter selection and the list
       untouched
-- [ ] 8.4 Confirm SwiftLint and swift-format pass on the changed files
+- [x] 8.4 Confirm SwiftLint and swift-format pass on the changed files

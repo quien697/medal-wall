@@ -47,6 +47,7 @@ struct StringCatalogTests {
       "All",
       "No time recorded",
       "PR",
+      "Personal best",
       "^[%lld medal](inflect: true)"
     ]
 
