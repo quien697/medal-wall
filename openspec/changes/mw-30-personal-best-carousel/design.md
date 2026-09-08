@@ -6,8 +6,9 @@ distance, keyed by a category normalized through `RaceDistanceCategory(value:)` 
 `personalRecordIDs: Set<String>` derived from it so `MedalRow` can ask "does this medal
 hold a record" in constant time. MW-30's design.md Decision 2 states the reason the
 dictionary is the primitive: it answers "what is the record at each distance", which is
-"the question MW-31's carousel asks, one card per entry". That is the whole of this
-change's data layer; nothing about how a record is decided moves.
+"the question the personal best carousel asks, one card per entry" — the carousel this
+change builds. That is the whole of this change's data layer; nothing about how a record
+is decided moves.
 
 What the dictionary cannot do is drive a `ForEach`. It is unordered, and its keys are not
 `Identifiable`. The carousel needs a stable sequence with stable identity, which is the

@@ -28,12 +28,12 @@ disagree, the token list wins per `CLAUDE.md`, and they disagree in two places h
 - A year-grouped, deterministically ordered list that reads as a running history.
 - A distance filter that describes the collection it filters, so it can never offer a dead
   option or empty the list.
-- One definition of "personal record" that the deferred MW-31 carousel can reuse without
-  restructuring.
+- One definition of "personal record" that the deferred personal best carousel can reuse
+  without restructuring.
 - Derivation logic testable as plain arrays — no ViewModel, no Firebase, no async.
 
 **Non-Goals:**
-- The Personal Best carousel above the filter chips (MW-31).
+- The Personal Best carousel above the filter chips (a follow-on change on this ticket).
 - Any Firestore schema change, query predicate, or ordering pushed to the server.
 - Persisting the filter selection across launches.
 - Search, multi-select filtering, filtering by year, or filtering by race type.
@@ -71,10 +71,11 @@ model and ViewModel that nothing else needs. Rejected as premature abstraction.
 **2. `personalRecords` is a dictionary; `personalRecordIDs` is the lookup.**
 
 The dictionary `[RaceDistanceCategory: Medal]` is the primitive because it answers "what is the
-record at each distance" — the question MW-31's carousel asks, one card per entry. `MedalRow`
-asks a different question, "does this medal hold a record", once per row, and wants O(1); it
-gets `Set<String>` of medal IDs derived from the dictionary's values. Deriving the set from the
-dictionary rather than computing both independently means one definition of the rule.
+record at each distance" — the question the personal best carousel asks, one card per entry.
+`MedalRow` asks a different question, "does this medal hold a record", once per row, and
+wants O(1); it gets `Set<String>` of medal IDs derived from the dictionary's values.
+Deriving the set from the dictionary rather than computing both independently means one
+definition of the rule.
 
 *Alternative — a `isPersonalRecord` computed property on `Medal`:* impossible. A medal cannot
 answer the question alone; it needs the collection.

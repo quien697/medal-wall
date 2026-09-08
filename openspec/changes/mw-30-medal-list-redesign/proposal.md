@@ -79,4 +79,5 @@ single earned marker. Tracked in Jira [MW-30](https://quien.atlassian.net/browse
 - Unchanged: the Firestore schema, `Medal`, `RaceDistance` encoding, `MedalDetailView`,
   achievements, profile stats, and `MedalEmptyView`.
 - Out of scope: the Personal Best carousel that v4.3 places above the filter chips.
-  Deferred to MW-31, which will read the same per-category record this change derives.
+  Deferred to a follow-on change on this ticket, which reads the same per-category
+  record this change derives.

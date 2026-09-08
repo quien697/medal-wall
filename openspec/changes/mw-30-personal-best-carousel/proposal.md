@@ -6,7 +6,8 @@ that medal was earned. A runner opening their collection to answer "what is my m
 best" has to hunt for it. Design system v4.3 answers the question at the top of the
 screen, and MW-30 deliberately built `personalRecords` as a per-category dictionary so
 this change could read it without restructuring anything. Tracked in Jira
-[MW-31](https://quien.atlassian.net/browse/MW-31).
+[MW-30](https://quien.atlassian.net/browse/MW-30), the same ticket as the list
+redesign this builds on.
 
 ## What Changes
 
