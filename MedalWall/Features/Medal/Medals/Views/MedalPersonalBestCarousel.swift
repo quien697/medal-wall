@@ -40,10 +40,10 @@ struct MedalPersonalBestCarousel: View {
     } else {
       VStack(spacing: .Space.stack) {
         ScrollView(.horizontal) {
-          HStack(spacing: .Space.row) {
+          HStack(spacing: .Space.gutter) {
             ForEach(personalBests) { personalBest in
               card(for: personalBest)
-                .containerRelativeFrame(.horizontal, count: 1, spacing: .Space.row)
+                .containerRelativeFrame(.horizontal, count: 1, spacing: .Space.gutter)
             }
           }  // HStack
           .scrollTargetLayout()
@@ -57,6 +57,7 @@ struct MedalPersonalBestCarousel: View {
           pageIndicator
         }
       }  // VStack
+      .padding(.top, .Space.row)
     }
   }
 

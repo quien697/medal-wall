@@ -77,13 +77,13 @@
 
 ## 6. Screen Wiring
 
-- [ ] 6.1 Add `MedalPersonalBestCarousel` to `MedalList`'s existing
+- [x] 6.1 Add `MedalPersonalBestCarousel` to `MedalList`'s existing
       `.safeAreaInset(edge: .top)`, above `MedalDistanceFilterBar` in a `VStack`, passing
       the view model's `personalBests` and the existing `@Namespace` (design.md Decision 5)
-- [ ] 6.2 Verify by inspection that the filter bar, year sections, empty state, and the
+- [x] 6.2 Verify by inspection that the filter bar, year sections, empty state, and the
       reload on `AddMedalView` dismissal are untouched, and that the list still scrolls
       under the pinned carousel
-- [ ] 6.3 Confirm the carousel is absent — not merely empty — on a collection with medals
+- [x] 6.3 Confirm the carousel is absent — not merely empty — on a collection with medals
       but no finish times, so the filter bar keeps its position
 
 ## 7. Localization

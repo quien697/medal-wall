@@ -38,11 +38,18 @@ struct MedalList: View {
         }  // ScrollView
         .scrollIndicators(.hidden)
         .safeAreaInset(edge: .top) {
-          MedalDistanceFilterBar(
-            filters: viewModel.availableFilters,
-            count: viewModel.count(for:),
-            selection: $viewModel.selectedFilter
-          )
+          VStack(spacing: .Space.inline) {
+            MedalPersonalBestCarousel(
+              personalBests: viewModel.personalBests,
+              namespace: namespace
+            )
+
+            MedalDistanceFilterBar(
+              filters: viewModel.availableFilters,
+              count: viewModel.count(for:),
+              selection: $viewModel.selectedFilter
+            )
+          }  // VStack
           .background(Color.Background.primary)
         }
       }
