@@ -25,27 +25,11 @@ final class MedalDetailViewModel {
   }
 
   var averagePaceText: String {
-    Self.paceText(minutesPerKilometer: medal.averagePace, in: DistanceUnit.resolved())
+    DistanceUnit.resolved().paceText(minutesPerKilometer: medal.averagePace)
   }
 
   var distanceText: String {
     Self.heroDistanceText(for: medal.distance.category, in: DistanceUnit.resolved())
-  }
-
-  /// A pace in minutes per kilometre, rendered per the given unit — `5'41" /km` or
-  /// `9'08" /mi`. Seconds are truncated, which is the app's long-standing behaviour.
-  nonisolated static func paceText(
-    minutesPerKilometer pace: Double?,
-    in unit: DistanceUnit,
-    defaults: UserDefaults = .standard
-  ) -> String {
-    guard let pace else { return "--'-- \"" }
-    let converted = unit.pace(fromMinutesPerKilometer: pace)
-    let minutes = Int(converted)
-    let seconds = Int((converted - Double(minutes)) * 60)
-
-    return String(
-      format: "%d'%02d\" /%@", minutes, seconds, unit.abbreviation(defaults: defaults))
   }
 
   /// The hero's distance line. A preset pairs its name with the measurement

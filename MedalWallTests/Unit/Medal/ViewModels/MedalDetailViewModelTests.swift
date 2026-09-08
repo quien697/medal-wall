@@ -83,9 +83,8 @@ struct MedalDetailViewModelTests {
   func testAveragePaceTextFormatted() {
     // 12624s over 42.195km → pace ≈ 4.9864 min/km → "4'59\" /km"
     let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: 12624))
-    let expected = MedalDetailViewModel.paceText(
-      minutesPerKilometer: 12624 / 60 / 42.195,
-      in: DistanceUnit.resolved()
+    let expected = DistanceUnit.resolved().paceText(
+      minutesPerKilometer: 12624 / 60 / 42.195
     )
 
     #expect(viewModel.averagePaceText == expected)
@@ -96,9 +95,8 @@ struct MedalDetailViewModelTests {
     let pace = 5 + 41.0 / 60
 
     #expect(
-      MedalDetailViewModel.paceText(
+      DistanceUnit.kilometers.paceText(
         minutesPerKilometer: pace,
-        in: .kilometers,
         defaults: Self.makeDefaults()
       ) == "5'41\" /km"
     )
@@ -109,9 +107,8 @@ struct MedalDetailViewModelTests {
     let pace = 5 + 41.0 / 60
 
     #expect(
-      MedalDetailViewModel.paceText(
+      DistanceUnit.miles.paceText(
         minutesPerKilometer: pace,
-        in: .miles,
         defaults: Self.makeDefaults()
       ) == "9'08\" /mi"
     )
@@ -120,9 +117,8 @@ struct MedalDetailViewModelTests {
   @Test("Pace is the placeholder when there is no pace to show")
   func testPaceTextNil() {
     #expect(
-      MedalDetailViewModel.paceText(
+      DistanceUnit.miles.paceText(
         minutesPerKilometer: nil,
-        in: .miles,
         defaults: Self.makeDefaults()
       ) == "--'-- \""
     )
