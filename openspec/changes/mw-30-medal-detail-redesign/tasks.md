@@ -12,37 +12,37 @@
 
 ## 2. ViewModel
 
-- [ ] 2.1 Write failing tests in `MedalDetailViewModelTests` that `isPersonalRecord` is
+- [x] 2.1 Write failing tests in `MedalDetailViewModelTests` that `isPersonalRecord` is
       taken from `init` and defaults to `false`
-- [ ] 2.2 Write failing tests for the division label: a medal with a division composes
+- [x] 2.2 Write failing tests for the division label: a medal with a division composes
       `Division` plus its group, and a medal without one reads the plain `Division`
       (design.md Decision 3)
-- [ ] 2.3 Write failing tests for unfilled fields: pace, overall, gender and division each
+- [x] 2.3 Write failing tests for unfilled fields: pace, overall, gender and division each
       read the em dash when unrecorded, and `finishTimeText` reads `No time recorded`
       rather than a placeholder character (spec: The Result Is Always Fully Stated)
-- [ ] 2.4 Write failing tests that a suffix is `nil` whenever its value is unfilled — a
+- [x] 2.4 Write failing tests that a suffix is `nil` whenever its value is unfilled — a
       recorded total with no placement must not render `— / 7373`
-- [ ] 2.5 Write failing tests for the filled shape: `1058` with `/ 7373`, `233` with
+- [x] 2.5 Write failing tests for the filled shape: `1058` with `/ 7373`, `233` with
       `/ 6081`, `523` with `/ 1633`, and pace value with its unit
-- [ ] 2.6 Add `isPersonalRecord` to `MedalDetailViewModel.init`, add `divisionLabel`,
+- [x] 2.6 Add `isPersonalRecord` to `MedalDetailViewModel.init`, add `divisionLabel`,
       `averagePaceValue` / `averagePaceUnit`, and change the placement properties to return
       the em dash and optional suffixes. Keep the project's `// MARK:` order
 
 ## 3. Result Item & Section
 
-- [ ] 3.1 Build `MedalDetailResultItem` (`Features/Medal/MedalDetail/Views/`) replacing
+- [x] 3.1 Build `MedalDetailResultItem` (`Features/Medal/MedalDetail/Views/`) replacing
       `MedalDetailStatsGridItem` — `label`, `value`, optional `suffix`, `isRecord`. Value
       in `Font.TypeScale.Numeric.large`, suffix in `microLabel` at `Text.secondary`, label
       in `microLabel` with call-site `.tracking()` / `.textCase(.uppercase)`
       (design.md Decision 8)
-- [ ] 3.2 Show the `PR` marker beside the value via `.tagStyle(.record)` when `isRecord`.
+- [x] 3.2 Show the `PR` marker beside the value via `.tagStyle(.record)` when `isRecord`.
       Do not carry over `headLineColor`: a finish time is ink, never gold
-- [ ] 3.3 Build `MedalDetailResultSection` replacing `MedalDetailStatsSection` — a
+- [x] 3.3 Build `MedalDetailResultSection` replacing `MedalDetailStatsSection` — a
       `PageSection` titled `The result` over a two-column grid, Finish spanning both
       columns, then avg pace, overall, gender, division
-- [ ] 3.4 Delete `MedalDetailStatsGridItem.swift` and `MedalDetailStatsSection.swift`, and
+- [x] 3.4 Delete `MedalDetailStatsGridItem.swift` and `MedalDetailStatsSection.swift`, and
       confirm by grep that nothing outside the medal detail feature referenced them
-- [ ] 3.5 Add `#Preview`s for the item and the section covering a fully recorded medal, a
+- [x] 3.5 Add `#Preview`s for the item and the section covering a fully recorded medal, a
       finish-time-only medal, and an untimed medal
 
 ## 4. Hero & Facts

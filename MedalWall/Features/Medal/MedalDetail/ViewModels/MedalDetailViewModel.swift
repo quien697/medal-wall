@@ -11,21 +11,42 @@ import SwiftUI
 final class MedalDetailViewModel {
   // MARK: - Properties
   var medal: Medal
+  /// Whether this medal holds its distance's personal record.
+  ///
+  /// Supplied by whatever opened the screen rather than derived here: a record is a
+  /// property of the whole collection, and this screen is presented one medal.
+  let isPersonalRecord: Bool
   private let repository = MedalFirestoreRepository()
 
+  /// What an unrecorded field reads as. One glyph across every result field but the
+  /// finish time, which is large enough to say it in words.
+  private static let unfilled = "—"
+
   // MARK: - Init
-  init(medal: Medal) {
+  init(medal: Medal, isPersonalRecord: Bool = false) {
     self.medal = medal
+    self.isPersonalRecord = isPersonalRecord
   }
 
   // MARK: - Computed
+  /// The finish time, or the same wording the collection list uses for an untimed medal.
   var finishTimeText: String {
-    guard let finishTime = medal.finishTime else { return "-" }
+    guard let finishTime = medal.finishTime else { return .appLocalized("No time recorded") }
     return finishTime.formattedHMS
   }
 
-  var averagePaceText: String {
-    DistanceUnit.resolved().paceText(minutesPerKilometer: medal.averagePace)
+  /// The pace without its unit, so the screen can set the two at different sizes.
+  var averagePaceValue: String {
+    DistanceUnit.resolved().paceValueText(minutesPerKilometer: medal.averagePace)
+      ?? Self.unfilled
+  }
+
+  /// The unit the pace is expressed in, absent when there is no pace to qualify.
+  var averagePaceUnit: String? {
+    let unit = DistanceUnit.resolved()
+    guard unit.paceValueText(minutesPerKilometer: medal.averagePace) != nil else { return nil }
+
+    return "/\(unit.abbreviation())"
   }
 
   var distanceText: String {
@@ -47,41 +68,52 @@ final class MedalDetailViewModel {
   }
 
   var overallPlacementText: String {
-    guard let placement = medal.overallPlacement else { return "-" }
-    return "\(placement)"
+    Self.placementText(medal.overallPlacement)
   }
 
-  var totalParticipantsText: String {
-    guard let total = medal.totalParticipants else { return "" }
-    return .appLocalized("of \(String(total))")
+  var overallTotalText: String? {
+    Self.totalText(medal.totalParticipants, placement: medal.overallPlacement)
   }
 
-  var divisionText: String {
-    guard let division = medal.divisionEnum else { return "-" }
-    return division.displayName
+  /// The division field's label, naming the group the placement was run within so the two
+  /// read as one fact rather than two measurements.
+  var divisionLabel: String {
+    guard let division = medal.divisionEnum else { return .appLocalized("Division") }
+    return "\(String.appLocalized("Division")) \(division.displayName)"
   }
 
   var divisionPlacementText: String {
-    guard let placement = medal.divisionPlacement else { return "-" }
-    return "\(placement)"
+    Self.placementText(medal.divisionPlacement)
   }
 
-  var divisionTotalText: String {
-    guard let total = medal.divisionTotal else { return "" }
-    return .appLocalized("of \(String(total))")
+  var divisionTotalText: String? {
+    Self.totalText(medal.divisionTotal, placement: medal.divisionPlacement)
   }
 
   var genderPlacementText: String {
-    guard let placement = medal.genderPlacement else { return "-" }
-    return "\(placement)"
+    Self.placementText(medal.genderPlacement)
   }
 
-  var genderTotalText: String {
-    guard let total = medal.genderTotal else { return "" }
-    return .appLocalized("of \(String(total))")
+  var genderTotalText: String? {
+    Self.totalText(medal.genderTotal, placement: medal.genderPlacement)
   }
 
   // MARK: - Functions
+  /// A placement, or the unfilled marker when it was never recorded.
+  private static func placementText(_ placement: Int?) -> String {
+    guard let placement else { return unfilled }
+    return "\(placement)"
+  }
+
+  /// The field a placement ran against, absent unless there is a placement to qualify.
+  ///
+  /// A total on its own would read as `— / 7373`, stating the size of a field the medal
+  /// never records a position in.
+  private static func totalText(_ total: Int?, placement: Int?) -> String? {
+    guard let total, placement != nil else { return nil }
+    return "/ \(total)"
+  }
+
   /// Reloads the medal from Firestore and updates the local state.
   func reloadMedal() async {
     guard let updated = try? await repository.fetchMedal(id: medal.id, userId: medal.userID) else {

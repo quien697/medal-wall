@@ -35,16 +35,18 @@ struct MedalDetailView: View {
         bib: viewModel.medal.bibNumber
       )
 
-      MedalDetailStatsSection(
+      MedalDetailResultSection(
         finishTime: viewModel.finishTimeText,
-        averagePace: viewModel.averagePaceText,
+        isPersonalRecord: viewModel.isPersonalRecord,
+        averagePaceValue: viewModel.averagePaceValue,
+        averagePaceUnit: viewModel.averagePaceUnit,
         overallPlacement: viewModel.overallPlacementText,
-        totalParticipants: viewModel.totalParticipantsText,
-        division: viewModel.divisionText,
-        divisionPlacement: viewModel.divisionPlacementText,
-        divisionTotal: viewModel.divisionTotalText,
+        overallTotal: viewModel.overallTotalText,
         genderPlacement: viewModel.genderPlacementText,
-        genderTotal: viewModel.genderTotalText
+        genderTotal: viewModel.genderTotalText,
+        divisionLabel: viewModel.divisionLabel,
+        divisionPlacement: viewModel.divisionPlacementText,
+        divisionTotal: viewModel.divisionTotalText
       )
 
       if let note = viewModel.medal.note, !note.isEmpty {
