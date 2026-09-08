@@ -251,4 +251,90 @@ struct MedalPersonalRecordTests {
     #expect(wholeCollection == filtered)
     #expect(filtered == "fastHalf")
   }
+
+  // MARK: - personalBests
+  @Test("personalBests is empty for an empty collection")
+  func testPersonalBestsEmptyCollection() {
+    let medals: [Medal] = []
+
+    #expect(medals.personalBests.isEmpty)
+  }
+
+  @Test("personalBests is empty when no medal records an eligible time")
+  func testPersonalBestsEmptyWhenNoEligibleTime() {
+    let medals = [
+      makeMedal(category: .full, finishTime: nil),
+      makeMedal(category: .half, finishTime: 0)
+    ]
+
+    #expect(medals.personalBests.isEmpty)
+  }
+
+  @Test("personalBests orders entries longest distance first")
+  func testPersonalBestsOrderedLongestFirst() {
+    let medals = [
+      makeMedal(id: "tenKM", category: .tenKM, finishTime: 2700),
+      makeMedal(id: "full", category: .full, finishTime: 12624),
+      makeMedal(id: "half", category: .half, finishTime: 6532)
+    ]
+
+    #expect(medals.personalBests.map(\.category) == [.full, .half, .tenKM])
+  }
+
+  /// The carousel and the filter chips must never disagree about distance order.
+  @Test("personalBests follows the order the distance filter offers")
+  func testPersonalBestsMatchesOwnedCategoryOrder() {
+    let medals = [
+      makeMedal(id: "half", category: .half, finishTime: 6532),
+      makeMedal(id: "fiveKM", category: .fiveKM, finishTime: 1200),
+      makeMedal(id: "full", category: .full, finishTime: 12624)
+    ]
+
+    let bestOrder = medals.personalBests.map(\.category.value)
+    let filterOrder = medals.distanceCategoriesOwned.map(\.value)
+
+    #expect(bestOrder == filterOrder)
+  }
+
+  /// The projection reads `personalRecords`; it must not re-derive the rule.
+  @Test("Each entry holds the medal personalRecords names for its category")
+  func testPersonalBestsAgreeWithPersonalRecords() {
+    let medals = [
+      makeMedal(id: "fastFull", category: .full, finishTime: 12624),
+      makeMedal(id: "slowFull", category: .full, finishTime: 14000),
+      makeMedal(id: "fastHalf", category: .half, finishTime: 6532),
+      makeMedal(id: "slowHalf", category: .half, finishTime: 6760)
+    ]
+
+    let records = medals.personalRecords
+
+    #expect(medals.personalBests.map(\.medal.id) == ["fastFull", "fastHalf"])
+
+    for best in medals.personalBests {
+      #expect(best.medal.id == records[best.category]?.id)
+    }
+  }
+
+  @Test("A distance whose medals are all untimed contributes no entry")
+  func testPersonalBestsOmitsUntimedCategory() {
+    let medals = [
+      makeMedal(id: "full", category: .full, finishTime: 12624),
+      makeMedal(id: "untimedHalf", category: .half, finishTime: nil),
+      makeMedal(id: "tenKM", category: .tenKM, finishTime: 2700)
+    ]
+
+    #expect(medals.personalBests.map(\.category) == [.full, .tenKM])
+    #expect(medals.distanceCategoriesOwned.contains(.half))
+  }
+
+  @Test("A custom distance equal to a preset yields one entry, not two")
+  func testPersonalBestsCollapsesCustomOntoPreset() {
+    let medals = [
+      makeMedal(id: "preset", category: .full, finishTime: 14000),
+      makeMedal(id: "custom", category: .custom(42.195), finishTime: 12624)
+    ]
+
+    #expect(medals.personalBests.count == 1)
+    #expect(medals.personalBests.first?.medal.id == "custom")
+  }
 }

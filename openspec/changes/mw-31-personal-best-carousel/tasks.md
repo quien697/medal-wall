@@ -10,17 +10,17 @@
 
 ## 2. Ordered Projection
 
-- [ ] 2.1 Write failing tests for `personalBests` ordering: entries come back longest
+- [x] 2.1 Write failing tests for `personalBests` ordering: entries come back longest
       distance first, in the same order `distanceCategoriesOwned` returns
       (spec: Personal Best Presentation)
-- [ ] 2.2 Write failing tests that each entry holds exactly the medal `personalRecords`
+- [x] 2.2 Write failing tests that each entry holds exactly the medal `personalRecords`
       names for that category — the projection must not re-derive the record
-- [ ] 2.3 Write failing tests for omission: a category whose medals are all untimed yields
+- [x] 2.3 Write failing tests for omission: a category whose medals are all untimed yields
       no entry while other categories still do, a fully untimed collection yields an empty
       array, and an empty collection yields an empty array
-- [ ] 2.4 Write a failing test that a custom distance equal to a preset collapses onto that
+- [x] 2.4 Write a failing test that a custom distance equal to a preset collapses onto that
       preset's single entry rather than producing two (design.md Decision 1)
-- [ ] 2.5 Implement `personalBests` in `Medal+Stats.swift` as an
+- [x] 2.5 Implement `personalBests` in `Medal+Stats.swift` as an
       `Array where Element == Medal` extension, walking `distanceCategoriesOwned` and
       `compactMap`-ing `personalRecords` — do not sort the dictionary's keys separately
 

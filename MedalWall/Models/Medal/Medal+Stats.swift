@@ -124,4 +124,21 @@ extension Array where Element == Medal {
   var personalRecordIDs: Set<String> {
     Set(personalRecords.values.map(\.id))
   }
+
+  /// The record at each distance that has one, longest distance first.
+  ///
+  /// Walks `distanceCategoriesOwned` rather than sorting `personalRecords` by key, so the
+  /// carousel and the filter chips share one ordering rule instead of keeping two in
+  /// agreement by hand. Both sides key on a category normalized through
+  /// `RaceDistanceCategory(value:)`, so a custom distance finds the preset it measures.
+  ///
+  /// A distance whose medals are all untimed holds no record and drops out here, which is
+  /// what leaves it out of the carousel while the filter still offers it.
+  var personalBests: [MedalPersonalBest] {
+    let records = personalRecords
+
+    return distanceCategoriesOwned.compactMap { category in
+      records[category].map { MedalPersonalBest(category: category, medal: $0) }
+    }
+  }
 }
