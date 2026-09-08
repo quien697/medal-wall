@@ -1,10 +1,10 @@
 ## 1. Pace Formatting
 
-- [ ] 1.1 Write failing tests in `DistanceUnitTests` for `paceValueText(
+- [x] 1.1 Write failing tests in `DistanceUnitTests` for `paceValueText(
       minutesPerKilometer:)`: it returns the value alone with no unit, truncates seconds the
-      way `paceText` does, converts per-mile when the unit is miles, and returns the
-      unfilled marker for a `nil` pace
-- [ ] 1.2 Write a failing test that `paceText` still returns value and abbreviation joined,
+      way `paceText` does, converts per-mile when the unit is miles, and returns `nil` for
+      a `nil` pace — the unfilled wording belongs to the caller, not to a unit
+- [x] 1.2 Write a failing test that `paceText` still returns value and abbreviation joined,
       so composing it from the new function changes nothing for its existing caller
 - [ ] 1.3 Add `paceValueText(minutesPerKilometer:)` to `DistanceUnit` and recompose
       `paceText` from it plus `abbreviation()`, so the pace format is written once

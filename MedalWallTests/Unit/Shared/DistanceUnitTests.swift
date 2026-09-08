@@ -280,6 +280,86 @@ struct DistanceUnitTests {
     #expect(RaceDistanceCategory(value: saved) == .full)
   }
 
+  // MARK: - paceValueText
+  @Test("paceValueText returns the value alone, with no unit")
+  func testPaceValueTextHasNoUnit() {
+    let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.kilometers.rawValue)
+    let pace = 5 + 41.0 / 60
+
+    let value = DistanceUnit.kilometers.paceValueText(
+      minutesPerKilometer: pace,
+      defaults: defaults
+    )
+
+    #expect(value == "5'41\"")
+  }
+
+  @Test("paceValueText truncates seconds the way paceText does")
+  func testPaceValueTextTruncatesSeconds() {
+    let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.kilometers.rawValue)
+    let pace = 4 + 59.9 / 60
+
+    let value = DistanceUnit.kilometers.paceValueText(
+      minutesPerKilometer: pace,
+      defaults: defaults
+    )
+
+    #expect(value == "4'59\"")
+  }
+
+  @Test("paceValueText converts to minutes per mile in miles mode")
+  func testPaceValueTextMiles() {
+    let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.miles.rawValue)
+    let pace = 5.0
+
+    let value = DistanceUnit.miles.paceValueText(
+      minutesPerKilometer: pace,
+      defaults: defaults
+    )
+
+    #expect(value == "8'02\"")
+  }
+
+  /// The unfilled wording belongs to the screen, not to a unit.
+  @Test("paceValueText returns nil when there is no pace")
+  func testPaceValueTextNil() {
+    let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.kilometers.rawValue)
+
+    #expect(
+      DistanceUnit.kilometers.paceValueText(minutesPerKilometer: nil, defaults: defaults) == nil
+    )
+  }
+
+  // MARK: - paceText
+  @Test("paceText joins the value with the unit abbreviation")
+  func testPaceTextComposesValueAndUnit() {
+    let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.kilometers.rawValue)
+    let pace = 5 + 41.0 / 60
+
+    let value = DistanceUnit.kilometers.paceValueText(
+      minutesPerKilometer: pace,
+      defaults: defaults
+    )
+    let joined = DistanceUnit.kilometers.paceText(
+      minutesPerKilometer: pace,
+      defaults: defaults
+    )
+
+    #expect(joined == "5'41\" /km")
+    #expect(joined == "\(value ?? "") /\(DistanceUnit.kilometers.abbreviation(defaults: defaults))")
+  }
+
+  /// Recomposing paceText must not disturb the placeholder its callers already pin.
+  @Test("paceText keeps its own placeholder when there is no pace")
+  func testPaceTextPlaceholderUnchanged() {
+    let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.kilometers.rawValue)
+
+    #expect(
+      DistanceUnit.kilometers.paceText(minutesPerKilometer: nil, defaults: defaults)
+        == "--'-- \""
+    )
+  }
+
   /// Formats a canonical kilometre value under a pinned English locale, so number
   /// formatting does not vary with the simulator's region.
   private static func text(

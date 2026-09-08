@@ -138,18 +138,36 @@ nonisolated enum DistanceUnit: String, CaseIterable {
       : .appLocalized("km", defaults: defaults)
   }
 
-  /// A pace in minutes per kilometre rendered in this unit — `5'41" /km` or `9'08" /mi`.
+  /// A pace in minutes per kilometre rendered in this unit, without its unit — `5'41"`.
   ///
-  /// Seconds are truncated, which is the app's long-standing behaviour. A nil pace
-  /// returns `"--'-- \""` so a missing time still keeps the right shape.
-  func paceText(minutesPerKilometer pace: Double?, defaults: UserDefaults = .standard) -> String {
-    guard let pace else { return "--'-- \"" }
+  /// Seconds are truncated, which is the app's long-standing behaviour. Returns `nil`
+  /// rather than a placeholder when there is no pace: how an unrecorded value reads is a
+  /// screen's decision, and a unit has no business holding one screen's wording.
+  ///
+  /// Exists so a caller that sets the value and the unit at different sizes can have both
+  /// without splitting `paceText`'s output back apart on its punctuation.
+  func paceValueText(
+    minutesPerKilometer pace: Double?,
+    defaults: UserDefaults = .standard
+  ) -> String? {
+    guard let pace else { return nil }
     let converted = self.pace(fromMinutesPerKilometer: pace)
     let minutes = Int(converted)
     let seconds = Int((converted - Double(minutes)) * 60)
 
-    return String(
-      format: "%d'%02d\" /%@", minutes, seconds, abbreviation(defaults: defaults))
+    return String(format: "%d'%02d\"", minutes, seconds)
+  }
+
+  /// A pace in minutes per kilometre rendered in this unit — `5'41" /km` or `9'08" /mi`.
+  ///
+  /// A nil pace returns `"--'-- \""` so a missing time still keeps the right shape.
+  /// Composed from `paceValueText` so the pace format itself is written once.
+  func paceText(minutesPerKilometer pace: Double?, defaults: UserDefaults = .standard) -> String {
+    guard let value = paceValueText(minutesPerKilometer: pace, defaults: defaults) else {
+      return "--'-- \""
+    }
+
+    return "\(value) /\(abbreviation(defaults: defaults))"
   }
 
   /// The custom-distance field's label — `"Custom distance (mi)"`.

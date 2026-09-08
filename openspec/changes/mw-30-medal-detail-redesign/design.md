@@ -111,6 +111,12 @@ format string's punctuation. `DistanceUnit` gains `paceValueText(minutesPerKilom
 returning the value alone, and `paceText` composes it with `abbreviation()` — so the two
 callers agree by construction and the format is written once.
 
+`paceValueText` returns `String?`, `nil` when there is no pace, rather than an unfilled
+marker. The em dash is this screen's wording for an unfilled field, not a fact about
+units, so `DistanceUnit` does not learn it. `paceText` keeps its own `--'-- "` placeholder
+ahead of the composition, leaving its existing contract — which `MedalDetailViewModelTests`
+already pins — untouched.
+
 **6. The hero stops using `DetailHeroSection`.**
 
 That component lays out a photo beside leading-aligned info; v4.3 centres the medal above
