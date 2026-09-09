@@ -66,7 +66,7 @@ struct MedalPersonalBestCard: View {
         Spacer()
 
         if pageCount > 1 {
-          pageDots
+          pageDots()
         }
       }  // HStack
     }  // VStack
@@ -74,11 +74,12 @@ struct MedalPersonalBestCard: View {
     .surfaceStyle()
   }
 
-  // MARK: - Subviews
+  // MARK: - Functions
   /// Which record of the set this card is, drawn on the card itself because a full-width
   /// card leaves no part of its neighbours showing. Only ever built past one record, so
   /// the range always holds at least two dots.
-  private var pageDots: some View {
+  @ViewBuilder
+  private func pageDots() -> some View {
     HStack(spacing: .Space.stack) {
       ForEach(0..<pageCount, id: \.self) { page in
         Circle()

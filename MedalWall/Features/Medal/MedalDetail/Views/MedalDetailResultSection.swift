@@ -27,8 +27,10 @@ struct MedalDetailResultSection: View {
   let divisionPlacement: String
   let divisionTotal: String?
 
-  // MARK: - Computed
-  var columns: [GridItem] {
+  // MARK: - Functions
+  /// Two equally-flexible columns whose inner gap matches the section's row spacing,
+  /// so the grid reads as one band with the rows above and below.
+  private static func columns(spacing: CGFloat) -> [GridItem] {
     [GridItem](
       repeating: GridItem(.flexible(minimum: 80), spacing: spacing, alignment: .leading),
       count: 2
@@ -37,7 +39,7 @@ struct MedalDetailResultSection: View {
 
   // MARK: - Body
   var body: some View {
-    PageSection(title: "The result", spacing: .Space.gutter) {
+    PageSection(title: "The result") {
       HStack(alignment: .center, spacing: .Space.stack) {
         Text(finishTime)
           .font(.TypeScale.Numeric.large)
@@ -53,7 +55,7 @@ struct MedalDetailResultSection: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       .surfaceStyle()
 
-      LazyVGrid(columns: columns, alignment: .leading, spacing: spacing) {
+      LazyVGrid(columns: Self.columns(spacing: spacing), alignment: .leading, spacing: spacing) {
         MedalDetailResultItem(
           label: .appLocalized("Avg pace"),
           value: averagePaceValue,

@@ -20,16 +20,11 @@ struct MedalDetailEventPhotoStrip: View {
   // MARK: - Properties
   let photos: [EventPhoto]
 
-  // MARK: - Computed
-  private var sortedPhotoUrls: [String] {
-    photos.sorted { $0.sortOrder < $1.sortOrder }.map { $0.imageUrl }
-  }
-
   // MARK: - Body
   var body: some View {
     ScrollView(.horizontal, showsIndicators: false) {
       HStack(spacing: .Space.row) {
-        ForEach(Array(sortedPhotoUrls.enumerated()), id: \.offset) { index, urlString in
+        ForEach(Array(photos.sortedImageUrls.enumerated()), id: \.offset) { index, urlString in
           PhotoImage(urlString: urlString, as: .event)
             .onTapGesture {
               selectedPhotoIndex = index
@@ -40,7 +35,7 @@ struct MedalDetailEventPhotoStrip: View {
     }  // ScrollView
     .fullScreenCover(isPresented: $isPresentingPhotoViewer) {
       PhotoViewer(
-        photos: sortedPhotoUrls,
+        photos: photos.sortedImageUrls,
         selectedIndex: $selectedPhotoIndex
       )
     }
