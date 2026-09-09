@@ -33,7 +33,7 @@ extension Medal {
       date: RaceEdition.vancouver2022.startDate,
       bibNumber: "2814",
       place: Race.vancouver.place,
-      distance: RaceEdition.vancouver2022.distances.first!,
+      distance: RaceEdition.vancouver2022.distances.first ?? .default,
       userID: "preview"
     )
 
