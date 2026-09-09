@@ -111,6 +111,24 @@ struct MedalDistanceFilteringTests {
     #expect(medals.distanceCategoriesOwned.count == 1)
   }
 
+  /// A marathon entered as 26.2 miles arrives as 42.16481 km — close to but not exactly
+  /// 42.195, so it lands as `.custom(42.16481)` rather than `.custom(42.195)`. The
+  /// tolerance that collapses it onto `.full` must run *before* the Set dedup, otherwise
+  /// the chip surfaces two `.full` entries side by side and `personalBests` emits two
+  /// records that share an `id`, breaking the carousel's `ForEach`.
+  @Test(
+    "distanceCategoriesOwned collapses a near-tolerance custom distance onto the preset it measures"
+  )
+  func testCategoriesOwnedCollapsesNearToleranceCustomOntoPreset() {
+    let medals = [
+      makeMedal(category: .full),
+      makeMedal(category: .custom(42.16481))
+    ]
+
+    #expect(medals.distanceCategoriesOwned.count == 1)
+    #expect(medals.distanceCategoriesOwned.first == .full)
+  }
+
   /// CLAUDE.md `## Patterns`: "Guard numeric values against out-of-range inputs."
   /// A corrupt Firestore write can deliver a non-finite distance; sorting a
   /// `Set<Double>` that contains NaN or Inf traps, so non-finite values must be
@@ -201,6 +219,20 @@ struct MedalDistanceFilteringTests {
   func testFilteredByCustomMatchesPreset() {
     let medals = [
       makeMedal(category: .custom(42.195)),
+      makeMedal(category: .half)
+    ]
+
+    #expect(medals.filtered(by: .category(.full)).count == 1)
+  }
+
+  /// A marathon entered as 26.2 miles rounds to 42.16481 km, just inside the 0.05 km
+  /// window `RaceDistanceCategory(value:)` collapses onto `.full`. `filtered(by:)` must
+  /// agree with that normalization — otherwise the chip surfaces `.full` but selecting
+  /// it excludes the medal that the personal-bests card lists under `.full`.
+  @Test("filtered by a preset matches a custom distance within the preset's tolerance")
+  func testFilteredByPresetMatchesCustomWithinTolerance() {
+    let medals = [
+      makeMedal(category: .custom(42.16481)),
       makeMedal(category: .half)
     ]
 

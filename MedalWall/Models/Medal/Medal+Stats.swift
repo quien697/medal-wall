@@ -57,13 +57,18 @@ extension Array where Element == Medal {
   /// The distance categories present in the collection, longest first.
   ///
   /// Categories are compared by measured distance, so a custom 42.195 collapses onto
-  /// `.full` rather than offering the same distance as a second option. Non-finite
-  /// values (`NaN`, `±Inf`) are dropped before the sort — sorting a `Set<Double>` that
-  /// contains them violates strict weak ordering and traps.
+  /// `.full` rather than offering the same distance as a second option. The Set dedup
+  /// runs on the normalized categories, not the raw `Double`s — otherwise a `.full`
+  /// (42.195) plus a `.custom(42.16481)` (the "26.2 mi" round-trip that lands inside
+  /// the 0.05 km tolerance) would surface two `.full` chips. Non-finite values
+  /// (`NaN`, `±Inf`) are dropped after the Set — sorting one violates strict weak
+  /// ordering and traps.
   var distanceCategoriesOwned: [RaceDistanceCategory] {
-    let finiteValues = map { $0.distance.category.value }.filter(\.isFinite)
-    let distances = Set(finiteValues)
-    return distances.sorted(by: >).map { RaceDistanceCategory(value: $0) }
+    let normalized = Set(map { RaceDistanceCategory(value: $0.distance.category.value) })
+    return
+      normalized
+      .filter { $0.value.isFinite }
+      .sorted { $0.value > $1.value }
   }
 
   /// The medals `distanceFilter` selects, across every race type at that distance.
@@ -72,7 +77,7 @@ extension Array where Element == Medal {
     case .all:
       return self
     case .category(let category):
-      return filter { $0.distance.category.value == category.value }
+      return filter { RaceDistanceCategory(value: $0.distance.category.value) == category }
     }
   }
 
