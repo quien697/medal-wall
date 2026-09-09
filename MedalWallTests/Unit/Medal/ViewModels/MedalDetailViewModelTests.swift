@@ -26,6 +26,7 @@ struct MedalDetailViewModelTests {
   }
 
   private func makeMedal(
+    id: String = UUID().uuidString,
     distance: RaceDistance = RaceDistance(category: .full, type: .inPerson),
     finishTime: TimeInterval? = nil,
     overallPlacement: Int? = nil,
@@ -39,6 +40,7 @@ struct MedalDetailViewModelTests {
     eventPhotos: [EventPhoto] = []
   ) -> Medal {
     Medal(
+      id: id,
       name: "Test",
       date: .now,
       bibNumber: "1",
@@ -97,11 +99,31 @@ struct MedalDetailViewModelTests {
   }
 
   /// The screen is handed one medal; whether it holds a record belongs to the collection,
-  /// so whatever opened the screen supplies it.
+  /// so whatever opened the screen supplies the live record set rather than a frozen bool.
   @Test("A record holder is opened as one")
   func testIsPersonalRecordSupplied() {
-    let viewModel = MedalDetailViewModel(
-      medal: makeMedal(finishTime: 12624), isPersonalRecord: true)
+    let medal = makeMedal(id: "X", finishTime: 12624)
+    let viewModel = MedalDetailViewModel(medal: medal, personalRecordIDs: ["X"])
+
+    #expect(viewModel.isPersonalRecord)
+  }
+
+  /// The screen calls `reloadMedal()` after an edit, and a faster/slower time elsewhere in
+  /// the collection can demote or promote this medal between reloads. `isPersonalRecord`
+  /// has to follow the live set — otherwise a stale "PR" tag persists until the user pops
+  /// the screen and re-enters.
+  @Test("isPersonalRecord follows personalRecordIDs after the set changes")
+  func testIsPersonalRecordFollowsPersonalRecordIDs() {
+    let medal = makeMedal(id: "X")
+    let viewModel = MedalDetailViewModel(medal: medal, personalRecordIDs: ["X"])
+
+    #expect(viewModel.isPersonalRecord)
+
+    viewModel.personalRecordIDs = ["Y"]
+
+    #expect(!viewModel.isPersonalRecord)
+
+    viewModel.personalRecordIDs = ["Y", "X"]
 
     #expect(viewModel.isPersonalRecord)
   }

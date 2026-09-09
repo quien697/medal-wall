@@ -41,6 +41,7 @@ struct MedalList: View {
           VStack(spacing: .Space.inline) {
             MedalPersonalBestCarousel(
               personalBests: viewModel.medals.personalBests,
+              personalRecordIDs: viewModel.personalRecordIDs,
               namespace: namespace
             )
 

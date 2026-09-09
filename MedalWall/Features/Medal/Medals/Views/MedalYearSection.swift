@@ -23,7 +23,7 @@ struct MedalYearSection: View {
         NavigationLink {
           MedalDetailView(
             medal: medal,
-            isPersonalRecord: personalRecordIDs.contains(medal.id)
+            personalRecordIDs: personalRecordIDs
           )
           .navigationTransition(.zoom(sourceID: medal.id, in: namespace))
         } label: {

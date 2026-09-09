@@ -21,6 +21,7 @@ struct MedalPersonalBestCarousel: View {
 
   // MARK: - Properties
   let personalBests: [MedalPersonalBest]
+  let personalRecordIDs: Set<String>
   let namespace: Namespace.ID
 
   // MARK: - Body
@@ -32,10 +33,13 @@ struct MedalPersonalBestCarousel: View {
         HStack(spacing: .Space.gutter) {
           ForEach(personalBests) { personalBest in
             NavigationLink {
-              MedalDetailView(medal: personalBest.medal, isPersonalRecord: true)
-                .navigationTransition(
-                  .zoom(sourceID: Self.transitionID(for: personalBest), in: namespace)
-                )
+              MedalDetailView(
+                medal: personalBest.medal,
+                personalRecordIDs: personalRecordIDs
+              )
+              .navigationTransition(
+                .zoom(sourceID: Self.transitionID(for: personalBest), in: namespace)
+              )
             } label: {
               MedalPersonalBestCard(
                 distance: personalBest.category.description,
@@ -45,7 +49,7 @@ struct MedalPersonalBestCarousel: View {
                   minutesPerKilometer: personalBest.medal.averagePace
                 ),
                 pageCount: personalBests.count,
-                currentPage: currentPage
+                currentPage: personalBests.pageIndex(for: scrolledID)
               )
               .matchedTransitionSource(
                 id: Self.transitionID(for: personalBest),
@@ -63,20 +67,6 @@ struct MedalPersonalBestCarousel: View {
       .contentMargins(.horizontal, .Space.gutter, for: .scrollContent)
       .padding(.vertical, .Space.row)
     }
-  }
-
-  // MARK: - Computed
-  /// Which card the scroll position is showing, for the dots the card draws.
-  ///
-  /// `scrollPosition` reports `nil` until the first scroll, and a stored position can name
-  /// a distance the collection no longer holds. Both resolve to the first card rather than
-  /// to no card at all, which would leave every dot dimmed.
-  private var currentPage: Int {
-    guard let scrolledID,
-      let page = personalBests.firstIndex(where: { $0.id == scrolledID })
-    else { return 0 }
-
-    return page
   }
 
   // MARK: - Functions
@@ -99,18 +89,27 @@ private func previewPersonalBests(medals: [Medal] = Medal.sampleData) -> [MedalP
 #Preview("Several records") {
   @Previewable @Namespace var namespace
 
+  let medals = Medal.sampleData
+
   NavigationStack {
-    MedalPersonalBestCarousel(personalBests: previewPersonalBests(), namespace: namespace)
-      .background(Color.Background.primary)
+    MedalPersonalBestCarousel(
+      personalBests: previewPersonalBests(medals: medals),
+      personalRecordIDs: medals.personalRecordIDs,
+      namespace: namespace
+    )
+    .background(Color.Background.primary)
   }  // NavigationStack
 }
 
 #Preview("One record") {
   @Previewable @Namespace var namespace
 
+  let medals = Array(Medal.sampleData.prefix(1))
+
   NavigationStack {
     MedalPersonalBestCarousel(
-      personalBests: previewPersonalBests(medals: Array(Medal.sampleData.prefix(1))),
+      personalBests: previewPersonalBests(medals: medals),
+      personalRecordIDs: medals.personalRecordIDs,
       namespace: namespace
     )
     .background(Color.Background.primary)
@@ -121,7 +120,11 @@ private func previewPersonalBests(medals: [Medal] = Medal.sampleData) -> [MedalP
   @Previewable @Namespace var namespace
 
   NavigationStack {
-    MedalPersonalBestCarousel(personalBests: previewPersonalBests(medals: []), namespace: namespace)
-      .background(Color.Background.primary)
+    MedalPersonalBestCarousel(
+      personalBests: previewPersonalBests(medals: []),
+      personalRecordIDs: [],
+      namespace: namespace
+    )
+    .background(Color.Background.primary)
   }  // NavigationStack
 }

@@ -18,9 +18,9 @@ struct MedalDetailView: View {
   @State private var isPresentingDeleteMedalConfirm = false
 
   // MARK: - Init
-  init(medal: Medal, isPersonalRecord: Bool = false) {
+  init(medal: Medal, personalRecordIDs: Set<String> = []) {
     self._viewModel = State(
-      initialValue: MedalDetailViewModel(medal: medal, isPersonalRecord: isPersonalRecord)
+      initialValue: MedalDetailViewModel(medal: medal, personalRecordIDs: personalRecordIDs)
     )
   }
 
@@ -35,7 +35,7 @@ struct MedalDetailView: View {
       MedalDetailInfoSection(
         location: viewModel.medal.place.formatted,
         date: viewModel.medal.date.formattedMonthDayYear(),
-        distance: viewModel.medal.distance.displayLabel,
+        distance: viewModel.medal.distance.category.description,
         raceType: viewModel.medal.distance.type.displayName,
         bib: viewModel.medal.bibNumber
       )
@@ -151,7 +151,7 @@ private func previewMedal(stripped: Bool = false) -> Medal {
 
 #Preview("Record holder") {
   NavigationStack {
-    MedalDetailView(medal: previewMedal(), isPersonalRecord: true)
+    MedalDetailView(medal: previewMedal(), personalRecordIDs: [previewMedal().id])
   }  // NavigationStack
 }
 

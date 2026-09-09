@@ -11,17 +11,27 @@ import SwiftUI
 final class MedalDetailViewModel {
   // MARK: - Properties
   var medal: Medal
-  let isPersonalRecord: Bool
+  /// The ids of medals that currently hold a record, taken from the whole collection.
+  ///
+  /// Stored as a `var` rather than a `let` so `isPersonalRecord` stays live: an edit
+  /// elsewhere in the collection can demote or promote this medal between reloads, and
+  /// the "PR" tag should follow the latest state without the user popping the screen.
+  var personalRecordIDs: Set<String>
   private let repository = MedalFirestoreRepository()
   private static let unfilled = "—"
 
   // MARK: - Init
-  init(medal: Medal, isPersonalRecord: Bool = false) {
+  init(medal: Medal, personalRecordIDs: Set<String> = []) {
     self.medal = medal
-    self.isPersonalRecord = isPersonalRecord
+    self.personalRecordIDs = personalRecordIDs
   }
 
   // MARK: - Computed
+  /// Whether this medal currently holds a record at its distance.
+  var isPersonalRecord: Bool {
+    personalRecordIDs.contains(medal.id)
+  }
+
   /// The finish time, or the same wording the collection list uses for an untimed medal.
   var finishTimeText: String {
     guard let finishTime = medal.finishTime else { return .appLocalized("No time recorded") }
@@ -103,12 +113,18 @@ final class MedalDetailViewModel {
     return "/ \(total)"
   }
 
-  /// Reloads the medal from Firestore and updates the local state.
+  /// Reloads the medal from Firestore and updates the local state, including the live
+  /// record set so an edit elsewhere in the collection that demotes or promotes this
+  /// medal is reflected on the "PR" tag without the user leaving the screen.
   func reloadMedal() async {
-    guard let updated = try? await repository.fetchMedal(id: medal.id, userId: medal.userID) else {
-      return
-    }
+    async let updatedMedal = repository.fetchMedal(id: medal.id, userId: medal.userID)
+    async let allMedals = repository.fetchMedals(userId: medal.userID)
+    guard let updated = try? await updatedMedal else { return }
+
     medal = updated
+    if let all = try? await allMedals {
+      personalRecordIDs = all.personalRecordIDs
+    }
   }
 
   /// Deletes the medal from Firestore.
