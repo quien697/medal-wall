@@ -1,5 +1,5 @@
 //
-//  MedalDetailFactsSection.swift
+//  MedalDetailInfoSection.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-09-08.
@@ -11,7 +11,7 @@ import SwiftUI
 ///
 /// Untitled by design: the rows label themselves, and a heading over four labelled rows
 /// would name the same thing twice.
-struct MedalDetailFactsSection: View {
+struct MedalDetailInfoSection: View {
   // MARK: - Properties
   let location: String
   let date: String
@@ -21,50 +21,42 @@ struct MedalDetailFactsSection: View {
 
   // MARK: - Body
   var body: some View {
-    VStack(spacing: 0) {
-      MedalDetailFactRow(
+    PageSection(spacing: 0) {
+      MedalDetailInfoRow(
         label: .appLocalized("Location"),
         value: location,
         secondaryValue: nil
       )
 
-      hairline
+      Divider()
 
-      MedalDetailFactRow(
+      MedalDetailInfoRow(
         label: .appLocalized("Date"),
         value: date,
         secondaryValue: nil
       )
 
-      hairline
+      Divider()
 
-      MedalDetailFactRow(
+      MedalDetailInfoRow(
         label: .appLocalized("Distance"),
         value: distance,
         secondaryValue: raceType
       )
 
-      hairline
+      Divider()
 
-      MedalDetailFactRow(
+      MedalDetailInfoRow(
         label: .appLocalized("Bib"),
         value: bib,
         secondaryValue: nil
       )
-    }  // VStack
-    .padding(.horizontal, .Space.gutter)
-  }
-
-  // MARK: - Subviews
-  private var hairline: some View {
-    Rectangle()
-      .fill(Color.Border.primary)
-      .frame(height: 1)
+    }  // PageSection
   }
 }
 
 #Preview {
-  MedalDetailFactsSection(
+  MedalDetailInfoSection(
     location: "Taipei City, TW",
     date: "Dec 15, 2019",
     distance: "Full · 42.2 km",

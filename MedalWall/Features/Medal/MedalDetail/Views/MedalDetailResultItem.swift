@@ -22,7 +22,6 @@ struct MedalDetailResultItem: View {
   let label: String
   let value: String
   let suffix: String?
-  let isRecord: Bool
 
   // MARK: - Body
   var body: some View {
@@ -45,15 +44,8 @@ struct MedalDetailResultItem: View {
         if let suffix {
           Text(suffix)
             .font(.TypeScale.microLabel)
-            .tracking(labelTracking)
             .textCase(.uppercase)
             .foregroundStyle(Color.Text.secondary)
-        }
-
-        if isRecord {
-          Text("PR")
-            .tagStyle(.record)
-            .padding(.leading, .Space.inline)
         }
       }  // HStack
     }  // VStack
@@ -62,19 +54,13 @@ struct MedalDetailResultItem: View {
 }
 
 #Preview("Placement with its field") {
-  MedalDetailResultItem(label: "Overall", value: "1058", suffix: "/ 7373", isRecord: false)
-    .padding()
-    .background(Color.Background.primary)
-}
-
-#Preview("Record holder") {
-  MedalDetailResultItem(label: "Finish", value: "03:30:24", suffix: nil, isRecord: true)
+  MedalDetailResultItem(label: "Overall", value: "1058", suffix: "/ 7373")
     .padding()
     .background(Color.Background.primary)
 }
 
 #Preview("Unfilled") {
-  MedalDetailResultItem(label: "Division", value: "—", suffix: nil, isRecord: false)
+  MedalDetailResultItem(label: "Division", value: "—", suffix: nil)
     .padding()
     .background(Color.Background.primary)
 }

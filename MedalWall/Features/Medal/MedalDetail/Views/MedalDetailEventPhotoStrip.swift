@@ -13,18 +13,22 @@ import SwiftUI
 /// No heading of its own: it sits inside `MedalDetailDaySection` beside the note, and the
 /// two together are what the heading names.
 struct MedalDetailEventPhotoStrip: View {
+  // MARK: - State
   @State private var isPresentingPhotoViewer = false
   @State private var selectedPhotoIndex = 0
 
+  // MARK: - Properties
   let photos: [EventPhoto]
 
+  // MARK: - Computed
   private var sortedPhotoUrls: [String] {
     photos.sorted { $0.sortOrder < $1.sortOrder }.map { $0.imageUrl }
   }
 
+  // MARK: - Body
   var body: some View {
     ScrollView(.horizontal, showsIndicators: false) {
-      HStack(spacing: 12) {
+      HStack(spacing: .Space.row) {
         ForEach(Array(sortedPhotoUrls.enumerated()), id: \.offset) { index, urlString in
           PhotoImage(urlString: urlString, as: .event)
             .onTapGesture {

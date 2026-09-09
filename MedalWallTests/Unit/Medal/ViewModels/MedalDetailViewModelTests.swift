@@ -177,43 +177,6 @@ struct MedalDetailViewModelTests {
     )
   }
 
-  // MARK: - distanceText
-  @Test("Hero shows a preset's name and measurement in kilometres")
-  func testDistanceTextPresetKilometers() {
-    #expect(Self.heroText(.full, in: .kilometers) == "Full · 42.2 km")
-    #expect(Self.heroText(.half, in: .kilometers) == "Half · 21.1 km")
-  }
-
-  @Test("Hero shows a preset's name and measurement in miles")
-  func testDistanceTextPresetMiles() {
-    #expect(Self.heroText(.full, in: .miles) == "Full · 26.2 mi")
-    #expect(Self.heroText(.tenKM, in: .miles) == "10K · 6.2 mi")
-  }
-
-  @Test("Hero keeps the redundant measurement for a 10K in kilometres")
-  func testDistanceTextRedundant() {
-    #expect(Self.heroText(.tenKM, in: .kilometers) == "10K · 10 km")
-    #expect(Self.heroText(.fiveKM, in: .kilometers) == "5K · 5 km")
-  }
-
-  @Test("Hero shows a custom distance once, not twice")
-  func testDistanceTextCustomNotRepeated() {
-    #expect(Self.heroText(.custom(16.09344), in: .miles) == "10 mi")
-    #expect(Self.heroText(.custom(16.09344), in: .kilometers) == "16.1 km")
-  }
-
-  private static func heroText(
-    _ category: RaceDistanceCategory,
-    in unit: DistanceUnit,
-    function: String = #function
-  ) -> String {
-    MedalDetailViewModel.heroDistanceText(
-      for: category,
-      in: unit,
-      defaults: makeDefaults(function: function)
-    )
-  }
-
   // MARK: - overallPlacementText
   @Test("overallPlacementText reads as unfilled when overallPlacement is nil")
   func testOverallPlacementTextNil() {

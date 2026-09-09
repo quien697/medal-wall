@@ -14,7 +14,7 @@ import SwiftUI
 /// screen exists to give; the rest pair off.
 struct MedalDetailResultSection: View {
   // MARK: - Properties
-  private let spacing: CGFloat = 12
+  private let spacing: CGFloat = .Space.row
   let finishTime: String
   let isPersonalRecord: Bool
   let averagePaceValue: String
@@ -37,45 +37,47 @@ struct MedalDetailResultSection: View {
 
   // MARK: - Body
   var body: some View {
-    PageSection(title: "The result") {
-      VStack(alignment: .leading, spacing: spacing) {
+    PageSection(title: "The result", spacing: .Space.gutter) {
+      HStack(alignment: .center, spacing: .Space.stack) {
+        Text(finishTime)
+          .font(.TypeScale.Numeric.large)
+          .foregroundStyle(Color.Text.primary)
+          .lineLimit(1)
+          .minimumScaleFactor(0.5)
+
+        if isPersonalRecord {
+          Text("PR")
+            .tagStyle(.record)
+        }
+      }  // HStack
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .surfaceStyle()
+
+      LazyVGrid(columns: columns, alignment: .leading, spacing: spacing) {
         MedalDetailResultItem(
-          label: .appLocalized("Finish"),
-          value: finishTime,
-          suffix: nil,
-          isRecord: isPersonalRecord
+          label: .appLocalized("Avg pace"),
+          value: averagePaceValue,
+          suffix: averagePaceUnit
         )
 
-        LazyVGrid(columns: columns, alignment: .leading, spacing: spacing) {
-          MedalDetailResultItem(
-            label: .appLocalized("Avg pace"),
-            value: averagePaceValue,
-            suffix: averagePaceUnit,
-            isRecord: false
-          )
+        MedalDetailResultItem(
+          label: .appLocalized("Overall"),
+          value: overallPlacement,
+          suffix: overallTotal
+        )
 
-          MedalDetailResultItem(
-            label: .appLocalized("Overall"),
-            value: overallPlacement,
-            suffix: overallTotal,
-            isRecord: false
-          )
+        MedalDetailResultItem(
+          label: .appLocalized("Gender"),
+          value: genderPlacement,
+          suffix: genderTotal
+        )
 
-          MedalDetailResultItem(
-            label: .appLocalized("Gender"),
-            value: genderPlacement,
-            suffix: genderTotal,
-            isRecord: false
-          )
-
-          MedalDetailResultItem(
-            label: divisionLabel,
-            value: divisionPlacement,
-            suffix: divisionTotal,
-            isRecord: false
-          )
-        }  // LazyVGrid
-      }  // VStack
+        MedalDetailResultItem(
+          label: divisionLabel,
+          value: divisionPlacement,
+          suffix: divisionTotal
+        )
+      }  // LazyVGrid
     }  // PageSection
   }
 }

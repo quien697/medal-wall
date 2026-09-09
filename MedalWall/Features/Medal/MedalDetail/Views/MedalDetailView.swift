@@ -32,10 +32,10 @@ struct MedalDetailView: View {
         name: viewModel.medal.name
       )
 
-      MedalDetailFactsSection(
+      MedalDetailInfoSection(
         location: viewModel.medal.place.formatted,
         date: viewModel.medal.date.formattedMonthDayYear(),
-        distance: viewModel.distanceText,
+        distance: viewModel.medal.distance.displayLabel,
         raceType: viewModel.medal.distance.type.displayName,
         bib: viewModel.medal.bibNumber
       )

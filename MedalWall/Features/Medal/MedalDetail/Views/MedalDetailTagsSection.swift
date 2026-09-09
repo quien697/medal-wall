@@ -15,8 +15,8 @@ struct MedalDetailTagsSection: View {
   let tags: [String]
 
   var body: some View {
-    PageSection(title: "Tags") {
-      FlowLayout(spacing: 6) {
+    PageSection(title: "Tags", spacing: .Space.gutter) {
+      FlowLayout(spacing: .Space.inline) {
         ForEach(tags, id: \.self) { tag in
           Text(tag)
             .chipStyle(.neutral)

@@ -1,5 +1,5 @@
 //
-//  MedalDetailFactRow.swift
+//  MedalDetailInfoRow.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-09-08.
@@ -11,7 +11,7 @@ import SwiftUI
 ///
 /// The second line carries a qualifier that belongs to the value rather than a fact of its
 /// own — the race type under the distance — so the list stays four rows rather than five.
-struct MedalDetailFactRow: View {
+struct MedalDetailInfoRow: View {
   // MARK: - Properties
   private let labelTracking: CGFloat = 1.4
   let label: String
@@ -48,13 +48,13 @@ struct MedalDetailFactRow: View {
 }
 
 #Preview("A plain fact") {
-  MedalDetailFactRow(label: "Location", value: "Taipei City, TW", secondaryValue: nil)
+  MedalDetailInfoRow(label: "Location", value: "Taipei City, TW", secondaryValue: nil)
     .padding(.horizontal)
     .background(Color.Background.primary)
 }
 
 #Preview("A fact with a qualifier") {
-  MedalDetailFactRow(label: "Distance", value: "Full · 42.2 km", secondaryValue: "In-Person")
+  MedalDetailInfoRow(label: "Distance", value: "Full · 42.2 km", secondaryValue: "In-Person")
     .padding(.horizontal)
     .background(Color.Background.primary)
 }

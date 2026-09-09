@@ -19,21 +19,19 @@ struct MedalDetailDaySection: View {
 
   // MARK: - Body
   var body: some View {
-    PageSection(title: "The day") {
-      VStack(alignment: .leading, spacing: .Space.row) {
-        if !photos.isEmpty {
-          MedalDetailEventPhotoStrip(photos: photos)
-        }
+    PageSection(title: "The day", spacing: .Space.gutter) {
+      if !photos.isEmpty {
+        MedalDetailEventPhotoStrip(photos: photos)
+      }
 
-        if let note {
-          Text(note)
-            .font(.TypeScale.body)
-            .foregroundStyle(Color.Text.primary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .lineLimit(3...)
-            .surfaceStyle()
-        }
-      }  // VStack
+      if let note {
+        Text(note)
+          .font(.TypeScale.body)
+          .foregroundStyle(Color.Text.primary)
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .lineLimit(3...)
+          .surfaceStyle()
+      }
     }  // PageSection
   }
 }

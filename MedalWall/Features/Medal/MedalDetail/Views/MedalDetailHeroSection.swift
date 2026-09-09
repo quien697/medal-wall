@@ -18,7 +18,6 @@ import SwiftUI
 /// longer does.
 struct MedalDetailHeroSection: View {
   // MARK: - Properties
-  private let titleTracking: CGFloat = -0.8
   let photoUrl: String?
   let name: String
 
@@ -30,8 +29,6 @@ struct MedalDetailHeroSection: View {
 
       Text(name)
         .font(.TypeScale.title1)
-        .tracking(titleTracking)
-        .textCase(.uppercase)
         .foregroundStyle(Color.Text.primary)
         .multilineTextAlignment(.center)
         .fixedSize(horizontal: false, vertical: true)

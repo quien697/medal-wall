@@ -11,15 +11,8 @@ import SwiftUI
 final class MedalDetailViewModel {
   // MARK: - Properties
   var medal: Medal
-  /// Whether this medal holds its distance's personal record.
-  ///
-  /// Supplied by whatever opened the screen rather than derived here: a record is a
-  /// property of the whole collection, and this screen is presented one medal.
   let isPersonalRecord: Bool
   private let repository = MedalFirestoreRepository()
-
-  /// What an unrecorded field reads as. One glyph across every result field but the
-  /// finish time, which is large enough to say it in words.
   private static let unfilled = "—"
 
   // MARK: - Init
@@ -49,24 +42,6 @@ final class MedalDetailViewModel {
     return "/\(unit.abbreviation())"
   }
 
-  var distanceText: String {
-    Self.heroDistanceText(for: medal.distance.category, in: DistanceUnit.resolved())
-  }
-
-  /// The hero's distance line. A preset pairs its name with the measurement
-  /// (`Full · 26.2 mi`); a custom distance already *is* the measurement, so it is shown
-  /// once rather than repeated.
-  nonisolated static func heroDistanceText(
-    for category: RaceDistanceCategory,
-    in unit: DistanceUnit,
-    defaults: UserDefaults = .standard
-  ) -> String {
-    let label = category.label(in: unit, defaults: defaults)
-    if case .custom = category { return label }
-
-    return "\(label) · \(unit.formatted(kilometers: category.value, defaults: defaults))"
-  }
-
   var overallPlacementText: String {
     Self.placementText(medal.overallPlacement)
   }
@@ -79,7 +54,7 @@ final class MedalDetailViewModel {
   /// read as one fact rather than two measurements.
   var divisionLabel: String {
     guard let division = medal.divisionEnum else { return .appLocalized("Division") }
-    return .appLocalized("Division \(division.displayName)")
+    return .appLocalized("Division (\(division.displayName))")
   }
 
   var divisionPlacementText: String {
