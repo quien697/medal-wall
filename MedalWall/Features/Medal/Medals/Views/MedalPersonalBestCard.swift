@@ -30,10 +30,7 @@ struct MedalPersonalBestCard: View {
   // MARK: - Body
   var body: some View {
     VStack(alignment: .leading, spacing: .Space.inline) {
-      HStack(
-        alignment: .firstTextBaseline,
-        spacing: .Space.row
-      ) {
+      HStack {
         Text("Personal best")
           .tagStyle(.record)
           .tracking(titleTracking)
@@ -46,6 +43,7 @@ struct MedalPersonalBestCard: View {
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
       }  // HStack
+      .padding(.bottom, .Space.inline)
 
       Text(raceName)
         .font(.TypeScale.callout)
