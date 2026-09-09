@@ -31,15 +31,19 @@
 ## 3. Result Item & Section
 
 - [x] 3.1 Build `MedalDetailResultItem` (`Features/Medal/MedalDetail/Views/`) replacing
-      `MedalDetailStatsGridItem` — `label`, `value`, optional `suffix`, `isRecord`. Value
-      in `Font.TypeScale.Numeric.large`, suffix in `microLabel` at `Text.secondary`, label
-      in `microLabel` with call-site `.tracking()` / `.textCase(.uppercase)`
+      `MedalDetailStatsGridItem` — `label`, `value`, optional `suffix`. No `isRecord`: the
+      record flag ended up on `MedalDetailResultSection` instead (design.md Decision 2).
+      Value in `Font.TypeScale.Numeric.large`, suffix in `microLabel` at `Text.secondary`,
+      label in `microLabel` with call-site `.tracking()` / `.textCase(.uppercase)`
       (design.md Decision 8)
-- [x] 3.2 Show the `PR` marker beside the value via `.tagStyle(.record)` when `isRecord`.
-      Do not carry over `headLineColor`: a finish time is ink, never gold
+- [x] 3.2 Show the `PR` marker beside the finish time directly in
+      `MedalDetailResultSection`, via `.tagStyle(.record)` when `isPersonalRecord` — not on
+      `MedalDetailResultItem`, since Finish no longer shares that cell's shape. Do not
+      carry over `headLineColor`: a finish time is ink, never gold (design.md Decision 2)
 - [x] 3.3 Build `MedalDetailResultSection` replacing `MedalDetailStatsSection` — a
-      `PageSection` titled `The result` over a two-column grid, Finish spanning both
-      columns, then avg pace, overall, gender, division
+      `PageSection` titled `The result` with the finish time on its own `surfaceStyle()`
+      band above a two-column grid of avg pace, overall, gender, division
+      (design.md Decision 2)
 - [x] 3.4 Delete `MedalDetailStatsGridItem.swift` and `MedalDetailStatsSection.swift`, and
       confirm by grep that nothing outside the medal detail feature referenced them
 - [x] 3.5 Add `#Preview`s for the item and the section covering a fully recorded medal, a
@@ -48,16 +52,23 @@
 ## 4. Hero & Facts
 
 - [x] 4.1 Rewrite `MedalDetailHeroSection` to lay itself out — centred
-      `PhotoImage(as: .medal)` with `.medalRing()`, above the race name in `title1`
-      uppercase, wrapping rather than truncating (spec: A long race name stays legible).
-      Do not change `DetailHeroSection`, which `RaceDetailHeroSection` still uses
-      (design.md Decision 6)
-- [x] 4.2 Build `MedalDetailFactRow` — label left in `microLabel` uppercase with tracking,
-      value right in `caption`, with an optional secondary line beneath the value for the
-      race type
-- [x] 4.3 Build `MedalDetailFactsSection` composing Location, Date, Distance (with race
-      type) and Bib, with a hairline above every row but the first
-- [x] 4.4 Add `#Preview`s for the hero (short name, long wrapping name) and the facts
+      `PhotoImage(as: .medal)` with `.medalRing()`, above the race name in `title1`,
+      wrapping rather than truncating (spec: A long race name stays legible). Race name
+      case: set at its natural case, a deliberate divergence from v4.3's uppercase mockup
+      pending a design system update (design.md Decision 8). `DetailHeroSection` turned out
+      to have no other caller once this screen stopped using it — `RaceDetailHeroSection`
+      already laid itself out independently — so it was deleted (design.md Decision 6)
+- [x] 4.2 Build `MedalDetailInfoRow` (named `MedalDetailFactRow` in the original plan;
+      renamed to `Info` during implementation) — label left in `microLabel` uppercase with
+      tracking, value right in `caption`, with an optional secondary line beneath the value
+      for the race type
+- [x] 4.3 Build `MedalDetailInfoSection` (renamed from `MedalDetailFactsSection`) composing
+      Location, Date, Distance (with race type) and Bib, laid out in a
+      `PageSection(spacing: 0)` with a `Divider()` above every row but the first. Distance
+      reads `medal.distance.displayLabel` directly — the same formatting every other screen
+      uses — rather than the hero-only format that appended the measurement to a preset
+      (design.md Decision 8 rationale note in the proposal's Impact section)
+- [x] 4.4 Add `#Preview`s for the hero (short name, long wrapping name) and the info
       section
 
 ## 5. The Day & Tags

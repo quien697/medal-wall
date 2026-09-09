@@ -29,8 +29,7 @@ looks like is a decision this change makes rather than reads off.
 - Deriving personal records on this screen.
 - v4.3's navy "Hero surface" panel and its Share action; there is no Share feature.
 - Any Firestore schema change, or any change to the record-derivation rules.
-- Changing `DetailHeroSection`, `PageSection`, the photo viewer, the edit sheet, or the
-  delete flow.
+- Changing the photo viewer, the edit sheet, or the delete flow.
 - Editing from the detail screen beyond the existing menu.
 
 ## Decisions
@@ -57,20 +56,26 @@ much machinery for a badge.
 record, but the detail is where a user reads the time itself, which is exactly where the
 marker means most.
 
-**2. One result cell shape, five uses.**
+**2. Finish leads its own band; one cell shape covers the four placements.**
 
 ```swift
 MedalDetailResultItem(
-  label: String,      // "Overall", "Division M30-34"
+  label: String,      // "Overall", "Division (M30-34)"
   value: String,      // "1058", "4′59″", "—"
   suffix: String?,    // "/ 7373", "/KM", nil
-  isRecord: Bool      // champagne PR beside the value
 )
 ```
 
-Every cell in the mockup is the same thing once the pattern is visible: a large tabular
-value with a small secondary tail. `1058` + `/ 7373`, `4′59″` + `/KM`, `523` + `/ 1633`.
-Finish is the same cell spanning both columns with no suffix and `isRecord` set.
+Finish is not one of these cells. It renders first, on its own `surfaceStyle()` band above
+the two-column grid, with the champagne `PR` marker beside it when `isPersonalRecord` is
+set — the value the screen exists to give gets its own visual weight rather than sharing a
+grid cell's shape with four other fields. The record flag therefore lives on
+`MedalDetailResultSection`, not on `MedalDetailResultItem`, which turned out to need no
+`isRecord` case at all.
+
+The remaining four fields — average pace, overall, gender, division — are the same thing
+once the pattern is visible: a large tabular value with a small secondary tail. `1058` +
+`/ 7373`, `4′59″` + `/KM`, `523` + `/ 1633`.
 
 This replaces `MedalDetailStatsGridItem`'s label/headline/subheadline, whose third line put
 the total *under* the placement rather than beside it, and whose `headLineColor` parameter
@@ -81,7 +86,7 @@ gold, because a time is a value rather than an award.
 
 Today the grid states `Division Group: M30-40` and `Division: 523 / 1633` as two cells, as
 though the group were a separate measurement. It is the field the placement was run in, so
-v4.3 folds it into the label: `DIVISION M30-34` over `523 / 1633`. This is also why the
+v4.3 folds it into the label: `DIVISION (M30-34)` over `523 / 1633`. This is also why the
 label is a `String` rather than the `LocalizedStringKey` the old grid item took — it is
 composed from a translated stem plus a division that is not translatable text.
 
@@ -117,12 +122,15 @@ units, so `DistanceUnit` does not learn it. `paceText` keeps its own `--'-- "` p
 ahead of the composition, leaving its existing contract — which `MedalDetailViewModelTests`
 already pins — untouched.
 
-**6. The hero stops using `DetailHeroSection`.**
+**6. The hero stops using `DetailHeroSection` — and that component is deleted.**
 
-That component lays out a photo beside leading-aligned info; v4.3 centres the medal above
+That component laid out a photo beside leading-aligned info; v4.3 centres the medal above
 centred display type. Rather than add a mode to a shared component for one caller,
-`MedalDetailHeroSection` lays itself out. `DetailHeroSection` stays exactly as it is for
-`RaceDetailHeroSection`, which still wants what it does.
+`MedalDetailHeroSection` lays itself out. The plan going in was to leave `DetailHeroSection`
+in place for `RaceDetailHeroSection`; in practice `RaceDetailHeroSection` had already built
+its own inline `HStack` layout rather than going through the shared component, so once this
+screen stopped calling it, it had no caller left anywhere in the app and was deleted rather
+than kept as unused code.
 
 **7. The day is one band.**
 
@@ -143,10 +151,22 @@ captured — rather than naming two data types.
   aligned across the grid.
 - Fact rows are `9px/700` labels against `13px/700` values; §02 bottoms out at `microLabel`
   (10/700), which takes the labels, and `caption` (13/500) takes the values.
-- The race name is `26/900` uppercase, which is `Font.TypeScale.title1` with
-  `.textCase(.uppercase)` at the call site.
+- The race name is `Font.TypeScale.title1`, set at its natural case rather than the
+  mockup's `26/900` uppercase — a deliberate divergence from v4.3, carried until the design
+  system itself is updated.
 - Tags are `.chipStyle(.neutral)` capsules. The mockup draws them white with a border,
   which is what that chip style already is.
+
+**9. `PageSection` gains `alignment` and `spacing`, in place of a non-goal.**
+
+The plan going in treated `PageSection` as unchanged: every existing section was fine with
+its hardcoded leading alignment and `VStack`'s default spacing. In practice
+`MedalDetailResultSection` needed the finish band pulled closer to the grid than that
+default allows, and `MedalDetailInfoSection` needed zero spacing between its
+hairline-separated rows. Rather than reach around `PageSection` with local padding tricks,
+it gained `alignment: HorizontalAlignment = .leading` and `spacing: CGFloat? = nil`
+parameters — both default to exactly today's behaviour, so every other caller is
+unaffected.
 
 ## Risks / Trade-offs
 
@@ -165,8 +185,10 @@ captured — rather than naming two data types.
 ## Migration Plan
 
 No data migration — nothing persisted changes. Rollback is a branch revert. The change is
-additive except for two renames and the `DetailHeroSection` call being dropped, all of them
-inside the medal detail feature.
+additive except for two renames, the deletion of `DetailHeroSection` (found to have no
+caller left once this screen stopped using it), and widening `PageSection` with two
+optional parameters. The last two reach outside the medal detail feature into
+`Shared/Components/Section`, but are non-breaking for every other caller.
 
 `medal-detail` is a new capability, so its spec has no prior version to fold onto. It
 archives independently of `medal-browsing`, which MW-30's other two changes share.

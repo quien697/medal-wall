@@ -12,16 +12,16 @@ and the personal best carousel.
 ## What Changes
 
 - **BREAKING (display only):** the hero drops place, date and bib and becomes a centred
-  88pt ringed medal beneath the race name set as uppercase display type. The three facts
-  it shed move into a list of their own.
+  88pt ringed medal beneath the race name at display size. The three facts it shed move
+  into a list of their own.
 - Add a facts list under the hero — Location, Date, Distance (with race type beneath the
   distance), Bib — as label-left value-right rows separated by hairlines.
-- Rebuild the stats grid as **The result**: Finish spanning both columns, then average
-  pace, overall, gender and division. Totals move inline beside their placement
-  (`1058 / 7373`) rather than onto a second line.
+- Rebuild the stats grid as **The result**: the finish time leads on its own band above the
+  grid, then a two-column grid of average pace, overall, gender and division. Totals move
+  inline beside their placement (`1058 / 7373`) rather than onto a second line.
 - **Division collapses from two cells into one.** Today's `Division Group` (`M30-34`) and
   `Division` (`523 of 1633`) become a single cell whose label carries the group —
-  `DIVISION M30-34` — and whose value is the placement. A medal with no division keeps
+  `DIVISION (M30-34)` — and whose value is the placement. A medal with no division keeps
   the cell under a plain `DIVISION` label.
 - Mark the finish time with the champagne `PR` tag when the medal holds its distance's
   record. The record is **passed in**, not derived here: a personal record is a property
@@ -54,17 +54,32 @@ and the personal best carousel.
 ## Impact
 
 - **Rewritten** `Features/Medal/MedalDetail/Views/MedalDetailHeroSection.swift` — stops
-  using the shared `DetailHeroSection`, which stays as it is for `RaceDetailHeroSection`.
-- **New** `MedalDetailFactsSection.swift` and `MedalDetailFactRow.swift`.
+  using the shared `DetailHeroSection`, and sets the race name at its natural case rather
+  than the mockup's uppercase, a deliberate divergence pending a design system update.
+- **New** `MedalDetailInfoSection.swift` and `MedalDetailInfoRow.swift` (named `Facts` in
+  the original proposal; renamed to `Info` during implementation).
 - **New** `MedalDetailDaySection.swift`, composing the existing photo strip and note.
 - **Renamed** `MedalDetailStatsSection.swift` → `MedalDetailResultSection.swift`, and
   `MedalDetailStatsGridItem.swift` → `MedalDetailResultItem.swift`, which gains an
-  optional trailing suffix and a record flag.
+  optional trailing suffix. The record flag ended up on `MedalDetailResultSection`
+  instead: Finish renders on its own band rather than sharing the item's cell shape, so
+  `MedalDetailResultItem` never needed `isRecord`.
+- **Deleted** `Shared/Components/Section/DetailHeroSection.swift` — once
+  `MedalDetailHeroSection` stopped calling it, it had no remaining caller;
+  `RaceDetailHeroSection` had already built its own inline layout rather than going
+  through it.
+- **Modified** `Shared/Components/Section/PageSection.swift` — gains optional
+  `alignment` and `spacing` parameters (both default to today's behaviour), so
+  `MedalDetailResultSection` and `MedalDetailInfoSection` can ask for tighter spacing
+  than the default without reaching around the component.
 - **Modified** `MedalDetailTagsSection.swift` — `.chipStyle(.neutral)` in place of
   `.tagStyle(.neutralOnPage)`.
 - **Modified** `MedalDetail/ViewModels/MedalDetailViewModel.swift` — takes
   `isPersonalRecord`, composes the division label, splits pace into value and unit, and
-  returns `—` where it returns `-` today.
+  returns `—` where it returns `-` today. Drops `distanceText`/`heroDistanceText`; the
+  facts list now reads `medal.distance.displayLabel` directly, the same distance
+  formatting every other screen already uses, rather than a hero-only format that
+  appended the measurement to a preset (`Full · 42.2 km`).
 - **Modified** `MedalDetailView.swift` — new composition, new init parameter, no inline
   title.
 - **Modified** `Shared/UIModels/DistanceUnit.swift` — adds `paceValueText(
@@ -77,7 +92,6 @@ and the personal best carousel.
 - `Localizable.xcstrings` — keys for `The result`, `The day`, `Location`, `Date`,
   `Distance`, `Bib`, `Finish`, `Avg pace`, `Overall`, `Gender`, `Division`, with `zh-TW`.
 - Unchanged: the Firestore schema, `Medal`, the photo viewer, the edit sheet, the delete
-  flow, `EditMedalView`, `DetailHeroSection`, `PageSection`, and every record-derivation
-  rule.
+  flow, `EditMedalView`, and every record-derivation rule.
 - Out of scope: v4.3's "Hero surface · navy + Gilt Bright" panel and its Share action —
   a different treatment for a screen that has no Share feature to offer.
