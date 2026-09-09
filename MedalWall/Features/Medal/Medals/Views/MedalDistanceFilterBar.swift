@@ -14,12 +14,23 @@ import SwiftUI
 /// design system's 34pt height and sit in a 44pt row: the row carries the tap target so a
 /// strip of filters stays visually light.
 struct MedalDistanceFilterBar: View {
+  // MARK: - State
+  @Binding var selection: MedalDistanceFilter
+
   // MARK: - Properties
   let filters: [MedalDistanceFilter]
   let count: (MedalDistanceFilter) -> Int
 
-  // MARK: - State
-  @Binding var selection: MedalDistanceFilter
+  // MARK: - Init
+  init(
+    filters: [MedalDistanceFilter],
+    count: @escaping (MedalDistanceFilter) -> Int,
+    selection: Binding<MedalDistanceFilter>
+  ) {
+    self.filters = filters
+    self.count = count
+    self._selection = selection
+  }
 
   // MARK: - Body
   var body: some View {
