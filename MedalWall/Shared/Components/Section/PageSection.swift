@@ -13,6 +13,10 @@ import SwiftUI
 /// Use it inside a `ScrollView`, where SwiftUI's own `Section` — a `List` / `Form`
 /// construct — does not apply.
 ///
+/// `spacing` only spaces the heading from the content; siblings inside `content` are
+/// laid out by whatever `content` itself uses. Wrap `content` in a `VStack` (or similar)
+/// when the section needs to space its own children.
+///
 /// ```swift
 /// ScrollView {
 ///   PageSection(title: "The result") {
@@ -38,14 +42,14 @@ struct PageSection<Content: View>: View {
   ///     is not.
   ///   - alignment: How the heading and the content line up. Applies to both, so
   ///     `.center` centres the heading as well.
-  ///   - spacing: The gap between the heading and the content, and between the content's
-  ///     own children. `nil` leaves SwiftUI's default `VStack` spacing.
+  ///   - spacing: The gap between the heading and the content. Siblings inside the
+  ///     content keep whatever spacing `content` itself provides.
   ///   - content: The content laid out below the heading, written without page margins —
   ///     the section supplies them.
   init(
     title: LocalizedStringKey? = nil,
     alignment: HorizontalAlignment = .leading,
-    spacing: CGFloat? = nil,
+    spacing: CGFloat? = .Space.gutter,
     @ViewBuilder content: () -> Content
   ) {
     self.title = title

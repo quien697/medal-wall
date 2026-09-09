@@ -19,7 +19,7 @@ struct MedalDetailDaySection: View {
 
   // MARK: - Body
   var body: some View {
-    PageSection(title: "The day", spacing: .Space.gutter) {
+    PageSection(title: "The day") {
       if !photos.isEmpty {
         MedalDetailEventPhotoStrip(photos: photos)
       }

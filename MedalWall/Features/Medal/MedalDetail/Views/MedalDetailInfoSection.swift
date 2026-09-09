@@ -21,36 +21,38 @@ struct MedalDetailInfoSection: View {
 
   // MARK: - Body
   var body: some View {
-    PageSection(spacing: 0) {
-      MedalDetailInfoRow(
-        label: .appLocalized("Location"),
-        value: location,
-        secondaryValue: nil
-      )
+    PageSection {
+      VStack(spacing: 0) {
+        MedalDetailInfoRow(
+          label: .appLocalized("Location"),
+          value: location,
+          secondaryValue: nil
+        )
 
-      Divider()
+        Divider()
 
-      MedalDetailInfoRow(
-        label: .appLocalized("Date"),
-        value: date,
-        secondaryValue: nil
-      )
+        MedalDetailInfoRow(
+          label: .appLocalized("Date"),
+          value: date,
+          secondaryValue: nil
+        )
 
-      Divider()
+        Divider()
 
-      MedalDetailInfoRow(
-        label: .appLocalized("Distance"),
-        value: distance,
-        secondaryValue: raceType
-      )
+        MedalDetailInfoRow(
+          label: .appLocalized("Distance"),
+          value: distance,
+          secondaryValue: raceType
+        )
 
-      Divider()
+        Divider()
 
-      MedalDetailInfoRow(
-        label: .appLocalized("Bib"),
-        value: bib,
-        secondaryValue: nil
-      )
+        MedalDetailInfoRow(
+          label: .appLocalized("Bib"),
+          value: bib,
+          secondaryValue: nil
+        )
+      }  // VStack
     }  // PageSection
   }
 }
