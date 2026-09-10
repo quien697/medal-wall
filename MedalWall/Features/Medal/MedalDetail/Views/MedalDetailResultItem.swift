@@ -36,7 +36,7 @@ struct MedalDetailResultItem: View {
 
       HStack(alignment: .firstTextBaseline, spacing: .Space.inline) {
         Text(value)
-          .font(.TypeScale.Numeric.large)
+          .font(.TypeScale.Numeric.medium)
           .foregroundStyle(Color.Text.primary)
           .lineLimit(1)
           .minimumScaleFactor(0.5)
