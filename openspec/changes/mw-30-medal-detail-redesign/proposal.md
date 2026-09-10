@@ -75,11 +75,14 @@ and the personal best carousel.
 - **Modified** `MedalDetailTagsSection.swift` — `.chipStyle(.neutral)` in place of
   `.tagStyle(.neutralOnPage)`.
 - **Modified** `MedalDetail/ViewModels/MedalDetailViewModel.swift` — takes
-  `isPersonalRecord`, composes the division label, splits pace into value and unit, and
-  returns `—` where it returns `-` today. Drops `distanceText`/`heroDistanceText`; the
-  facts list now reads `medal.distance.displayLabel` directly, the same distance
-  formatting every other screen already uses, rather than a hero-only format that
-  appended the measurement to a preset (`Full · 42.2 km`).
+  `personalRecordIDs: Set<String>` (not a frozen `isPersonalRecord: Bool` as first
+  proposed); `isPersonalRecord` is now computed from it, and `reloadMedal()` refreshes
+  the set alongside the medal so the "PR" tag can't go stale after an in-place edit
+  (design.md Decision 1). Also composes the division label, splits pace into value and
+  unit, and returns `—` where it returns `-` today. Drops `distanceText`/
+  `heroDistanceText`; the facts list now reads `medal.distance.displayLabel` directly,
+  the same distance formatting every other screen already uses, rather than a hero-only
+  format that appended the measurement to a preset (`Full · 42.2 km`).
 - **Modified** `MedalDetailView.swift` — new composition, new init parameter, no inline
   title.
 - **Modified** `Shared/UIModels/DistanceUnit.swift` — adds `paceValueText(

@@ -34,23 +34,38 @@ looks like is a decision this change makes rather than reads off.
 
 ## Decisions
 
-**1. The record flag is passed in.**
+**1. The record set is passed in, and kept live rather than frozen.**
 
-`MedalDetailView(medal:isPersonalRecord:)`. A personal record is a property of the
+`MedalDetailView(medal:personalRecordIDs:)`. A personal record is a property of the
 collection — MW-30's design states this as the reason it is never persisted — and this
 screen is handed one medal. Both call sites already know the answer: `MedalYearSection`
-holds `personalRecordIDs`, and `MedalPersonalBestCarousel` only ever presents record
-holders, so it passes `true`.
+and `MedalPersonalBestCarousel` both hold `personalRecordIDs` and pass it straight
+through; `isPersonalRecord` is computed from it (`personalRecordIDs.contains(medal.id)`)
+rather than resolved once at open.
 
-*Accepted cost:* editing the medal's finish time from the detail sheet can leave the flag
-stale until the user backs out and returns. `reloadMedal()` refreshes the medal but not the
-collection, and the screen has no collection to refresh. This is visible only in the window
-between an edit and a dismissal, and the list behind it is correct the moment it reappears.
+The plan going in accepted a frozen `Bool` and its stale-flag cost (below) as "too much
+machinery for a badge." In practice `personalRecordIDs: Set<String>` costs nothing extra
+to carry — the call sites already hold it as a set, not a bool — and `reloadMedal()`
+already had to re-fetch this medal after an edit; re-fetching the collection alongside it
+closes the gap the plan had accepted:
 
-*Alternative — the ViewModel fetches the collection and derives it:* always correct,
-including straight after an edit, at the price of a second Firestore read on every detail
-open and a `UserManager` dependency on a screen that currently needs none. Rejected as too
-much machinery for a badge.
+```swift
+func reloadMedal() async {
+  async let updatedMedal = repository.fetchMedal(id: medal.id, userId: medal.userID)
+  async let allMedals = repository.fetchMedals(userId: medal.userID)
+  guard let updated = try? await updatedMedal else { return }
+
+  medal = updated
+  if let all = try? await allMedals {
+    personalRecordIDs = all.personalRecordIDs
+  }
+}
+```
+
+*Superseded — accept a stale flag between edit and dismissal:* the plan going in expected
+`isPersonalRecord` to be a frozen `Bool` that `reloadMedal()` couldn't refresh, since the
+screen had no collection to refresh it from. Once `reloadMedal()` fetches the collection
+anyway, holding the live set instead of a snapshot bool removes the staleness for free.
 
 *Alternative — no marker on this screen:* the list and the carousel already mark the
 record, but the detail is where a user reads the time itself, which is exactly where the
@@ -170,8 +185,9 @@ unaffected.
 
 ## Risks / Trade-offs
 
-- **A stale record marker after an in-place edit** → Accepted and bounded (Decision 1);
-  the list behind is correct on return.
+- **A stale record marker after an in-place edit** → Superseded (Decision 1): once
+  `reloadMedal()` fetches the collection to refresh `personalRecordIDs`, the marker is
+  live rather than a snapshot, so there is nothing left to accept here.
 - **Five always-present cells make a bare medal look empty** → Intended. The spec makes it
   a requirement rather than an accident: the grid is also a prompt.
 - **`Numeric.large` at 32pt in a two-column grid may crowd a four-digit placement beside a

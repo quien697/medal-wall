@@ -13,7 +13,9 @@
 ## 2. ViewModel
 
 - [x] 2.1 Write failing tests in `MedalDetailViewModelTests` that `isPersonalRecord` is
-      taken from `init` and defaults to `false`
+      computed from `personalRecordIDs` (empty by default) and follows the set live,
+      including after it changes post-`init` (superseded the original frozen-`Bool`
+      plan — design.md Decision 1)
 - [x] 2.2 Write failing tests for the division label: a medal with a division composes
       `Division` plus its group, and a medal without one reads the plain `Division`
       (design.md Decision 3)
@@ -24,9 +26,10 @@
       recorded total with no placement must not render `— / 7373`
 - [x] 2.5 Write failing tests for the filled shape: `1058` with `/ 7373`, `233` with
       `/ 6081`, `523` with `/ 1633`, and pace value with its unit
-- [x] 2.6 Add `isPersonalRecord` to `MedalDetailViewModel.init`, add `divisionLabel`,
-      `averagePaceValue` / `averagePaceUnit`, and change the placement properties to return
-      the em dash and optional suffixes. Keep the project's `// MARK:` order
+- [x] 2.6 Add `personalRecordIDs: Set<String>` to `MedalDetailViewModel.init`, compute
+      `isPersonalRecord` from it, add `divisionLabel`, `averagePaceValue` /
+      `averagePaceUnit`, and change the placement properties to return the em dash and
+      optional suffixes. Keep the project's `// MARK:` order
 
 ## 3. Result Item & Section
 
@@ -86,13 +89,16 @@
 ## 6. Screen Wiring
 
 - [x] 6.1 Recompose `MedalDetailView` — hero, facts, result, day, tags — and add
-      `isPersonalRecord` to its `init`, passing it to the view model
+      `personalRecordIDs: Set<String>` to its `init`, passing it to the view model
 - [x] 6.2 Drop the inline navigation title so the race name is not stated twice, keeping
       the back button's automatic title
-- [x] 6.3 Pass `personalRecordIDs.contains(medal.id)` from `MedalYearSection` and `true`
-      from `MedalPersonalBestCarousel` (design.md Decision 1)
+- [x] 6.3 Pass `personalRecordIDs` straight through from both `MedalYearSection` and
+      `MedalPersonalBestCarousel`, which already hold it as a set rather than resolving
+      a bool at the call site (design.md Decision 1)
 - [x] 6.4 Verify the edit sheet, delete confirmation, error presentation and
-      `reloadMedal()` on dismissal all still work unchanged
+      `reloadMedal()` on dismissal all still work unchanged, and that `reloadMedal()`
+      also refreshes `personalRecordIDs` from the collection so the "PR" tag can't go
+      stale (design.md Decision 1)
 
 ## 7. Localization
 
