@@ -145,10 +145,35 @@ struct MedalDetailViewModelTests {
     #expect(viewModel.finishTimeText == "03:30:24")
   }
 
+  /// CLAUDE.md `## Patterns`: "Guard numeric values against out-of-range inputs." A
+  /// corrupt or malicious `finishTime` of zero must read the same as no time at all,
+  /// not literally as "00:00:00".
+  @Test("finishTimeText says no time was recorded when finishTime is zero")
+  func testFinishTimeTextZero() {
+    let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: 0))
+
+    #expect(viewModel.finishTimeText == "No time recorded")
+  }
+
+  @Test("finishTimeText says no time was recorded when finishTime is negative")
+  func testFinishTimeTextNegative() {
+    let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: -1))
+
+    #expect(viewModel.finishTimeText == "No time recorded")
+  }
+
   // MARK: - averagePace
   @Test("An unrecorded pace reads as unfilled, with no unit beside it")
   func testAveragePaceUnrecorded() {
     let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: nil))
+
+    #expect(viewModel.averagePaceValue == "—")
+    #expect(viewModel.averagePaceUnit == nil)
+  }
+
+  @Test("A zero finishTime reads as unfilled pace rather than a fabricated 0'00\"")
+  func testAveragePaceZeroFinishTime() {
+    let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: 0))
 
     #expect(viewModel.averagePaceValue == "—")
     #expect(viewModel.averagePaceUnit == nil)

@@ -34,7 +34,9 @@ final class MedalDetailViewModel {
 
   /// The finish time, or the same wording the collection list uses for an untimed medal.
   var finishTimeText: String {
-    guard let finishTime = medal.finishTime else { return .appLocalized("No time recorded") }
+    guard let finishTime = medal.recordedFinishTime else {
+      return .appLocalized("No time recorded")
+    }
     return finishTime.formattedHMS
   }
 

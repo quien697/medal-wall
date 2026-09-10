@@ -43,7 +43,7 @@ struct MedalPersonalBestCarousel: View {
             } label: {
               MedalPersonalBestCard(
                 distance: personalBest.category.description,
-                finishTime: personalBest.medal.finishTime?.formattedHMS ?? "-",
+                finishTime: personalBest.medal.recordedFinishTime?.formattedHMS ?? "—",
                 raceName: personalBest.medal.name,
                 pace: DistanceUnit.resolved().paceText(
                   minutesPerKilometer: personalBest.medal.averagePace
@@ -57,7 +57,7 @@ struct MedalPersonalBestCarousel: View {
               )
             }
             .containerRelativeFrame(.horizontal, count: 1, spacing: .Space.gutter)
-          }
+          }  // ForEach
         }  // HStack
         .scrollTargetLayout()
       }  // ScrollView

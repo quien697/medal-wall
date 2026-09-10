@@ -32,13 +32,13 @@ struct MedalYearSection: View {
             date: medal.date.formattedMonthDayYear(),
             name: medal.name,
             distance: medal.distance.displayLabel,
-            finishTime: medal.finishTime?.formattedHMS,
+            finishTime: medal.recordedFinishTime?.formattedHMS,
             isPersonalRecord: personalRecordIDs.contains(medal.id)
           )
           .matchedTransitionSource(id: medal.id, in: namespace)
         }
         .buttonStyle(.plain)
-      }
+      }  // ForEach
     }  // VStack
   }
 }
