@@ -2,64 +2,52 @@
 //  MedalDetailHeroSection.swift
 //  MedalWall
 //
-//  Created by Quien on 2026-04-06.
+//  Created by Quien on 2026-04-07.
 //
 
 import SwiftUI
 
+/// What the screen opens with: the medal, and the race it came from.
+///
+/// Nothing else shares the band. Where, when, how far and under which bib are facts about
+/// the race rather than the thing on the wall, and they are stated below in a list of
+/// their own.
+///
+/// Lays itself out rather than going through `DetailHeroSection`, which sets a photo beside
+/// leading-aligned text — the shape `RaceDetailHeroSection` still wants and this one no
+/// longer does.
 struct MedalDetailHeroSection: View {
+  // MARK: - Properties
   let photoUrl: String?
   let name: String
-  let raceDistance: String
-  let raceDistanceType: String
-  let place: String
-  let date: String
-  let bib: String
 
+  // MARK: - Body
   var body: some View {
-    DetailHeroSection {
+    VStack(spacing: .Space.row) {
       PhotoImage(urlString: photoUrl, as: .medal)
         .medalRing()
-    } infoContent: {
-      HStack(spacing: 6) {
-        Text(raceDistance)
-          .tagStyle(.neutralOnPage)
-
-        Text(raceDistanceType)
-          .tagStyle(.neutralOnPage)
-      }  // HStack
 
       Text(name)
-        .font(.title3)
-        .fontWeight(.bold)
+        .font(.TypeScale.title1)
         .foregroundStyle(Color.Text.primary)
+        .multilineTextAlignment(.center)
         .fixedSize(horizontal: false, vertical: true)
-        .frame(maxWidth: .infinity, alignment: .leading)
-
-      VStack(alignment: .leading, spacing: 8) {
-        Label(place, systemImage: "mappin.and.ellipse")
-        Label(date, systemImage: "calendar")
-        Label("Bib \(bib)", systemImage: "number")
-      }  // VStack
-      .font(.caption)
-      .foregroundStyle(Color.Text.secondary)
-    }  // DetailHeroSection
+    }  // VStack
+    .frame(maxWidth: .infinity)
+    .padding(.horizontal, .Space.gutter)
+    .padding(.vertical, .Space.panel)
   }
 }
 
-#Preview {
-  let medal = Medal.sampleData.first!
+#Preview("Short name") {
+  MedalDetailHeroSection(photoUrl: nil, name: "Taipei Marathon 2019")
+    .background(Color.Background.primary)
+}
 
+#Preview("Name that must wrap") {
   MedalDetailHeroSection(
-    photoUrl: medal.photoUrl,
-    name: medal.name,
-    raceDistance: MedalDetailViewModel.heroDistanceText(
-      for: medal.distance.category,
-      in: DistanceUnit.resolved()
-    ),
-    raceDistanceType: medal.distance.type.displayName,
-    place: medal.place.formatted,
-    date: medal.date.formattedMonthDayYear(),
-    bib: medal.bibNumber
+    photoUrl: nil,
+    name: "BMO Vancouver Marathon Half Marathon 2022"
   )
+  .background(Color.Background.primary)
 }

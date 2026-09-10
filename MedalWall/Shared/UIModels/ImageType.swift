@@ -17,6 +17,7 @@ enum ImageType {
   case raceHero
 
   // Medal
+  case medalThumbnail
   case medal
   case eventThumbnail
   case event
@@ -25,7 +26,7 @@ enum ImageType {
 extension ImageType {
   var shape: AnyShape {
     switch self {
-    case .avatarThumbnail, .avatar, .medal:
+    case .avatarThumbnail, .avatar, .medalThumbnail, .medal:
       return AnyShape(Circle())
     case .raceThumbnail, .raceHero, .eventThumbnail, .event:
       return AnyShape(.rect(cornerRadius: .Radius.image))
@@ -38,6 +39,7 @@ extension ImageType {
     case .avatar: return CGSize(width: 100, height: 100)
     case .raceThumbnail: return CGSize(width: 60, height: 60)
     case .raceHero: return CGSize(width: 100, height: 100)
+    case .medalThumbnail: return CGSize(width: 96, height: 96)
     case .medal: return CGSize(width: 160, height: 160)
     case .eventThumbnail: return CGSize(width: 100, height: 80)
     case .event: return CGSize(width: 140, height: 110)
@@ -49,7 +51,7 @@ extension ImageType {
     switch self {
     case .avatarThumbnail, .avatar: return "person.fill"
     case .raceThumbnail, .raceHero: return "figure.run"
-    case .medal: return "medal.fill"
+    case .medalThumbnail, .medal: return "medal.fill"
     case .eventThumbnail, .event: return "photo"
     }
   }

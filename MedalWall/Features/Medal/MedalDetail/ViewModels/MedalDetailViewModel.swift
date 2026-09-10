@@ -11,99 +11,122 @@ import SwiftUI
 final class MedalDetailViewModel {
   // MARK: - Properties
   var medal: Medal
+  /// The ids of medals that currently hold a record, taken from the whole collection.
+  ///
+  /// Stored as a `var` rather than a `let` so `isPersonalRecord` stays live: an edit
+  /// elsewhere in the collection can demote or promote this medal between reloads, and
+  /// the "PR" tag should follow the latest state without the user popping the screen.
+  var personalRecordIDs: Set<String>
   private let repository = MedalFirestoreRepository()
+  private static let unfilled = "—"
 
   // MARK: - Init
-  init(medal: Medal) {
+  init(medal: Medal, personalRecordIDs: Set<String> = []) {
     self.medal = medal
+    self.personalRecordIDs = personalRecordIDs
   }
 
   // MARK: - Computed
+  /// Whether this medal currently holds a record at its distance.
+  var isPersonalRecord: Bool {
+    personalRecordIDs.contains(medal.id)
+  }
+
+  /// The finish time, or the same wording the collection list uses for an untimed medal.
   var finishTimeText: String {
-    guard let finishTime = medal.finishTime else { return "-" }
+    guard let finishTime = medal.recordedFinishTime else {
+      return .appLocalized("No time recorded")
+    }
     return finishTime.formattedHMS
   }
 
-  var averagePaceText: String {
-    Self.paceText(minutesPerKilometer: medal.averagePace, in: DistanceUnit.resolved())
+  /// The pace without its unit, so the screen can set the two at different sizes.
+  var averagePaceValue: String {
+    DistanceUnit.resolved().paceValueText(minutesPerKilometer: medal.averagePace)
+      ?? Self.unfilled
   }
 
-  var distanceText: String {
-    Self.heroDistanceText(for: medal.distance.category, in: DistanceUnit.resolved())
-  }
+  /// The unit the pace is expressed in, absent when there is no pace to qualify.
+  var averagePaceUnit: String? {
+    let unit = DistanceUnit.resolved()
+    guard unit.paceValueText(minutesPerKilometer: medal.averagePace) != nil else { return nil }
 
-  /// A pace in minutes per kilometre, rendered per the given unit — `5'41" /km` or
-  /// `9'08" /mi`. Seconds are truncated, which is the app's long-standing behaviour.
-  nonisolated static func paceText(
-    minutesPerKilometer pace: Double?,
-    in unit: DistanceUnit,
-    defaults: UserDefaults = .standard
-  ) -> String {
-    guard let pace else { return "--'-- \"" }
-    let converted = unit.pace(fromMinutesPerKilometer: pace)
-    let minutes = Int(converted)
-    let seconds = Int((converted - Double(minutes)) * 60)
-
-    return String(
-      format: "%d'%02d\" /%@", minutes, seconds, unit.abbreviation(defaults: defaults))
-  }
-
-  /// The hero's distance line. A preset pairs its name with the measurement
-  /// (`Full · 26.2 mi`); a custom distance already *is* the measurement, so it is shown
-  /// once rather than repeated.
-  nonisolated static func heroDistanceText(
-    for category: RaceDistanceCategory,
-    in unit: DistanceUnit,
-    defaults: UserDefaults = .standard
-  ) -> String {
-    let label = category.label(in: unit, defaults: defaults)
-    if case .custom = category { return label }
-
-    return "\(label) · \(unit.formatted(kilometers: category.value, defaults: defaults))"
+    return "/\(unit.abbreviation())"
   }
 
   var overallPlacementText: String {
-    guard let placement = medal.overallPlacement else { return "-" }
-    return "\(placement)"
+    Self.placementText(medal.overallPlacement)
   }
 
-  var totalParticipantsText: String {
-    guard let total = medal.totalParticipants else { return "" }
-    return .appLocalized("of \(String(total))")
+  var overallTotalText: String? {
+    Self.totalText(medal.totalParticipants, placement: medal.overallPlacement)
   }
 
-  var divisionText: String {
-    guard let division = medal.divisionEnum else { return "-" }
-    return division.displayName
+  /// The division field's label, naming the group the placement was run within so the two
+  /// read as one fact rather than two measurements.
+  var divisionLabel: String {
+    guard let division = medal.divisionEnum else { return .appLocalized("Division") }
+    return .appLocalized("Division (\(division.displayName))")
   }
 
   var divisionPlacementText: String {
-    guard let placement = medal.divisionPlacement else { return "-" }
-    return "\(placement)"
+    Self.placementText(medal.divisionPlacement)
   }
 
-  var divisionTotalText: String {
-    guard let total = medal.divisionTotal else { return "" }
-    return .appLocalized("of \(String(total))")
+  var divisionTotalText: String? {
+    Self.totalText(medal.divisionTotal, placement: medal.divisionPlacement)
   }
 
   var genderPlacementText: String {
-    guard let placement = medal.genderPlacement else { return "-" }
-    return "\(placement)"
+    Self.placementText(medal.genderPlacement)
   }
 
-  var genderTotalText: String {
-    guard let total = medal.genderTotal else { return "" }
-    return .appLocalized("of \(String(total))")
+  var genderTotalText: String? {
+    Self.totalText(medal.genderTotal, placement: medal.genderPlacement)
+  }
+
+  /// What the user wrote about the day, or nothing when they wrote only whitespace.
+  var noteText: String? {
+    guard let note = medal.note?.trimmingCharacters(in: .whitespacesAndNewlines),
+      !note.isEmpty
+    else { return nil }
+
+    return note
+  }
+
+  /// Whether the user kept anything of the day — photos, a note, or both.
+  var hasDay: Bool {
+    !medal.eventPhotos.isEmpty || noteText != nil
   }
 
   // MARK: - Functions
-  /// Reloads the medal from Firestore and updates the local state.
+  /// A placement, or the unfilled marker when it was never recorded.
+  private static func placementText(_ placement: Int?) -> String {
+    guard let placement else { return unfilled }
+    return "\(placement)"
+  }
+
+  /// The field a placement ran against, absent unless there is a placement to qualify.
+  ///
+  /// A total on its own would read as `— / 7373`, stating the size of a field the medal
+  /// never records a position in.
+  private static func totalText(_ total: Int?, placement: Int?) -> String? {
+    guard let total, placement != nil else { return nil }
+    return "/ \(total)"
+  }
+
+  /// Reloads the medal from Firestore and updates the local state, including the live
+  /// record set so an edit elsewhere in the collection that demotes or promotes this
+  /// medal is reflected on the "PR" tag without the user leaving the screen.
   func reloadMedal() async {
-    guard let updated = try? await repository.fetchMedal(id: medal.id, userId: medal.userID) else {
-      return
-    }
+    async let updatedMedal = repository.fetchMedal(id: medal.id, userId: medal.userID)
+    async let allMedals = repository.fetchMedals(userId: medal.userID)
+    guard let updated = try? await updatedMedal else { return }
+
     medal = updated
+    if let all = try? await allMedals {
+      personalRecordIDs = all.personalRecordIDs
+    }
   }
 
   /// Deletes the medal from Firestore.

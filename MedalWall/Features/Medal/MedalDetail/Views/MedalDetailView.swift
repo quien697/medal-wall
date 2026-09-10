@@ -18,8 +18,10 @@ struct MedalDetailView: View {
   @State private var isPresentingDeleteMedalConfirm = false
 
   // MARK: - Init
-  init(medal: Medal) {
-    self._viewModel = State(initialValue: MedalDetailViewModel(medal: medal))
+  init(medal: Medal, personalRecordIDs: Set<String> = []) {
+    self._viewModel = State(
+      initialValue: MedalDetailViewModel(medal: medal, personalRecordIDs: personalRecordIDs)
+    )
   }
 
   // MARK: - Body
@@ -27,40 +29,42 @@ struct MedalDetailView: View {
     ScrollView {
       MedalDetailHeroSection(
         photoUrl: viewModel.medal.photoUrl,
-        name: viewModel.medal.name,
-        raceDistance: viewModel.distanceText,
-        raceDistanceType: viewModel.medal.distance.type.displayName,
-        place: viewModel.medal.place.formatted,
+        name: viewModel.medal.name
+      )
+
+      MedalDetailInfoSection(
+        location: viewModel.medal.place.formatted,
         date: viewModel.medal.date.formattedMonthDayYear(),
+        distance: viewModel.medal.distance.category.description,
+        raceType: viewModel.medal.distance.type.displayName,
         bib: viewModel.medal.bibNumber
       )
 
-      MedalDetailStatsSection(
+      MedalDetailResultSection(
         finishTime: viewModel.finishTimeText,
-        averagePace: viewModel.averagePaceText,
+        isPersonalRecord: viewModel.isPersonalRecord,
+        averagePaceValue: viewModel.averagePaceValue,
+        averagePaceUnit: viewModel.averagePaceUnit,
         overallPlacement: viewModel.overallPlacementText,
-        totalParticipants: viewModel.totalParticipantsText,
-        division: viewModel.divisionText,
-        divisionPlacement: viewModel.divisionPlacementText,
-        divisionTotal: viewModel.divisionTotalText,
+        overallTotal: viewModel.overallTotalText,
         genderPlacement: viewModel.genderPlacementText,
-        genderTotal: viewModel.genderTotalText
+        genderTotal: viewModel.genderTotalText,
+        divisionLabel: viewModel.divisionLabel,
+        divisionPlacement: viewModel.divisionPlacementText,
+        divisionTotal: viewModel.divisionTotalText
       )
 
-      if let note = viewModel.medal.note, !note.isEmpty {
-        MedalDetailNoteSection(note: note)
-      }
-
-      if !viewModel.medal.eventPhotos.isEmpty {
-        MedalDetailEventPhotosSection(photos: viewModel.medal.eventPhotos)
+      if viewModel.hasDay {
+        MedalDetailDaySection(
+          photos: viewModel.medal.eventPhotos,
+          note: viewModel.noteText
+        )
       }
 
       if !viewModel.medal.tags.isEmpty {
         MedalDetailTagsSection(tags: viewModel.medal.tags)
       }
     }
-    .navigationTitle(viewModel.medal.name)
-    .navigationBarTitleDisplayMode(.inline)
     .background(Color.Background.primary)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
@@ -115,8 +119,50 @@ struct MedalDetailView: View {
   }
 }
 
-#Preview {
-  NavigationStack {
-    MedalDetailView(medal: Medal.sampleData.first!)
+/// Builds a medal for the previews below — `#Preview` bodies are `ViewBuilder` closures,
+/// which take declarations and view expressions but not assignments.
+private func previewMedal(stripped: Bool = false) -> Medal {
+  guard var medal = Medal.sampleData.first else {
+    return Medal(
+      name: "Sample",
+      date: .now,
+      bibNumber: "1",
+      place: Place(countryCode: "TW", city: "Taipei"),
+      distance: RaceDistance(category: .full, type: .inPerson),
+      userID: "preview"
+    )
   }
+
+  if stripped {
+    medal.finishTime = nil
+    medal.overallPlacement = nil
+    medal.totalParticipants = nil
+    medal.division = nil
+    medal.divisionPlacement = nil
+    medal.divisionTotal = nil
+    medal.genderPlacement = nil
+    medal.genderTotal = nil
+    medal.note = nil
+    medal.eventPhotos = []
+  }
+
+  return medal
+}
+
+#Preview("Record holder") {
+  NavigationStack {
+    MedalDetailView(medal: previewMedal(), personalRecordIDs: [previewMedal().id])
+  }  // NavigationStack
+}
+
+#Preview("Not a record") {
+  NavigationStack {
+    MedalDetailView(medal: previewMedal())
+  }  // NavigationStack
+}
+
+#Preview("Nothing recorded") {
+  NavigationStack {
+    MedalDetailView(medal: previewMedal(stripped: true))
+  }  // NavigationStack
 }

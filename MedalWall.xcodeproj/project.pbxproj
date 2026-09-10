@@ -62,7 +62,11 @@
 			membershipExceptions = (
 				Features/Medal/EditMedal/ViewModels/EditMedalViewModel.swift,
 				Features/Medal/MedalDetail/ViewModels/MedalDetailViewModel.swift,
+				Features/Medal/Medals/ViewModels/MedalsViewModel.swift,
 				Features/Medal/Models/DraftEventPhoto.swift,
+				Features/Medal/Models/MedalDistanceFilter.swift,
+				Features/Medal/Models/MedalPersonalBest.swift,
+				Features/Medal/Models/MedalYearGroup.swift,
 				Features/Profile/EditProfile/ViewModels/EditProfileViewModel.swift,
 				Features/Race/EditRace/ViewModels/EditRaceViewModel.swift,
 				Features/Race/EditRaceEdition/ViewModels/EditRaceEditionViewModel.swift,

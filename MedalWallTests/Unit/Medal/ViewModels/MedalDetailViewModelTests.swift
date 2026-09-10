@@ -26,6 +26,7 @@ struct MedalDetailViewModelTests {
   }
 
   private func makeMedal(
+    id: String = UUID().uuidString,
     distance: RaceDistance = RaceDistance(category: .full, type: .inPerson),
     finishTime: TimeInterval? = nil,
     overallPlacement: Int? = nil,
@@ -34,9 +35,12 @@ struct MedalDetailViewModelTests {
     divisionPlacement: Int? = nil,
     divisionTotal: Int? = nil,
     genderPlacement: Int? = nil,
-    genderTotal: Int? = nil
+    genderTotal: Int? = nil,
+    note: String? = nil,
+    eventPhotos: [EventPhoto] = []
   ) -> Medal {
     Medal(
+      id: id,
       name: "Test",
       date: .now,
       bibNumber: "1",
@@ -50,17 +54,87 @@ struct MedalDetailViewModelTests {
       divisionTotal: divisionTotal,
       genderPlacement: genderPlacement,
       genderTotal: genderTotal,
+      note: note,
+      eventPhotos: eventPhotos,
       userID: "u1"
     )
   }
 
+  // MARK: - The day
+  @Test("A blank note is no note at all")
+  func testNoteTextBlank() {
+    #expect(MedalDetailViewModel(medal: makeMedal(note: nil)).noteText == nil)
+    #expect(MedalDetailViewModel(medal: makeMedal(note: "")).noteText == nil)
+    #expect(MedalDetailViewModel(medal: makeMedal(note: "   ")).noteText == nil)
+  }
+
+  @Test("A written note is kept")
+  func testNoteTextWritten() {
+    let viewModel = MedalDetailViewModel(medal: makeMedal(note: "Strong negative split."))
+
+    #expect(viewModel.noteText == "Strong negative split.")
+  }
+
+  @Test("The day is present when there is a note, photos, or both")
+  func testHasDay() {
+    let photo = EventPhoto(imageUrl: "https://example.com/1.jpg", sortOrder: 0)
+
+    #expect(MedalDetailViewModel(medal: makeMedal(note: "Rained.")).hasDay)
+    #expect(MedalDetailViewModel(medal: makeMedal(eventPhotos: [photo])).hasDay)
+    #expect(MedalDetailViewModel(medal: makeMedal(note: "Rained.", eventPhotos: [photo])).hasDay)
+  }
+
+  @Test("The day is absent when the user kept nothing of it")
+  func testHasDayAbsent() {
+    #expect(!MedalDetailViewModel(medal: makeMedal(note: nil, eventPhotos: [])).hasDay)
+    #expect(!MedalDetailViewModel(medal: makeMedal(note: "  ", eventPhotos: [])).hasDay)
+  }
+
+  // MARK: - isPersonalRecord
+  @Test("A medal is not a record holder unless it is opened as one")
+  func testIsPersonalRecordDefaultsToFalse() {
+    let viewModel = MedalDetailViewModel(medal: makeMedal())
+
+    #expect(!viewModel.isPersonalRecord)
+  }
+
+  /// The screen is handed one medal; whether it holds a record belongs to the collection,
+  /// so whatever opened the screen supplies the live record set rather than a frozen bool.
+  @Test("A record holder is opened as one")
+  func testIsPersonalRecordSupplied() {
+    let medal = makeMedal(id: "X", finishTime: 12624)
+    let viewModel = MedalDetailViewModel(medal: medal, personalRecordIDs: ["X"])
+
+    #expect(viewModel.isPersonalRecord)
+  }
+
+  /// The screen calls `reloadMedal()` after an edit, and a faster/slower time elsewhere in
+  /// the collection can demote or promote this medal between reloads. `isPersonalRecord`
+  /// has to follow the live set — otherwise a stale "PR" tag persists until the user pops
+  /// the screen and re-enters.
+  @Test("isPersonalRecord follows personalRecordIDs after the set changes")
+  func testIsPersonalRecordFollowsPersonalRecordIDs() {
+    let medal = makeMedal(id: "X")
+    let viewModel = MedalDetailViewModel(medal: medal, personalRecordIDs: ["X"])
+
+    #expect(viewModel.isPersonalRecord)
+
+    viewModel.personalRecordIDs = ["Y"]
+
+    #expect(!viewModel.isPersonalRecord)
+
+    viewModel.personalRecordIDs = ["Y", "X"]
+
+    #expect(viewModel.isPersonalRecord)
+  }
+
   // MARK: - finishTimeText
-  @Test("finishTimeText is dash when finishTime is nil")
+  @Test("finishTimeText says no time was recorded when finishTime is nil")
   func testFinishTimeTextNil() {
     let medal = makeMedal()
     let viewModel = MedalDetailViewModel(medal: medal)
 
-    #expect(viewModel.finishTimeText == "-")
+    #expect(viewModel.finishTimeText == "No time recorded")
   }
 
   @Test("finishTimeText formats seconds as HH:MM:SS")
@@ -71,24 +145,49 @@ struct MedalDetailViewModelTests {
     #expect(viewModel.finishTimeText == "03:30:24")
   }
 
-  // MARK: - averagePaceText
-  @Test("averagePaceText is placeholder when finishTime is nil")
-  func testAveragePaceTextNil() {
-    let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: nil))
+  /// CLAUDE.md `## Patterns`: "Guard numeric values against out-of-range inputs." A
+  /// corrupt or malicious `finishTime` of zero must read the same as no time at all,
+  /// not literally as "00:00:00".
+  @Test("finishTimeText says no time was recorded when finishTime is zero")
+  func testFinishTimeTextZero() {
+    let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: 0))
 
-    #expect(viewModel.averagePaceText == "--'-- \"")
+    #expect(viewModel.finishTimeText == "No time recorded")
   }
 
-  @Test("averagePaceText formats pace as M'SS\" for a full marathon")
-  func testAveragePaceTextFormatted() {
-    // 12624s over 42.195km → pace ≈ 4.9864 min/km → "4'59\" /km"
-    let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: 12624))
-    let expected = MedalDetailViewModel.paceText(
-      minutesPerKilometer: 12624 / 60 / 42.195,
-      in: DistanceUnit.resolved()
-    )
+  @Test("finishTimeText says no time was recorded when finishTime is negative")
+  func testFinishTimeTextNegative() {
+    let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: -1))
 
-    #expect(viewModel.averagePaceText == expected)
+    #expect(viewModel.finishTimeText == "No time recorded")
+  }
+
+  // MARK: - averagePace
+  @Test("An unrecorded pace reads as unfilled, with no unit beside it")
+  func testAveragePaceUnrecorded() {
+    let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: nil))
+
+    #expect(viewModel.averagePaceValue == "—")
+    #expect(viewModel.averagePaceUnit == nil)
+  }
+
+  @Test("A zero finishTime reads as unfilled pace rather than a fabricated 0'00\"")
+  func testAveragePaceZeroFinishTime() {
+    let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: 0))
+
+    #expect(viewModel.averagePaceValue == "—")
+    #expect(viewModel.averagePaceUnit == nil)
+  }
+
+  @Test("A recorded pace splits into its value and its unit")
+  func testAveragePaceSplit() {
+    // 12624s over 42.195km → pace ≈ 4.9864 min/km → "4'59\"" and "/km"
+    let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: 12624))
+    let unit = DistanceUnit.resolved()
+    let expected = unit.paceValueText(minutesPerKilometer: 12624 / 60 / 42.195)
+
+    #expect(viewModel.averagePaceValue == expected)
+    #expect(viewModel.averagePaceUnit == "/\(unit.abbreviation())")
   }
 
   @Test("Pace is expressed per kilometre in kilometres mode")
@@ -96,9 +195,8 @@ struct MedalDetailViewModelTests {
     let pace = 5 + 41.0 / 60
 
     #expect(
-      MedalDetailViewModel.paceText(
+      DistanceUnit.kilometers.paceText(
         minutesPerKilometer: pace,
-        in: .kilometers,
         defaults: Self.makeDefaults()
       ) == "5'41\" /km"
     )
@@ -109,9 +207,8 @@ struct MedalDetailViewModelTests {
     let pace = 5 + 41.0 / 60
 
     #expect(
-      MedalDetailViewModel.paceText(
+      DistanceUnit.miles.paceText(
         minutesPerKilometer: pace,
-        in: .miles,
         defaults: Self.makeDefaults()
       ) == "9'08\" /mi"
     )
@@ -120,57 +217,19 @@ struct MedalDetailViewModelTests {
   @Test("Pace is the placeholder when there is no pace to show")
   func testPaceTextNil() {
     #expect(
-      MedalDetailViewModel.paceText(
+      DistanceUnit.miles.paceText(
         minutesPerKilometer: nil,
-        in: .miles,
         defaults: Self.makeDefaults()
       ) == "--'-- \""
     )
   }
 
-  // MARK: - distanceText
-  @Test("Hero shows a preset's name and measurement in kilometres")
-  func testDistanceTextPresetKilometers() {
-    #expect(Self.heroText(.full, in: .kilometers) == "Full · 42.2 km")
-    #expect(Self.heroText(.half, in: .kilometers) == "Half · 21.1 km")
-  }
-
-  @Test("Hero shows a preset's name and measurement in miles")
-  func testDistanceTextPresetMiles() {
-    #expect(Self.heroText(.full, in: .miles) == "Full · 26.2 mi")
-    #expect(Self.heroText(.tenKM, in: .miles) == "10K · 6.2 mi")
-  }
-
-  @Test("Hero keeps the redundant measurement for a 10K in kilometres")
-  func testDistanceTextRedundant() {
-    #expect(Self.heroText(.tenKM, in: .kilometers) == "10K · 10 km")
-    #expect(Self.heroText(.fiveKM, in: .kilometers) == "5K · 5 km")
-  }
-
-  @Test("Hero shows a custom distance once, not twice")
-  func testDistanceTextCustomNotRepeated() {
-    #expect(Self.heroText(.custom(16.09344), in: .miles) == "10 mi")
-    #expect(Self.heroText(.custom(16.09344), in: .kilometers) == "16.1 km")
-  }
-
-  private static func heroText(
-    _ category: RaceDistanceCategory,
-    in unit: DistanceUnit,
-    function: String = #function
-  ) -> String {
-    MedalDetailViewModel.heroDistanceText(
-      for: category,
-      in: unit,
-      defaults: makeDefaults(function: function)
-    )
-  }
-
   // MARK: - overallPlacementText
-  @Test("overallPlacementText is dash when overallPlacement is nil")
+  @Test("overallPlacementText reads as unfilled when overallPlacement is nil")
   func testOverallPlacementTextNil() {
     let viewModel = MedalDetailViewModel(medal: makeMedal(overallPlacement: nil))
 
-    #expect(viewModel.overallPlacementText == "-")
+    #expect(viewModel.overallPlacementText == "—")
   }
 
   @Test("overallPlacementText returns the placement as a string")
@@ -180,43 +239,58 @@ struct MedalDetailViewModelTests {
     #expect(viewModel.overallPlacementText == "1058")
   }
 
-  // MARK: - totalParticipantsText
-  @Test("totalParticipantsText is empty string when totalParticipants is nil")
-  func testTotalParticipantsTextNil() {
+  // MARK: - overallTotalText
+  @Test("overallTotalText is absent when totalParticipants is nil")
+  func testOverallTotalTextNil() {
     let viewModel = MedalDetailViewModel(medal: makeMedal(totalParticipants: nil))
 
-    #expect(viewModel.totalParticipantsText.isEmpty)
+    #expect(viewModel.overallTotalText == nil)
   }
 
-  @Test("totalParticipantsText returns 'of N' when totalParticipants is set")
-  func testTotalParticipantsTextValue() {
-    let viewModel = MedalDetailViewModel(medal: makeMedal(totalParticipants: 7373))
+  @Test("overallTotalText states the field the placement ran against")
+  func testOverallTotalTextValue() {
+    let viewModel = MedalDetailViewModel(
+      medal: makeMedal(overallPlacement: 1058, totalParticipants: 7373)
+    )
 
-    #expect(viewModel.totalParticipantsText == "of 7373")
+    #expect(viewModel.overallTotalText == "/ 7373")
   }
 
-  // MARK: - divisionText
-  @Test("divisionText is dash when division is nil")
-  func testDivisionTextNil() {
-    let viewModel = MedalDetailViewModel(medal: makeMedal(division: nil))
+  /// A total with no placement would otherwise render as "— / 7373".
+  @Test("overallTotalText is absent when there is no placement to qualify")
+  func testOverallTotalTextWithoutPlacement() {
+    let viewModel = MedalDetailViewModel(
+      medal: makeMedal(overallPlacement: nil, totalParticipants: 7373)
+    )
 
-    #expect(viewModel.divisionText == "-")
+    #expect(viewModel.overallPlacementText == "—")
+    #expect(viewModel.overallTotalText == nil)
   }
 
-  @Test("divisionText returns the division display name when set")
-  func testDivisionTextValue() {
+  // MARK: - divisionLabel
+  @Test("divisionLabel names the group the placement ran within")
+  func testDivisionLabelWithGroup() {
     let division = Division(gender: .male, ageGroup: .from30to34)
     let viewModel = MedalDetailViewModel(medal: makeMedal(division: division))
 
-    #expect(viewModel.divisionText == division.displayName)
+    #expect(viewModel.divisionLabel.contains(division.displayName))
+    #expect(viewModel.divisionLabel != division.displayName)
+  }
+
+  /// The field is still something the user can fill in, so it keeps its plain label.
+  @Test("divisionLabel is the plain label when there is no group")
+  func testDivisionLabelWithoutGroup() {
+    let viewModel = MedalDetailViewModel(medal: makeMedal(division: nil))
+
+    #expect(viewModel.divisionLabel == "Division")
   }
 
   // MARK: - divisionPlacementText
-  @Test("divisionPlacementText is dash when divisionPlacement is nil")
+  @Test("divisionPlacementText reads as unfilled when divisionPlacement is nil")
   func testDivisionPlacementTextNil() {
     let viewModel = MedalDetailViewModel(medal: makeMedal(divisionPlacement: nil))
 
-    #expect(viewModel.divisionPlacementText == "-")
+    #expect(viewModel.divisionPlacementText == "—")
   }
 
   @Test("divisionPlacementText returns the placement as a string")
@@ -227,26 +301,28 @@ struct MedalDetailViewModelTests {
   }
 
   // MARK: - divisionTotalText
-  @Test("divisionTotalText is empty string when divisionTotal is nil")
+  @Test("divisionTotalText is absent when divisionTotal is nil")
   func testDivisionTotalTextNil() {
     let viewModel = MedalDetailViewModel(medal: makeMedal(divisionTotal: nil))
 
-    #expect(viewModel.divisionTotalText.isEmpty)
+    #expect(viewModel.divisionTotalText == nil)
   }
 
-  @Test("divisionTotalText returns 'of N' when divisionTotal is set")
+  @Test("divisionTotalText states the field the placement ran against")
   func testDivisionTotalTextValue() {
-    let viewModel = MedalDetailViewModel(medal: makeMedal(divisionTotal: 1633))
+    let viewModel = MedalDetailViewModel(
+      medal: makeMedal(divisionPlacement: 523, divisionTotal: 1633)
+    )
 
-    #expect(viewModel.divisionTotalText == "of 1633")
+    #expect(viewModel.divisionTotalText == "/ 1633")
   }
 
   // MARK: - genderPlacementText
-  @Test("genderPlacementText is dash when genderPlacement is nil")
+  @Test("genderPlacementText reads as unfilled when genderPlacement is nil")
   func testGenderPlacementTextNil() {
     let viewModel = MedalDetailViewModel(medal: makeMedal(genderPlacement: nil))
 
-    #expect(viewModel.genderPlacementText == "-")
+    #expect(viewModel.genderPlacementText == "—")
   }
 
   @Test("genderPlacementText returns the placement as a string")
@@ -257,17 +333,19 @@ struct MedalDetailViewModelTests {
   }
 
   // MARK: - genderTotalText
-  @Test("genderTotalText is empty string when genderTotal is nil")
+  @Test("genderTotalText is absent when genderTotal is nil")
   func testGenderTotalTextNil() {
     let viewModel = MedalDetailViewModel(medal: makeMedal(genderTotal: nil))
 
-    #expect(viewModel.genderTotalText.isEmpty)
+    #expect(viewModel.genderTotalText == nil)
   }
 
-  @Test("genderTotalText returns 'of N' when genderTotal is set")
+  @Test("genderTotalText states the field the placement ran against")
   func testGenderTotalTextValue() {
-    let viewModel = MedalDetailViewModel(medal: makeMedal(genderTotal: 6081))
+    let viewModel = MedalDetailViewModel(
+      medal: makeMedal(genderPlacement: 233, genderTotal: 6081)
+    )
 
-    #expect(viewModel.genderTotalText == "of 6081")
+    #expect(viewModel.genderTotalText == "/ 6081")
   }
 }

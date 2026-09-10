@@ -150,6 +150,40 @@ struct RaceDistanceCategoryTests {
     #expect(RaceDistanceCategory(value: 42.0) == .custom(42.0))
   }
 
+  /// `init(value:)` reconstructs the *exact* stored category — it is what `RaceDistance`
+  /// decode uses, and collapsing here would silently rewrite a genuinely custom course
+  /// into a preset every time it round-trips through Firestore. Grouping distances for
+  /// display is `nearestPreset(forValue:)`'s job, not this initializer's.
+  @Test("init(value:) does not collapse a miles-based marathon onto full")
+  func testInitValueMilesMarathonStaysCustom() {
+    #expect(RaceDistanceCategory(value: 42.16481) == .custom(42.16481))
+  }
+
+  // MARK: - nearestPreset(forValue:)
+  @Test("nearestPreset(forValue:) reconstructs full from 42.195")
+  func testNearestPresetFull() {
+    #expect(RaceDistanceCategory.nearestPreset(forValue: 42.195) == .full)
+  }
+
+  @Test("nearestPreset(forValue:) falls back to custom for unknown value")
+  func testNearestPresetCustomFallback() {
+    #expect(RaceDistanceCategory.nearestPreset(forValue: 99) == .custom(99))
+  }
+
+  @Test("nearestPreset(forValue:) falls back to custom for value close to but not matching full")
+  func testNearestPresetNearFullFallback() {
+    #expect(RaceDistanceCategory.nearestPreset(forValue: 42.0) == .custom(42.0))
+  }
+
+  /// A marathon persisted as 26.2 miles arrives as 42.16481 km. Without tolerance it
+  /// would live as a separate chip alongside `.full`, splitting one distance into two.
+  /// The tolerance tight enough to reject 42.0 (off by 0.195 km) still accepts
+  /// 42.16481 (off by 0.030 km).
+  @Test("nearestPreset(forValue:) collapses a miles-based marathon onto full within tolerance")
+  func testNearestPresetMilesMarathonCollapsesToFull() {
+    #expect(RaceDistanceCategory.nearestPreset(forValue: 42.16481) == .full)
+  }
+
   // MARK: - standardCases
   @Test("standardCases contains exactly full, half, tenKM, fiveKM in order")
   func testStandardCases() {

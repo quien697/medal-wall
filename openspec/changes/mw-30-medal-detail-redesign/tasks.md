@@ -1,0 +1,123 @@
+## 1. Pace Formatting
+
+- [x] 1.1 Write failing tests in `DistanceUnitTests` for `paceValueText(
+      minutesPerKilometer:)`: it returns the value alone with no unit, truncates seconds the
+      way `paceText` does, converts per-mile when the unit is miles, and returns `nil` for
+      a `nil` pace — the unfilled wording belongs to the caller, not to a unit
+- [x] 1.2 Write a failing test that `paceText` still returns value and abbreviation joined,
+      so composing it from the new function changes nothing for its existing caller
+- [x] 1.3 Add `paceValueText(minutesPerKilometer:)` to `DistanceUnit` and recompose
+      `paceText` from it plus `abbreviation()`, so the pace format is written once
+      (design.md Decision 5)
+
+## 2. ViewModel
+
+- [x] 2.1 Write failing tests in `MedalDetailViewModelTests` that `isPersonalRecord` is
+      computed from `personalRecordIDs` (empty by default) and follows the set live,
+      including after it changes post-`init` (superseded the original frozen-`Bool`
+      plan — design.md Decision 1)
+- [x] 2.2 Write failing tests for the division label: a medal with a division composes
+      `Division` plus its group, and a medal without one reads the plain `Division`
+      (design.md Decision 3)
+- [x] 2.3 Write failing tests for unfilled fields: pace, overall, gender and division each
+      read the em dash when unrecorded, and `finishTimeText` reads `No time recorded`
+      rather than a placeholder character (spec: The Result Is Always Fully Stated)
+- [x] 2.4 Write failing tests that a suffix is `nil` whenever its value is unfilled — a
+      recorded total with no placement must not render `— / 7373`
+- [x] 2.5 Write failing tests for the filled shape: `1058` with `/ 7373`, `233` with
+      `/ 6081`, `523` with `/ 1633`, and pace value with its unit
+- [x] 2.6 Add `personalRecordIDs: Set<String>` to `MedalDetailViewModel.init`, compute
+      `isPersonalRecord` from it, add `divisionLabel`, `averagePaceValue` /
+      `averagePaceUnit`, and change the placement properties to return the em dash and
+      optional suffixes. Keep the project's `// MARK:` order
+
+## 3. Result Item & Section
+
+- [x] 3.1 Build `MedalDetailResultItem` (`Features/Medal/MedalDetail/Views/`) replacing
+      `MedalDetailStatsGridItem` — `label`, `value`, optional `suffix`. No `isRecord`: the
+      record flag ended up on `MedalDetailResultSection` instead (design.md Decision 2).
+      Value in `Font.TypeScale.Numeric.large`, suffix in `microLabel` at `Text.secondary`,
+      label in `microLabel` with call-site `.tracking()` / `.textCase(.uppercase)`
+      (design.md Decision 8)
+- [x] 3.2 Show the `PR` marker beside the finish time directly in
+      `MedalDetailResultSection`, via `.tagStyle(.record)` when `isPersonalRecord` — not on
+      `MedalDetailResultItem`, since Finish no longer shares that cell's shape. Do not
+      carry over `headLineColor`: a finish time is ink, never gold (design.md Decision 2)
+- [x] 3.3 Build `MedalDetailResultSection` replacing `MedalDetailStatsSection` — a
+      `PageSection` titled `The result` with the finish time on its own `surfaceStyle()`
+      band above a two-column grid of avg pace, overall, gender, division
+      (design.md Decision 2)
+- [x] 3.4 Delete `MedalDetailStatsGridItem.swift` and `MedalDetailStatsSection.swift`, and
+      confirm by grep that nothing outside the medal detail feature referenced them
+- [x] 3.5 Add `#Preview`s for the item and the section covering a fully recorded medal, a
+      finish-time-only medal, and an untimed medal
+
+## 4. Hero & Facts
+
+- [x] 4.1 Rewrite `MedalDetailHeroSection` to lay itself out — centred
+      `PhotoImage(as: .medal)` with `.medalRing()`, above the race name in `title1`,
+      wrapping rather than truncating (spec: A long race name stays legible). Race name
+      case: set at its natural case, a deliberate divergence from v4.3's uppercase mockup
+      pending a design system update (design.md Decision 8). `DetailHeroSection` turned out
+      to have no other caller once this screen stopped using it — `RaceDetailHeroSection`
+      already laid itself out independently — so it was deleted (design.md Decision 6)
+- [x] 4.2 Build `MedalDetailInfoRow` (named `MedalDetailFactRow` in the original plan;
+      renamed to `Info` during implementation) — label left in `microLabel` uppercase with
+      tracking, value right in `caption`, with an optional secondary line beneath the value
+      for the race type
+- [x] 4.3 Build `MedalDetailInfoSection` (renamed from `MedalDetailFactsSection`) composing
+      Location, Date, Distance (with race type) and Bib, laid out in a
+      `PageSection(spacing: 0)` with a `Divider()` above every row but the first. Distance
+      reads `medal.distance.displayLabel` directly — the same formatting every other screen
+      uses — rather than the hero-only format that appended the measurement to a preset
+      (design.md Decision 8 rationale note in the proposal's Impact section)
+- [x] 4.4 Add `#Preview`s for the hero (short name, long wrapping name) and the info
+      section
+
+## 5. The Day & Tags
+
+- [x] 5.1 Build `MedalDetailDaySection` composing the existing event photo strip and note
+      under one `PageSection` titled `The day` (design.md Decision 7)
+- [x] 5.2 Keep the photo strip's tap-to-open `PhotoViewer` behaviour and the note's
+      surface treatment exactly as they are today
+- [x] 5.3 Render the band when the medal has photos, a note, or both, and omit it entirely
+      when it has neither (spec: One without the other still reads as the day)
+- [x] 5.4 Change `MedalDetailTagsSection` to `.chipStyle(.neutral)` capsules
+      (spec: Tags Are Presented As Capsules)
+- [x] 5.5 Add `#Preview`s for the day section covering photos only, note only, and both
+
+## 6. Screen Wiring
+
+- [x] 6.1 Recompose `MedalDetailView` — hero, facts, result, day, tags — and add
+      `personalRecordIDs: Set<String>` to its `init`, passing it to the view model
+- [x] 6.2 Drop the inline navigation title so the race name is not stated twice, keeping
+      the back button's automatic title
+- [x] 6.3 Pass `personalRecordIDs` straight through from both `MedalYearSection` and
+      `MedalPersonalBestCarousel`, which already hold it as a set rather than resolving
+      a bool at the call site (design.md Decision 1)
+- [x] 6.4 Verify the edit sheet, delete confirmation, error presentation and
+      `reloadMedal()` on dismissal all still work unchanged, and that `reloadMedal()`
+      also refreshes `personalRecordIDs` from the collection so the "PR" tag can't go
+      stale (design.md Decision 1)
+
+## 7. Localization
+
+- [x] 7.1 Add `The result`, `The day`, `Location`, `Date`, `Distance`, `Bib`, `Finish`,
+      `Avg pace`, `Overall`, `Gender` and `Division` to `Localizable.xcstrings` with
+      `zh-TW` translations
+- [x] 7.2 Confirm the composed division label reads correctly in `zh-TW`, where the group
+      follows rather than precedes the stem
+- [x] 7.3 Extend `StringCatalogTests` to cover the new keys
+
+## 8. Verification
+
+- [x] 8.1 Run the full test suite — `xcodebuild test -project MedalWall.xcodeproj -scheme
+      MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro'` — and confirm it
+      passes
+- [x] 8.2 Check the screen against `Medal Wall iOS v4.3.html` in light, dark and `zh-TW`,
+      confirming the design.md Decision 8 divergences are the only ones
+- [x] 8.3 Check a `1058 / 7373` medal on device for the crowding risk design.md names, and
+      a medal with only a finish time for the always-present grid
+- [x] 8.4 Verify the `PR` marker appears when opened from a record-holding row and from the
+      carousel, and is absent on a non-record medal
+- [x] 8.5 Confirm SwiftLint and swift-format pass on the changed files

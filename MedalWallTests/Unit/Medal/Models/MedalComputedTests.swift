@@ -27,10 +27,56 @@ struct MedalComputedTests {
     )
   }
 
+  // MARK: - recordedFinishTime
+  @Test("recordedFinishTime is nil when finishTime is nil")
+  func testRecordedFinishTimeNilWhenNoFinishTime() {
+    let medal = makeMedal()
+
+    #expect(medal.recordedFinishTime == nil)
+  }
+
+  /// CLAUDE.md `## Patterns`: "Guard numeric values against out-of-range inputs." A
+  /// stored zero is not a real time — it would otherwise format as "00:00:00" and win
+  /// every "fastest" comparison it's held up against.
+  @Test("recordedFinishTime is nil when finishTime is zero")
+  func testRecordedFinishTimeNilWhenFinishTimeZero() {
+    let medal = makeMedal(finishTime: 0)
+
+    #expect(medal.recordedFinishTime == nil)
+  }
+
+  @Test("recordedFinishTime is nil when finishTime is negative")
+  func testRecordedFinishTimeNilWhenFinishTimeNegative() {
+    let medal = makeMedal(finishTime: -1)
+
+    #expect(medal.recordedFinishTime == nil)
+  }
+
+  @Test("recordedFinishTime returns the value when it is positive")
+  func testRecordedFinishTimeReturnsPositiveValue() {
+    let medal = makeMedal(finishTime: 12624)
+
+    #expect(medal.recordedFinishTime == 12624)
+  }
+
   // MARK: - averagePace
   @Test("averagePace is nil when finishTime is nil")
   func testAveragePaceNilWhenNoFinishTime() {
     let medal = makeMedal()
+
+    #expect(medal.averagePace == nil)
+  }
+
+  @Test("averagePace is nil when finishTime is zero")
+  func testAveragePaceNilWhenFinishTimeZero() {
+    let medal = makeMedal(finishTime: 0)
+
+    #expect(medal.averagePace == nil)
+  }
+
+  @Test("averagePace is nil when finishTime is negative")
+  func testAveragePaceNilWhenFinishTimeNegative() {
+    let medal = makeMedal(finishTime: -1)
 
     #expect(medal.averagePace == nil)
   }

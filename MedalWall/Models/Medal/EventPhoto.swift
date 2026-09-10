@@ -28,3 +28,11 @@ struct EventPhoto: Codable, Identifiable {
     self.createdAt = createdAt
   }
 }
+
+extension Array where Element == EventPhoto {
+  /// The photos' image URLs in display order — `sortOrder` ascending — so the strip and
+  /// the full-screen viewer never disagree about which photo a tap is opening.
+  var sortedImageUrls: [String] {
+    sorted { $0.sortOrder < $1.sortOrder }.map(\.imageUrl)
+  }
+}

@@ -66,13 +66,14 @@ enum TagStyle {
 struct TagViewModifier: ViewModifier {
   let style: TagStyle
   let font: Font?
+  let textCase: Text.Case?
   let vPadding: CGFloat
   let hPadding: CGFloat
 
   func body(content: Content) -> some View {
     content
       .font(font ?? style.font)
-      .textCase(style.textCase)
+      .textCase(textCase ?? style.textCase)
       .foregroundStyle(style.foreground)
       .padding(.vertical, vPadding)
       .padding(.horizontal, hPadding)
@@ -90,6 +91,7 @@ extension View {
   func tagStyle(
     _ style: TagStyle,
     font: Font? = nil,
+    textCase: Text.Case? = nil,
     vPadding: CGFloat = 4,
     hPadding: CGFloat = 8
   ) -> some View {
@@ -97,6 +99,7 @@ extension View {
       TagViewModifier(
         style: style,
         font: font,
+        textCase: textCase,
         vPadding: vPadding,
         hPadding: hPadding
       )
@@ -107,6 +110,8 @@ extension View {
 #Preview("On a card") {
   VStack(spacing: 8) {
     Text("PR").tagStyle(.record)
+    Text("Personal best")
+      .tagStyle(.neutralInCard, textCase: .uppercase)
     Text("Full").tagStyle(.neutralInCard)
     Text("42.195 km").tagStyle(.neutralInCard)
     Text("Synced").tagStyle(.success)

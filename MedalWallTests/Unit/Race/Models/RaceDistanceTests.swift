@@ -139,4 +139,16 @@ struct RaceDistanceTests {
     #expect(decoded.type == .inPerson)
     #expect(decoded.category == .full)
   }
+
+  /// Collapsing near-preset values onto their preset is `nearestPreset(forValue:)`'s job
+  /// for grouping medals in the collection view, not decode's. A genuinely custom 42.20km
+  /// course must survive a save/relaunch round-trip as itself, not silently become "Full".
+  @Test("Decode preserves a custom distance within the grouping tolerance of a preset")
+  func testCodableCustomNearPresetNotCollapsed() throws {
+    let json = #"{"value": 42.2, "type": "inPerson"}"#
+    let data = Data(json.utf8)
+    let decoded = try JSONDecoder().decode(RaceDistance.self, from: data)
+
+    #expect(decoded.category == .custom(42.2))
+  }
 }
