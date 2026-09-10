@@ -52,23 +52,42 @@ enum RaceDistanceCategory: CustomStringConvertible, Hashable {
 }
 
 extension RaceDistanceCategory {
-  /// Reconstructs a category from its stored numeric value (kilometres).
+  /// Reconstructs a category from its stored numeric value (kilometres) exactly.
   ///
-  /// A small tolerance collapses values that round-trip across units onto the preset
-  /// they measure — a marathon persisted as 26.2 miles arrives as 42.16481 km and
-  /// would otherwise live as a separate chip from `.full`. 0.05 km is tight enough
-  /// to reject 42.0 (off by 0.195) while still accepting 42.16481 (off by 0.030).
+  /// This is what `RaceDistance` decode uses. It does not tolerate near-preset values,
+  /// because decode has to preserve whatever was actually saved — collapsing here would
+  /// silently rewrite a genuine custom course into a preset every time a medal or race
+  /// round-trips through Firestore. Collapsing near-preset values for display is
+  /// `nearestPreset(forValue:)`'s job, not this initializer's.
   nonisolated init(value: Double) {
-    if abs(value - 42.195) < 0.05 {
-      self = .full
-    } else if abs(value - 21.0975) < 0.05 {
-      self = .half
-    } else if abs(value - 10) < 0.05 {
-      self = .tenKM
-    } else if abs(value - 5) < 0.05 {
-      self = .fiveKM
+    switch value {
+    case 42.195: self = .full
+    case 21.0975: self = .half
+    case 10: self = .tenKM
+    case 5: self = .fiveKM
+    default: self = .custom(value)
+    }
+  }
+
+  /// The preset this measured value is close enough to be presented as, collapsing unit
+  /// round-trip drift onto the preset it measures — a marathon persisted as 26.2 miles
+  /// arrives as 42.16481 km and would otherwise live as a separate chip from `.full`.
+  /// 0.05 km is tight enough to reject 42.0 (off by 0.195) while still accepting
+  /// 42.16481 (off by 0.030).
+  ///
+  /// Used only where distances are grouped or filtered for display — the medal
+  /// collection's chips and its personal-best derivation — never for decode.
+  nonisolated static func nearestPreset(forValue value: Double) -> RaceDistanceCategory {
+    if abs(value - RaceDistanceCategory.full.value) < 0.05 {
+      return .full
+    } else if abs(value - RaceDistanceCategory.half.value) < 0.05 {
+      return .half
+    } else if abs(value - RaceDistanceCategory.tenKM.value) < 0.05 {
+      return .tenKM
+    } else if abs(value - RaceDistanceCategory.fiveKM.value) < 0.05 {
+      return .fiveKM
     } else {
-      self = .custom(value)
+      return .custom(value)
     }
   }
 

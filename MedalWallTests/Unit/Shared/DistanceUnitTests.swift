@@ -277,7 +277,7 @@ struct DistanceUnitTests {
     )
 
     #expect(saved == 42.1648128)
-    #expect(RaceDistanceCategory(value: saved) == .full)
+    #expect(RaceDistanceCategory.nearestPreset(forValue: saved) == .full)
   }
 
   // MARK: - paceValueText

@@ -226,9 +226,10 @@ struct MedalDistanceFilteringTests {
   }
 
   /// A marathon entered as 26.2 miles rounds to 42.16481 km, just inside the 0.05 km
-  /// window `RaceDistanceCategory(value:)` collapses onto `.full`. `filtered(by:)` must
-  /// agree with that normalization — otherwise the chip surfaces `.full` but selecting
-  /// it excludes the medal that the personal-bests card lists under `.full`.
+  /// window `RaceDistanceCategory.nearestPreset(forValue:)` collapses onto `.full`.
+  /// `filtered(by:)` must agree with that normalization — otherwise the chip surfaces
+  /// `.full` but selecting it excludes the medal that the personal-bests card lists
+  /// under `.full`.
   @Test("filtered by a preset matches a custom distance within the preset's tolerance")
   func testFilteredByPresetMatchesCustomWithinTolerance() {
     let medals = [

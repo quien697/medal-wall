@@ -64,7 +64,8 @@ extension Array where Element == Medal {
   /// (`NaN`, `±Inf`) are dropped after the Set — sorting one violates strict weak
   /// ordering and traps.
   var distanceCategoriesOwned: [RaceDistanceCategory] {
-    let normalized = Set(map { RaceDistanceCategory(value: $0.distance.category.value) })
+    let normalized = Set(
+      map { RaceDistanceCategory.nearestPreset(forValue: $0.distance.category.value) })
     return
       normalized
       .filter { $0.value.isFinite }
@@ -77,7 +78,9 @@ extension Array where Element == Medal {
     case .all:
       return self
     case .category(let category):
-      return filter { RaceDistanceCategory(value: $0.distance.category.value) == category }
+      return filter {
+        RaceDistanceCategory.nearestPreset(forValue: $0.distance.category.value) == category
+      }
     }
   }
 
@@ -106,7 +109,7 @@ extension Array where Element == Medal {
 
     for medal in sortedForDisplay {
       guard let finishTime = medal.finishTime, finishTime > 0 else { continue }
-      let category = RaceDistanceCategory(value: medal.distance.category.value)
+      let category = RaceDistanceCategory.nearestPreset(forValue: medal.distance.category.value)
 
       guard let leader = records[category] else {
         records[category] = medal
@@ -135,7 +138,8 @@ extension Array where Element == Medal {
   /// Walks `distanceCategoriesOwned` rather than sorting `personalRecords` by key, so the
   /// carousel and the filter chips share one ordering rule instead of keeping two in
   /// agreement by hand. Both sides key on a category normalized through
-  /// `RaceDistanceCategory(value:)`, so a custom distance finds the preset it measures.
+  /// `RaceDistanceCategory.nearestPreset(forValue:)`, so a custom distance finds the
+  /// preset it measures.
   ///
   /// A distance whose medals are all untimed holds no record and drops out here, which is
   /// what leaves it out of the carousel while the filter still offers it.
