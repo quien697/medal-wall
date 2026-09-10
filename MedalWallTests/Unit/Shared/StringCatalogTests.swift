@@ -70,7 +70,7 @@ struct StringCatalogTests {
       "Overall",
       "Gender",
       "Division",
-      "Division %@"
+      "Division (%@)"
     ]
 
     for key in keys {
@@ -82,7 +82,7 @@ struct StringCatalogTests {
   /// group silently vanishes from the label.
   @Test("The composed division label keeps its placeholder in zh-TW")
   func testDivisionLabelKeepsPlaceholder() {
-    #expect(zhTWTable["Division %@"]?.contains("%@") == true)
+    #expect(zhTWTable["Division (%@)"]?.contains("%@") == true)
   }
 
   @Test("The retired medal list title is gone from the catalog")
