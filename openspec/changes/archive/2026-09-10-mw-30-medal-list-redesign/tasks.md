@@ -136,9 +136,9 @@
 - [x] 10.1 Run the full test suite — `xcodebuild test -project MedalWall.xcodeproj -scheme
       MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro'` — and confirm it
       passes
-- [ ] 10.2 Build and check the screen against `Medal Wall iOS v4.3.html` in both light and
+- [x] 10.2 Build and check the screen against `Medal Wall iOS v4.4.html` in both light and
       dark appearance, confirming the deliberate divergences from design.md Decision 8 are
-      the only ones
+      the only ones — v4.4 supersedes the v4.3 file this task originally named
 - [x] 10.3 Verify against the sample data that the PR marker lands on the fastest medal in
       each category and nowhere else
 - [x] 10.4 Confirm SwiftLint and swift-format pass on the changed files

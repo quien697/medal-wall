@@ -75,3 +75,34 @@ a threshold is crossed; the badge reflects the new state the next time Profile i
 - **WHEN** a medal save causes a track to cross a tier threshold
 - **THEN** no notification or celebration UI is presented
 - **AND** the updated badge appears on the next Profile view
+
+## Design Notes
+Rationale carried over from the 2026-07-14 milestone-achievements design, kept here because
+it explains choices the requirements above do not justify on their own.
+
+**One shared tier list, not per-track curves.** Full marathons are harder to accumulate than
+halves, but a single threshold list was chosen over two tuned curves for simplicity. Centurion
+(100) is deliberately kept as a lifelong-goal cap for full marathons rather than lowered or
+removed.
+
+**Badges evolve in ornamentation, not in metal colour.** A single badge shape gains detail
+layers as the tier rises. Gold/silver/bronze is deliberately not used here — that colour
+language belongs to real race placement (`overallPlacement`, `divisionPlacement`), and reusing
+it for milestone counts would blur two different ideas.
+
+**Display uses `max(persisted, live)`; progress uses the raw live count.** Only the persisted
+value makes a tier sticky against later deletion. Taking the max for display covers the
+transient case where the ratchet write has not synced yet, without weakening stickiness, since
+a higher live count is ratcheted in on the next successful write. Progress is a truthful count
+of what remains, so it always uses the raw live count.
+
+**Self-reported data is out of scope, not overlooked.** Fabricated medals are not guarded
+against because the whole `Medal` model is self-reported — bib number, finish time, and
+placement have no verification against an official results feed. This is not a gap unique to
+achievements.
+
+**Deferred deliberately.** A full achievement system — Majors club, streaks, personal-best
+achievements — is blocked on canonical race identity: races are freeform manual entries with
+no link to a race registry, so "ran all 6 Majors" cannot be reliably detected. Also deferred:
+milestone tracks for 10K/5K/custom distances, any celebration or notification UI on unlock,
+and verification handling for medal data in general.

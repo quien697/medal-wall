@@ -132,12 +132,19 @@ becomes multi-select or year-based.
 
 **8. Mockup drift resolved toward the token list.**
 
+Checked against `Medal Wall iOS v4.4.html`; the first two bullets were since resolved by the
+mockup itself, the rest stand as written.
+
 - The mockup sets row metadata at `9px/700/+0.16em` uppercase. §02 bottoms out at Micro label
   `10/12/700/+14%` upper, so those lines take `Font.TypeScale.microLabel`. Tracking and
   uppercasing are applied at the call site — `Font` cannot carry them.
-- The mockup fills unselected chips `#EAE7DF`; §04 `FilterChip .unselected` is white with an
-  `#E4E1DA` border. Chips take `.chipStyle(.secondary)` selected-off and `.chipStyle(.primary)`
-  selected-on.
+  *Resolved in v4.4:* the mockup now draws this at `700 10px/1.2` with `1.4px` tracking —
+  exactly `microLabel`. No longer a divergence.
+- The mockup fills unselected chips `#EAE7DF`; the token list's `FilterChip .unselected` is
+  white with an `#E4E1DA` border. Chips take `.chipStyle(.secondary)` selected-off and
+  `.chipStyle(.primary)` selected-on.
+  *Resolved in v4.4:* the mockup now draws the unselected chip `#FFFFFF` with a
+  `1px solid #E4E1DA` border. No longer a divergence.
 - The mockup's row name is `15px/700`, off-scale between `callout` (15/500) and `headline`
   (17/700). It takes `headline`, matching `MedalCard` today and keeping the race name the
   strongest line in the row.
