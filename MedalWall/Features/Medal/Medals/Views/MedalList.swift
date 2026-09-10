@@ -32,7 +32,7 @@ struct MedalList: View {
                 personalRecordIDs: viewModel.personalRecordIDs,
                 namespace: namespace
               )
-            }
+            }  // ForEach
           }  // LazyVStack
           .padding(.horizontal, .Space.gutter)
         }  // ScrollView

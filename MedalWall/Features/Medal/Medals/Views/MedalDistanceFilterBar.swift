@@ -51,7 +51,7 @@ struct MedalDistanceFilterBar: View {
           .chipStyle(
             selection == filter ? .primary : .secondary,
             font: .TypeScale.microLabel)
-        }
+        }  // ForEach
       }  // HStack
       .padding(.horizontal, .Space.gutter)
       .padding(.vertical, .Space.stack)

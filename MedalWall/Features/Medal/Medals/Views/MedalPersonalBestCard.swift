@@ -86,7 +86,7 @@ struct MedalPersonalBestCard: View {
           .fill(Color.Text.secondary)
           .opacity(page == currentPage ? 1 : dimmedDot)
           .frame(width: dotSize, height: dotSize)
-      }
+      }  // ForEach
     }  // HStack
   }
 }
