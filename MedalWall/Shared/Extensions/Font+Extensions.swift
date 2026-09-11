@@ -18,9 +18,7 @@ extension Font {
     static let callout = Font.system(size: 15, weight: .medium)
     static let caption = Font.system(size: 13, weight: .medium)
     static let overline = Font.system(size: 11, weight: .bold)
-
-    static let sectionTitle = Font.system(size: 14, weight: .heavy)
-    static let microLabel = Font.system(size: 10, weight: .bold)
+    static let microLabel = Font.system(size: 11, weight: .bold)
 
     struct Field {
       static let label = Font.system(size: 16, weight: .bold)

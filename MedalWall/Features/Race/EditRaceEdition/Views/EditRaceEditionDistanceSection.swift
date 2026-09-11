@@ -48,7 +48,7 @@ struct EditRaceEditionDistanceSection: View {
         }
         .actionStyle(
           .plain,
-          font: .TypeScale.sectionTitle,
+          font: .TypeScale.callout,
           vPadding: 0,
           hPadding: 0
         )

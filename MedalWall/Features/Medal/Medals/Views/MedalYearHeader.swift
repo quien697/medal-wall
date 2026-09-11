@@ -23,7 +23,8 @@ struct MedalYearHeader: View {
     VStack(alignment: .leading, spacing: .Space.inline) {
       HStack(spacing: .Space.row) {
         Text(year, format: .number.grouping(.never))
-          .font(.TypeScale.sectionTitle)
+          .font(.TypeScale.callout)
+          .fontWeight(.heavy)
           .monospacedDigit()
           .foregroundStyle(Color.Text.primary)
 

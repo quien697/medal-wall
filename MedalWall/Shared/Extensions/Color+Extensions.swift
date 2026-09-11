@@ -26,7 +26,6 @@ extension Color {
     static let ash = Color("Ash")
     static let pewter = Color("Pewter")
     static let inkNavy = Color("InkNavy")
-    static let navy900 = Color("Navy900")
     static let navy950 = Color("Navy950")
     static let slate = Color("Slate")
     static let mist = Color("Mist")

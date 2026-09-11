@@ -10,9 +10,6 @@ import SwiftUI
 extension CGFloat {
 
   /// The design system's corner radii, named by the role they belong to.
-  ///
-  /// The pill radius is deliberately absent — SwiftUI expresses it natively as
-  /// `.capsule`, which stays correct at any height.
   struct Radius {
     static let tag: CGFloat = 6
     static let field: CGFloat = 12
