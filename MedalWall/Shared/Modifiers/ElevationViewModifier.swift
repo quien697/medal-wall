@@ -14,30 +14,22 @@ import SwiftUI
 /// blurring it. Each level is therefore approximated with a tighter radius and a
 /// lower opacity than a direct blur conversion would give.
 enum Elevation {
-  case soft
-  case lifted
   case ring
 
   fileprivate var color: Color {
     switch self {
-    case .soft: Color.black.opacity(0.20)
-    case .lifted: Color.black.opacity(0.26)
     case .ring: Color.black.opacity(0.28)
     }
   }
 
   fileprivate var radius: CGFloat {
     switch self {
-    case .soft: 8
-    case .lifted: 14
     case .ring: 6
     }
   }
 
   fileprivate var yOffset: CGFloat {
     switch self {
-    case .soft: 6
-    case .lifted: 12
     case .ring: 4
     }
   }
@@ -67,20 +59,10 @@ extension View {
 }
 
 #Preview {
-  VStack(spacing: 40) {
-    Text("Soft")
-      .surfaceStyle()
-      .elevation(.soft)
-
-    Text("Lifted")
-      .surfaceStyle()
-      .elevation(.lifted)
-
-    Circle()
-      .fill(Color.Surface.primary)
-      .frame(width: 72, height: 72)
-      .elevation(.ring)
-  }  // VStack
-  .padding(40)
-  .background(Color.Background.primary)
+  Circle()
+    .fill(Color.Surface.primary)
+    .frame(width: 72, height: 72)
+    .elevation(.ring)
+    .padding(40)
+    .background(Color.Background.primary)
 }
