@@ -31,7 +31,7 @@ struct MedalRow: View {
 
       VStack(alignment: .leading, spacing: .Space.inline) {
         Text(date)
-          .font(.TypeScale.microLabel)
+          .font(.TypeScale.overline)
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
@@ -42,7 +42,7 @@ struct MedalRow: View {
           .lineLimit(2)
 
         Text(distance)
-          .font(.TypeScale.microLabel)
+          .font(.TypeScale.overline)
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
@@ -61,7 +61,7 @@ struct MedalRow: View {
           .padding(.top, .Space.inline)
         } else {
           Text("No time recorded")
-            .font(.TypeScale.microLabel)
+            .font(.TypeScale.overline)
             .tracking(metadataTracking)
             .textCase(.uppercase)
             .foregroundStyle(Color.Text.secondary)

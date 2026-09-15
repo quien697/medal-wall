@@ -22,7 +22,7 @@ struct MedalDetailInfoRow: View {
   var body: some View {
     HStack(alignment: .firstTextBaseline, spacing: .Space.gutter) {
       Text(label)
-        .font(.TypeScale.microLabel)
+        .font(.TypeScale.overline)
         .tracking(labelTracking)
         .textCase(.uppercase)
         .foregroundStyle(Color.Text.secondary)

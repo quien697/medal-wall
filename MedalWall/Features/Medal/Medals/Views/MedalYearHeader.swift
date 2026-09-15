@@ -31,7 +31,7 @@ struct MedalYearHeader: View {
         Spacer()
 
         Text("^[\(count) medal](inflect: true)")
-          .font(.TypeScale.microLabel)
+          .font(.TypeScale.overline)
           .tracking(countTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)

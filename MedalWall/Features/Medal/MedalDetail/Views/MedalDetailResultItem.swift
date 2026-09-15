@@ -27,7 +27,7 @@ struct MedalDetailResultItem: View {
   var body: some View {
     VStack(alignment: .leading, spacing: .Space.inline) {
       Text(label)
-        .font(.TypeScale.microLabel)
+        .font(.TypeScale.overline)
         .tracking(labelTracking)
         .textCase(.uppercase)
         .foregroundStyle(Color.Text.secondary)
@@ -43,7 +43,7 @@ struct MedalDetailResultItem: View {
 
         if let suffix {
           Text(suffix)
-            .font(.TypeScale.microLabel)
+            .font(.TypeScale.overline)
             .textCase(.uppercase)
             .foregroundStyle(Color.Text.secondary)
         }

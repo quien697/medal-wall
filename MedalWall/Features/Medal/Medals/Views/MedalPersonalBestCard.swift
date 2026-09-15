@@ -38,7 +38,7 @@ struct MedalPersonalBestCard: View {
         Spacer()
 
         Text(distance)
-          .font(.TypeScale.microLabel)
+          .font(.TypeScale.overline)
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
@@ -58,7 +58,7 @@ struct MedalPersonalBestCard: View {
 
       HStack {
         Text(pace)
-          .font(.TypeScale.microLabel)
+          .font(.TypeScale.overline)
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)

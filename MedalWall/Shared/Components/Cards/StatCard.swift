@@ -40,7 +40,7 @@ struct StatCard: View {
         .minimumScaleFactor(0.5)
 
       Text(subTitle)
-        .font(.TypeScale.microLabel)
+        .font(.TypeScale.overline)
         .tracking(1.4)
         .textCase(.uppercase)
         .foregroundStyle(Color.Text.tertiary)
