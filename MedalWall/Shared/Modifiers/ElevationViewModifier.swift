@@ -11,8 +11,12 @@ import SwiftUI
 ///
 /// The source values are CSS `box-shadow`, whose negative spread has no SwiftUI
 /// equivalent — `shadow(color:radius:x:y:)` cannot shrink a shadow before
-/// blurring it. Each level is therefore approximated with a tighter radius and a
-/// lower opacity than a direct blur conversion would give.
+/// blurring it. Each level is therefore approximated with a tighter radius, a shorter
+/// offset and a lower opacity than a direct blur conversion would give.
+///
+/// The source casts in ink navy (`#0F1B2D`); these cast in black.
+///
+/// `hairline` has no case: it is a border with no shadow, and `surfaceStyle` draws it.
 enum Elevation {
   case ring
 
