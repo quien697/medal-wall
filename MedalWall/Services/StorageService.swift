@@ -96,7 +96,7 @@ final class StorageService {
 
   // MARK: - Functions -> Common
   private func upload(image: UIImage, to path: String) async throws -> String {
-    guard let data = image.jpegData(compressionQuality: 0.8) else {
+    guard let data = image.uploadData() else {
       throw AppError.photoDataInvalid
     }
 

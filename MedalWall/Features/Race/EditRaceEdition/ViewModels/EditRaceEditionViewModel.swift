@@ -144,7 +144,7 @@ final class EditRaceEditionViewModel {
         distances: distances,
         createdBy: userId
       )
-      if let photo, let data = photo.jpegData(compressionQuality: 0.8) {
+      if let photo, let data = photo.uploadData() {
         draft.newPhotoData = data
       }
       return draft
@@ -164,7 +164,7 @@ final class EditRaceEditionViewModel {
       draft.distances = distances
       draft.isModified = true
       if isPhotoChanged {
-        if let photo, let data = photo.jpegData(compressionQuality: 0.8) {
+        if let photo, let data = photo.uploadData() {
           draft.newPhotoData = data
           draft.isPhotoCleared = false
         } else {
