@@ -17,18 +17,18 @@ struct EditProfileInfoSection: View {
     Section {
       LabeledContent {
         TextField("First Name", text: $firstName)
-          .fromStyle(.value)
+          .fieldStyle(.value)
       } label: {
         Text("First Name")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }
 
       LabeledContent {
         TextField("Last Name", text: $lastName)
-          .fromStyle(.value)
+          .fieldStyle(.value)
       } label: {
         Text("Last Name")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }
 
       Picker(selection: $gender) {
@@ -41,7 +41,7 @@ struct EditProfileInfoSection: View {
         }
       } label: {
         Text("Gender")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }
       .pickerStyle(.menu)
 
@@ -57,7 +57,7 @@ struct EditProfileInfoSection: View {
         }
       } label: {
         Text("Birthday")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }
     } header: {
       Text("Info")

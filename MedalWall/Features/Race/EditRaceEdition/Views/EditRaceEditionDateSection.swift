@@ -32,7 +32,7 @@ struct EditRaceEditionDateSection: View {
         )
       ) {
         Text("One Day Event")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }
 
       Picker(
@@ -48,7 +48,7 @@ struct EditRaceEditionDateSection: View {
         }
       } label: {
         Text("Year")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }
 
       DatePicker(
@@ -60,7 +60,7 @@ struct EditRaceEditionDateSection: View {
         displayedComponents: [.date]
       ) {
         Text("Start Date")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }
 
       if !isOneDay {
@@ -70,7 +70,7 @@ struct EditRaceEditionDateSection: View {
           displayedComponents: [.date]
         ) {
           Text("End Date")
-            .fromStyle(.label)
+            .fieldStyle(.label)
         }
       }
     } header: {

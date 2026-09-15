@@ -56,7 +56,7 @@ struct EditMedalPlacementSection: View {
         }
       } label: {
         Text("Division Group")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }
 
       if division != nil {

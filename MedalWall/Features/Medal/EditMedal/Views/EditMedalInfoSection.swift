@@ -20,10 +20,10 @@ struct EditMedalInfoSection: View {
     Section("Info") {
       LabeledContent {
         TextField("e.g. Taipei Marathon 2025", text: $name)
-          .fromStyle(.value)
+          .fieldStyle(.value)
       } label: {
         Text("Name")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }
 
       DatePicker(
@@ -31,20 +31,20 @@ struct EditMedalInfoSection: View {
         displayedComponents: .date
       ) {
         Text("Date")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }
 
       LabeledContent {
         TextField("e.g. 4291 (Optional)", text: $bib)
-          .fromStyle(.value)
+          .fieldStyle(.value)
       } label: {
         Text("Bib")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }
 
       HStack {
         Text("Distance")
-          .fromStyle(.label)
+          .fieldStyle(.label)
 
         Spacer()
 
@@ -52,21 +52,21 @@ struct EditMedalInfoSection: View {
           onEditDistance()
         } label: {
           Text(distance)
-            .fromStyle(.value)
+            .fieldStyle(.value)
         }
         .buttonStyle(.bordered)
       }  // HStack
 
       LabeledContent {
         Text(place.formatted.isEmpty ? .appLocalized("Choose a place") : place.formatted)
-          .fromStyle(.value)
+          .fieldStyle(.value)
           .foregroundStyle(place.formatted.isEmpty ? .secondary : .primary)
           .onTapGesture {
             onEditPlace()
           }
       } label: {
         Text("Place")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }  // LabeledContent
     }  // Section
   }

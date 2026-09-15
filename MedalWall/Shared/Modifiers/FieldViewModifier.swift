@@ -1,5 +1,5 @@
 //
-//  FromViewModifier.swift
+//  FieldViewModifier.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-04-13.
@@ -7,7 +7,12 @@
 
 import SwiftUI
 
-enum FromStyle {
+/// Which side of a form row a piece of text sits on.
+///
+/// Both sides share one size and are separated by colour: the label names the value in
+/// `Text.tertiary`, the value sits opposite in `Text.primary`. Weight is what says the
+/// value can be changed, so the value is lighter than its label.
+enum FieldStyle {
   case label
   case value
 
@@ -33,8 +38,9 @@ enum FromStyle {
   }
 }
 
-struct FromViewModifier: ViewModifier {
-  let style: FromStyle
+/// A view modifier that sets text as one side of a form row.
+struct FieldViewModifier: ViewModifier {
+  let style: FieldStyle
 
   func body(content: Content) -> some View {
     content
@@ -46,21 +52,20 @@ struct FromViewModifier: ViewModifier {
 
 extension View {
 
-  func fromStyle(_ style: FromStyle) -> some View {
-    modifier(FromViewModifier(style: style))
+  /// Applies the design system's form row text for `style`.
+  func fieldStyle(_ style: FieldStyle) -> some View {
+    modifier(FieldViewModifier(style: style))
   }
 }
 
 #Preview {
-  let text: String = ""
-
   Form {
     LabeledContent {
-      TextField("Text", text: .constant(text))
-        .fromStyle(.value)
+      TextField("Bib number", text: .constant("00001"))
+        .fieldStyle(.value)
     } label: {
-      Text("Text Title")
-        .fromStyle(.label)
-    }
-  }
+      Text("Bib number")
+        .fieldStyle(.label)
+    }  // LabeledContent
+  }  // Form
 }

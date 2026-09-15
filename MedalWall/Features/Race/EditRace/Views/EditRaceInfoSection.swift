@@ -18,18 +18,18 @@ struct EditRaceInfoSection: View {
     Section {
       LabeledContent {
         TextField("e.g. Taipei Marathon", text: $name)
-          .fromStyle(.value)
+          .fieldStyle(.value)
       } label: {
         Text("Name")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }  // LabeledContent
 
       LabeledContent {
         TextField("optional", text: $url)
-          .fromStyle(.value)
+          .fieldStyle(.value)
       } label: {
         Text("WebSite")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }  // LabeledContent
 
       LabeledContent {
@@ -48,7 +48,7 @@ struct EditRaceInfoSection: View {
         }
       } label: {
         Text("Place")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }  // LabeledContent
     } header: {
       Text("Info")
