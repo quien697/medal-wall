@@ -44,11 +44,10 @@ final class EditRaceEditionViewModel {
       self.endDate = edition.endDate
       self.distances = edition.distances
     } else {
-      let currentYear = Calendar.current.component(.year, from: Date())
+      let currentYear = Date.now.year
       self.year = currentYear
       self.isOneDay = true
-      let startOfYear =
-        Calendar.current.date(from: DateComponents(year: currentYear, month: 1, day: 1)) ?? Date()
+      let startOfYear = Date.startOfYear(currentYear)
       self.startDate = startOfYear
       self.endDate = startOfYear
       self.distances = []
@@ -67,16 +66,13 @@ final class EditRaceEditionViewModel {
   }
 
   var yearDateRange: ClosedRange<Date> {
-    let calendar = Calendar.current
-    let startOfYear = calendar.date(from: DateComponents(year: year, month: 1, day: 1)) ?? Date()
-    let endOfYear = calendar.date(from: DateComponents(year: year, month: 12, day: 31)) ?? Date()
-    return startOfYear...endOfYear
+    Date.yearRange(year)
   }
 
   var minEndDate: Date { startDate }
 
   var maxEndDate: Date {
-    Calendar.current.date(from: DateComponents(year: year, month: 12, day: 31)) ?? Date()
+    Date.endOfYear(year)
   }
 
   // MARK: - Functions
@@ -106,9 +102,8 @@ final class EditRaceEditionViewModel {
   /// Updates the year and clamps both dates to remain within the new year's bounds.
   func updateYear(_ newYear: Int) {
     year = newYear
-    let calendar = Calendar.current
-    let startOfYear = calendar.date(from: DateComponents(year: newYear, month: 1, day: 1)) ?? Date()
-    let endOfYear = calendar.date(from: DateComponents(year: newYear, month: 12, day: 31)) ?? Date()
+    let startOfYear = Date.startOfYear(newYear)
+    let endOfYear = Date.endOfYear(newYear)
     if startDate < startOfYear || startDate > endOfYear { startDate = startOfYear }
     if endDate < startDate || endDate > endOfYear { endDate = isOneDay ? startDate : endOfYear }
   }

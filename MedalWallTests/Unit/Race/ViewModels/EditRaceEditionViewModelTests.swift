@@ -276,4 +276,39 @@ struct EditRaceEditionViewModelTests {
 
     #expect(viewModel.distances.count == 1)
   }
+
+  // MARK: - updateYear
+  @Test("updateYear keeps an end date late on 31 December inside the year")
+  func testUpdateYearKeepsLateDecemberThirtyFirst() throws {
+    let viewModel = makeViewModel()
+    let calendar = Calendar.current
+    let december1 = try #require(calendar.date(from: DateComponents(year: 2025, month: 12, day: 1)))
+    let lateNewYearsEve = try #require(
+      calendar.date(from: DateComponents(year: 2025, month: 12, day: 31, hour: 14))
+    )
+    viewModel.isOneDay = false
+    viewModel.startDate = december1
+    viewModel.endDate = lateNewYearsEve
+
+    viewModel.updateYear(2025)
+
+    #expect(viewModel.endDate == lateNewYearsEve)
+  }
+
+  @Test("updateYear still clamps an end date that falls in the following year")
+  func testUpdateYearClampsDateBeyondTheYear() throws {
+    let viewModel = makeViewModel()
+    let calendar = Calendar.current
+    let december1 = try #require(calendar.date(from: DateComponents(year: 2025, month: 12, day: 1)))
+    let nextNewYearsDay = try #require(
+      calendar.date(from: DateComponents(year: 2026, month: 1, day: 1))
+    )
+    viewModel.isOneDay = false
+    viewModel.startDate = december1
+    viewModel.endDate = nextNewYearsDay
+
+    viewModel.updateYear(2025)
+
+    #expect(viewModel.endDate < nextNewYearsDay)
+  }
 }

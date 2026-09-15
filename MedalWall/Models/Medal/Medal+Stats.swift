@@ -42,10 +42,7 @@ extension Array where Element == Medal {
   ///
   /// A year with no medals yields no group, so the list never renders an empty year.
   var groupedByYear: [MedalYearGroup] {
-    let calendar = Calendar.current
-    let grouped = Dictionary(grouping: sortedForDisplay) {
-      calendar.component(.year, from: $0.date)
-    }
+    let grouped = Dictionary(grouping: sortedForDisplay) { $0.date.year }
     return grouped.keys.sorted(by: >).map { year in
       MedalYearGroup(year: year, medals: grouped[year] ?? [])
     }
