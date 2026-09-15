@@ -68,6 +68,10 @@ A deviation takes two shapes — code carrying a token the design system does no
 code holding a different value for a token it does name. The ledger SHALL be able to declare
 either.
 
+Values SHALL be compared by what the platform renders, not by how the file spells them. In
+particular, a colour set with no dark appearance renders its light value in both modes and
+SHALL be treated as equal to a design system token whose light and dark values are the same.
+
 Where a design system token name and its code counterpart differ by convention — `fieldLabel`
 against `Field.label`, `numericL` against `Numeric.large`, `label` against `overline` — the
 check SHALL resolve them and SHALL say which pairings it applied, so a wrong pairing is
@@ -80,6 +84,11 @@ The check SHALL conclude with an explicit statement of whether any `drift` or
 - **WHEN** a token's light or dark value differs from its colour set, and no ledger entry
   covers it
 - **THEN** the check reports `drift` for that token, naming both values
+
+#### Scenario: A colour with no dark slot against a token with equal light and dark values
+- **WHEN** a colour set has no dark appearance and the design system states the same value
+  for light and dark
+- **THEN** the check reports `match`, because both render the same colour in both modes
 
 #### Scenario: Code carries a token the design system does not name
 - **WHEN** the asset catalog contains a colour set absent from the design system and absent

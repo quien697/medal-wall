@@ -22,7 +22,7 @@ and a week is realistic. Everything below is built for the slow case; the fast c
 case with the clock run down.
 
 Measured state at the time of writing: of 16 colours, 7 radii, 13 type tokens, and 3 component
-enums, everything matches except three deliberate deviations and one duplicate constant.
+enums, everything matches except two deliberate deviations and one duplicate constant.
 
 ## Goals / Non-Goals
 
@@ -75,6 +75,17 @@ A careless reader can drop a token family just as a regex can, so the failure mo
 assertions guarded against does not disappear with them. The check reports per-family counts
 against the previous `tokens.json` — `color 16 → 16` — making a family that fell to zero
 visible rather than something inferred from an absence.
+
+### Equivalent values are compared by effect, not by representation
+
+A colour set with no dark appearance renders the same colour in both modes, which is exactly
+what the design system means by `#EBD9AE / #EBD9AE`. The two are the same fact written
+differently, so the check compares effective values: a missing dark slot equals the light
+value. `champagne` looked like a deviation under a naive slot-by-slot comparison and is in
+fact a match.
+
+The general rule is that a comparison must model what the platform renders, not how the file
+happens to spell it.
 
 ### The ledger makes the iOS value win, and the check never overwrites it
 
