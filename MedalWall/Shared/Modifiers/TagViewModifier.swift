@@ -30,7 +30,7 @@ enum TagStyle {
 
   fileprivate var foreground: Color {
     switch self {
-    case .record: Color.Record.ink
+    case .record: Color.Record.onPersonalBest
     case .neutralInCard, .neutralOnPage: Color.Text.secondary
     case .success: Color.Status.success
     case .error: Color.Status.error
@@ -39,7 +39,7 @@ enum TagStyle {
 
   fileprivate var background: Color {
     switch self {
-    case .record: Color.Record.champagne
+    case .record: Color.Record.personalBest
     case .neutralInCard: Color.Surface.tertiary
     case .neutralOnPage: Color.Surface.quaternary
     case .success: Color.Status.success.opacity(0.2)
@@ -60,6 +60,15 @@ enum TagStyle {
     case .record, .success, .error: .uppercase
     }
   }
+
+  /// A badge's uppercase label is tracked out; a meta tag is sentence case and keeps
+  /// the step's own spacing.
+  fileprivate var tracking: CGFloat {
+    switch self {
+    case .neutralInCard, .neutralOnPage: 0
+    case .record, .success, .error: 0.6
+    }
+  }
 }
 
 /// A view modifier that paints a label as a tag.
@@ -70,9 +79,15 @@ struct TagViewModifier: ViewModifier {
   let vPadding: CGFloat
   let hPadding: CGFloat
 
+  /// Internal so a test can read the tracking a style resolves to.
+  var resolvedTracking: CGFloat {
+    style.tracking
+  }
+
   func body(content: Content) -> some View {
     content
       .font(font ?? style.font)
+      .tracking(resolvedTracking)
       .textCase(textCase ?? style.textCase)
       .foregroundStyle(style.foreground)
       .padding(.vertical, vPadding)
@@ -87,7 +102,8 @@ extension View {
   /// Applies the design system's tag appearance for `style`.
   ///
   /// Every argument past `style` overrides what the style already carries — pass one
-  /// only where a call site genuinely departs from the design system.
+  /// only where a call site genuinely departs from the design system. The default
+  /// padding was measured on device, so it stays off the space scale.
   func tagStyle(
     _ style: TagStyle,
     font: Font? = nil,
