@@ -21,6 +21,7 @@ what they contain, not by their position, because the order changes between vers
 | `color` | lines starting `color.paper` | name → light hex, dark hex, role |
 | `type` | a Swift `extension Font…` | name → size, weight, tabular |
 | `radius` | lines starting `radius.tag` | name → number, or `capsule` |
+| `elevation` | lines starting `elevation.` — **the same block as `radius`**; read both prefixes out of it, not `radius.` alone | name → CSS shadow spec, or a plain border |
 | `space` | a Swift `extension CGFloat` with `struct Space` | name → number |
 | `component` | lines starting `ActionStyle` | enum → case names |
 
@@ -36,6 +37,7 @@ internal-consistency report below.
 | `color` | `MedalWall/Assets.xcassets/Colors/*.colorset/Contents.json` |
 | `type` | `Font.TypeScale` in `MedalWall/Shared/Extensions/Font+Extensions.swift` |
 | `radius`, `space` | `CGFloat.Radius` / `CGFloat.Space` in `CGFloat+Extensions.swift` |
+| `elevation` | `Elevation` in `MedalWall/Shared/Modifiers/ElevationViewModifier.swift` |
 | `component` | `ActionStyle`, `ChipStyle`, `TagStyle` in `MedalWall/Shared/Modifiers/` |
 
 Colour components are `"red"`/`"green"`/`"blue"` strings that are **either** floats (`"0.788"`)
@@ -52,6 +54,15 @@ every declared one as a problem.
 **Compare what renders, not how the file spells it.** A colour set with no dark appearance shows
 its light value in both modes, so it equals a design system token whose light and dark values are
 the same. `champagne` is exactly this case and is a match, not a deviation.
+
+`elevation` values do not compare numerically. The design system states a CSS `box-shadow`
+(blur, spread, y-offset, opacity); SwiftUI's `shadow(radius:x:y:)` has no negative-spread
+equivalent, so `ElevationViewModifier.swift` already approximates every level with a tighter
+radius and lower opacity — its doc comment says so. Match `elevation` by **level name presence**,
+not by whether the opacity or radius numbers line up: a level named in both is a match regardless
+of its approximated numbers. A level in code with no design system counterpart, or named in the
+design system with no code counterpart, is the real signal — treat that as `undeclared lead` /
+`unimplemented` as usual.
 
 Names differ by convention. State which pairings you used:
 
@@ -132,6 +143,7 @@ Write what the design system said to `openspec/design-system/tokens.json`:
   "color":     { "gilt": { "light": "#C9A227", "dark": "#C7A84A", "role": "earned records only" } },
   "type":      { "display": { "size": 32, "weight": "black", "tabular": false } },
   "radius":    { "tag": 6, "pill": "capsule" },
+  "elevation": { "hairline": "1px border.default, no shadow", "ring": "0 6px 14px -4px · ink 40%" },
   "space":     { "inline": 4 },
   "component": { "ActionStyle": ["primary", "secondary", "tertiary", "neutral", "plain", "destructive"] }
 }
