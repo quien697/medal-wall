@@ -10,14 +10,17 @@ import SwiftUI
 /// The gold ring that marks something earned.
 ///
 /// The ring tracks *earned*, never *photographed* — it is applied by the caller that
-/// knows the record was set, so an image never wears gold on its own.
+/// knows a finish time was recorded, so an image never wears gold on its own. No ring
+/// is a real state: it says the result is missing.
+///
+/// The ring is a circle drawn behind the content, so the content must be circular too.
 struct MedalRingViewModifier: ViewModifier {
   private let ringWidth: CGFloat = 3
 
   func body(content: Content) -> some View {
     content
       .padding(ringWidth)
-      .background(Circle().fill(Color.Record.primary))
+      .background(Circle().fill(Color.Record.earned))
       .elevation(.ring)
   }
 }

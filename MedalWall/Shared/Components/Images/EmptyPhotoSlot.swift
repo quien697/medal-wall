@@ -28,7 +28,7 @@ struct EmptyPhotoSlot: View {
       .frame(width: imageType.size.width, height: imageType.size.height)
       .overlay(
         imageType.shape
-          .stroke(Color.Pigment.pewter, style: StrokeStyle(lineWidth: 2, dash: [10, 2]))
+          .stroke(Color.Border.placeholder, style: StrokeStyle(lineWidth: 2, dash: [10, 2]))
       )
   }
 }

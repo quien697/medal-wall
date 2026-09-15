@@ -16,7 +16,8 @@ extension Color {
   /// *role* and points here, so a pigment used by two components — gilt is both
   /// an earned record and a tier badge's outer ring — is written once.
   ///
-  /// Reach for a role first. Use a pigment directly only where no role fits.
+  /// Only the roles below reference a pigment. A view or modifier that needs a colour
+  /// no role names gets a new role rather than a pigment.
   struct Pigment {
     static let paper = Color("Paper")
     static let porcelain = Color("Porcelain")
@@ -26,7 +27,7 @@ extension Color {
     static let ash = Color("Ash")
     static let pewter = Color("Pewter")
     static let inkNavy = Color("InkNavy")
-    static let navy950 = Color("Navy950")
+    static let obsidian = Color("Obsidian")
     static let slate = Color("Slate")
     static let mist = Color("Mist")
     static let taupe = Color("Taupe")
@@ -51,6 +52,7 @@ extension Color {
 
   struct Border {
     static let primary = Pigment.ash
+    static let placeholder = Pigment.pewter
   }
 
   struct Text {
@@ -58,13 +60,23 @@ extension Color {
     static let secondary = Pigment.slate
     static let tertiary = Pigment.mist
     static let placeholder = Pigment.taupe
+    /// Text on an `Accent` fill.
+    static let inverse = Pigment.paper
   }
 
-  /// Something the user earned — a finish time, a PR, a medal's ring.
+  /// Every control's fill, border and tint. Gold never takes this job.
+  struct Accent {
+    static let primary = Pigment.inkNavy
+  }
+
+  /// Something the user earned — a medal's ring, a tier mark. Never tappable, and never
+  /// a value: a finish time is text, not an award.
   struct Record {
-    static let primary = Pigment.gilt
-    static let champagne = Pigment.champagne
-    static let ink = Pigment.navy950
+    static let earned = Pigment.gilt
+    /// The PR badge fill. Fixed in both appearances.
+    static let personalBest = Pigment.champagne
+    /// Text on `personalBest`. Fixed too, so it never inverts out from under its fill.
+    static let onPersonalBest = Pigment.obsidian
   }
 
   /// The double-ring seal, earned and locked. Locked keeps the same silhouette in

@@ -15,7 +15,7 @@ struct RaceEntrySubTitle: View {
       if let selection {
         Text(selection.selectionLabel)
           .font(.TypeScale.callout)
-          .foregroundStyle(Color.Record.primary)
+          .foregroundStyle(Color.Text.primary)
           .frame(maxWidth: .infinity, alignment: .leading)
       } else {
         Text("Tap a distance to select the race entry.")

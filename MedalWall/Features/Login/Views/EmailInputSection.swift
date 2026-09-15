@@ -31,7 +31,7 @@ struct EmailInputSection: View {
       .padding()
       .background(Color.Surface.quaternary)
       .clipShape(.rect(cornerRadius: .Radius.field))
-      .tint(Color.Pigment.inkNavy)
+      .tint(Color.Accent.primary)
 
       Button {
         Task {

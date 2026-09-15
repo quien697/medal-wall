@@ -29,7 +29,7 @@ struct PlaceholderImage: View {
       .clipShape(imageType.shape)
       .overlay(
         imageType.shape
-          .stroke(Color.Pigment.pewter, lineWidth: 1.5)
+          .stroke(Color.Border.placeholder, lineWidth: 1.5)
       )
   }
 }

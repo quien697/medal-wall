@@ -100,7 +100,7 @@ struct RingSeal<Content: View>: View {
     Text(verbatim: "MW")
       .font(.system(size: 28, weight: .black))
       .tracking(-1.12)
-      .foregroundStyle(Color.Record.primary)
+      .foregroundStyle(Color.Record.earned)
   }  // RingSeal
   .padding()
   .background(Color.Background.primary)

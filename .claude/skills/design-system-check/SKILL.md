@@ -164,12 +164,12 @@ Only with `apply` in `$ARGUMENTS`.
 **Never write:**
 
 - any token a ledger entry covers, in any status — the iOS value wins
-- the colour role structs — `Background`, `Surface`, `Border`, `Text`, `Record`, `TierBadge`,
-  `Status`
+- the colour role structs — `Background`, `Surface`, `Border`, `Text`, `Accent`, `Record`,
+  `TierBadge`, `Status`
 - the modifier enums
 - any doc comment
 
-The role structs and enums are design reasoning written as code. `Record.primary = Pigment.gilt`
+The role structs and enums are design reasoning written as code. `Record.earned = Pigment.gilt`
 encodes *gold is never tappable*; `TierBadge.lockedInner = Pigment.ash` encodes *no gold until it
 is earned*. Rewriting them from a token list would keep the values and delete the thinking.
 

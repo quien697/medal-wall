@@ -65,8 +65,8 @@ struct ActionShapeTests {
     shape: ActionShape,
     vPadding: CGFloat? = nil,
     hPadding: CGFloat? = nil
-  ) -> ActionStyleViewModifier {
-    ActionStyleViewModifier(
+  ) -> ActionViewModifier {
+    ActionViewModifier(
       style: .primary,
       shape: shape,
       font: .TypeScale.headline,

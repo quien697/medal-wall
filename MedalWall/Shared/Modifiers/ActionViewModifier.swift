@@ -21,15 +21,15 @@ enum ActionStyle {
 
   fileprivate var foreground: Color {
     switch self {
-    case .primary: Color.Background.primary
-    case .secondary, .tertiary, .neutral, .plain: Color.Pigment.inkNavy
+    case .primary: Color.Text.inverse
+    case .secondary, .tertiary, .neutral, .plain: Color.Accent.primary
     case .destructive: Color.Status.error
     }
   }
 
   fileprivate var background: Color {
     switch self {
-    case .primary: Color.Pigment.inkNavy
+    case .primary: Color.Accent.primary
     case .secondary, .tertiary: Color.Surface.primary
     case .neutral: Color.Surface.tertiary
     case .plain, .destructive: .clear
@@ -39,7 +39,7 @@ enum ActionStyle {
   fileprivate var border: Color {
     switch self {
     case .primary, .neutral, .plain: .clear
-    case .secondary: Color.Pigment.inkNavy
+    case .secondary: Color.Accent.primary
     case .tertiary: Color.Border.primary
     case .destructive: Color.Status.error
     }
@@ -99,6 +99,7 @@ enum ActionShape {
     }
   }
 
+  /// Measured on device rather than taken from the space scale, like `hPadding`.
   fileprivate var vPadding: CGFloat {
     switch self {
     case .roundedRectangle: 16
@@ -115,7 +116,7 @@ enum ActionShape {
 }
 
 /// A view modifier that paints a label as a button.
-struct ActionStyleViewModifier: ViewModifier {
+struct ActionViewModifier: ViewModifier {
   // MARK: - Environment
   @Environment(\.isEnabled) private var isEnabled
 
@@ -177,13 +178,14 @@ extension View {
     hPadding: CGFloat? = nil
   ) -> some View {
     modifier(
-      ActionStyleViewModifier(
+      ActionViewModifier(
         style: style,
         shape: shape,
         font: font,
         vPadding: vPadding,
         hPadding: hPadding
-      ))
+      )
+    )
   }
 }
 

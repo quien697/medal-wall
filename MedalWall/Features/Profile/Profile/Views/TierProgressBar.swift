@@ -17,7 +17,7 @@ struct TierProgressBar: View {
           .fill(Color.Surface.tertiary)
 
         RoundedRectangle(cornerRadius: 3)
-          .fill(Color.Record.primary)
+          .fill(Color.Accent.primary)
           .frame(width: proxy.size.width * fraction)
       }  // ZStack
     }  // GeometryReader

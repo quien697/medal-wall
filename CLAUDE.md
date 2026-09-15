@@ -27,10 +27,10 @@ Code-side tokens. **Read the cases from the source — they are not listed here*
 a list in this file goes stale and then misleads. What is here is the reasoning, which
 the source cannot carry:
 - `Color+Extensions.swift` — `Pigment` (asset names, spelled once) then roles that
-  point at it: `Background`, `Surface`, `Border`, `Text`, `Record`, `Status`,
-  `TierBadge`. Reach for a role first; use a `Pigment` directly only where no role
-  fits (ink on a filled control, ink on champagne). Gold is never tappable — `Record`
-  only ever describes something earned.
+  point at it: `Background`, `Surface`, `Border`, `Text`, `Accent`, `Record`, `Status`,
+  `TierBadge`. Views and modifiers never use a `Pigment` — only roles reference one;
+  when no role fits, add a role. Gold is never tappable — `Record` only ever describes
+  something earned.
 - `Font+Extensions.swift` — `Font.TypeScale`. Line height, tracking and uppercasing
   are **not** in it (`Font` cannot carry them); apply `.tracking()` / `.textCase()`
   at the call site.
@@ -46,8 +46,8 @@ the source cannot carry:
   read-only is a tag.
 - `ElevationViewModifier.swift` — `.elevation(…)`.
 
-A fixed colour needs a fixed counterpart: anything sitting on `Record.champagne`
-(no dark slot) must use `Record.ink`, or it inverts out from under its background.
+A fixed colour needs a fixed counterpart: anything sitting on `Record.personalBest`
+(no dark slot) must use `Record.onPersonalBest`, or it inverts out from under its background.
 
 ### Keeping code and the design system in step
 - `openspec/design-system/tokens.json` records what the design system says. Its git

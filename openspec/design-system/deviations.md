@@ -16,11 +16,7 @@ choosing.
 
 | Token | Code | Design system | Why | Status | Since | Ticket |
 |---|---|---|---|---|---|---|
-| `color.navy950` | `Navy950` `#0F1B2D`, no dark slot | absent | Fixed ink for content sitting on `color.champagne`. Champagne has no dark slot, so anything on it needs a counterpart that does not invert out from under its background. | unreported | 2026-08-26 | MW-29 |
 
-## Notes
-
-**`color.navy950` may be a design system gap rather than an iOS customization.** Its reason
-holds on every platform: `champagne` is a design system token with no dark slot, so Android and
-web will need the same fixed ink. Worth settling when it is raised with design — if it is a gap,
-the design system should name the token and this entry is deleted rather than kept.
+No open deviations. `color.navy950` (MW-29, since 2026-08-26) was resolved in v4.5.3, which
+named the same fixed ink as `color.obsidian` — the code was renamed `Navy950` → `Obsidian` to
+match.
