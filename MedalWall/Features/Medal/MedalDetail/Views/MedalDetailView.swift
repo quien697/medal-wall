@@ -87,7 +87,7 @@ struct MedalDetailView: View {
     }
     .alert(isPresented: $isPresentingDeleteMedalConfirm) {
       .deleteConfirmation(
-        name: viewModel.medal.name,
+        .medal(name: viewModel.medal.name),
         onDelete: {
           Task {
             do {

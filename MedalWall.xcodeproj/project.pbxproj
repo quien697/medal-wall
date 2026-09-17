@@ -112,6 +112,7 @@
 				"Shared/Extensions/Date+Extensions.swift",
 				"Shared/Extensions/TimeInterval+Extensions.swift",
 				"Shared/Extensions/UIImage+Extensions.swift",
+				Shared/UIModels/DeletePrompt.swift,
 				Shared/UIModels/DistanceUnit.swift,
 				Shared/UIModels/ItemEditMode.swift,
 			);

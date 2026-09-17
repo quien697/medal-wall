@@ -10,20 +10,17 @@ import SwiftUI
 /// Shared alerts, so a destructive prompt reads the same wherever it is raised.
 extension Alert {
 
-  /// A two-button confirmation for deleting `name`, with Delete destructive and Cancel
-  /// alongside it.
+  /// A two-button confirmation for deleting what `prompt` names, with Delete destructive
+  /// and Cancel alongside it.
   ///
-  /// `name` is interpolated into the `Delete %@` catalog key, and interpolation localizes
-  /// the key rather than the value it receives. So pass either user data — a race or medal
-  /// name, which should never be translated — or a string already resolved through
-  /// `String.appLocalized`. A bare literal such as `"Edition"` would reach the Chinese
-  /// build untranslated, and nothing would flag it.
+  /// `DeletePrompt` owns both lines: a call site picks the case, never the wording.
   static func deleteConfirmation(
-    name: String,
+    _ prompt: DeletePrompt,
     onDelete: @escaping () -> Void
   ) -> Alert {
     Alert(
-      title: Text("Delete \(name)"),
+      title: Text(prompt.title),
+      message: Text(prompt.message),
       primaryButton: .destructive(Text("Delete"), action: onDelete),
       secondaryButton: .cancel()
     )

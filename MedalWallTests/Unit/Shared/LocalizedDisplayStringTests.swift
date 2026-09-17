@@ -193,4 +193,31 @@ struct LocalizedDisplayStringTests {
         == "Please check your connection and try again."
     )
   }
+
+  // MARK: - DeletePrompt
+  @Test("A delete prompt names its subject in the title")
+  func testDeletePromptTitles() {
+    #expect(DeletePrompt.race(name: "Taipei Marathon").title == "Delete Taipei Marathon?")
+    #expect(
+      DeletePrompt.medal(name: "Taipei Marathon 2019").title == "Delete Taipei Marathon 2019?"
+    )
+    #expect(DeletePrompt.edition(year: 2026).title == "Delete 2026 edition?")
+    #expect(translated("Delete \("Taipei Marathon")?") == "刪除Taipei Marathon？")
+    #expect(translated("Delete \("2026") edition?") == "刪除2026年屆次？")
+  }
+
+  @Test("Only the race prompt spells out what else a delete takes with it")
+  func testDeletePromptMessages() {
+    #expect(
+      DeletePrompt.race(name: "Taipei Marathon").message
+        == "Deleting it also deletes all editions. Medals you've added are kept."
+    )
+    #expect(DeletePrompt.medal(name: "Taipei Marathon 2019").message == "This can't be undone.")
+    #expect(DeletePrompt.edition(year: 2026).message == "This can't be undone.")
+    #expect(
+      translated("Deleting it also deletes all editions. Medals you've added are kept.")
+        == "刪除後，所有屆次也會一併刪除。你已新增的獎牌會保留。"
+    )
+    #expect(translated("This can't be undone.") == "此操作無法復原。")
+  }
 }

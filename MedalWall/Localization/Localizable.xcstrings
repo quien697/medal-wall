@@ -394,12 +394,22 @@
         }
       }
     },
-    "Delete %@" : {
+    "Delete %@ edition?" : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "刪除%@"
+            "value" : "刪除%@年屆次？"
+          }
+        }
+      }
+    },
+    "Delete %@?" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除%@？"
           }
         }
       }
@@ -430,6 +440,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "刪除賽事"
+          }
+        }
+      }
+    },
+    "Deleting it also deletes all editions. Medals you've added are kept." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除後，所有屆次也會一併刪除。你已新增的獎牌會保留。"
           }
         }
       }
@@ -592,16 +612,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "編輯賽事"
-          }
-        }
-      }
-    },
-    "Edition" : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "屆次"
           }
         }
       }
@@ -1780,6 +1790,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "成績"
+          }
+        }
+      }
+    },
+    "This can't be undone." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此操作無法復原。"
           }
         }
       }

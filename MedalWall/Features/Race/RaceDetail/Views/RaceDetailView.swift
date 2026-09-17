@@ -68,7 +68,7 @@ struct RaceDetailView: View {
     }  // toolbar
     .alert(isPresented: $isPresentingDeleteRaceConfirm) {
       .deleteConfirmation(
-        name: viewModel.race.name,
+        .race(name: viewModel.race.name),
         onDelete: {
           Task {
             await viewModel.deleteRace()
