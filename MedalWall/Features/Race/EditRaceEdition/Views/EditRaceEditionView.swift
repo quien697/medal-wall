@@ -110,16 +110,16 @@ struct EditRaceEditionView: View {
             ProgressView()
           } else {
             Button(role: .confirm) {
+              guard let userId = userManager.currentUserID else {
+                errorWrapper = ErrorWrapper(error: AppError.notSignedIn)
+                return
+              }
+
               if let onCommit {
-                let draft = viewModel.buildDraft(userId: userManager.currentUserID ?? "")
+                let draft = viewModel.buildDraft(userId: userId)
                 onCommit(draft)
                 dismiss()
               } else {
-                guard let userId = userManager.currentUserID else {
-                  errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
-                  return
-                }
-
                 Task {
                   await viewModel.save(by: userId)
                   if viewModel.error == nil {
