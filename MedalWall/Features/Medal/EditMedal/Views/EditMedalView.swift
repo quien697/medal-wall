@@ -113,7 +113,7 @@ struct EditMedalView: View {
           } else {
             Button(role: .confirm) {
               guard let userID = userManager.currentUserID else {
-                errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
+                errorWrapper = ErrorWrapper(error: AppError.notSignedIn)
                 return
               }
 

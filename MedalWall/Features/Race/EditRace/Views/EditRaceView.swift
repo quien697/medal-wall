@@ -97,7 +97,7 @@ struct EditRaceView: View {
           } else {
             Button(role: .confirm) {
               guard let userId = userManager.currentUserID else {
-                errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
+                errorWrapper = ErrorWrapper(error: AppError.notSignedIn)
                 return
               }
               Task {

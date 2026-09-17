@@ -170,4 +170,27 @@ struct LocalizedDisplayStringTests {
         == "我們無法載入你的賽事。network down"
     )
   }
+
+  @Test("A missing session reads as signed out, not as a failed load")
+  func testNotSignedInStrings() {
+    let error = AppError.notSignedIn
+
+    #expect(error.title == "Not Signed In")
+    #expect(error.message == "You're not signed in.")
+    #expect(error.guidance == "Please sign in and try again.")
+    #expect(translated("Not Signed In") == "尚未登入")
+    #expect(translated("You're not signed in.") == "你目前尚未登入。")
+    #expect(translated("Please sign in and try again.") == "請登入後再試一次。")
+  }
+
+  @Test("An error bridged through `any Error` still reads its own message and guidance")
+  func testAppErrorLocalizedDescription() {
+    let error: any Error = AppError.raceFetchFailed("network down")
+
+    #expect(error.localizedDescription == "We couldn't load your races. network down")
+    #expect(
+      (error as? LocalizedError)?.recoverySuggestion
+        == "Please check your connection and try again."
+    )
+  }
 }

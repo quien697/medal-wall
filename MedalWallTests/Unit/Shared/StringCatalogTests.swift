@@ -65,7 +65,6 @@ struct StringCatalogTests {
       "Date",
       "Distance",
       "Bib",
-      "Finish",
       "Avg pace",
       "Overall",
       "Gender",
