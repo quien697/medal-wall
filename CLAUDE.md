@@ -128,8 +128,8 @@ Key value types (not persisted directly): `RaceDistance`, `RaceDistanceCategory`
 - No SwiftData (`@Model`, `ModelContext`, `@Query`) — persistence is Firestore only
 
 ## Commands
-- **Build:** `xcodebuild -project MedalWall.xcodeproj -scheme MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build`
-- **Test:** `xcodebuild test -project MedalWall.xcodeproj -scheme MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro'`
+- **Build:** `xcodebuild -project MedalWall.xcodeproj -scheme MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.5' build`
+- **Test:** `xcodebuild test -project MedalWall.xcodeproj -scheme MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.5'`
 - **Single test:** append `-only-testing:MedalWallTests/<TestClass>/<testMethod>`
 - **Lint:** SwiftLint runs automatically as an Xcode build phase; swift-format runs via pre-commit hook
 
