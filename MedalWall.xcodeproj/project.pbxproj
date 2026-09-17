@@ -73,7 +73,6 @@
 				Features/Race/Models/DraftRaceEdition.swift,
 				Features/Race/RaceDetail/ViewModels/RaceDetailViewModel.swift,
 				Features/Race/Races/ViewModels/RacesViewModel.swift,
-				Localization/AppLanguage.swift,
 				"Localization/String+Localization.swift",
 				Managers/UserManager.swift,
 				Models/Achievement/AchievementProgress.swift,
@@ -96,6 +95,8 @@
 				Models/User/User.swift,
 				"Models/User/User+Computed.swift",
 				Models/User/UserName.swift,
+				Preferences/AppLanguage.swift,
+				Preferences/DistanceUnit.swift,
 				Repositories/MedalFirestoreRepository.swift,
 				Repositories/RaceFirestoreRepository.swift,
 				Repositories/UserFirestoreRepository.swift,
@@ -113,7 +114,6 @@
 				"Shared/Extensions/TimeInterval+Extensions.swift",
 				"Shared/Extensions/UIImage+Extensions.swift",
 				Shared/UIModels/DeletePrompt.swift,
-				Shared/UIModels/DistanceUnit.swift,
 				Shared/UIModels/ItemEditMode.swift,
 			);
 			target = 60B570BE2EA616CA000B3FDE /* MedalWallTests */;
