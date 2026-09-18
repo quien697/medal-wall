@@ -147,16 +147,16 @@ struct PlacePickerView: View {
         }
     }
   }
+
+  #Preview("Results") {
+    PlacePickerPreview(.results)
+  }
+
+  #Preview("No results") {
+    PlacePickerPreview(.empty)
+  }
+
+  #Preview("Error") {
+    PlacePickerPreview(.failure)
+  }
 #endif
-
-#Preview("Results") {
-  PlacePickerPreview(.results)
-}
-
-#Preview("No results") {
-  PlacePickerPreview(.empty)
-}
-
-#Preview("Error") {
-  PlacePickerPreview(.failure)
-}
