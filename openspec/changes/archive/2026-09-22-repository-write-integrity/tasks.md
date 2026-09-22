@@ -78,5 +78,5 @@
       offered and skipped as unnecessary.
 - [x] 6.3 Confirm no UI tokens changed, so `design-system-check` is not required for this
       change. No colour, font, radius, spacing or modifier was touched.
-- [ ] 6.4 Archive the change (`openspec-archive-change`) so `persistence-integrity` and the
+- [x] 6.4 Archive the change (`openspec-archive-change`) so `persistence-integrity` and the
       `races` delta fold into `openspec/specs/`.
