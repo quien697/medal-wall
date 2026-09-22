@@ -30,13 +30,14 @@ final class EditRaceViewModel {
   // MARK: - Dependencies
   let mode: ItemEditMode
   private let race: Race?
-  private let repository = RaceFirestoreRepository()
+  private let repository: any RaceRepository
   private let storageService = StorageService()
 
   // MARK: - Init
-  init(mode: ItemEditMode, race: Race?) {
+  init(mode: ItemEditMode, race: Race?, repository: (any RaceRepository)? = nil) {
     self.mode = mode
     self.race = race
+    self.repository = repository ?? RaceFirestoreRepository()
 
     if let race, mode == .edit {
       self.name = race.name

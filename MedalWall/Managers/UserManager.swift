@@ -11,7 +11,7 @@ import SwiftUI
 @Observable
 class UserManager {
   // MARK: - Properties
-  private let repository = UserFirestoreRepository()
+  private let repository: any UserRepository
   private let authService = AuthService()
   private let storageService = StorageService()
   private var firebaseUser: FirebaseAuth.User?
@@ -22,7 +22,8 @@ class UserManager {
   var isLoggedIn: Bool { firebaseUser != nil }
 
   // MARK: - Init
-  init() {
+  init(repository: (any UserRepository)? = nil) {
+    self.repository = repository ?? UserFirestoreRepository()
     addAuthListener()
   }
 

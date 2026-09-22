@@ -28,14 +28,20 @@ final class EditRaceEditionViewModel {
   let mode: ItemEditMode
   private let raceId: String
   private let edition: RaceEdition?
-  private let repository = RaceFirestoreRepository()
+  private let repository: any RaceRepository
   private let storageService = StorageService()
 
   // MARK: - Init
-  init(mode: ItemEditMode, raceId: String, edition: RaceEdition?) {
+  init(
+    mode: ItemEditMode,
+    raceId: String,
+    edition: RaceEdition?,
+    repository: (any RaceRepository)? = nil
+  ) {
     self.mode = mode
     self.raceId = raceId
     self.edition = edition
+    self.repository = repository ?? RaceFirestoreRepository()
 
     if let edition, mode == .edit {
       self.year = edition.year

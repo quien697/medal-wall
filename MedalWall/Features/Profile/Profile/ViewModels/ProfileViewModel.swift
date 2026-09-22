@@ -13,7 +13,12 @@ final class ProfileViewModel {
   var medals: [Medal] = []
 
   // MARK: - Dependencies
-  private let repository = MedalFirestoreRepository()
+  private let repository: any MedalRepository
+
+  // MARK: - Init
+  init(repository: (any MedalRepository)? = nil) {
+    self.repository = repository ?? MedalFirestoreRepository()
+  }
 
   // MARK: - Computed
   var totalMedals: Int { medals.count }

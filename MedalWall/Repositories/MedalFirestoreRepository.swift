@@ -8,7 +8,29 @@
 import FirebaseFirestore
 import Foundation
 
-final class MedalFirestoreRepository {
+/// The medal store, behind a protocol so callers can be tested against a stub.
+///
+/// Callers take this as `(any MedalRepository)? = nil` and resolve it with
+/// `?? MedalFirestoreRepository()` inside `init`, because a default argument expression is
+/// evaluated in a nonisolated context and cannot construct a `@MainActor` type.
+protocol MedalRepository {
+  /// Fetches all medals for a user. Callers map a failure to `AppError.medalFetchFailed`.
+  func fetchMedals(userId: String) async throws -> [Medal]
+
+  /// Fetches a single medal by ID, or nil when it does not exist.
+  func fetchMedal(id: String, userId: String) async throws -> Medal?
+
+  /// Creates a medal. Callers map a failure to `AppError.medalSaveFailed`.
+  func createMedal(_ medal: Medal) async throws
+
+  /// Updates a medal. Callers map a failure to `AppError.medalSaveFailed`.
+  func updateMedal(_ medal: Medal) async throws
+
+  /// Deletes a medal. Callers map a failure to `AppError.medalDeleteFailed`.
+  func deleteMedal(id: String, userId: String) async throws
+}
+
+final class MedalFirestoreRepository: MedalRepository {
   private var db: Firestore { Firestore.firestore() }
 
   private func medalsRef(userId: String) -> CollectionReference {

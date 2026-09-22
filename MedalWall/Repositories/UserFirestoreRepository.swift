@@ -8,7 +8,23 @@
 import FirebaseFirestore
 import Foundation
 
-final class UserFirestoreRepository {
+/// The user store, behind a protocol so callers can be tested against a stub.
+///
+/// Callers take this as `(any UserRepository)? = nil` and resolve it with
+/// `?? UserFirestoreRepository()` inside `init`, because a default argument expression is
+/// evaluated in a nonisolated context and cannot construct a `@MainActor` type.
+protocol UserRepository {
+  /// Fetches the user document, or nil when it does not exist.
+  func fetchUser(uid: String) async throws -> User?
+
+  /// Creates a user document. Callers map a failure to `AppError.userSaveFailed`.
+  func createUser(_ user: User) async throws
+
+  /// Updates a user document. Callers map a failure to `AppError.userSaveFailed`.
+  func updateUser(_ user: User) async throws
+}
+
+final class UserFirestoreRepository: UserRepository {
   private var db: Firestore { Firestore.firestore() }
   private let collection = "users"
 

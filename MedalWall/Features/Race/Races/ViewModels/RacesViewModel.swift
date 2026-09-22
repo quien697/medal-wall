@@ -18,7 +18,12 @@ final class RacesViewModel {
   var searchText: String = ""
 
   // MARK: - Dependencies
-  private let repository = RaceFirestoreRepository()
+  private let repository: any RaceRepository
+
+  // MARK: - Init
+  init(repository: (any RaceRepository)? = nil) {
+    self.repository = repository ?? RaceFirestoreRepository()
+  }
 
   // MARK: - Computed
   var filteredRaces: [Race] {

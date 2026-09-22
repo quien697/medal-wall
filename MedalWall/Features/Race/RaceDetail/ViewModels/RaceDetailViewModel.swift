@@ -13,11 +13,12 @@ final class RaceDetailViewModel {
   var editions: [RaceEdition] = []
   var isLoading = false
   var error: AppError?
-  private let repository = RaceFirestoreRepository()
+  private let repository: any RaceRepository
 
   // MARK: - Init
-  init(race: Race) {
+  init(race: Race, repository: (any RaceRepository)? = nil) {
     self.race = race
+    self.repository = repository ?? RaceFirestoreRepository()
   }
 
   // MARK: - Functions

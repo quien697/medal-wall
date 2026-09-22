@@ -34,14 +34,15 @@ final class EditMedalViewModel {
   let mode: ItemEditMode
   private let medal: Medal?
   private let medalId: String
-  private let repository = MedalFirestoreRepository()
+  private let repository: any MedalRepository
   private let storageService = StorageService()
 
   // MARK: - Init
-  init(mode: ItemEditMode, medal: Medal? = nil) {
+  init(mode: ItemEditMode, medal: Medal? = nil, repository: (any MedalRepository)? = nil) {
     self.mode = mode
     self.medal = medal
     self.medalId = medal?.id ?? UUID().uuidString
+    self.repository = repository ?? MedalFirestoreRepository()
 
     if let medal, mode == .edit {
       self.name = medal.name

@@ -12,8 +12,13 @@ struct RaceEntryPicker: View {
   @State private var selection: RaceEntry?
   @State private var races: [Race] = []
   @State private var editions: [String: [RaceEdition]] = [:]
-  private let repository = RaceFirestoreRepository()
+  private let repository: any RaceRepository
   let onSelect: (RaceEntry) -> Void
+
+  init(repository: (any RaceRepository)? = nil, onSelect: @escaping (RaceEntry) -> Void) {
+    self.repository = repository ?? RaceFirestoreRepository()
+    self.onSelect = onSelect
+  }
 
   var body: some View {
     NavigationStack {

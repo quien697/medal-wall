@@ -29,7 +29,12 @@ final class MedalsViewModel {
   }
 
   // MARK: - Dependencies
-  private let repository = MedalFirestoreRepository()
+  private let repository: any MedalRepository
+
+  // MARK: - Init
+  init(repository: (any MedalRepository)? = nil) {
+    self.repository = repository ?? MedalFirestoreRepository()
+  }
 
   // MARK: - Computed
   /// `All` followed by one option per distance the user owns, longest first.

@@ -17,13 +17,18 @@ final class MedalDetailViewModel {
   /// elsewhere in the collection can demote or promote this medal between reloads, and
   /// the "PR" tag should follow the latest state without the user popping the screen.
   var personalRecordIDs: Set<String>
-  private let repository = MedalFirestoreRepository()
+  private let repository: any MedalRepository
   private static let unfilled = "—"
 
   // MARK: - Init
-  init(medal: Medal, personalRecordIDs: Set<String> = []) {
+  init(
+    medal: Medal,
+    personalRecordIDs: Set<String> = [],
+    repository: (any MedalRepository)? = nil
+  ) {
     self.medal = medal
     self.personalRecordIDs = personalRecordIDs
+    self.repository = repository ?? MedalFirestoreRepository()
   }
 
   // MARK: - Computed
@@ -118,15 +123,29 @@ final class MedalDetailViewModel {
   /// Reloads the medal from Firestore and updates the local state, including the live
   /// record set so an edit elsewhere in the collection that demotes or promotes this
   /// medal is reflected on the "PR" tag without the user leaving the screen.
+  ///
+  /// The two fetches run concurrently through methods on `self` rather than `async let` on
+  /// the repository directly: `self` is main-actor isolated and so can cross into a child
+  /// task, where the injected `any MedalRepository` existential cannot.
   func reloadMedal() async {
-    async let updatedMedal = repository.fetchMedal(id: medal.id, userId: medal.userID)
-    async let allMedals = repository.fetchMedals(userId: medal.userID)
+    async let updatedMedal = fetchMedal()
+    async let allMedals = fetchAllMedals()
     guard let updated = try? await updatedMedal else { return }
 
     medal = updated
     if let all = try? await allMedals {
       personalRecordIDs = all.personalRecordIDs
     }
+  }
+
+  /// Fetches this medal on its own, for the concurrent reload above.
+  private func fetchMedal() async throws -> Medal? {
+    try await repository.fetchMedal(id: medal.id, userId: medal.userID)
+  }
+
+  /// Fetches the owner's whole collection, for the concurrent reload above.
+  private func fetchAllMedals() async throws -> [Medal] {
+    try await repository.fetchMedals(userId: medal.userID)
   }
 
   /// Deletes the medal from Firestore.
