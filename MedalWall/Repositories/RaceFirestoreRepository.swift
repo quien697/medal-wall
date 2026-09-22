@@ -48,36 +48,69 @@ protocol RaceRepository {
 
 final class RaceFirestoreRepository: RaceRepository {
   private var db: Firestore { Firestore.firestore() }
-  private let collection = "races"
-  private let editionsCollection = "editions"
-  private let editionCount = "editionCount"
+  private static let collection = "races"
+  private static let editionsCollection = "editions"
+  private static let editionCountField = "editionCount"
+
+  /// Every race field an update writes. `editionCount` is absent on purpose: the edition
+  /// operations own it, and a client editing a name holds only the count it read earlier.
+  ///
+  /// `RaceFirestoreRepositoryTests` fails if `Race` gains a field missing from this list,
+  /// so a new field cannot quietly stop being saved.
+  static let raceUpdateFields = [
+    "id",
+    "name",
+    "photoUrl",
+    "place",
+    "websiteUrl",
+    "createdBy",
+    "createdAt",
+    "updatedAt"
+  ]
 
   // MARK: - Race
   /// Fetches all races created.
   func fetchRaces() async throws -> [Race] {
-    let snapshot = try await db.collection(collection).getDocuments()
+    let snapshot = try await db.collection(Self.collection).getDocuments()
     return try snapshot.documents.map { try $0.data(as: Race.self) }
   }
 
   /// Fetches a single race by ID. Returns nil if the document does not exist.
   func fetchRace(id: String) async throws -> Race? {
-    let snapshot = try await db.collection(collection).document(id).getDocument()
+    let snapshot = try await db.collection(Self.collection).document(id).getDocument()
     guard snapshot.exists else { return nil }
     return try snapshot.data(as: Race.self)
   }
 
-  /// Creates a new race document in Firestore.
+  /// Creates a new race document in Firestore, establishing its edition count at zero.
   func createRace(_ race: Race) async throws {
-    try await db.collection(collection).document(race.id)
+    try await db.collection(Self.collection).document(race.id)
       .setData(Firestore.Encoder().encode(race))
   }
 
-  /// Replaces the race document with the updated Race and stamps updatedAt.
+  /// Updates the race's own fields and stamps updatedAt, leaving `editionCount` untouched.
+  ///
+  /// An update rather than a replace, so a count another client incremented between this
+  /// race being read and saved survives the edit. It fails if the race no longer exists,
+  /// which is correct: an edit should not resurrect a race someone else deleted.
   func updateRace(_ race: Race) async throws {
     var updated = race
     updated.updatedAt = Date()
-    try await db.collection(collection).document(updated.id)
-      .setData(Firestore.Encoder().encode(updated))
+    try await db.collection(Self.collection).document(updated.id)
+      .updateData(Self.updateFields(for: updated))
+  }
+
+  /// The fields a race update writes: everything encoded except `editionCount`, plus an
+  /// explicit delete for each updatable field the race no longer carries, so clearing a
+  /// photo or a website URL removes the stored value instead of leaving it behind.
+  static func updateFields(for race: Race) throws -> [String: Any] {
+    var fields = try Firestore.Encoder().encode(race)
+    fields.removeValue(forKey: editionCountField)
+
+    for field in raceUpdateFields where fields[field] == nil {
+      fields[field] = FieldValue.delete()
+    }
+    return fields
   }
 
   /// Deletes a race and all of its editions.
@@ -86,12 +119,13 @@ final class RaceFirestoreRepository: RaceRepository {
     for edition in editions {
       try await deleteEdition(raceId: id, editionId: edition.id)
     }
-    try await db.collection(collection).document(id).delete()
+    try await db.collection(Self.collection).document(id).delete()
   }
 
   // MARK: - Race Edition
   private func editionsRef(raceId: String) -> CollectionReference {
-    db.collection(collection).document(raceId).collection(editionsCollection)
+    db.collection(Self.collection).document(raceId)
+      .collection(Self.editionsCollection)
   }
 
   /// Fetches all editions for a given race.
@@ -100,13 +134,17 @@ final class RaceFirestoreRepository: RaceRepository {
     return try snapshot.documents.map { try $0.data(as: RaceEdition.self) }
   }
 
-  /// Creates a new edition document under the race and increments the race's edition count.
+  /// Creates a new edition document under the race and increments the race's edition count,
+  /// both in one batch so the edition and the count cannot disagree.
   func createEdition(_ edition: RaceEdition) async throws {
-    try await editionsRef(raceId: edition.raceId).document(edition.id)
-      .setData(Firestore.Encoder().encode(edition))
-    try? await db.collection(collection).document(edition.raceId).updateData([
-      editionCount: FieldValue.increment(Int64(1))
-    ])
+    let batch = db.batch()
+    try batch.setData(
+      from: edition, forDocument: editionsRef(raceId: edition.raceId).document(edition.id))
+    batch.updateData(
+      [Self.editionCountField: FieldValue.increment(Int64(1))],
+      forDocument: db.collection(Self.collection).document(edition.raceId)
+    )
+    try await batch.commit()
   }
 
   /// Replaces the edition document with the updated RaceEdition and stamps updatedAt.
@@ -117,11 +155,15 @@ final class RaceFirestoreRepository: RaceRepository {
       .setData(Firestore.Encoder().encode(updated))
   }
 
-  /// Deletes a single edition by ID and decrements the race's edition count.
+  /// Deletes a single edition and decrements the race's edition count, both in one batch so
+  /// the edition and the count cannot disagree.
   func deleteEdition(raceId: String, editionId: String) async throws {
-    try await editionsRef(raceId: raceId).document(editionId).delete()
-    try? await db.collection(collection).document(raceId).updateData([
-      editionCount: FieldValue.increment(Int64(-1))
-    ])
+    let batch = db.batch()
+    batch.deleteDocument(editionsRef(raceId: raceId).document(editionId))
+    batch.updateData(
+      [Self.editionCountField: FieldValue.increment(Int64(-1))],
+      forDocument: db.collection(Self.collection).document(raceId)
+    )
+    try await batch.commit()
   }
 }
