@@ -50,6 +50,26 @@ struct RacesViewModelRepositoryTests {
     }
   }
 
+  @Test("a negative stored edition count is presented as zero")
+  func testNegativeEditionCountIsClamped() async {
+    let repository = StubRaceRepository(races: [makeRace(id: "a", editionCount: -1)])
+    let viewModel = RacesViewModel(repository: repository)
+
+    await viewModel.loadRaces()
+
+    #expect(viewModel.filteredRaces.first?.editionCount == 0)
+  }
+
+  @Test("a real edition count passes through unchanged")
+  func testPositiveEditionCountIsKept() async {
+    let repository = StubRaceRepository(races: [makeRace(id: "a", editionCount: 3)])
+    let viewModel = RacesViewModel(repository: repository)
+
+    await viewModel.loadRaces()
+
+    #expect(viewModel.filteredRaces.first?.editionCount == 3)
+  }
+
   @Test("a failed delete surfaces raceDeleteFailed and keeps the race")
   func testFailedDeleteSurfacesError() async {
     let race = makeRace(id: "a")

@@ -26,14 +26,22 @@ final class RacesViewModel {
   }
 
   // MARK: - Computed
+  /// The races to show, searched and sorted, each with `editionCount` clamped to zero or
+  /// more: the count is maintained server-side, so a corrupt value must not reach a row and
+  /// render as "-1 editions".
   var filteredRaces: [Race] {
     let searched =
       searchText.isEmpty
       ? races
       : races.filter { $0.name.localizedStandardContains(searchText) }
-    return searched.sorted {
-      $0.name.localizedCompare($1.name) == .orderedAscending
-    }
+    return
+      searched
+      .sorted { $0.name.localizedCompare($1.name) == .orderedAscending }
+      .map { race in
+        var clamped = race
+        clamped.editionCount = max(0, race.editionCount)
+        return clamped
+      }
   }
 
   // MARK: - Functions
