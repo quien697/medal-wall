@@ -52,6 +52,9 @@ final class RaceFirestoreRepository: RaceRepository {
   private static let editionsCollection = "editions"
   private static let editionCountField = "editionCount"
 
+  /// Firestore commits at most 500 operations in one batch.
+  static let batchLimit = 500
+
   /// Every race field an update writes. `editionCount` is absent on purpose: the edition
   /// operations own it, and a client editing a name holds only the count it read earlier.
   ///
@@ -113,13 +116,35 @@ final class RaceFirestoreRepository: RaceRepository {
     return fields
   }
 
-  /// Deletes a race and all of its editions.
+  /// Deletes a race and all of its editions in batched commits, since Firestore does not
+  /// cascade-delete subcollections.
+  ///
+  /// No count updates: decrementing a document this same batch deletes is work for nothing.
   func deleteRace(id: String) async throws {
-    let editions = try await fetchEditions(raceId: id)
-    for edition in editions {
-      try await deleteEdition(raceId: id, editionId: edition.id)
+    let editionIds = try await fetchEditions(raceId: id).map { $0.id }
+    let chunks = Self.deletionChunks(editionIds: editionIds)
+
+    for (index, chunk) in chunks.enumerated() {
+      let batch = db.batch()
+      for editionId in chunk {
+        batch.deleteDocument(editionsRef(raceId: id).document(editionId))
+      }
+      if index == chunks.count - 1 {
+        batch.deleteDocument(db.collection(Self.collection).document(id))
+      }
+      try await batch.commit()
     }
-    try await db.collection(Self.collection).document(id).delete()
+  }
+
+  /// Splits edition ids into batches that leave room for the race delete, which always goes
+  /// in the last one: an interrupted delete then leaves a race holding fewer editions rather
+  /// than editions orphaned under a race that is already gone.
+  static func deletionChunks(editionIds: [String], limit: Int = batchLimit) -> [[String]] {
+    guard !editionIds.isEmpty else { return [[]] }
+
+    return stride(from: 0, to: editionIds.count, by: limit - 1).map { start in
+      Array(editionIds[start..<min(start + limit - 1, editionIds.count)])
+    }
   }
 
   // MARK: - Race Edition
