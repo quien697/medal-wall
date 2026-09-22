@@ -37,13 +37,15 @@ final class UserFirestoreRepository: UserRepository {
 
   /// Creates a new user document in Firestore.
   func createUser(_ user: User) async throws {
-    try db.collection(collection).document(user.uid).setData(from: user)
+    try await db.collection(collection).document(user.uid)
+      .setData(Firestore.Encoder().encode(user))
   }
 
   /// Replaces the user document with the updated User and stamps updatedAt.
   func updateUser(_ user: User) async throws {
     var updated = user
     updated.updatedAt = Date()
-    try db.collection(collection).document(updated.uid).setData(from: updated)
+    try await db.collection(collection).document(updated.uid)
+      .setData(Firestore.Encoder().encode(updated))
   }
 }

@@ -68,14 +68,16 @@ final class RaceFirestoreRepository: RaceRepository {
 
   /// Creates a new race document in Firestore.
   func createRace(_ race: Race) async throws {
-    try db.collection(collection).document(race.id).setData(from: race)
+    try await db.collection(collection).document(race.id)
+      .setData(Firestore.Encoder().encode(race))
   }
 
   /// Replaces the race document with the updated Race and stamps updatedAt.
   func updateRace(_ race: Race) async throws {
     var updated = race
     updated.updatedAt = Date()
-    try db.collection(collection).document(updated.id).setData(from: updated)
+    try await db.collection(collection).document(updated.id)
+      .setData(Firestore.Encoder().encode(updated))
   }
 
   /// Deletes a race and all of its editions.
@@ -100,7 +102,8 @@ final class RaceFirestoreRepository: RaceRepository {
 
   /// Creates a new edition document under the race and increments the race's edition count.
   func createEdition(_ edition: RaceEdition) async throws {
-    try editionsRef(raceId: edition.raceId).document(edition.id).setData(from: edition)
+    try await editionsRef(raceId: edition.raceId).document(edition.id)
+      .setData(Firestore.Encoder().encode(edition))
     try? await db.collection(collection).document(edition.raceId).updateData([
       editionCount: FieldValue.increment(Int64(1))
     ])
@@ -110,7 +113,8 @@ final class RaceFirestoreRepository: RaceRepository {
   func updateEdition(_ edition: RaceEdition) async throws {
     var updated = edition
     updated.updatedAt = Date()
-    try editionsRef(raceId: updated.raceId).document(updated.id).setData(from: updated)
+    try await editionsRef(raceId: updated.raceId).document(updated.id)
+      .setData(Firestore.Encoder().encode(updated))
   }
 
   /// Deletes a single edition by ID and decrements the race's edition count.

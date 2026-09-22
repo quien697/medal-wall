@@ -53,18 +53,21 @@ final class MedalFirestoreRepository: MedalRepository {
 
   /// Creates a new medal document in Firestore.
   func createMedal(_ medal: Medal) async throws {
-    try medalsRef(userId: medal.userID).document(medal.id).setData(from: medal)
+    try await medalsRef(userId: medal.userID).document(medal.id)
+      .setData(Firestore.Encoder().encode(medal))
   }
 
   /// Replaces the medal document with the updated Medal and stamps updatedAt.
   func updateMedal(_ medal: Medal) async throws {
     var updated = medal
     updated.updatedAt = Date()
-    try medalsRef(userId: updated.userID).document(updated.id).setData(from: updated)
+    try await medalsRef(userId: updated.userID).document(updated.id)
+      .setData(Firestore.Encoder().encode(updated))
   }
 
   /// Deletes a medal document.
   func deleteMedal(id: String, userId: String) async throws {
-    try await medalsRef(userId: userId).document(id).delete()
+    try await medalsRef(userId: userId).document(id)
+      .delete()
   }
 }
