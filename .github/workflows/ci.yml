@@ -21,6 +21,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check formatting
+        run: |
+          # --strict: without it findings are only warnings and the command exits 0, so a
+          # misformatted file would sail through CI. A config swift-format cannot read also
+          # exits non-zero here, which is how this step earns its keep: formatting was
+          # previously enforced only by the local pre-commit hook, which is untracked and
+          # ignores the formatter's exit status.
+          swift format lint --recursive --parallel --strict .
+
+      - name: Lint
+        run: |
+          # --strict: most rules in .swiftlint.yml are warnings, and SwiftLint exits 0 on
+          # warnings alone, so without this the step would report violations and still pass.
+          # github-actions-logging: violations appear as annotations on the PR diff.
+          # SwiftLint is pre-installed on the runner image; its version can run ahead of the
+          # local one, so a new rule may fail here before it fails on a developer's machine.
+          swiftlint lint --strict --reporter github-actions-logging
+
       - name: Cache SPM packages
         uses: actions/cache@v4
         with:
