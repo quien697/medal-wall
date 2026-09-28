@@ -53,7 +53,7 @@ final class EditMedalViewModel {
       self.finishTime = medal.finishTime
       self.overallPlacement = medal.overallPlacement
       self.totalParticipants = medal.totalParticipants
-      self.division = medal.divisionEnum
+      self.division = medal.parsedDivision
       self.divisionPlacement = medal.divisionPlacement
       self.divisionTotal = medal.divisionTotal
       self.genderPlacement = medal.genderPlacement

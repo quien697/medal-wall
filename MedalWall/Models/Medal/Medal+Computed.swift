@@ -23,7 +23,11 @@ extension Medal {
     return (recordedFinishTime / 60) / distance.category.value
   }
 
-  var divisionEnum: Division? {
+  /// The stored `division` string as a `Division`, or `nil` when absent or unrecognised.
+  ///
+  /// `division` stays a string on purpose: an unrecognised value then hides the division
+  /// instead of failing the whole medal's decode.
+  var parsedDivision: Division? {
     guard let division else { return nil }
     return Division(rawValue: division)
   }

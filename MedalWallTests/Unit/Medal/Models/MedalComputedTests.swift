@@ -110,28 +110,28 @@ struct MedalComputedTests {
     #expect(medal.averagePace == expected)
   }
 
-  // MARK: - divisionEnum
-  @Test("divisionEnum is nil when division is nil")
-  func testDivisionEnumNilWhenNoDivision() {
+  // MARK: - parsedDivision
+  @Test("parsedDivision is nil when division is nil")
+  func testParsedDivisionNilWhenNoDivision() {
     let medal = makeMedal()
 
-    #expect(medal.divisionEnum == nil)
+    #expect(medal.parsedDivision == nil)
   }
 
-  @Test("divisionEnum reconstructs a valid Division from its stored raw value")
-  func testDivisionEnumValid() {
+  @Test("parsedDivision reconstructs a valid Division from its stored raw value")
+  func testParsedDivisionValid() {
     let division = Division(gender: .male, ageGroup: .from30to34)
     let medal = makeMedal(division: division)
 
-    #expect(medal.divisionEnum?.gender == .male)
-    #expect(medal.divisionEnum?.ageGroup == .from30to34)
+    #expect(medal.parsedDivision?.gender == .male)
+    #expect(medal.parsedDivision?.ageGroup == .from30to34)
   }
 
-  @Test("divisionEnum round-trips through Medal storage for a female division")
-  func testDivisionEnumRoundTripFemale() {
+  @Test("parsedDivision round-trips through Medal storage for a female division")
+  func testParsedDivisionRoundTripFemale() {
     let division = Division(gender: .female, ageGroup: .from40to44)
     let medal = makeMedal(division: division)
 
-    #expect(medal.divisionEnum == division)
+    #expect(medal.parsedDivision == division)
   }
 }

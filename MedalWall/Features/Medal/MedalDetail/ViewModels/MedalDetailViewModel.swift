@@ -70,7 +70,7 @@ final class MedalDetailViewModel {
   /// The division field's label, naming the group the placement was run within so the two
   /// read as one fact rather than two measurements.
   var divisionLabel: String {
-    guard let division = medal.divisionEnum else { return .appLocalized("Division") }
+    guard let division = medal.parsedDivision else { return .appLocalized("Division") }
     return .appLocalized("Division (\(division.displayName))")
   }
 

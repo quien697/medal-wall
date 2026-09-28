@@ -79,7 +79,7 @@ struct EditMedalPlacementSection: View {
       totalParticipants: .constant(medal.totalParticipants),
       genderPlacement: .constant(medal.genderPlacement),
       genderTotal: .constant(medal.genderTotal),
-      division: .constant(medal.divisionEnum),
+      division: .constant(medal.parsedDivision),
       divisionPlacement: .constant(medal.divisionPlacement),
       divisionTotal: .constant(medal.divisionTotal)
     )
