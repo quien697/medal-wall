@@ -115,12 +115,12 @@ class UserManager {
       if let existing = try await repository.fetchUser(uid: firebaseUser.uid) {
         self.currentUser = existing
       } else {
-        let newUser = User(firebaseUser: firebaseUser)
+        let newUser = User(uid: firebaseUser.uid, email: firebaseUser.email)
         try await repository.createUser(newUser)
         self.currentUser = newUser
       }
     } catch {
-      self.currentUser = User(firebaseUser: firebaseUser)
+      self.currentUser = User(uid: firebaseUser.uid, email: firebaseUser.email)
     }
   }
 }

@@ -5,7 +5,6 @@
 //  Created by Quien on 2026-04-28.
 //
 
-import FirebaseAuth
 import Foundation
 
 struct User: Codable {
@@ -22,24 +21,8 @@ struct User: Codable {
   var highestFullMilestone: Int?
   var highestHalfMilestone: Int?
 
-  /// Creates a new User from Firebase Auth on first sign-in.
-  /// firstName/lastName are seeded separately from the provider via UserDefaults.
-  init(firebaseUser: FirebaseAuth.User) {
-    uid = firebaseUser.uid
-    email = firebaseUser.email
-    firstName = nil
-    lastName = nil
-    photoUrl = nil
-    bio = nil
-    gender = nil
-    birthday = nil
-    createdAt = Date()
-    updatedAt = nil
-    highestFullMilestone = nil
-    highestHalfMilestone = nil
-  }
-
-  /// Creates a User with explicit field values for use in previews and tests.
+  /// Creates a User. A first sign-in knows only `uid` and `email`; every other field
+  /// starts empty until the user edits their profile.
   init(
     uid: String,
     email: String?,
