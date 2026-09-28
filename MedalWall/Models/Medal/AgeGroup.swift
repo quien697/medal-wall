@@ -36,7 +36,7 @@ enum AgeGroup: String, Codable, CaseIterable, Identifiable {
 
   var id: String { rawValue }
 
-  nonisolated var displayName: String {
+  var displayName: String {
     switch self {
     case .under20: return .appLocalized("Under 20")
     case .from20to24: return "20–24"

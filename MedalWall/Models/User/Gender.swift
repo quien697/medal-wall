@@ -11,14 +11,14 @@ enum Gender: String, CaseIterable, Codable {
   case male
   case female
 
-  nonisolated var displayName: String {
+  var displayName: String {
     switch self {
     case .male: return .appLocalized("Male")
     case .female: return .appLocalized("Female")
     }
   }
 
-  nonisolated var shortName: String {
+  var shortName: String {
     switch self {
     case .male: return .appLocalized("M")
     case .female: return .appLocalized("F")
