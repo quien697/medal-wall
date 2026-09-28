@@ -57,7 +57,7 @@ enum AgeGroup: String, Codable, CaseIterable, Identifiable {
     case .from40to49: return "40–49"
     case .from50to59: return "50–59"
     case .from60to69: return "60–69"
-    case .from70to79: return "70-79"
+    case .from70to79: return "70–79"
     }
   }
 

@@ -71,6 +71,14 @@ struct LocalizedDisplayStringTests {
     #expect(AgeGroup.from60to69.displayName == "60–69")
   }
 
+  @Test(
+    "Every age group bracket separates its range with an en dash, never a hyphen",
+    arguments: AgeGroup.allCases
+  )
+  func testAgeGroupDisplayNameUsesEnDash(ageGroup: AgeGroup) {
+    #expect(!ageGroup.displayName.contains("-"))
+  }
+
   // MARK: - Division
   @Test("Division display name composes gender and age group")
   func testDivisionDisplayName() {
