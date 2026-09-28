@@ -5,10 +5,9 @@
 //  Created by Quien on 2025-11-05.
 //
 
-import SwiftUI
+import Foundation
 
-/// Represents standard or custom marathon distance categories,
-/// used to display each distance with a distinct color.
+/// Represents standard or custom marathon distance categories.
 enum RaceDistanceCategory: CustomStringConvertible, Hashable {
   case full
   case half

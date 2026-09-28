@@ -6,8 +6,8 @@
 //
 
 /// A race division combining gender and age group bracket.
-/// Displayed as e.g. "Male 30-34", "Female Under 20".
-/// Stored as a pipe-separated raw string: "male|30-34".
+/// Displayed as e.g. "M 30–34", "F Under 20".
+/// Stored as a space-separated raw string: "male from30to34".
 struct Division: Hashable, Sendable {
   var gender: Gender
   var ageGroup: AgeGroup
