@@ -86,7 +86,7 @@ extension Array where Element == Medal {
     var records: [RaceDistanceCategory: Medal] = [:]
 
     for medal in sortedForDisplay {
-      guard let finishTime = medal.finishTime, finishTime > 0 else { continue }
+      guard let finishTime = medal.recordedFinishTime else { continue }
       let category = RaceDistanceCategory.nearestPreset(forValue: medal.distance.category.value)
 
       guard let leader = records[category] else {
@@ -94,7 +94,7 @@ extension Array where Element == Medal {
         continue
       }
 
-      let leaderTime = leader.finishTime ?? .greatestFiniteMagnitude
+      let leaderTime = leader.recordedFinishTime ?? .greatestFiniteMagnitude
       if finishTime < leaderTime || (finishTime == leaderTime && medal.date < leader.date) {
         records[category] = medal
       }

@@ -13,15 +13,13 @@ extension Array where Element == Medal {
 
   var bestFullTime: TimeInterval? {
     filter { $0.distance.category == .full }
-      .compactMap { $0.finishTime }
-      .filter { $0 > 0 }
+      .compactMap(\.recordedFinishTime)
       .min()
   }
 
   var bestHalfTime: TimeInterval? {
     filter { $0.distance.category == .half }
-      .compactMap { $0.finishTime }
-      .filter { $0 > 0 }
+      .compactMap(\.recordedFinishTime)
       .min()
   }
 }
