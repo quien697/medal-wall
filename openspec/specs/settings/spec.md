@@ -49,6 +49,6 @@ owned by the `distance-units` capability.
 - **THEN** Miles is shown as the current selection
 
 #### Scenario: Switching the unit dismisses Settings
-- **WHEN** a user changes the distance unit while the Settings sheet is open
-- **THEN** the app re-renders and the sheet is dismissed, matching the existing behaviour
+- **WHEN** a user changes the distance unit while the Settings screen is open
+- **THEN** the app re-renders and Settings is closed, matching the existing behaviour
   of changing the app language
