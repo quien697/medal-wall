@@ -87,8 +87,6 @@ struct DraftRaceEdition: Identifiable {
   }
 
   var dateDisplayLabel: String {
-    let start = startDate.formattedMonthDay()
-    let end = ", \(endDate.formattedMonthDay())"
-    return "\(start)\(isOneDay ? "" : end)"
+    RaceEdition.dateDisplayLabel(startDate: startDate, endDate: endDate, isOneDay: isOneDay)
   }
 }

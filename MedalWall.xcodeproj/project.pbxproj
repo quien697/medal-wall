@@ -91,6 +91,7 @@
 				Models/Race/RaceDistanceCategory.swift,
 				Models/Race/RaceDistanceType.swift,
 				Models/Race/RaceEdition.swift,
+				"Models/Race/RaceEdition+Computed.swift",
 				Models/Shared/Place.swift,
 				Models/User/Gender.swift,
 				Models/User/User.swift,
