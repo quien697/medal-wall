@@ -10,6 +10,9 @@ import SwiftUI
 nonisolated enum AppTheme: String, CaseIterable {
   case system, light, dark
 
+  /// The `@AppStorage` / `UserDefaults` key backing the appearance preference.
+  static let storageKey = "appTheme"
+
   var label: String {
     switch self {
     case .system: .appLocalized("System")

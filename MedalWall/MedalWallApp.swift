@@ -11,8 +11,8 @@ import SwiftUI
 @main
 struct MedalWallApp: App {
   @Environment(\.scenePhase) private var scenePhase
-  @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-  @AppStorage("appTheme") private var appTheme: AppTheme = .system
+  @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+  @AppStorage(AppTheme.storageKey) private var appTheme: AppTheme = .system
   @AppStorage(AppLanguage.storageKey) private var appLanguage: AppLanguage = .system
   @AppStorage(DistanceUnit.storageKey) private var distanceUnit: DistanceUnit = .deviceDefault
   @State private var userManager: UserManager?
@@ -54,8 +54,8 @@ struct MedalWallApp: App {
   }
 }
 
-class AppDelegate: NSObject, UIApplicationDelegate {
-
+final class AppDelegate: NSObject, UIApplicationDelegate {
+  /// Configures Firebase before anything touches it.
   func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil

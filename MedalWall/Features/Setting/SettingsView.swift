@@ -13,7 +13,7 @@ struct SettingsView: View {
   @Environment(UserManager.self) private var userManager
 
   // MARK: - State
-  @AppStorage("appTheme") private var appTheme: AppTheme = .system
+  @AppStorage(AppTheme.storageKey) private var appTheme: AppTheme = .system
   @AppStorage(AppLanguage.storageKey) private var appLanguage: AppLanguage = .system
   @AppStorage(DistanceUnit.storageKey) private var distanceUnit: DistanceUnit = .deviceDefault
 
