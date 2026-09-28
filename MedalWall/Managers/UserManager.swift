@@ -33,15 +33,13 @@ class UserManager {
     await authService.validateSession()
   }
 
-  /// Completes an email link sign-in using the URL opened by the user.
-  func handleEmailLink(_ link: String) async {
-    guard let email = UserDefaults.standard.string(forKey: AuthService.pendingEmailSignInKey) else {
-      return
-    }
-    do {
-      try await authService.signInWithEmailLink(email: email, link: link)
-      UserDefaults.standard.removeObject(forKey: AuthService.pendingEmailSignInKey)
-    } catch {}
+  /// Completes a sign-in from a URL the app was opened with — a Google Sign-In redirect or
+  /// a Firebase email sign-in link.
+  func handleOpenURL(_ url: URL) async {
+    authService.handleGoogleSignInURL(url)
+    guard authService.isSignInLink(url) else { return }
+
+    await handleEmailLink(url.absoluteString)
   }
 
   /// Signs the current user out of Firebase.
@@ -93,6 +91,17 @@ class UserManager {
   }
 
   // MARK: - Private Functions
+  /// Completes an email link sign-in using the URL opened by the user.
+  private func handleEmailLink(_ link: String) async {
+    guard let email = UserDefaults.standard.string(forKey: AuthService.pendingEmailSignInKey) else {
+      return
+    }
+    do {
+      try await authService.signInWithEmailLink(email: email, link: link)
+      UserDefaults.standard.removeObject(forKey: AuthService.pendingEmailSignInKey)
+    } catch {}
+  }
+
   /// Registers a Firebase Auth state listener; called once on init.
   private func addAuthListener() {
     _ = Auth.auth().addStateDidChangeListener { [weak self] _, user in

@@ -45,6 +45,11 @@ final class AuthService {
     )
   }
 
+  /// Whether the URL is a Firebase email sign-in link.
+  func isSignInLink(_ url: URL) -> Bool {
+    Auth.auth().isSignIn(withEmailLink: url.absoluteString)
+  }
+
   @discardableResult
   func signInWithEmailLink(email: String, link: String) async throws -> AuthDataResult {
     try await Auth.auth().signIn(withEmail: email, link: link)
@@ -67,6 +72,11 @@ final class AuthService {
   }
 
   // MARK: - Functions -> Sign in with google
+  /// Hands a URL the app was opened with to Google Sign-In, which finishes its flow from it.
+  func handleGoogleSignInURL(_ url: URL) {
+    GIDSignIn.sharedInstance.handle(url)
+  }
+
   @discardableResult
   func signInWithGoogle(idToken: String, accessToken: String) async throws -> AuthDataResult {
     let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)

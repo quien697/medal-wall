@@ -5,9 +5,7 @@
 //  Created by Quien on 2025-10-20.
 //
 
-import FirebaseAuth
 import FirebaseCore
-import GoogleSignIn
 import SwiftUI
 
 @main
@@ -37,11 +35,8 @@ struct MedalWallApp: App {
       .id("\(appLanguage.rawValue)-\(distanceUnit.rawValue)")
       .preferredColorScheme(appTheme.colorScheme)
       .onOpenURL { url in
-        GIDSignIn.sharedInstance.handle(url)
-        if Auth.auth().isSignIn(withEmailLink: url.absoluteString) {
-          Task {
-            await userManager?.handleEmailLink(url.absoluteString)
-          }
+        Task {
+          await userManager?.handleOpenURL(url)
         }
       }
       .task {
