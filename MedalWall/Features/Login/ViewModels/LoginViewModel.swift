@@ -7,9 +7,7 @@
 
 import AuthenticationServices
 import CryptoKit
-import FirebaseCore
 import Foundation
-import GoogleSignIn
 import Network
 
 enum ActiveSignIn {
@@ -183,37 +181,27 @@ final class LoginViewModel {
   // MARK: - Functions -> Sign in with Google
   /// Presents the Google Sign-In sheet and signs the user in to Firebase.
   func signInWithGoogle() async {
-    guard let clientID = FirebaseApp.app()?.options.clientID else {
-      self.error = .signInFailed
-      return
-    }
-
-    GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
-
     guard let rootViewController = keyWindow?.rootViewController else {
       self.error = .signInFailed
       return
     }
 
     do {
-      let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
-      guard let idToken = result.user.idToken?.tokenString else {
-        self.error = .missingIdentityToken
-        return
-      }
+      let tokens = try await authService.requestGoogleTokens(presenting: rootViewController)
 
       activeSignIn = .google
       defer { activeSignIn = nil }
 
-      let accessToken = result.user.accessToken.tokenString
-      try await authService.signInWithGoogle(idToken: idToken, accessToken: accessToken)
+      try await authService.signInWithGoogle(
+        idToken: tokens.idToken,
+        accessToken: tokens.accessToken
+      )
+    } catch is CancellationError {
+      // The user closed Google's sheet; there is nothing to report.
+    } catch let error as AppError {
+      self.error = error
     } catch {
-      switch (error as NSError).code {
-      case GIDSignInError.Code.canceled.rawValue:
-        break
-      default:
-        self.error = .signInFailed
-      }
+      self.error = .signInFailed
     }
   }
 }

@@ -7,8 +7,10 @@
 
 import AuthenticationServices
 import FirebaseAuth
+import FirebaseCore
 import Foundation
 import GoogleSignIn
+import UIKit
 
 final class AuthService {
   static let pendingEmailSignInKey = "pendingEmailSignIn"
@@ -75,6 +77,33 @@ final class AuthService {
   /// Hands a URL the app was opened with to Google Sign-In, which finishes its flow from it.
   func handleGoogleSignInURL(_ url: URL) {
     GIDSignIn.sharedInstance.handle(url)
+  }
+
+  /// Presents Google's sign-in sheet and returns the tokens Firebase signs in with.
+  ///
+  /// Throws `CancellationError` when the user closes the sheet, so callers can tell a
+  /// cancel from a failure without importing GoogleSignIn.
+  func requestGoogleTokens(
+    presenting viewController: UIViewController
+  ) async throws -> (idToken: String, accessToken: String) {
+    guard let clientID = FirebaseApp.app()?.options.clientID else {
+      throw AppError.signInFailed
+    }
+
+    GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
+
+    let result: GIDSignInResult
+    do {
+      result = try await GIDSignIn.sharedInstance.signIn(withPresenting: viewController)
+    } catch let error as NSError where error.code == GIDSignInError.Code.canceled.rawValue {
+      throw CancellationError()
+    }
+
+    guard let idToken = result.user.idToken?.tokenString else {
+      throw AppError.missingIdentityToken
+    }
+
+    return (idToken, result.user.accessToken.tokenString)
   }
 
   @discardableResult
