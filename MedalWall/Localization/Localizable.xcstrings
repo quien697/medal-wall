@@ -2004,7 +2004,7 @@
         }
       }
     },
-    "We sent To %@.\nTo complete sign-in, tap the sign-in link in your email, if it doesn't arrive within 3 minutes, check your spam folder" : {
+    "We sent a sign-in link to %@.\nTap it to finish signing in. If it doesn't arrive within 3 minutes, check your spam folder." : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
