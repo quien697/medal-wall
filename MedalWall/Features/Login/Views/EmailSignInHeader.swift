@@ -10,7 +10,7 @@ import SwiftUI
 struct EmailSignInHeader: View {
   // MARK: - Properties
   let title: LocalizedStringKey
-  let subTitle: LocalizedStringKey
+  let subtitle: LocalizedStringKey
 
   // MARK: - Body
   var body: some View {
@@ -19,7 +19,7 @@ struct EmailSignInHeader: View {
         .font(.TypeScale.title1)
         .foregroundStyle(Color.Text.primary)
 
-      Text(subTitle)
+      Text(subtitle)
         .font(.TypeScale.callout)
         .foregroundStyle(Color.Text.secondary)
         .multilineTextAlignment(.center)
@@ -30,6 +30,6 @@ struct EmailSignInHeader: View {
 #Preview {
   EmailSignInHeader(
     title: "What's your email?",
-    subTitle: "Enter your email address and we'll send you a sign-in link. No password needed."
+    subtitle: "Enter your email address and we'll send you a sign-in link. No password needed."
   )
 }

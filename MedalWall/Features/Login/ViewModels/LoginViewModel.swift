@@ -16,14 +16,18 @@ enum ActiveSignIn {
 
 @Observable
 final class LoginViewModel {
-  // MARK: - Properties
-  private let authService = AuthService()
+  // MARK: - Data
   var email = ""
+
+  // MARK: - State
   var activeSignIn: ActiveSignIn?
   var isSendingEmail = false
   var isEmailLinkSent = false
   var isPresentingEmailSignIn = false
   var error: AppError?
+
+  // MARK: - Dependencies
+  private let authService = AuthService()
 
   // MARK: - Computed
   var isEmailValid: Bool {
@@ -45,7 +49,8 @@ final class LoginViewModel {
   }
 
   // MARK: - Functions
-  func isConnected() async -> Bool {
+  /// Reports whether the device currently has a usable network path.
+  private func isConnected() async -> Bool {
     await withCheckedContinuation { continuation in
       let monitor = NWPathMonitor()
       monitor.pathUpdateHandler = { path in

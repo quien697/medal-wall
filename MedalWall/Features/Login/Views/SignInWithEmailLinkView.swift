@@ -10,6 +10,7 @@ import SwiftUI
 struct SignInWithEmailLinkView: View {
   // MARK: - Environment
   @Environment(\.dismiss) private var dismiss
+
   // MARK: - Properties
   @Binding var email: String
   let isEmailLinkSent: Bool
@@ -48,7 +49,7 @@ struct SignInWithEmailLinkView: View {
   }
 }
 
-#Preview("Idel") {
+#Preview("Idle") {
   @Previewable @State var email = ""
 
   SignInWithEmailLinkView(

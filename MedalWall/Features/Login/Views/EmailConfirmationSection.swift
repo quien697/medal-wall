@@ -17,7 +17,7 @@ struct EmailConfirmationSection: View {
     VStack(alignment: .center, spacing: 16) {
       EmailSignInHeader(
         title: "Now check your email",
-        subTitle: """
+        subtitle: """
           We sent a sign-in link to \(email).
           Tap it to finish signing in. If it doesn't arrive within 3 minutes, \
           check your spam folder.
