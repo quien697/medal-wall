@@ -27,21 +27,21 @@ struct ProfileSummarySection: View {
   var body: some View {
     PageSection {
       LazyVGrid(columns: threeColumns, spacing: 8) {
-        StatCard(title: "\(totalMedals)", subTitle: "Medals")
-        StatCard(title: "\(fullCount)", subTitle: "Full")
-        StatCard(title: "\(halfCount)", subTitle: "Half")
+        StatCard(title: "\(totalMedals)", subtitle: "Medals")
+        StatCard(title: "\(fullCount)", subtitle: "Full")
+        StatCard(title: "\(halfCount)", subtitle: "Half")
       }
 
       LazyVGrid(columns: twoColumns, spacing: 8) {
         StatCard(
           title: bestFullTime,
           titleFont: .TypeScale.Numeric.medium,
-          subTitle: "Best Full"
+          subtitle: "Best Full"
         )
         StatCard(
           title: bestHalfTime,
           titleFont: .TypeScale.Numeric.medium,
-          subTitle: "Best Half"
+          subtitle: "Best Half"
         )
       }
     }  // PageSection

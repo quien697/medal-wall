@@ -10,7 +10,7 @@ import SwiftUI
 struct StatCard: View {
   let title: String
   let titleFont: Font
-  let subTitle: LocalizedStringKey
+  let subtitle: LocalizedStringKey
   let titleColor: Color
   let vPadding: CGFloat
   let hPadding: CGFloat
@@ -18,14 +18,14 @@ struct StatCard: View {
   init(
     title: String,
     titleFont: Font? = nil,
-    subTitle: LocalizedStringKey,
+    subtitle: LocalizedStringKey,
     titleColor: Color? = nil,
     vPadding: CGFloat? = nil,
     hPadding: CGFloat? = nil
   ) {
     self.title = title
     self.titleFont = titleFont ?? .TypeScale.Numeric.large
-    self.subTitle = subTitle
+    self.subtitle = subtitle
     self.titleColor = titleColor ?? Color.Text.primary
     self.vPadding = vPadding ?? 16
     self.hPadding = hPadding ?? 16
@@ -39,7 +39,7 @@ struct StatCard: View {
         .lineLimit(1)
         .minimumScaleFactor(0.5)
 
-      Text(subTitle)
+      Text(subtitle)
         .font(.TypeScale.overline)
         .tracking(1.4)
         .textCase(.uppercase)
@@ -70,17 +70,17 @@ struct StatCard: View {
   LazyVGrid(columns: threeColumns, spacing: 8) {
     StatCard(
       title: "32",
-      subTitle: "Medals"
+      subtitle: "Medals"
     )
 
     StatCard(
       title: "12",
-      subTitle: "Full"
+      subtitle: "Full"
     )
 
     StatCard(
       title: "4",
-      subTitle: "Half"
+      subtitle: "Half"
     )
   }
 
@@ -88,13 +88,13 @@ struct StatCard: View {
     StatCard(
       title: "03:30:10",
       titleFont: .TypeScale.Numeric.medium,
-      subTitle: "Best Full"
+      subtitle: "Best Full"
     )
 
     StatCard(
       title: "--:--:--",
       titleFont: .TypeScale.Numeric.medium,
-      subTitle: "Best Half"
+      subtitle: "Best Half"
     )
   }
 }
