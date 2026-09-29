@@ -6,14 +6,20 @@
 //
 
 import AuthenticationServices
-import UIKit
 
 final class AppleSignInDelegate: NSObject,
   ASAuthorizationControllerDelegate,
   ASAuthorizationControllerPresentationContextProviding
 {
   // MARK: - Properties
+  private let anchor: ASPresentationAnchor
   private var continuation: CheckedContinuation<ASAuthorization, Error>?
+
+  // MARK: - Init
+  /// Creates a delegate that presents Apple's authorization sheet over `anchor`.
+  init(anchor: ASPresentationAnchor) {
+    self.anchor = anchor
+  }
 
   // MARK: - Functions
   /// Suspends until Apple's authorization sheet completes, then returns the result.
@@ -25,9 +31,7 @@ final class AppleSignInDelegate: NSObject,
 
   /// Returns the window used to present the Apple Sign-In sheet.
   func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-    let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
-    let scene = (scenes.first(where: { $0.activationState == .foregroundActive }) ?? scenes.first)!
-    return scene.keyWindow ?? UIWindow(windowScene: scene)
+    anchor
   }
 
   /// Called when the user successfully completes Apple Sign-In; resumes the continuation with the authorization.

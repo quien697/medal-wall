@@ -37,6 +37,15 @@ final class LoginViewModel {
     activeSignIn != nil
   }
 
+  /// The foreground scene's key window, which the Apple and Google sign-in sheets present over.
+  private var keyWindow: UIWindow? {
+    let windowScene =
+      UIApplication.shared.connectedScenes.first(where: {
+        $0.activationState == .foregroundActive
+      }) as? UIWindowScene
+    return windowScene?.windows.first(where: { $0.isKeyWindow })
+  }
+
   // MARK: - Functions
   func isConnected() async -> Bool {
     await withCheckedContinuation { continuation in
@@ -82,13 +91,18 @@ final class LoginViewModel {
   // MARK: - Functions -> Sign in with Apple
   /// Presents the Apple Sign-In sheet and signs the user in to Firebase.
   func signInWithApple() async {
+    guard let keyWindow else {
+      self.error = .signInFailed
+      return
+    }
+
     do {
       let nonce = try randomNonceString()
       let request = ASAuthorizationAppleIDProvider().createRequest()
       request.requestedScopes = [.fullName, .email]
       request.nonce = sha256(nonce)
 
-      let delegate = AppleSignInDelegate()
+      let delegate = AppleSignInDelegate(anchor: keyWindow)
       let controller = ASAuthorizationController(authorizationRequests: [request])
       controller.delegate = delegate
       controller.presentationContextProvider = delegate
@@ -176,13 +190,7 @@ final class LoginViewModel {
 
     GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
 
-    guard
-      let windowScene = UIApplication.shared.connectedScenes.first(where: {
-        $0.activationState == .foregroundActive
-      }) as? UIWindowScene,
-      let rootViewController = windowScene.windows.first(where: { $0.isKeyWindow })?
-        .rootViewController
-    else {
+    guard let rootViewController = keyWindow?.rootViewController else {
       self.error = .signInFailed
       return
     }
