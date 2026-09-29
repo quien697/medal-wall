@@ -36,11 +36,13 @@ final class AuthService {
 
   // MARK: - Functions -> Sign in with Email Link
   func sendSignInLink(to email: String) async throws {
+    guard let bundleID = Bundle.main.bundleIdentifier else { throw AppError.unknown }
+
     let authorizedDomain: String = "https://medal-wall-4697.firebaseapp.com"
     let actionCodeSettings = ActionCodeSettings()
     actionCodeSettings.url = URL(string: authorizedDomain)
     actionCodeSettings.handleCodeInApp = true
-    actionCodeSettings.setIOSBundleID(Bundle.main.bundleIdentifier!)
+    actionCodeSettings.setIOSBundleID(bundleID)
     try await Auth.auth().sendSignInLink(
       toEmail: email,
       actionCodeSettings: actionCodeSettings
