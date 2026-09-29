@@ -38,24 +38,24 @@ struct LoginView: View {
 
         VStack(spacing: 16) {
           SignInButton(
-            icon: "apple.logo",
             title: "Continue with Apple",
+            systemImage: "apple.logo",
             isLoading: viewModel.activeSignIn == .apple
           ) {
             await viewModel.signInWithApple()
           }
 
           SignInButton(
-            icon: "google-icon",
             title: "Continue with Google",
+            image: "google-icon",
             isLoading: viewModel.activeSignIn == .google
           ) {
             await viewModel.signInWithGoogle()
           }
 
           SignInButton(
-            icon: "envelope",
-            title: "Continue with Email"
+            title: "Continue with Email",
+            systemImage: "envelope"
           ) {
             await viewModel.signInWithEmailLink()
           }
