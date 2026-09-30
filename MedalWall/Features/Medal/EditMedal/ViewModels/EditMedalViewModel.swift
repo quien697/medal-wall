@@ -87,7 +87,10 @@ final class EditMedalViewModel {
   // MARK: - Functions
   /// Downloads the existing medal cover photo so the edit form can display it.
   func loadPhoto() async {
-    photo = await UIImage.load(from: medal?.photoUrl)
+    let existingPhoto = await UIImage.load(from: medal?.photoUrl)
+    guard !isPhotoChanged else { return }
+
+    photo = existingPhoto
   }
 
   /// Sets the newly selected cover photo and marks it as changed.

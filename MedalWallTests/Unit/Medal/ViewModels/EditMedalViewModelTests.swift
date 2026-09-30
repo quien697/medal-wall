@@ -7,6 +7,7 @@
 
 import Foundation
 import Testing
+import UIKit
 
 @testable import MedalWall
 
@@ -197,5 +198,26 @@ struct EditMedalViewModelTests {
     #expect(viewModel.finishTime == 12624)
     #expect(viewModel.note == "Great race")
     #expect(viewModel.tags == ["fun"])
+  }
+
+  // MARK: - Photo
+  @Test("a photo picked while the existing one loads is kept")
+  func testPickedPhotoSurvivesExistingPhotoLoad() async {
+    let medal = Medal(
+      name: "Taipei Marathon 2019",
+      date: Date(timeIntervalSince1970: 1_577_836_800),
+      bibNumber: "00001",
+      photoUrl: "file:///nonexistent/medal.jpg",
+      place: Place(countryCode: "TW", city: "Taipei"),
+      distance: .default,
+      userID: "uid"
+    )
+    let viewModel = EditMedalViewModel(mode: .edit, medal: medal)
+    let pickedPhoto = UIImage()
+    viewModel.updatePhoto(with: pickedPhoto)
+
+    await viewModel.loadPhoto()
+
+    #expect(viewModel.photo === pickedPhoto)
   }
 }
