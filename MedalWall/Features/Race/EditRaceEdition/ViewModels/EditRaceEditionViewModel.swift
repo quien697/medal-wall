@@ -28,6 +28,8 @@ final class EditRaceEditionViewModel {
   let mode: ItemEditMode
   private let raceId: String
   private let edition: RaceEdition?
+  /// The staged edition being re-edited, carrying changes the race save hasn't written yet.
+  private let draft: DraftRaceEdition?
   private let repository: any RaceRepository
   private let storageService = StorageService()
 
@@ -36,14 +38,23 @@ final class EditRaceEditionViewModel {
     mode: ItemEditMode,
     raceId: String,
     edition: RaceEdition?,
+    draft: DraftRaceEdition? = nil,
     repository: (any RaceRepository)? = nil
   ) {
     self.mode = mode
     self.raceId = raceId
     self.edition = edition
+    self.draft = draft
     self.repository = repository ?? RaceFirestoreRepository()
 
-    if let edition, mode == .edit {
+    if let draft, mode == .edit {
+      self.year = draft.year
+      self.isOneDay = draft.isOneDay
+      self.startDate = draft.startDate
+      self.endDate = draft.endDate
+      self.distances = draft.distances
+      self.photo = draft.displayPhoto
+    } else if let edition, mode == .edit {
       self.year = edition.year
       self.isOneDay = edition.isOneDay
       self.startDate = edition.startDate
@@ -84,7 +95,10 @@ final class EditRaceEditionViewModel {
   // MARK: - Functions
   /// Downloads the existing edition photo into `photo` so the picker shows the current image.
   func loadExistingPhoto() async {
-    photo = await UIImage.load(from: edition?.photoUrl)
+    let photoUrl = if let draft { draft.displayPhotoUrl } else { edition?.photoUrl }
+    guard let photoUrl else { return }
+
+    photo = await UIImage.load(from: photoUrl)
   }
 
   /// Replaces the current photo and marks it as changed.
@@ -156,29 +170,28 @@ final class EditRaceEditionViewModel {
       return draft
 
     case .edit:
-      guard let edition else {
+      guard var updated = draft ?? edition.map({ DraftRaceEdition(from: $0) }) else {
         return DraftRaceEdition(
           year: year, isOneDay: isOneDay, startDate: startDate,
           endDate: endDate, distances: distances, createdBy: userId
         )
       }
-      var draft = DraftRaceEdition(from: edition)
-      draft.year = year
-      draft.isOneDay = isOneDay
-      draft.startDate = startDate
-      draft.endDate = endDate
-      draft.distances = distances
-      draft.isModified = true
+      updated.year = year
+      updated.isOneDay = isOneDay
+      updated.startDate = startDate
+      updated.endDate = endDate
+      updated.distances = distances
+      updated.isModified = true
       if isPhotoChanged {
         if let photo, let data = photo.uploadData() {
-          draft.newPhotoData = data
-          draft.isPhotoCleared = false
+          updated.newPhotoData = data
+          updated.isPhotoCleared = false
         } else {
-          draft.newPhotoData = nil
-          draft.isPhotoCleared = true
+          updated.newPhotoData = nil
+          updated.isPhotoCleared = true
         }
       }
-      return draft
+      return updated
     }
   }
 

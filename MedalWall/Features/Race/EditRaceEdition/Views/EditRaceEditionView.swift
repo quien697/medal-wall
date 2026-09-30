@@ -33,11 +33,13 @@ struct EditRaceEditionView: View {
     mode: ItemEditMode,
     raceId: String,
     edition: RaceEdition? = nil,
+    draft: DraftRaceEdition? = nil,
     onCommit: ((DraftRaceEdition) -> Void)? = nil,
     onDelete: (() -> Void)? = nil
   ) {
     self._viewModel = State(
-      initialValue: EditRaceEditionViewModel(mode: mode, raceId: raceId, edition: edition))
+      initialValue: EditRaceEditionViewModel(
+        mode: mode, raceId: raceId, edition: edition, draft: draft))
     self.onCommit = onCommit
     self.onDelete = onDelete
   }

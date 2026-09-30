@@ -65,4 +65,27 @@ struct EditRaceViewModelRepositoryTests {
     #expect(await repository.races.first?.name == "Taipei Marathon 2026")
     #expect(await repository.races.first?.editionCount == 3)
   }
+
+  @Test("an added edition edited again before saving is still created")
+  func testReEditedNewEditionIsCreated() async throws {
+    let race = makeRace()
+    let repository = StubRaceRepository(races: [race])
+    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+    let raceDay = try #require(
+      Calendar.current.date(from: DateComponents(year: 2026, month: 3, day: 1))
+    )
+    let added = DraftRaceEdition(
+      year: 2026, isOneDay: true, startDate: raceDay, endDate: raceDay, distances: [],
+      createdBy: "uid")
+    viewModel.stageAddEdition(added)
+
+    let editor = EditRaceEditionViewModel(
+      mode: .edit, raceId: race.id, edition: nil, draft: added)
+    editor.updateStartDate(raceDay.addingTimeInterval(86_400))
+    viewModel.stageUpdateEdition(editor.buildDraft(userId: "uid"))
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == nil)
+    #expect(await repository.createdEditions.map(\.id) == [added.id])
+  }
 }

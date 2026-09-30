@@ -171,16 +171,7 @@ struct EditRaceView: View {
           EditRaceEditionView(
             mode: .edit,
             raceId: raceId,
-            edition: RaceEdition(
-              id: draft.id,
-              raceId: raceId,
-              year: draft.year,
-              startDate: draft.startDate,
-              endDate: draft.endDate,
-              photoUrl: draft.existingPhotoUrl,
-              distances: draft.distances,
-              createdBy: draft.createdBy
-            ),
+            draft: draft,
             onCommit: { updatedDraft in
               viewModel.stageUpdateEdition(updatedDraft)
             },
