@@ -101,7 +101,10 @@ final class EditRaceViewModel {
 
   /// Downloads the existing race photo into `photo` so the picker shows the current image.
   func loadExistingPhoto() async {
-    photo = await UIImage.load(from: race?.photoUrl)
+    let existingPhoto = await UIImage.load(from: race?.photoUrl)
+    guard !isPhotoChanged else { return }
+
+    photo = existingPhoto
   }
 
   /// Replaces the current photo and marks it as changed.

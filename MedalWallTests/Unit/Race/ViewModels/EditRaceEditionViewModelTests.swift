@@ -374,6 +374,20 @@ struct EditRaceEditionViewModelTests {
     #expect(viewModel.photo != nil)
   }
 
+  @Test("a photo picked while the existing one loads is kept")
+  func testPickedPhotoSurvivesExistingPhotoLoad() async {
+    var staged = DraftRaceEdition(from: .taipei2025)
+    staged.existingPhotoUrl = "file:///nonexistent/edition.jpg"
+    let viewModel = EditRaceEditionViewModel(
+      mode: .edit, raceId: "test-race", edition: nil, draft: staged)
+    let pickedPhoto = UIImage()
+    viewModel.updatePhoto(with: pickedPhoto)
+
+    await viewModel.loadExistingPhoto()
+
+    #expect(viewModel.photo === pickedPhoto)
+  }
+
   @Test("re-editing a staged multi-day edition keeps it multi-day")
   func testReEditedEditionKeepsMultiDay() throws {
     var staged = try makeStagedDraft()

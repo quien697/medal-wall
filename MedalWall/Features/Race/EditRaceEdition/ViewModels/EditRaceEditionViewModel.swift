@@ -98,7 +98,10 @@ final class EditRaceEditionViewModel {
     let photoUrl = if let draft { draft.displayPhotoUrl } else { edition?.photoUrl }
     guard let photoUrl else { return }
 
-    photo = await UIImage.load(from: photoUrl)
+    let existingPhoto = await UIImage.load(from: photoUrl)
+    guard !isPhotoChanged else { return }
+
+    photo = existingPhoto
   }
 
   /// Replaces the current photo and marks it as changed.
