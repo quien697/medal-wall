@@ -146,7 +146,12 @@ final class EditRaceViewModel {
       race.websiteUrl = websiteUrl.isEmpty ? nil : websiteUrl
       if isPhotoChanged {
         if let photo {
-          race.photoUrl = try? await storageService.uploadRaceLogo(raceId: race.id, image: photo)
+          do {
+            race.photoUrl = try await storageService.uploadRaceLogo(raceId: race.id, image: photo)
+          } catch {
+            self.error = .raceSaveFailed
+            return
+          }
         } else {
           try? await storageService.deleteRaceLogo(raceId: race.id)
           race.photoUrl = nil
@@ -191,13 +196,8 @@ final class EditRaceViewModel {
         createdBy: draft.createdBy
       )
 
-      if let photoData = draft.newPhotoData, let photo = UIImage(data: photoData) {
-        newEdition.photoUrl = try? await storageService.uploadRaceEditionLogo(
-          raceId: raceId, editionId: newEdition.id, image: photo
-        )
-      }
-
       do {
+        newEdition.photoUrl = try await uploadNewPhoto(of: draft, raceId: raceId)
         try await repository.createEdition(newEdition)
       } catch {
         anyFailed = true
@@ -215,18 +215,15 @@ final class EditRaceViewModel {
       edition.endDate = draft.endDate
       edition.distances = draft.distances
 
-      if let photoData = draft.newPhotoData, let photo = UIImage(data: photoData) {
-        edition.photoUrl = try? await storageService.uploadRaceEditionLogo(
-          raceId: raceId, editionId: edition.id, image: photo
-        )
-      } else if draft.isPhotoCleared {
-        if edition.photoUrl != nil {
-          try? await storageService.deleteRaceEditionLogo(raceId: raceId, editionId: edition.id)
-        }
-        edition.photoUrl = nil
-      }
-
       do {
+        if let photoUrl = try await uploadNewPhoto(of: draft, raceId: raceId) {
+          edition.photoUrl = photoUrl
+        } else if draft.isPhotoCleared {
+          if edition.photoUrl != nil {
+            try? await storageService.deleteRaceEditionLogo(raceId: raceId, editionId: edition.id)
+          }
+          edition.photoUrl = nil
+        }
         try await repository.updateEdition(edition)
       } catch {
         anyFailed = true
@@ -234,5 +231,15 @@ final class EditRaceViewModel {
     }
 
     if anyFailed { error = .editionSaveFailed }
+  }
+
+  /// Uploads the photo newly picked for a draft and returns its URL, or `nil` when it has none.
+  private func uploadNewPhoto(of draft: DraftRaceEdition, raceId: String) async throws -> String? {
+    guard let photoData = draft.newPhotoData, let photo = UIImage(data: photoData) else {
+      return nil
+    }
+
+    return try await storageService.uploadRaceEditionLogo(
+      raceId: raceId, editionId: draft.id, image: photo)
   }
 }

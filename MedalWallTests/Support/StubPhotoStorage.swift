@@ -1,0 +1,70 @@
+//
+//  StubPhotoStorage.swift
+//  MedalWall
+//
+//  Created by Quien on 2026-09-30.
+//
+
+import UIKit
+
+@testable import MedalWall
+
+/// Scriptable `PhotoStorage` so photo flows can be tested without Firebase Storage.
+///
+/// An `actor` for the same reason as the repository stubs: `PhotoStorage` is nonisolated,
+/// and an actor's isolated methods can witness its `async` requirements.
+actor StubPhotoStorage: PhotoStorage {
+
+  // MARK: - Script
+  /// What every upload returns: a download URL, or the error it throws.
+  private let uploadOutcome: Result<String, AppError>
+
+  // MARK: - Recorded calls
+  private(set) var uploadCallCount = 0
+
+  // MARK: - Init
+  init(uploadOutcome: Result<String, AppError> = .success("https://example.com/uploaded.jpg")) {
+    self.uploadOutcome = uploadOutcome
+  }
+
+  // MARK: - PhotoStorage
+  func uploadUserAvatar(uid: String, image: UIImage) async throws -> String {
+    try recordUpload()
+  }
+
+  func deleteUserAvatar(uid: String) async throws {}
+
+  func uploadRaceLogo(raceId: String, image: UIImage) async throws -> String {
+    try recordUpload()
+  }
+
+  func deleteRaceLogo(raceId: String) async throws {}
+
+  func uploadRaceEditionLogo(raceId: String, editionId: String, image: UIImage) async throws
+    -> String
+  {
+    try recordUpload()
+  }
+
+  func deleteRaceEditionLogo(raceId: String, editionId: String) async throws {}
+
+  func uploadMedalPhoto(userId: String, medalId: String, image: UIImage) async throws -> String {
+    try recordUpload()
+  }
+
+  func deleteMedalPhoto(userId: String, medalId: String) async throws {}
+
+  func uploadMedalEventPhoto(
+    userId: String, medalId: String, photoId: String, image: UIImage
+  ) async throws -> String {
+    try recordUpload()
+  }
+
+  func deleteMedalEventPhoto(userId: String, medalId: String, photoId: String) async throws {}
+
+  // MARK: - Private
+  private func recordUpload() throws -> String {
+    uploadCallCount += 1
+    return try uploadOutcome.get()
+  }
+}
