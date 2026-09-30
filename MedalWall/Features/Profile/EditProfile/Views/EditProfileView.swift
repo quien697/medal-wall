@@ -21,7 +21,6 @@ struct EditProfileView: View {
   @State private var isPresentingCropImageView: Bool = false
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var rawPickedImage: UIImage?
-  @State private var shouldDismiss: Bool = false
 
   // MARK: - Init
   init(profile: User) {
@@ -77,7 +76,6 @@ struct EditProfileView: View {
                 try await viewModel.save(userManager: userManager)
                 dismiss()
               } catch {
-                shouldDismiss = true
                 errorWrapper = ErrorWrapper(error: AppError.userSaveFailed)
               }
             }
@@ -119,9 +117,6 @@ struct EditProfileView: View {
       )
       .sheet(
         item: $errorWrapper,
-        onDismiss: {
-          if shouldDismiss { dismiss() }
-        },
         content: { wrapper in
           ErrorView(errorWrapper: wrapper)
         }

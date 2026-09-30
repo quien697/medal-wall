@@ -21,7 +21,6 @@ struct EditMedalView: View {
   @State private var isPresentingCropImageView: Bool = false
   @State private var isPresentingRaceEntryPicker: Bool = false
   @State private var isPresentingPlacePicker: Bool = false
-  @State private var shouldDismiss: Bool = false
   // Medal photo picker
   @State private var isPresentingPhotoPicker: Bool = false
   @State private var selectedPhoto: PhotosPickerItem?
@@ -126,7 +125,6 @@ struct EditMedalView: View {
                   try await viewModel.save(by: userID, userManager: userManager)
                   dismiss()
                 } catch {
-                  shouldDismiss = true
                   errorWrapper = ErrorWrapper(error: AppError.medalSaveFailed)
                 }
               }
@@ -221,11 +219,6 @@ struct EditMedalView: View {
       }
       .sheet(
         item: $errorWrapper,
-        onDismiss: {
-          if shouldDismiss {
-            dismiss()
-          }
-        },
         content: { wrapper in
           ErrorView(errorWrapper: wrapper)
         }
