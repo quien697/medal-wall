@@ -66,7 +66,8 @@ final class EditRaceViewModel {
   }
 
   // MARK: - Functions
-  /// Loads editions from Firestore into the draft state.
+  /// Loads editions from Firestore into the draft state, keeping any new edition staged
+  /// before the load finished.
   func loadEditions() async {
     guard let raceId else { return }
     isEditionsLoading = true
@@ -76,7 +77,9 @@ final class EditRaceViewModel {
       let loaded = try await repository.fetchEditions(raceId: raceId)
       originalEditions = loaded
       originalEditionIds = Set(loaded.map { $0.id })
-      draftEditions = loaded.map { DraftRaceEdition(from: $0) }
+      draftEditions =
+        loaded.map { DraftRaceEdition(from: $0) }
+        + draftEditions.filter { $0.sourceEditionId == nil }
     } catch {
       self.error = .raceFetchFailed(error.localizedDescription)
     }

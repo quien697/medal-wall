@@ -81,6 +81,27 @@ struct EditRaceViewModelRepositoryTests {
     }
   }
 
+  @Test("an edition added before the editions finish loading is kept")
+  func testEditionStagedDuringLoadIsKept() async throws {
+    let race = makeRace()
+    let raceDay = try #require(
+      Calendar.current.date(from: DateComponents(year: 2026, month: 3, day: 1))
+    )
+    let existing = RaceEdition(
+      id: "edition-2025", raceId: race.id, year: 2025, startDate: raceDay,
+      endDate: raceDay, createdBy: "uid")
+    let repository = StubRaceRepository(races: [race], editions: [race.id: [existing]])
+    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+    let added = DraftRaceEdition(
+      year: 2026, isOneDay: true, startDate: raceDay, endDate: raceDay, distances: [],
+      createdBy: "uid")
+    viewModel.stageAddEdition(added)
+
+    await viewModel.loadEditions()
+
+    #expect(Set(viewModel.displayedEditions.map(\.id)) == [existing.id, added.id])
+  }
+
   @Test("an added edition edited again before saving is still created")
   func testReEditedNewEditionIsCreated() async throws {
     let race = makeRace()
