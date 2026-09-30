@@ -93,7 +93,11 @@ struct EditMedalView: View {
           }
         )
 
-        EditMedalTagsSection(tags: $viewModel.tags)
+        EditMedalTagsSection(
+          tags: viewModel.tags,
+          onAdd: { viewModel.addTag($0) },
+          onRemove: { viewModel.removeTag($0) }
+        )
       }  // Form
       .navigationTitle("\(viewModel.mode.displayName) Medal")
       .navigationBarTitleDisplayMode(.inline)

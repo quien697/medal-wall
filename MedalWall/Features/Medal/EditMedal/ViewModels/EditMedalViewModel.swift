@@ -115,6 +115,19 @@ final class EditMedalViewModel {
     draftEventPhotos.removeAll { $0.id == id }
   }
 
+  /// Adds a tag trimmed of surrounding spaces, ignoring one that is blank or already there.
+  func addTag(_ input: String) {
+    let tag = input.trimmingCharacters(in: .whitespaces)
+    guard !tag.isEmpty, !tags.contains(tag) else { return }
+
+    tags.append(tag)
+  }
+
+  /// Removes a tag.
+  func removeTag(_ tag: String) {
+    tags.removeAll { $0 == tag }
+  }
+
   /// Auto-fills form fields from a selected race entry.
   func autoFill(from selection: RaceEntry) {
     name = "\(selection.race.name) \(selection.edition.year)"

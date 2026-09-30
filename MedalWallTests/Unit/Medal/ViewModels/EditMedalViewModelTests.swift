@@ -200,6 +200,45 @@ struct EditMedalViewModelTests {
     #expect(viewModel.tags == ["fun"])
   }
 
+  // MARK: - Tags
+  @Test("addTag trims the spaces around a tag")
+  func testAddTagTrims() {
+    let viewModel = EditMedalViewModel(mode: .add)
+
+    viewModel.addTag("  taipei ")
+
+    #expect(viewModel.tags == ["taipei"])
+  }
+
+  @Test("addTag ignores a tag that is already there")
+  func testAddTagIgnoresDuplicate() {
+    let viewModel = EditMedalViewModel(mode: .add)
+    viewModel.tags = ["taipei"]
+
+    viewModel.addTag("taipei")
+
+    #expect(viewModel.tags == ["taipei"])
+  }
+
+  @Test("addTag ignores a blank tag")
+  func testAddTagIgnoresBlank() {
+    let viewModel = EditMedalViewModel(mode: .add)
+
+    viewModel.addTag("   ")
+
+    #expect(viewModel.tags.isEmpty)
+  }
+
+  @Test("removeTag removes only that tag")
+  func testRemoveTag() {
+    let viewModel = EditMedalViewModel(mode: .add)
+    viewModel.tags = ["marathon", "taipei"]
+
+    viewModel.removeTag("marathon")
+
+    #expect(viewModel.tags == ["taipei"])
+  }
+
   // MARK: - Photo
   @Test("a photo picked while the existing one loads is kept")
   func testPickedPhotoSurvivesExistingPhotoLoad() async {

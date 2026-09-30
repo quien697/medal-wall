@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct EditMedalTagsSection: View {
-  @Binding var tags: [String]
   @State private var input: String = ""
+  let tags: [String]
+  let onAdd: (String) -> Void
+  let onRemove: (String) -> Void
 
   var body: some View {
     Section("Tags") {
@@ -18,7 +20,7 @@ struct EditMedalTagsSection: View {
           HStack(spacing: 4) {
             Text(tag)
             Button {
-              tags.removeAll { $0 == tag }
+              onRemove(tag)
             } label: {
               Image(systemName: "xmark")
                 .font(.TypeScale.overline)
@@ -35,13 +37,7 @@ struct EditMedalTagsSection: View {
 
         if !input.trimmingCharacters(in: .whitespaces).isEmpty {
           Button {
-            let trimmed = input.trimmingCharacters(in: .whitespaces)
-            guard !trimmed.isEmpty, !tags.contains(trimmed) else {
-              input = ""
-              return
-            }
-
-            tags.append(trimmed)
+            onAdd(input)
             input = ""
           } label: {
             Image(systemName: "plus.circle.fill")
@@ -60,6 +56,10 @@ struct EditMedalTagsSection: View {
 
 #Preview {
   Form {
-    EditMedalTagsSection(tags: .constant(["marathon", "taipei", "2026"]))
+    EditMedalTagsSection(
+      tags: ["marathon", "taipei", "2026"],
+      onAdd: { _ in },
+      onRemove: { _ in }
+    )
   }
 }
