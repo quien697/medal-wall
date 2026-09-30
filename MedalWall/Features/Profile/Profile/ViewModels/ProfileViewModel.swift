@@ -12,6 +12,9 @@ final class ProfileViewModel {
   // MARK: - Data
   var medals: [Medal] = []
 
+  // MARK: - State
+  var error: AppError?
+
   // MARK: - Dependencies
   private let repository: any MedalRepository
 
@@ -28,9 +31,13 @@ final class ProfileViewModel {
   var bestHalfTime: String { medals.bestHalfTime?.formattedHMS ?? "-" }
 
   // MARK: - Functions
-  /// Loads all medals for the given user from Firestore.
+  /// Loads all medals for the given user from Firestore, keeping the current ones if the fetch fails.
   func loadMedals(userId: String) async {
-    medals = (try? await repository.fetchMedals(userId: userId)) ?? []
+    do {
+      medals = try await repository.fetchMedals(userId: userId)
+    } catch {
+      self.error = .medalFetchFailed(error.localizedDescription)
+    }
   }
 
   /// Computes Full Marathon achievement progress from the loaded medals and the given user's persisted milestone.

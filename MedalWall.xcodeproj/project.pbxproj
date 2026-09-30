@@ -70,6 +70,7 @@
 				Features/Medal/Models/MedalYearGroup.swift,
 				Features/Medal/Models/RaceEntry.swift,
 				Features/Profile/EditProfile/ViewModels/EditProfileViewModel.swift,
+				Features/Profile/Profile/ViewModels/ProfileViewModel.swift,
 				Features/Race/EditRace/ViewModels/EditRaceViewModel.swift,
 				Features/Race/EditRaceEdition/ViewModels/EditRaceEditionViewModel.swift,
 				Features/Race/Models/DraftRaceEdition.swift,

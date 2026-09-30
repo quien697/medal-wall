@@ -14,6 +14,7 @@ struct ProfileView: View {
   // MARK: - State
   @State private var viewModel = ProfileViewModel()
   @State private var isPresentingEditProfile = false
+  @State private var errorWrapper: ErrorWrapper?
 
   // MARK: - Body
   var body: some View {
@@ -77,6 +78,18 @@ struct ProfileView: View {
       .sheet(isPresented: $isPresentingEditProfile) {
         if let user = userManager.currentUser {
           EditProfileView(profile: user)
+        }
+      }
+      .sheet(
+        item: $errorWrapper,
+        onDismiss: { viewModel.error = nil },
+        content: { wrapper in
+          ErrorView(errorWrapper: wrapper)
+        }
+      )
+      .onChange(of: viewModel.error) { _, error in
+        if let error {
+          errorWrapper = ErrorWrapper(error: error)
         }
       }
     }  // NavigationStack
