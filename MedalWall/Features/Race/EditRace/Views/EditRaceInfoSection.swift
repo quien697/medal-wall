@@ -5,7 +5,6 @@
 //  Created by Quien on 2025-11-26.
 //
 
-import PhotosUI
 import SwiftUI
 
 struct EditRaceInfoSection: View {

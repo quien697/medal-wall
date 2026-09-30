@@ -8,9 +8,6 @@
 import SwiftUI
 
 struct RacesView: View {
-  // MARK: - Environment
-  @Environment(UserManager.self) private var userManager
-
   // MARK: - State
   @State private var viewModel = RacesViewModel()
   @State private var errorWrapper: ErrorWrapper?

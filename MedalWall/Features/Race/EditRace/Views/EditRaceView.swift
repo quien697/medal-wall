@@ -61,17 +61,14 @@ struct EditRaceView: View {
           }
         )
 
-        if viewModel.mode == .edit, let raceId = viewModel.raceId {
+        if viewModel.mode == .edit, viewModel.raceId != nil {
           EditRaceEditionSection(
-            raceId: raceId,
             editions: viewModel.displayedEditions,
             isLoading: viewModel.isEditionsLoading,
             namespace: namespace,
             transitionID: addEdition,
             onTapAddEdition: { isPresentingAddEdition = true },
             onTapEdition: { selectedEdition = $0 },
-            onAdd: { viewModel.stageAddEdition($0) },
-            onUpdate: { viewModel.stageUpdateEdition($0) },
             onDelete: viewModel.stageDeleteEdition
           )
         }
