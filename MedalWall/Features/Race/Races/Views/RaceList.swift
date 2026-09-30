@@ -15,9 +15,9 @@ struct RaceList: View {
   var body: some View {
     Group {
       if races.isEmpty && searchText.isEmpty {
-        RaceEmptyView()
+        RaceEmptyState()
       } else if races.isEmpty {
-        RaceNoResultView(searchText: searchText)
+        RaceNoResultState(searchText: searchText)
       } else {
         List(races) { race in
           NavigationLink {

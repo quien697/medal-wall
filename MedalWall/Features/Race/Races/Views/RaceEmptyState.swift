@@ -1,5 +1,5 @@
 //
-//  RaceNoResultView.swift
+//  RaceEmptyState.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-04-17.
@@ -7,16 +7,14 @@
 
 import SwiftUI
 
-struct RaceNoResultView: View {
-  let searchText: String
-
+struct RaceEmptyState: View {
   var body: some View {
     ContentUnavailableView {
-      Label("No Results", systemImage: "magnifyingglass")
+      Label("No Race Events", systemImage: "tray")
         .font(.TypeScale.title2)
         .foregroundStyle(Color.Text.primary)
     } description: {
-      Text("No race events match '\(searchText)'")
+      Text("Tap the + button to add your first race event!")
         .font(.TypeScale.body)
         .foregroundStyle(Color.Text.secondary)
     }  // ContentUnavailableView
@@ -24,5 +22,5 @@ struct RaceNoResultView: View {
 }
 
 #Preview {
-  RaceNoResultView(searchText: "Taipei")
+  RaceEmptyState()
 }
