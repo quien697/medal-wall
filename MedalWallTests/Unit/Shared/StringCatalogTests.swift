@@ -56,6 +56,19 @@ struct StringCatalogTests {
     }
   }
 
+  @Test("The race list's zh-TW strings ship translated")
+  func testRaceListKeysAreTranslated() {
+    let keys = [
+      "No Race Events",
+      "No race events match '%@'",
+      "^[%lld edition](inflect: true)"
+    ]
+
+    for key in keys {
+      #expect(zhTWTable[key] != nil, "missing zh-TW entry for \(key)")
+    }
+  }
+
   @Test("The medal detail's zh-TW strings ship translated")
   func testMedalDetailKeysAreTranslated() {
     let keys = [

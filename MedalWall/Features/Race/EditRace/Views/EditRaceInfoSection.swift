@@ -28,7 +28,7 @@ struct EditRaceInfoSection: View {
         TextField("optional", text: $url)
           .fieldStyle(.value)
       } label: {
-        Text("WebSite")
+        Text("Website")
           .fieldStyle(.label)
       }  // LabeledContent
 

@@ -16,7 +16,7 @@ struct RaceNoResultView: View {
         .font(.TypeScale.title2)
         .foregroundStyle(Color.Text.primary)
     } description: {
-      Text("No race evnets match '\(searchText)'")
+      Text("No race events match '\(searchText)'")
         .font(.TypeScale.body)
         .foregroundStyle(Color.Text.secondary)
     }  // ContentUnavailableView

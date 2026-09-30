@@ -57,16 +57,6 @@
     "%lld" : {
       "shouldTranslate" : false
     },
-    "%lld editions" : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld 個屆次"
-          }
-        }
-      }
-    },
     "%lld of %lld" : {
       "localizations" : {
         "zh-TW" : {
@@ -83,6 +73,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld / %lld → %@"
+          }
+        }
+      }
+    },
+    "^[%lld edition](inflect: true)" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 個屆次"
           }
         }
       }
@@ -1126,17 +1126,7 @@
         }
       }
     },
-    "No Race evnets" : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "尚無賽事"
-          }
-        }
-      }
-    },
-    "No race evnets match '%@'" : {
+    "No race events match '%@'" : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
@@ -2011,7 +2001,7 @@
         }
       }
     },
-    "WebSite" : {
+    "Website" : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {

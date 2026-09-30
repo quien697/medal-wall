@@ -10,7 +10,7 @@ import SwiftUI
 struct RaceEmptyView: View {
   var body: some View {
     ContentUnavailableView {
-      Label("No Race evnets", systemImage: "tray")
+      Label("No Race Events", systemImage: "tray")
         .font(.TypeScale.title2)
         .foregroundStyle(Color.Text.primary)
     } description: {
@@ -22,5 +22,5 @@ struct RaceEmptyView: View {
 }
 
 #Preview {
-  MedalEmptyView()
+  RaceEmptyView()
 }

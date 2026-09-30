@@ -29,7 +29,7 @@ struct RaceRow: View {
           .font(.TypeScale.caption)
           .foregroundStyle(Color.Text.secondary)
 
-        Text("\(editionCount) editions")
+        Text("^[\(editionCount) edition](inflect: true)")
           .font(.TypeScale.caption)
           .foregroundStyle(Color.Text.tertiary)
       }
