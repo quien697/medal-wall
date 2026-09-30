@@ -31,7 +31,7 @@ struct MedalDetailViewModelRepositoryTests {
     let repository = StubMedalRepository(medals: [medal])
     let viewModel = MedalDetailViewModel(medal: medal, repository: repository)
 
-    try await viewModel.deleteMedal(medal)
+    try await viewModel.deleteMedal()
 
     #expect(await repository.deletedMedalIDs == [medal.id])
     #expect(await repository.medals.isEmpty)
@@ -45,7 +45,7 @@ struct MedalDetailViewModelRepositoryTests {
     let viewModel = MedalDetailViewModel(medal: medal, repository: repository)
 
     await #expect(throws: AppError.medalDeleteFailed) {
-      try await viewModel.deleteMedal(medal)
+      try await viewModel.deleteMedal()
     }
     #expect(await repository.medals.count == 1)
   }

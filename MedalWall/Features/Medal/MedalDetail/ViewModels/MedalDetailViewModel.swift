@@ -149,7 +149,7 @@ final class MedalDetailViewModel {
   }
 
   /// Deletes the medal from Firestore.
-  func deleteMedal(_ medal: Medal) async throws {
+  func deleteMedal() async throws {
     try await repository.deleteMedal(id: medal.id, userId: medal.userID)
   }
 }

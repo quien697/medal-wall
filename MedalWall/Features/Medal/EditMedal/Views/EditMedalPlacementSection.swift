@@ -35,23 +35,23 @@ struct EditMedalPlacementSection: View {
 
         Section("Female") {
           ForEach(AgeGroup.fiveYearCases, id: \.self) { ageGroup in
-            let div = Division(gender: .female, ageGroup: ageGroup)
-            Text(div.displayName).tag(Division?.some(div))
+            let option = Division(gender: .female, ageGroup: ageGroup)
+            Text(option.displayName).tag(Division?.some(option))
           }
           ForEach(AgeGroup.tenYearCases, id: \.self) { ageGroup in
-            let div = Division(gender: .female, ageGroup: ageGroup)
-            Text(div.displayName).tag(Division?.some(div))
+            let option = Division(gender: .female, ageGroup: ageGroup)
+            Text(option.displayName).tag(Division?.some(option))
           }
         }
 
         Section("Male") {
           ForEach(AgeGroup.fiveYearCases, id: \.self) { ageGroup in
-            let div = Division(gender: .male, ageGroup: ageGroup)
-            Text(div.displayName).tag(Division?.some(div))
+            let option = Division(gender: .male, ageGroup: ageGroup)
+            Text(option.displayName).tag(Division?.some(option))
           }
           ForEach(AgeGroup.tenYearCases, id: \.self) { ageGroup in
-            let div = Division(gender: .male, ageGroup: ageGroup)
-            Text(div.displayName).tag(Division?.some(div))
+            let option = Division(gender: .male, ageGroup: ageGroup)
+            Text(option.displayName).tag(Division?.some(option))
           }
         }
       } label: {

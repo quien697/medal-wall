@@ -21,18 +21,18 @@ struct EditMedalView: View {
   @State private var isPresentingCropImageView: Bool = false
   @State private var isPresentingRaceEntryPicker: Bool = false
   @State private var isPresentingPlacePicker: Bool = false
-  // Medal photo picker
   @State private var isPresentingPhotoPicker: Bool = false
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var rawPickedImage: UIImage?
-  // Event photos picker
   @State private var isPresentingEventPhotosPicker: Bool = false
   @State private var selectedEventPhotos: [PhotosPickerItem] = []
 
+  // MARK: - Init
   init(mode: ItemEditMode, medal: Medal? = nil) {
     self._viewModel = State(initialValue: EditMedalViewModel(mode: mode, medal: medal))
   }
 
+  // MARK: - Body
   var body: some View {
     NavigationStack {
       Form {
@@ -229,7 +229,7 @@ struct EditMedalView: View {
 
 #Preview {
   NavigationStack {
-    EditMedalView(mode: .edit, medal: Medal.sampleData.first!)
+    EditMedalView(mode: .edit, medal: Medal.sampleData.first)
   }
   .environment(UserManager())
 }

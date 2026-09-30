@@ -13,8 +13,8 @@ struct EditMedalInfoSection: View {
   @Binding var bib: String
   let place: Place
   let distance: String
-  var onEditPlace: () -> Void
-  var onEditDistance: () -> Void
+  let onEditPlace: () -> Void
+  let onEditDistance: () -> Void
 
   var body: some View {
     Section {
