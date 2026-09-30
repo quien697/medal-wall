@@ -38,7 +38,6 @@ struct ProfileView: View {
           fullMarathonProgress: viewModel.fullMarathonProgress(user: userManager.currentUser),
           halfMarathonProgress: viewModel.halfMarathonProgress(user: userManager.currentUser)
         )
-
         .padding(.bottom, 10)
       }  // ScrollView
       .scrollIndicators(.hidden)

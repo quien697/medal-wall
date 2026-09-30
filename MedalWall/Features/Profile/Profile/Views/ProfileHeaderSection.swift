@@ -18,13 +18,13 @@ struct ProfileHeaderSection: View {
         PhotoImage(urlString: photoUrl, as: .avatar)
 
         VStack(alignment: .leading, spacing: 8) {
-          Text("\(userName)")
+          Text(userName)
             .font(.TypeScale.title2)
             .foregroundStyle(Color.Text.primary)
             .lineLimit(1)
             .minimumScaleFactor(0.5)
 
-          if let bio = bio, !bio.isEmpty {
+          if let bio, !bio.isEmpty {
             Text(bio)
               .font(.TypeScale.body)
               .foregroundStyle(Color.Text.secondary)

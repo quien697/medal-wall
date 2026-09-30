@@ -13,6 +13,7 @@ struct EditProfileView: View {
   // MARK: - Environment
   @Environment(\.dismiss) private var dismiss
   @Environment(UserManager.self) private var userManager
+
   // MARK: - State
   @State private var viewModel: EditProfileViewModel
   @State private var errorWrapper: ErrorWrapper?

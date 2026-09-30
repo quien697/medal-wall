@@ -4,9 +4,6 @@
     "" : {
       "shouldTranslate" : false
     },
-    "%@" : {
-      "shouldTranslate" : false
-    },
     "%@ %@ (%@) selected" : {
       "localizations" : {
         "zh-TW" : {
