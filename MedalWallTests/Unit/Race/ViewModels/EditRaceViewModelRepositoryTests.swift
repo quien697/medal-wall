@@ -66,6 +66,21 @@ struct EditRaceViewModelRepositoryTests {
     #expect(await repository.races.first?.editionCount == 3)
   }
 
+  @Test("a failed editions load surfaces raceFetchFailed")
+  func testFailedEditionsLoadSurfacesError() async {
+    let race = makeRace()
+    let repository = StubRaceRepository(
+      races: [race], fetchOutcome: .failure(.raceFetchFailed("network down")))
+    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+
+    await viewModel.loadEditions()
+
+    if case .raceFetchFailed = viewModel.error {
+    } else {
+      Issue.record("expected raceFetchFailed, got \(String(describing: viewModel.error))")
+    }
+  }
+
   @Test("an added edition edited again before saving is still created")
   func testReEditedNewEditionIsCreated() async throws {
     let race = makeRace()

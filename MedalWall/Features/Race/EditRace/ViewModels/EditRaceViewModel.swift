@@ -72,10 +72,14 @@ final class EditRaceViewModel {
     isEditionsLoading = true
     defer { isEditionsLoading = false }
 
-    let loaded = (try? await repository.fetchEditions(raceId: raceId)) ?? []
-    originalEditions = loaded
-    originalEditionIds = Set(loaded.map { $0.id })
-    draftEditions = loaded.map { DraftRaceEdition(from: $0) }
+    do {
+      let loaded = try await repository.fetchEditions(raceId: raceId)
+      originalEditions = loaded
+      originalEditionIds = Set(loaded.map { $0.id })
+      draftEditions = loaded.map { DraftRaceEdition(from: $0) }
+    } catch {
+      self.error = .raceFetchFailed(error.localizedDescription)
+    }
   }
 
   /// Stages a new edition to be created on save.
