@@ -39,7 +39,7 @@ struct RaceEntryList: View {
 
         if !raceEditions.isEmpty {
           VStack(alignment: .leading, spacing: 16) {
-            ForEach(raceEditions.sorted { $0.year > $1.year }) { edition in
+            ForEach(raceEditions) { edition in
               RaceEntryEditionRow(
                 race: race,
                 edition: edition,

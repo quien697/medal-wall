@@ -8,18 +8,24 @@
 import SwiftUI
 
 struct RaceEntryPicker: View {
+  // MARK: - Environment
   @Environment(\.dismiss) private var dismiss
+
+  // MARK: - State
+  @State private var viewModel: RaceEntryPickerViewModel
   @State private var selection: RaceEntry?
-  @State private var races: [Race] = []
-  @State private var editions: [String: [RaceEdition]] = [:]
-  private let repository: any RaceRepository
+  @State private var errorWrapper: ErrorWrapper?
+
+  // MARK: - Properties
   let onSelect: (RaceEntry) -> Void
 
+  // MARK: - Init
   init(repository: (any RaceRepository)? = nil, onSelect: @escaping (RaceEntry) -> Void) {
-    self.repository = repository ?? RaceFirestoreRepository()
+    self._viewModel = State(initialValue: RaceEntryPickerViewModel(repository: repository))
     self.onSelect = onSelect
   }
 
+  // MARK: - Body
   var body: some View {
     NavigationStack {
       VStack(spacing: 0) {
@@ -27,7 +33,10 @@ struct RaceEntryPicker: View {
 
         Divider()
 
-        if races.isEmpty {
+        if viewModel.isLoading {
+          ProgressView()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if viewModel.races.isEmpty {
           ContentUnavailableView {
             Label("No Race Events", systemImage: "flag.fill")
               .font(.TypeScale.title2)
@@ -38,17 +47,14 @@ struct RaceEntryPicker: View {
               .foregroundStyle(Color.Text.secondary)
           }  // ContentUnavailableView
         } else {
-          RaceEntryList(races: races, editions: editions, selection: $selection)
+          RaceEntryList(
+            races: viewModel.races, editions: viewModel.editions, selection: $selection)
         }
       }
       .navigationTitle("Pick Race Entry")
       .navigationBarTitleDisplayMode(.inline)
       .task {
-        guard let fetched = try? await repository.fetchRaces() else { return }
-        races = fetched
-        for race in fetched {
-          editions[race.id] = try? await repository.fetchEditions(raceId: race.id)
-        }
+        await viewModel.load()
       }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
@@ -66,6 +72,18 @@ struct RaceEntryPicker: View {
           }
         }
       }  // toolbar
+      .onChange(of: viewModel.error) { _, error in
+        if let error {
+          errorWrapper = ErrorWrapper(error: error)
+        }
+      }
+      .sheet(
+        item: $errorWrapper,
+        onDismiss: { viewModel.error = nil },
+        content: { wrapper in
+          ErrorView(errorWrapper: wrapper)
+        }
+      )
     }  // NavigationStack
   }
 }
