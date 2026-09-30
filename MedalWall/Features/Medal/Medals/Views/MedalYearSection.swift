@@ -36,7 +36,7 @@ struct MedalYearSection: View {
             isPersonalRecord: personalRecordIDs.contains(medal.id)
           )
           .matchedTransitionSource(id: medal.id, in: namespace)
-        }
+        }  // NavigationLink
         .buttonStyle(.plain)
       }  // ForEach
     }  // VStack

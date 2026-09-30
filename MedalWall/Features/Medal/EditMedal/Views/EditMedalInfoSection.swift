@@ -24,7 +24,7 @@ struct EditMedalInfoSection: View {
       } label: {
         Text("Name")
           .fieldStyle(.label)
-      }
+      }  // LabeledContent
 
       DatePicker(
         selection: $date,
@@ -32,7 +32,7 @@ struct EditMedalInfoSection: View {
       ) {
         Text("Date")
           .fieldStyle(.label)
-      }
+      }  // DatePicker
 
       LabeledContent {
         TextField("e.g. 4291 (Optional)", text: $bib)
@@ -40,7 +40,7 @@ struct EditMedalInfoSection: View {
       } label: {
         Text("Bib")
           .fieldStyle(.label)
-      }
+      }  // LabeledContent
 
       HStack {
         Text("Distance")
@@ -53,7 +53,7 @@ struct EditMedalInfoSection: View {
         } label: {
           Text(distance)
             .fieldStyle(.value)
-        }
+        }  // Button
         .buttonStyle(.bordered)
       }  // HStack
 

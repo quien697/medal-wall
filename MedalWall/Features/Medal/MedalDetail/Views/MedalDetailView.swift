@@ -64,7 +64,7 @@ struct MedalDetailView: View {
       if !viewModel.medal.tags.isEmpty {
         MedalDetailTagsSection(tags: viewModel.medal.tags)
       }
-    }
+    }  // ScrollView
     .background(Color.Background.primary)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
@@ -73,7 +73,7 @@ struct MedalDetailView: View {
             isPresentingEditMedal = true
           } label: {
             Label("Edit Medal", systemImage: "square.and.pencil")
-          }
+          }  // Button
 
           Divider()
 
@@ -81,10 +81,10 @@ struct MedalDetailView: View {
             isPresentingDeleteMedalConfirm = true
           } label: {
             Label("Delete Medal", systemImage: "trash")
-          }
-        }
-      }
-    }
+          }  // Button
+        }  // Menu
+      }  // ToolbarItem
+    }  // toolbar
     .alert(isPresented: $isPresentingDeleteMedalConfirm) {
       .deleteConfirmation(
         .medal(name: viewModel.medal.name),

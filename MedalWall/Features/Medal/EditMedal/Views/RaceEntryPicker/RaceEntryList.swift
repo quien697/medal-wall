@@ -45,8 +45,8 @@ struct RaceEntryList: View {
                 edition: edition,
                 selection: $selection
               )
-            }
-          }
+            }  // ForEach
+          }  // VStack
           .frame(maxWidth: .infinity, alignment: .leading)
           .surfaceStyle(vPadding: 12, hPadding: 12)
         }

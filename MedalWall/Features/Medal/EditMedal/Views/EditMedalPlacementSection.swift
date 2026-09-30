@@ -37,27 +37,27 @@ struct EditMedalPlacementSection: View {
           ForEach(AgeGroup.fiveYearCases, id: \.self) { ageGroup in
             let option = Division(gender: .female, ageGroup: ageGroup)
             Text(option.displayName).tag(Division?.some(option))
-          }
+          }  // ForEach
           ForEach(AgeGroup.tenYearCases, id: \.self) { ageGroup in
             let option = Division(gender: .female, ageGroup: ageGroup)
             Text(option.displayName).tag(Division?.some(option))
-          }
-        }
+          }  // ForEach
+        }  // Section
 
         Section("Male") {
           ForEach(AgeGroup.fiveYearCases, id: \.self) { ageGroup in
             let option = Division(gender: .male, ageGroup: ageGroup)
             Text(option.displayName).tag(Division?.some(option))
-          }
+          }  // ForEach
           ForEach(AgeGroup.tenYearCases, id: \.self) { ageGroup in
             let option = Division(gender: .male, ageGroup: ageGroup)
             Text(option.displayName).tag(Division?.some(option))
-          }
-        }
+          }  // ForEach
+        }  // Section
       } label: {
         Text("Division Group")
           .fieldStyle(.label)
-      }
+      }  // Picker
 
       if division != nil {
         EditMedalPlacementRow(

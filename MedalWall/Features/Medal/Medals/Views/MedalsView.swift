@@ -38,17 +38,17 @@ struct MedalsView: View {
         .toolbar {
           ToolbarItem(placement: .title) {
             ExpandedNavigationTitle(title: "Your Collection")
-          }
+          }  // ToolbarItem
 
           ToolbarItem(placement: .topBarTrailing) {
             Button {
               isPresentingAddMedal = true
             } label: {
               Image(systemName: "plus")
-            }
+            }  // Button
             .matchedTransitionSource(id: addMedal, in: namespace)
             .buttonStyle(.glassProminent)
-          }
+          }  // ToolbarItem
         }  // toolbar
         .onAppear {
           guard let userId = userManager.currentUserID else { return }

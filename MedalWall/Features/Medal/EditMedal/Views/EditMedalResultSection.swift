@@ -19,7 +19,7 @@ struct EditMedalResultSection: View {
       ) {
         Text("Finish Time")
           .fieldStyle(.label)
-      }
+      }  // TimePicker
       .timePickerStyle(accentColor: Color.Accent.primary, fontWeight: .bold)
     } header: {
       Text("Result")

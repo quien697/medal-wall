@@ -24,8 +24,8 @@ struct EditMedalTagsSection: View {
             } label: {
               Image(systemName: "xmark")
                 .font(.TypeScale.overline)
-            }
-          }
+            }  // Button
+          }  // HStack
           .chipStyle(.neutral)
           .buttonStyle(.plain)
         }  // ForEach
@@ -42,7 +42,7 @@ struct EditMedalTagsSection: View {
           } label: {
             Image(systemName: "plus.circle.fill")
               .foregroundStyle(Color.Text.primary)
-          }
+          }  // Button
           .buttonStyle(.plain)
         }
       }  // HStack

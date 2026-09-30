@@ -23,7 +23,7 @@ struct RaceEntrySubtitle: View {
           .foregroundStyle(Color.Text.tertiary)
           .frame(maxWidth: .infinity, alignment: .leading)
       }
-    }
+    }  // Group
     .animation(.easeInOut(duration: 0.2), value: selection?.selectionLabel)
     .padding(.horizontal, 16)
     .padding(.vertical, 12)

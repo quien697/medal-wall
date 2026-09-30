@@ -33,7 +33,7 @@ struct RaceEntryEditionRow: View {
               distance: distance,
               selection: $selection
             )
-          }
+          }  // ForEach
         }  // FlowLayout
       } else {
         Text("No Distances")

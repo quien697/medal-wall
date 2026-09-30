@@ -21,7 +21,7 @@ struct EditMedalAutoFillSection: View {
           Text("Pick a race event to auto-fill fields")
             .font(.TypeScale.caption)
             .foregroundStyle(Color.Text.tertiary)
-        }
+        }  // VStack
 
         Spacer()
 
@@ -29,7 +29,7 @@ struct EditMedalAutoFillSection: View {
           onAction()
         } label: {
           Text("Select")
-        }
+        }  // Button
         .buttonStyle(.plain)
         .actionStyle(.tertiary)
       }  // HStack

@@ -50,7 +50,7 @@ struct RaceEntryPicker: View {
           RaceEntryList(
             races: viewModel.races, editions: viewModel.editions, selection: $selection)
         }
-      }
+      }  // VStack
       .navigationTitle("Pick Race Entry")
       .navigationBarTitleDisplayMode(.inline)
       .task {
@@ -61,7 +61,7 @@ struct RaceEntryPicker: View {
           Button(role: .cancel) {
             dismiss()
           }
-        }
+        }  // ToolbarItem
 
         if let selection {
           ToolbarItem(placement: .confirmationAction) {
@@ -69,7 +69,7 @@ struct RaceEntryPicker: View {
               onSelect(selection)
               dismiss()
             }
-          }
+          }  // ToolbarItem
         }
       }  // toolbar
       .onChange(of: viewModel.error) { _, error in
