@@ -39,7 +39,10 @@ final class EditProfileViewModel {
 
   // MARK: - Functions
   func loadExistingPhoto() async {
-    photo = await UIImage.load(from: profile.photoUrl)
+    let existingPhoto = await UIImage.load(from: profile.photoUrl)
+    guard !isPhotoChanged else { return }
+
+    photo = existingPhoto
   }
 
   func updatePhoto(with uiImage: UIImage) {

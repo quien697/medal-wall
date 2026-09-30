@@ -7,6 +7,7 @@
 
 import Foundation
 import Testing
+import UIKit
 
 @testable import MedalWall
 
@@ -43,5 +44,16 @@ struct EditProfileViewModelTests {
     viewModel.birthday = nil
 
     #expect(viewModel.makeUpdatedUser().birthday == nil)
+  }
+
+  @Test("a photo picked while the existing one loads is kept")
+  func testPickedPhotoSurvivesExistingPhotoLoad() async {
+    let viewModel = EditProfileViewModel(profile: makeProfile())
+    let pickedPhoto = UIImage()
+    viewModel.updatePhoto(with: pickedPhoto)
+
+    await viewModel.loadExistingPhoto()
+
+    #expect(viewModel.photo === pickedPhoto)
   }
 }
