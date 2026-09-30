@@ -89,8 +89,8 @@ final class EditRaceViewModel {
 
   /// Replaces a staged edition with an updated draft.
   func stageUpdateEdition(_ draft: DraftRaceEdition) {
-    if let idx = draftEditions.firstIndex(where: { $0.id == draft.id }) {
-      draftEditions[idx] = draft
+    if let index = draftEditions.firstIndex(where: { $0.id == draft.id }) {
+      draftEditions[index] = draft
     }
   }
 

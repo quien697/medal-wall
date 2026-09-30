@@ -108,6 +108,6 @@ struct RaceDetailView: View {
 
 #Preview {
   NavigationStack {
-    RaceDetailView(race: Race.sampleData.first!)
+    RaceDetailView(race: Race.taipei)
   }
 }

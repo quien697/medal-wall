@@ -197,6 +197,6 @@ struct EditRaceView: View {
 }
 
 #Preview("Edit mode") {
-  EditRaceView(mode: .edit, race: Race.sampleData.first!)
+  EditRaceView(mode: .edit, race: Race.taipei)
     .environment(UserManager())
 }

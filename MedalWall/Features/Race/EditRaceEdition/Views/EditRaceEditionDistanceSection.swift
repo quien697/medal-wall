@@ -9,8 +9,8 @@ import SwiftUI
 
 struct EditRaceEditionDistanceSection: View {
   let distances: [RaceDistance]
-  var onRemove: (RaceDistance) -> Void
-  var onAdd: () -> Void
+  let onRemove: (RaceDistance) -> Void
+  let onAdd: () -> Void
 
   var body: some View {
     Section {
@@ -59,7 +59,7 @@ struct EditRaceEditionDistanceSection: View {
 }
 
 #Preview {
-  let distances = RaceEdition.sampleData.first!.distances
+  let distances = RaceEdition.taipei2019.distances
 
   Form {
     EditRaceEditionDistanceSection(

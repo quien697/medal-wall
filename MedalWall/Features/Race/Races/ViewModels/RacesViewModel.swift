@@ -9,8 +9,10 @@ import Foundation
 
 @Observable
 final class RacesViewModel {
-  // MARK: - State
+  // MARK: - Data
   var races: [Race] = []
+
+  // MARK: - State
   var isLoading = false
   var error: AppError?
 
@@ -45,7 +47,7 @@ final class RacesViewModel {
   }
 
   // MARK: - Functions
-  /// Loads all races created by the given user from Firestore.
+  /// Loads all races from Firestore.
   func loadRaces() async {
     isLoading = true
     defer { isLoading = false }

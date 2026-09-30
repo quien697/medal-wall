@@ -9,6 +9,7 @@ import Foundation
 
 @Observable
 final class RaceDetailViewModel {
+  // MARK: - Properties
   var race: Race
   var editions: [RaceEdition] = []
   var isLoading = false

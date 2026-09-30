@@ -11,7 +11,7 @@ struct EditRaceInfoSection: View {
   @Binding var name: String
   @Binding var url: String
   let place: Place
-  var onEditPlace: () -> Void
+  let onEditPlace: () -> Void
 
   var body: some View {
     Section {
@@ -40,7 +40,6 @@ struct EditRaceInfoSection: View {
             .font(.TypeScale.overline)
             .padding(.leading, -6)
         }
-
         .foregroundStyle(place.formatted.isEmpty ? Color.Text.tertiary : Color.Text.primary)
         .onTapGesture {
           onEditPlace()
@@ -58,7 +57,7 @@ struct EditRaceInfoSection: View {
 }
 
 #Preview {
-  let race = Race.sampleData.first!
+  let race = Race.taipei
 
   Form {
     EditRaceInfoSection(

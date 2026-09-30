@@ -18,9 +18,9 @@ struct EditRaceEditionDateSection: View {
   let yearDateRange: ClosedRange<Date>
   let minEndDate: Date
   let maxEndDate: Date
-  var onToggleOneDay: () -> Void
-  var onUpdateYear: (Int) -> Void
-  var onUpdateStartDate: (Date) -> Void
+  let onToggleOneDay: () -> Void
+  let onUpdateYear: (Int) -> Void
+  let onUpdateStartDate: (Date) -> Void
 
   // MARK: - Body
   var body: some View {
@@ -83,9 +83,9 @@ struct EditRaceEditionDateSection: View {
 
 #Preview {
   let calendar = Calendar.current
-  let jan1 = calendar.date(from: DateComponents(year: 2026, month: 1, day: 1))!
-  let jun15 = calendar.date(from: DateComponents(year: 2026, month: 6, day: 15))!
-  let dec31 = calendar.date(from: DateComponents(year: 2026, month: 12, day: 31))!
+  let jan1 = calendar.date(from: DateComponents(year: 2026, month: 1, day: 1)) ?? .now
+  let jun15 = calendar.date(from: DateComponents(year: 2026, month: 6, day: 15)) ?? .now
+  let dec31 = calendar.date(from: DateComponents(year: 2026, month: 12, day: 31)) ?? .now
   let yearRange = jan1...dec31
 
   Form {

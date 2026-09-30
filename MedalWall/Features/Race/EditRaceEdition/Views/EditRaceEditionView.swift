@@ -211,8 +211,8 @@ struct EditRaceEditionView: View {
 #Preview("Edit Mode") {
   EditRaceEditionView(
     mode: .edit,
-    raceId: RaceEdition.sampleData.first!.raceId,
-    edition: RaceEdition.sampleData.first!
+    raceId: RaceEdition.taipei2019.raceId,
+    edition: RaceEdition.taipei2019
   )
   .environment(UserManager())
 }
