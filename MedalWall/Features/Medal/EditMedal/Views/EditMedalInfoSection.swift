@@ -17,7 +17,7 @@ struct EditMedalInfoSection: View {
   var onEditDistance: () -> Void
 
   var body: some View {
-    Section("Info") {
+    Section {
       LabeledContent {
         TextField("e.g. Taipei Marathon 2025", text: $name)
           .fieldStyle(.value)
@@ -68,6 +68,9 @@ struct EditMedalInfoSection: View {
         Text("Place")
           .fieldStyle(.label)
       }  // LabeledContent
+    } header: {
+      Text("Info")
+        .sectionTitleStyle()
     }  // Section
   }
 }

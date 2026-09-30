@@ -17,7 +17,7 @@ struct EditMedalPlacementSection: View {
   @Binding var divisionTotal: Int?
 
   var body: some View {
-    Section("Placement (Optional)") {
+    Section {
       EditMedalPlacementRow(
         label: "Overall",
         placement: $overallPlacement,
@@ -66,6 +66,9 @@ struct EditMedalPlacementSection: View {
           total: $divisionTotal
         )
       }
+    } header: {
+      Text("Placement (Optional)")
+        .sectionTitleStyle()
     }  // Section
   }
 }

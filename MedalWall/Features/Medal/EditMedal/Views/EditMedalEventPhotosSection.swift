@@ -13,7 +13,7 @@ struct EditMedalEventPhotosSection: View {
   let onRemove: (String) -> Void
 
   var body: some View {
-    Section("Event Photos") {
+    Section {
       ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 10) {
           ForEach(photos) { photo in
@@ -47,6 +47,9 @@ struct EditMedalEventPhotosSection: View {
         .padding()
       }  // ScrollView
       .listRowInsets(EdgeInsets())
+    } header: {
+      Text("Event Photos")
+        .sectionTitleStyle()
     }  // Section
   }
 }

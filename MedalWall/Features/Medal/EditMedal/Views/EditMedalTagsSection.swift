@@ -14,7 +14,7 @@ struct EditMedalTagsSection: View {
   let onRemove: (String) -> Void
 
   var body: some View {
-    Section("Tags") {
+    Section {
       FlowLayout(spacing: 8) {
         ForEach(tags, id: \.self) { tag in
           HStack(spacing: 4) {
@@ -50,6 +50,9 @@ struct EditMedalTagsSection: View {
       .padding(8)
       .background(Color.Surface.secondary)
       .clipShape(.rect(cornerRadius: 8))
+    } header: {
+      Text("Tags")
+        .sectionTitleStyle()
     }  // Section
   }
 }
