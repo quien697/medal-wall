@@ -35,9 +35,9 @@ struct RaceList: View {
               onDelete(race)
             } label: {
               Label("Delete", systemImage: "trash")
-            }
+            }  // Button
           }
-        }
+        }  // List
         .scrollContentBackground(.hidden)
       }
     }  // Group

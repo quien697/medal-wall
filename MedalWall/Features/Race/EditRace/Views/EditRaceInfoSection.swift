@@ -39,7 +39,7 @@ struct EditRaceInfoSection: View {
           Image(systemName: "chevron.right")
             .font(.TypeScale.overline)
             .padding(.leading, -6)
-        }
+        }  // HStack
         .foregroundStyle(place.formatted.isEmpty ? Color.Text.tertiary : Color.Text.primary)
         .onTapGesture {
           onEditPlace()

@@ -34,7 +34,7 @@ struct RaceDetailView: View {
 
       ScrollView {
         RaceDetailEditionsSection(editions: viewModel.editions)
-      }
+      }  // ScrollView
     }  // VStack
     .background(Color.Background.primary)
     .overlay {
@@ -54,7 +54,7 @@ struct RaceDetailView: View {
             isPresentingEditRace = true
           } label: {
             Label("Edit Race", systemImage: "square.and.pencil")
-          }
+          }  // Button
 
           Divider()
 
@@ -62,7 +62,7 @@ struct RaceDetailView: View {
             isPresentingDeleteRaceConfirm = true
           } label: {
             Label("Delete Race", systemImage: "trash")
-          }
+          }  // Button
         }  // Menu
       }  // ToolbarItem
     }  // toolbar

@@ -21,7 +21,7 @@ struct RaceDetailEditionsSection: View {
           Text("Add editions to track your race history.")
             .font(.TypeScale.body)
             .foregroundStyle(Color.Text.secondary)
-        }
+        }  // ContentUnavailableView
         .surfaceStyle()
       } else {
         ForEach(editions) { edition in
@@ -45,7 +45,7 @@ struct RaceDetailEditionsSection: View {
                 ForEach(edition.distances.sorted()) { distance in
                   Text(distance.displayLabel)
                     .tagStyle(.neutralInCard)
-                }
+                }  // ForEach
               }  // FlowLayout
 
               Spacer()

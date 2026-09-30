@@ -91,7 +91,7 @@ struct EditRaceEditionView: View {
               } label: {
                 Text("Delete Edition")
                   .frame(maxWidth: .infinity, alignment: .center)
-              }
+              }  // Button
             }  // Section
           }
         }  // Form

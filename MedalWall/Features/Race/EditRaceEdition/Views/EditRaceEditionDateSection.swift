@@ -33,7 +33,7 @@ struct EditRaceEditionDateSection: View {
       ) {
         Text("One Day Event")
           .fieldStyle(.label)
-      }
+      }  // Toggle
 
       Picker(
         selection: Binding(
@@ -45,11 +45,11 @@ struct EditRaceEditionDateSection: View {
           Text(String(year))
             .font(.TypeScale.body)
             .tag(year)
-        }
+        }  // ForEach
       } label: {
         Text("Year")
           .fieldStyle(.label)
-      }
+      }  // Picker
 
       DatePicker(
         selection: Binding(
@@ -61,7 +61,7 @@ struct EditRaceEditionDateSection: View {
       ) {
         Text("Start Date")
           .fieldStyle(.label)
-      }
+      }  // DatePicker
 
       if !isOneDay {
         DatePicker(
@@ -71,7 +71,7 @@ struct EditRaceEditionDateSection: View {
         ) {
           Text("End Date")
             .fieldStyle(.label)
-        }
+        }  // DatePicker
       }
     } header: {
       Text("Date")

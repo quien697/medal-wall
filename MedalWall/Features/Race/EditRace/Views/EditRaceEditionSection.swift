@@ -57,7 +57,7 @@ struct EditRaceEditionSection: View {
                     ForEach(edition.distances.sorted()) { distance in
                       Text(distance.displayLabel)
                         .tagStyle(.neutralInCard)
-                    }
+                    }  // ForEach
                   }  // HStack
                 }  // ScrollView
               }  // VStack
@@ -88,7 +88,7 @@ struct EditRaceEditionSection: View {
 
           Text("Add")
             .textCase(.uppercase)
-        }
+        }  // Button
         .actionStyle(
           .plain,
           font: .TypeScale.callout,

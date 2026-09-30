@@ -57,7 +57,7 @@ struct RacesView: View {
             isPresentingAddRace = true
           } label: {
             Image(systemName: "plus")
-          }
+          }  // Button
           .matchedTransitionSource(id: addRace, in: namespace)
           .buttonStyle(.glassProminent)
         }  // ToolbarItem

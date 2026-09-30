@@ -35,7 +35,7 @@ struct RaceDetailHeroSection: View {
               .font(.TypeScale.caption)
               .foregroundStyle(Color.Text.secondary)
               .underline(true, color: Color.Text.secondary)
-          }
+          }  // Link
         }
       }  // VStack
       .frame(maxWidth: .infinity, alignment: .leading)

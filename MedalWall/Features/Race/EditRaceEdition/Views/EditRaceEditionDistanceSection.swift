@@ -25,11 +25,11 @@ struct EditRaceEditionDistanceSection: View {
               Image(systemName: "xmark")
                 .font(.TypeScale.overline)
                 .foregroundStyle(Color.Text.tertiary)
-            }
+            }  // Button
             .buttonStyle(.plain)
-          }
+          }  // HStack
           .chipStyle(.neutral)
-        }
+        }  // ForEach
       }  // FlowLayout
     } header: {
       HStack {
@@ -45,14 +45,14 @@ struct EditRaceEditionDistanceSection: View {
 
           Text("Add")
             .textCase(.uppercase)
-        }
+        }  // Button
         .actionStyle(
           .plain,
           font: .TypeScale.callout,
           vPadding: 0,
           hPadding: 0
         )
-      }
+      }  // HStack
     }  // Section
     .listRowBackground(Color.Surface.primary)
   }
