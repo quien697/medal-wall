@@ -53,15 +53,15 @@ struct ProfileView: View {
       .toolbar {
         ToolbarItem(placement: .title) {
           ExpandedNavigationTitle(title: "Profile")
-        }
+        }  // ToolbarItem
 
         ToolbarItem(placement: .topBarTrailing) {
           NavigationLink {
             SettingsView()
           } label: {
             Image(systemName: "gearshape")
-          }
-        }
+          }  // NavigationLink
+        }  // ToolbarItem
 
         ToolbarItem(placement: .topBarTrailing) {
           Menu {
@@ -69,11 +69,11 @@ struct ProfileView: View {
               isPresentingEditProfile = true
             } label: {
               Label("Edit Profile", systemImage: "square.and.pencil")
-            }
+            }  // Button
           } label: {
             Image(systemName: "ellipsis")
-          }
-        }
+          }  // Menu
+        }  // ToolbarItem
       }  // toolbar
       .sheet(isPresented: $isPresentingEditProfile) {
         if let user = userManager.currentUser {

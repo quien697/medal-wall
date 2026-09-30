@@ -30,7 +30,7 @@ struct ProfileSummarySection: View {
         StatCard(title: "\(totalMedals)", subtitle: "Medals")
         StatCard(title: "\(fullCount)", subtitle: "Full")
         StatCard(title: "\(halfCount)", subtitle: "Half")
-      }
+      }  // LazyVGrid
 
       LazyVGrid(columns: twoColumns, spacing: 8) {
         StatCard(
@@ -43,7 +43,7 @@ struct ProfileSummarySection: View {
           titleFont: .TypeScale.Numeric.medium,
           subtitle: "Best Half"
         )
-      }
+      }  // LazyVGrid
     }  // PageSection
   }
 }

@@ -67,7 +67,7 @@ struct EditProfileView: View {
           Button(role: .close) {
             dismiss()
           }
-        }
+        }  // ToolbarItem
 
         ToolbarItem(placement: .confirmationAction) {
           Button(role: .confirm) {
@@ -82,7 +82,7 @@ struct EditProfileView: View {
             }
           }
           .disabled(!viewModel.isFormValid || viewModel.isLoading)
-        }
+        }  // ToolbarItem
       }  // toolbar
       .photosPicker(
         isPresented: $isPresentingPhotoPicker,

@@ -17,8 +17,8 @@ struct ProfileAchievementsSection: View {
         ProfileAchievementRow(trackName: "Full Marathon", progress: fullMarathonProgress)
 
         ProfileAchievementRow(trackName: "Half Marathon", progress: halfMarathonProgress)
-      }
-    }
+      }  // VStack
+    }  // PageSection
   }
 }
 

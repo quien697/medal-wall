@@ -21,7 +21,7 @@ struct EditProfileInfoSection: View {
       } label: {
         Text("First Name")
           .fieldStyle(.label)
-      }
+      }  // LabeledContent
 
       LabeledContent {
         TextField("Last Name", text: $lastName)
@@ -29,7 +29,7 @@ struct EditProfileInfoSection: View {
       } label: {
         Text("Last Name")
           .fieldStyle(.label)
-      }
+      }  // LabeledContent
 
       Picker(selection: $gender) {
         Text("Not Set")
@@ -38,11 +38,11 @@ struct EditProfileInfoSection: View {
         ForEach(Gender.allCases, id: \.self) { genderCase in
           Text(genderCase.displayName)
             .tag(Gender?.some(genderCase))
-        }
+        }  // ForEach
       } label: {
         Text("Gender")
           .fieldStyle(.label)
-      }
+      }  // Picker
       .pickerStyle(.menu)
 
       LabeledContent {
@@ -58,7 +58,7 @@ struct EditProfileInfoSection: View {
       } label: {
         Text("Birthday")
           .fieldStyle(.label)
-      }
+      }  // LabeledContent
     } header: {
       Text("Info")
         .sectionTitleStyle()

@@ -29,11 +29,11 @@ struct ProfileHeaderSection: View {
               .font(.TypeScale.body)
               .foregroundStyle(Color.Text.secondary)
           }
-        }
+        }  // VStack
 
         Spacer()
-      }
-    }
+      }  // HStack
+    }  // PageSection
   }
 }
 
