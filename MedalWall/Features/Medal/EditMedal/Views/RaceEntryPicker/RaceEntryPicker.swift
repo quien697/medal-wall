@@ -29,7 +29,7 @@ struct RaceEntryPicker: View {
   var body: some View {
     NavigationStack {
       VStack(spacing: 0) {
-        RaceEntrySubTitle(selection: selection)
+        RaceEntrySubtitle(selection: selection)
 
         Divider()
 

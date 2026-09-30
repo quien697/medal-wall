@@ -22,7 +22,7 @@ struct MedalList: View {
   var body: some View {
     Group {
       if viewModel.isEmpty && !viewModel.isLoading {
-        MedalEmptyView()
+        MedalEmptyState()
       } else {
         ScrollView {
           LazyVStack(alignment: .leading, spacing: .Space.section) {

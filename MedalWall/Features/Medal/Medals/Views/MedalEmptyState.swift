@@ -1,5 +1,5 @@
 //
-//  MedalEmptyView.swift
+//  MedalEmptyState.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-04-16.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MedalEmptyView: View {
+struct MedalEmptyState: View {
   var body: some View {
     ContentUnavailableView(
       "No Medals",
@@ -18,5 +18,5 @@ struct MedalEmptyView: View {
 }
 
 #Preview {
-  MedalEmptyView()
+  MedalEmptyState()
 }

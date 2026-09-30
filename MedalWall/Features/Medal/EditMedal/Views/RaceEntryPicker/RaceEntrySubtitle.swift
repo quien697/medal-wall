@@ -1,5 +1,5 @@
 //
-//  RaceEntrySubTitle.swift
+//  RaceEntrySubtitle.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-04-16.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RaceEntrySubTitle: View {
+struct RaceEntrySubtitle: View {
   let selection: RaceEntry?
 
   var body: some View {
@@ -34,7 +34,7 @@ struct RaceEntrySubTitle: View {
   let edition = RaceEdition.taipei2019
   let distance = edition.distances.first!
 
-  RaceEntrySubTitle(selection: nil)
+  RaceEntrySubtitle(selection: nil)
 
-  RaceEntrySubTitle(selection: RaceEntry(race: Race.taipei, edition: edition, distance: distance))
+  RaceEntrySubtitle(selection: RaceEntry(race: Race.taipei, edition: edition, distance: distance))
 }
