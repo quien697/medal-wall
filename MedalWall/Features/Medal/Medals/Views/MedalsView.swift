@@ -61,7 +61,7 @@ struct MedalsView: View {
             Task { await viewModel.loadMedals(userId: userId) }
           },
           content: {
-            AddMedalView()
+            EditMedalView(mode: .add)
               .navigationTransition(.zoom(sourceID: addMedal, in: namespace))
           }
         )
