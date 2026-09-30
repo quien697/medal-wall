@@ -15,7 +15,6 @@ struct EditProfileView: View {
   @Environment(UserManager.self) private var userManager
   // MARK: - State
   @State private var viewModel: EditProfileViewModel
-  @State private var isLoading = false
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingPhotoPicker: Bool = false
   @State private var isPresentingCropImageView: Bool = false
@@ -59,7 +58,7 @@ struct EditProfileView: View {
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
       .background(Color.Background.primary)
-      .disabled(isLoading)
+      .disabled(viewModel.isLoading)
       .task {
         await viewModel.loadExistingPhoto()
       }
@@ -73,16 +72,8 @@ struct EditProfileView: View {
         ToolbarItem(placement: .confirmationAction) {
           Button(role: .confirm) {
             Task {
-              isLoading = true
-              defer { isLoading = false }
-
               do {
-                var updatedUser = viewModel.makeUpdatedUser()
-                if viewModel.isPhotoChanged && viewModel.photo == nil {
-                  updatedUser.photoUrl = nil
-                }
-                let updatedUserPhoto = viewModel.isPhotoChanged ? viewModel.photo : nil
-                try await userManager.updateUser(updatedUser, photo: updatedUserPhoto)
+                try await viewModel.save(userManager: userManager)
                 dismiss()
               } catch {
                 shouldDismiss = true
@@ -90,7 +81,7 @@ struct EditProfileView: View {
               }
             }
           }
-          .disabled(!viewModel.isFormValid || isLoading)
+          .disabled(!viewModel.isFormValid || viewModel.isLoading)
         }
       }  // toolbar
       .photosPicker(

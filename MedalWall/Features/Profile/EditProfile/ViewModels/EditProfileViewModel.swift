@@ -9,14 +9,18 @@ import SwiftUI
 
 @Observable
 final class EditProfileViewModel {
-  // MARK: - Properties
+  // MARK: - Data
   var userName: UserName
   var photo: UIImage?
-  private(set) var isPhotoChanged = false
   var bio: String
   var gender: Gender?
   var birthday: Date?
 
+  // MARK: - State
+  private(set) var isPhotoChanged = false
+  private(set) var isLoading = false
+
+  // MARK: - Dependencies
   private let profile: User
 
   // MARK: - Init
@@ -36,6 +40,9 @@ final class EditProfileViewModel {
   var isFormValid: Bool {
     !userName.trimmedFirstName.isEmpty && !userName.trimmedLastName.isEmpty
   }
+
+  /// The photo to upload on save — only a newly picked one, never the existing photo.
+  var photoToUpload: UIImage? { isPhotoChanged ? photo : nil }
 
   // MARK: - Functions
   func loadExistingPhoto() async {
@@ -64,6 +71,17 @@ final class EditProfileViewModel {
     updated.bio = updatedBio.isEmpty ? nil : updatedBio
     updated.gender = gender
     updated.birthday = birthday
+    if isPhotoChanged && photo == nil {
+      updated.photoUrl = nil
+    }
     return updated
+  }
+
+  /// Saves the edited profile, uploading the photo only when it changed.
+  func save(userManager: UserManager) async throws {
+    isLoading = true
+    defer { isLoading = false }
+
+    try await userManager.updateUser(makeUpdatedUser(), photo: photoToUpload)
   }
 }

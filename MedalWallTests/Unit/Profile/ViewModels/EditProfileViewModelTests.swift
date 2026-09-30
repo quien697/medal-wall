@@ -14,10 +14,12 @@ import UIKit
 @MainActor
 struct EditProfileViewModelTests {
 
-  private func makeProfile(birthday: Date? = nil) -> User {
+  private let avatarUrl = "https://example.com/avatar.jpg"
+
+  private func makeProfile(birthday: Date? = nil, photoUrl: String? = nil) -> User {
     User(
       uid: "uid", email: "runner@example.com", firstName: "John", lastName: "Doe",
-      birthday: birthday)
+      photoUrl: photoUrl, birthday: birthday)
   }
 
   @Test("an unset birthday survives a save")
@@ -55,5 +57,33 @@ struct EditProfileViewModelTests {
     await viewModel.loadExistingPhoto()
 
     #expect(viewModel.photo === pickedPhoto)
+  }
+
+  @Test("an untouched photo keeps its URL and is not re-uploaded")
+  func testUntouchedPhotoKeepsURL() {
+    let viewModel = EditProfileViewModel(profile: makeProfile(photoUrl: avatarUrl))
+
+    #expect(viewModel.makeUpdatedUser().photoUrl == avatarUrl)
+    #expect(viewModel.photoToUpload == nil)
+  }
+
+  @Test("removing the photo clears its URL")
+  func testRemovedPhotoClearsURL() {
+    let viewModel = EditProfileViewModel(profile: makeProfile(photoUrl: avatarUrl))
+
+    viewModel.clearPhoto()
+
+    #expect(viewModel.makeUpdatedUser().photoUrl == nil)
+    #expect(viewModel.photoToUpload == nil)
+  }
+
+  @Test("a newly picked photo is the one uploaded")
+  func testPickedPhotoIsUploaded() {
+    let viewModel = EditProfileViewModel(profile: makeProfile(photoUrl: avatarUrl))
+    let pickedPhoto = UIImage()
+
+    viewModel.updatePhoto(with: pickedPhoto)
+
+    #expect(viewModel.photoToUpload === pickedPhoto)
   }
 }
