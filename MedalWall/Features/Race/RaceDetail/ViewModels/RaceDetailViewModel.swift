@@ -33,13 +33,14 @@ final class RaceDetailViewModel {
     }
   }
 
-  /// Loads all editions for this race from Firestore.
+  /// Loads all editions for this race from Firestore, newest first.
   func loadEditions() async {
     isLoading = true
     defer { isLoading = false }
 
     do {
       editions = try await repository.fetchEditions(raceId: race.id)
+        .sorted { $0.startDate > $1.startDate }
     } catch {
       self.error = .raceFetchFailed(error.localizedDescription)
     }

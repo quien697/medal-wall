@@ -36,6 +36,21 @@ struct RaceDetailViewModelRepositoryTests {
     )
   }
 
+  @Test("editions load newest first")
+  func testEditionsLoadNewestFirst() async {
+    var older = makeEdition(id: "2019")
+    older.startDate = Date(timeIntervalSince1970: 1_546_300_800)  // 2019-01-01
+    var newer = makeEdition(id: "2025")
+    newer.startDate = Date(timeIntervalSince1970: 1_735_689_600)  // 2025-01-01
+    let repository = StubRaceRepository(
+      races: [makeRace()], editions: [raceId: [older, newer]])
+    let viewModel = RaceDetailViewModel(race: makeRace(), repository: repository)
+
+    await viewModel.loadEditions()
+
+    #expect(viewModel.editions.map(\.id) == ["2025", "2019"])
+  }
+
   @Test("deleting a race removes it and every one of its editions")
   func testDeleteRemovesRaceAndEditions() async {
     let repository = StubRaceRepository(
