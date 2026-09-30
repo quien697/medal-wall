@@ -29,6 +29,7 @@ final class EditMedalViewModel {
   // MARK: - State
   var isLoading = false
   var error: AppError?
+  private(set) var isPhotoChanged = false
 
   // MARK: - Dependencies
   let mode: ItemEditMode
@@ -89,14 +90,16 @@ final class EditMedalViewModel {
     photo = await UIImage.load(from: medal?.photoUrl)
   }
 
-  /// Sets the newly selected cover photo.
+  /// Sets the newly selected cover photo and marks it as changed.
   func updatePhoto(with uiImage: UIImage) {
     self.photo = uiImage
+    isPhotoChanged = true
   }
 
-  /// Clears the cover photo.
+  /// Clears the cover photo and marks it as changed.
   func clearPhoto() {
     self.photo = nil
+    isPhotoChanged = true
   }
 
   /// Appends new event photos from the photo picker.
@@ -177,9 +180,17 @@ final class EditMedalViewModel {
     } catch {}
   }
 
-  /// Returns the final cover photo URL — uploads a new image if one was selected, otherwise reuses the existing URL.
+  /// Returns the final cover photo URL: the existing one while the photo is unchanged, an
+  /// upload of a newly picked one, or `nil` once a removed photo is deleted from Storage.
   private func resolvedPhotoUrl(userId: String) async throws -> String? {
-    guard let photo else { return medal?.photoUrl }
+    guard isPhotoChanged else { return medal?.photoUrl }
+    guard let photo else {
+      if medal?.photoUrl != nil {
+        try? await storageService.deleteMedalPhoto(userId: userId, medalId: medalId)
+      }
+      return nil
+    }
+
     return try await storageService.uploadMedalPhoto(
       userId: userId, medalId: medalId, image: photo
     )
