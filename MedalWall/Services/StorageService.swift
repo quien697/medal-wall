@@ -8,7 +8,46 @@
 @preconcurrency import FirebaseStorage
 import UIKit
 
-final class StorageService {
+/// Photo uploads and deletions, behind a protocol so callers can be tested against a stub.
+///
+/// Callers take this as `(any PhotoStorage)? = nil` and resolve it with `?? StorageService()`
+/// inside `init`, for the same reason the repositories do.
+protocol PhotoStorage {
+  /// Uploads a user avatar and returns its download URL.
+  func uploadUserAvatar(uid: String, image: UIImage) async throws -> String
+
+  /// Deletes a user avatar.
+  func deleteUserAvatar(uid: String) async throws
+
+  /// Uploads a race logo and returns its download URL.
+  func uploadRaceLogo(raceId: String, image: UIImage) async throws -> String
+
+  /// Deletes a race logo.
+  func deleteRaceLogo(raceId: String) async throws
+
+  /// Uploads a race edition logo and returns its download URL.
+  func uploadRaceEditionLogo(raceId: String, editionId: String, image: UIImage) async throws
+    -> String
+
+  /// Deletes a race edition logo.
+  func deleteRaceEditionLogo(raceId: String, editionId: String) async throws
+
+  /// Uploads a medal cover photo and returns its download URL.
+  func uploadMedalPhoto(userId: String, medalId: String, image: UIImage) async throws -> String
+
+  /// Deletes a medal cover photo.
+  func deleteMedalPhoto(userId: String, medalId: String) async throws
+
+  /// Uploads a medal event photo and returns its download URL.
+  func uploadMedalEventPhoto(
+    userId: String, medalId: String, photoId: String, image: UIImage
+  ) async throws -> String
+
+  /// Deletes a medal event photo.
+  func deleteMedalEventPhoto(userId: String, medalId: String, photoId: String) async throws
+}
+
+final class StorageService: PhotoStorage {
   private var storage: Storage { Storage.storage() }
 
   // MARK: - Paths

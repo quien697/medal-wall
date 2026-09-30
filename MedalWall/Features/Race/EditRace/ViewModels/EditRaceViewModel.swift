@@ -31,13 +31,19 @@ final class EditRaceViewModel {
   let mode: ItemEditMode
   private let race: Race?
   private let repository: any RaceRepository
-  private let storageService = StorageService()
+  private let storageService: any PhotoStorage
 
   // MARK: - Init
-  init(mode: ItemEditMode, race: Race?, repository: (any RaceRepository)? = nil) {
+  init(
+    mode: ItemEditMode,
+    race: Race?,
+    repository: (any RaceRepository)? = nil,
+    storageService: (any PhotoStorage)? = nil
+  ) {
     self.mode = mode
     self.race = race
     self.repository = repository ?? RaceFirestoreRepository()
+    self.storageService = storageService ?? StorageService()
 
     if let race, mode == .edit {
       self.name = race.name
