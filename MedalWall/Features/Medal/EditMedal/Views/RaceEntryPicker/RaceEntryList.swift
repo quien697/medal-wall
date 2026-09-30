@@ -31,7 +31,7 @@ struct RaceEntryList: View {
               .font(.TypeScale.caption)
               .foregroundStyle(Color.Text.secondary)
 
-            Text("\(raceEditions.count) editions")
+            Text("^[\(raceEditions.count) edition](inflect: true)")
               .font(.TypeScale.caption)
               .foregroundStyle(Color.Text.tertiary)
           }  // VStack
