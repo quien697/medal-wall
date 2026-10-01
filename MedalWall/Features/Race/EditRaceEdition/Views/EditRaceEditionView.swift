@@ -187,9 +187,13 @@ struct EditRaceEditionView: View {
         }
       )
       .sheet(isPresented: $isPresentingAddDistance) {
-        AddDistanceView { newDistance in
-          try viewModel.addDistance(newDistance)
-        }
+        EditDistanceView(
+          mode: .add,
+          distance: .default,
+          onAction: { newDistance in
+            try viewModel.addDistance(newDistance)
+          }
+        )
         .presentationDetents([.medium])
       }
       .sheet(
