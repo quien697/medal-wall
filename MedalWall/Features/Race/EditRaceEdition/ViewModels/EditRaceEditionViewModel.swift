@@ -92,6 +92,12 @@ final class EditRaceEditionViewModel {
     Date.endOfYear(year)
   }
 
+  /// The year the edition had when the form opened — what a delete removes, whatever `year`
+  /// has since been edited to.
+  var originalYear: Int {
+    draft?.year ?? edition?.year ?? year
+  }
+
   // MARK: - Functions
   /// Downloads the existing edition photo into `photo` so the picker shows the current image.
   func loadExistingPhoto() async {
