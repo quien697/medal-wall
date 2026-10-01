@@ -178,6 +178,10 @@ final class EditRaceViewModel {
   }
 
   /// Writes all pending edition creates, updates, and deletes to Firestore.
+  ///
+  /// Each delete and create that succeeds is recorded in the staged state, so saving again
+  /// after a partial failure retries only what failed: repeating one would move the race's
+  /// edition count a second time.
   private func commitPendingEditions(raceId: String) async {
     var anyFailed = false
 
@@ -189,6 +193,7 @@ final class EditRaceViewModel {
 
       do {
         try await repository.deleteEdition(raceId: raceId, editionId: id)
+        originalEditionIds.remove(id)
       } catch {
         anyFailed = true
       }
@@ -209,6 +214,11 @@ final class EditRaceViewModel {
       do {
         newEdition.photoUrl = try await uploadNewPhoto(of: draft, raceId: raceId)
         try await repository.createEdition(newEdition)
+        originalEditions.append(newEdition)
+        originalEditionIds.insert(newEdition.id)
+        if let index = draftEditions.firstIndex(where: { $0.id == newEdition.id }) {
+          draftEditions[index] = DraftRaceEdition(from: newEdition)
+        }
       } catch {
         anyFailed = true
       }

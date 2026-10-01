@@ -124,4 +124,62 @@ struct EditRaceViewModelRepositoryTests {
     #expect(viewModel.error == nil)
     #expect(await repository.createdEditions.map(\.id) == [added.id])
   }
+
+  // MARK: - Retrying a partly failed save
+  private let raceDay = Date(timeIntervalSince1970: 1_577_836_800)
+
+  private func makeExistingEdition() -> RaceEdition {
+    RaceEdition(
+      id: "edition-2019", raceId: "race-taipei", year: 2019, startDate: raceDay,
+      endDate: raceDay, createdBy: "uid")
+  }
+
+  private func makeAddedEdition() -> DraftRaceEdition {
+    DraftRaceEdition(
+      year: 2020, isOneDay: true, startDate: raceDay, endDate: raceDay, distances: [],
+      createdBy: "uid")
+  }
+
+  @Test("retrying a save after a failed delete does not create an edition twice")
+  func testRetryDoesNotRecreateEdition() async {
+    let race = makeRace(editionCount: 1)
+    let existing = makeExistingEdition()
+    let added = makeAddedEdition()
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [existing]],
+      deleteOutcome: .failure(.editionDeleteFailed))
+    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+    await viewModel.loadEditions()
+    viewModel.stageAddEdition(added)
+    viewModel.stageDeleteEdition(id: existing.id)
+
+    await viewModel.save(by: "uid")
+    viewModel.error = nil  // what dismissing the error sheet does
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .editionSaveFailed)
+    #expect(await repository.createdEditions.map(\.id) == [added.id])
+    #expect(await repository.races.first?.editionCount == 2)
+  }
+
+  @Test("retrying a save after a failed create does not delete an edition twice")
+  func testRetryDoesNotRedeleteEdition() async {
+    let race = makeRace(editionCount: 1)
+    let existing = makeExistingEdition()
+    let added = makeAddedEdition()
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [existing]], failingEditionCreateIDs: [added.id])
+    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+    await viewModel.loadEditions()
+    viewModel.stageAddEdition(added)
+    viewModel.stageDeleteEdition(id: existing.id)
+
+    await viewModel.save(by: "uid")
+    viewModel.error = nil  // what dismissing the error sheet does
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .editionSaveFailed)
+    #expect(await repository.deletedEditionIDs == [existing.id])
+    #expect(await repository.races.first?.editionCount == 0)
+  }
 }
