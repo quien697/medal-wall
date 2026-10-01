@@ -21,6 +21,8 @@ actor StubRaceRepository: RaceRepository {
   /// Editions keyed by race id.
   private(set) var editions: [String: [RaceEdition]]
   private let fetchOutcome: Result<Void, AppError>
+  /// Races whose editions fail to fetch while every other fetch follows `fetchOutcome`.
+  private let failingEditionRaceIDs: Set<String>
   private let writeOutcome: Result<Void, AppError>
   private let deleteOutcome: Result<Void, AppError>
 
@@ -38,12 +40,14 @@ actor StubRaceRepository: RaceRepository {
     races: [Race] = [],
     editions: [String: [RaceEdition]] = [:],
     fetchOutcome: Result<Void, AppError> = .success(()),
+    failingEditionRaceIDs: Set<String> = [],
     writeOutcome: Result<Void, AppError> = .success(()),
     deleteOutcome: Result<Void, AppError> = .success(())
   ) {
     self.races = races
     self.editions = editions
     self.fetchOutcome = fetchOutcome
+    self.failingEditionRaceIDs = failingEditionRaceIDs
     self.writeOutcome = writeOutcome
     self.deleteOutcome = deleteOutcome
   }
@@ -87,6 +91,9 @@ actor StubRaceRepository: RaceRepository {
   func fetchEditions(raceId: String) async throws -> [RaceEdition] {
     fetchCallCount += 1
     try fetchOutcome.get()
+    if failingEditionRaceIDs.contains(raceId) {
+      throw AppError.raceFetchFailed("editions unavailable")
+    }
     return editions[raceId] ?? []
   }
 

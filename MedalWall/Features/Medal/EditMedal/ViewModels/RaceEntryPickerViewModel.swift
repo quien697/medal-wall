@@ -26,21 +26,31 @@ final class RaceEntryPickerViewModel {
 
   // MARK: - Functions
   /// Loads every race and its editions, newest edition first.
+  ///
+  /// A race whose editions fail to load is still listed and the failure is reported, so one
+  /// bad fetch does not hide every other race.
   func load() async {
     isLoading = true
     defer { isLoading = false }
 
+    let fetched: [Race]
     do {
-      let fetched = try await repository.fetchRaces()
-      var loaded: [String: [RaceEdition]] = [:]
-      for race in fetched {
-        loaded[race.id] = try await repository.fetchEditions(raceId: race.id)
-          .sorted { $0.year > $1.year }
-      }
-      races = fetched
-      editions = loaded
+      fetched = try await repository.fetchRaces()
     } catch {
       self.error = .raceFetchFailed(error.localizedDescription)
+      return
     }
+
+    var loaded: [String: [RaceEdition]] = [:]
+    for race in fetched {
+      do {
+        loaded[race.id] = try await repository.fetchEditions(raceId: race.id)
+          .sorted { $0.year > $1.year }
+      } catch {
+        self.error = .raceFetchFailed(error.localizedDescription)
+      }
+    }
+    races = fetched
+    editions = loaded
   }
 }

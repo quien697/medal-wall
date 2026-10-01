@@ -53,6 +53,32 @@ struct RaceEntryPickerViewModelTests {
     }
   }
 
+  @Test("one race's editions failing to load still lists the other races and reports it")
+  func testFailedEditionsFetchKeepsOtherRaces() async {
+    let tokyo = Race(
+      id: "race-tokyo",
+      name: "Tokyo Marathon",
+      place: Place(countryCode: "JP", city: "Tokyo"),
+      createdBy: "uid"
+    )
+    let tokyo2025 = RaceEdition(
+      id: "edition-tokyo-2025", raceId: tokyo.id, year: 2025, startDate: Date.startOfYear(2025),
+      endDate: Date.startOfYear(2025), createdBy: "uid")
+    let repository = StubRaceRepository(
+      races: [race, tokyo], editions: [tokyo.id: [tokyo2025]],
+      failingEditionRaceIDs: [race.id])
+    let viewModel = RaceEntryPickerViewModel(repository: repository)
+
+    await viewModel.load()
+
+    #expect(viewModel.races.map(\.id) == [race.id, tokyo.id])
+    #expect(viewModel.editions[tokyo.id]?.map(\.year) == [2025])
+    if case .raceFetchFailed = viewModel.error {
+    } else {
+      Issue.record("expected raceFetchFailed, got \(String(describing: viewModel.error))")
+    }
+  }
+
   @Test("the picker counts as loading until its first load finishes")
   func testLoadingUntilFirstLoadFinishes() async {
     let viewModel = RaceEntryPickerViewModel(repository: StubRaceRepository())
