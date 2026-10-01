@@ -13,7 +13,7 @@ import UIKit
 struct EditRaceEditionViewModelTests {
 
   private func makeViewModel() -> EditRaceEditionViewModel {
-    EditRaceEditionViewModel(mode: .add, raceId: "test-race", edition: nil)
+    EditRaceEditionViewModel(mode: .add, edition: nil)
   }
 
   // MARK: - isFormValid
@@ -326,7 +326,7 @@ struct EditRaceEditionViewModelTests {
   func testReEditedNewEditionStaysNew() throws {
     let staged = try makeStagedDraft()
     let viewModel = EditRaceEditionViewModel(
-      mode: .edit, raceId: "test-race", edition: nil, draft: staged)
+      mode: .edit, edition: nil, draft: staged)
 
     let rebuilt = viewModel.buildDraft(userId: "uid")
 
@@ -339,7 +339,7 @@ struct EditRaceEditionViewModelTests {
     var staged = try makeStagedDraft()
     staged.newPhotoData = Data([0x01, 0x02])
     let viewModel = EditRaceEditionViewModel(
-      mode: .edit, raceId: "test-race", edition: nil, draft: staged)
+      mode: .edit, edition: nil, draft: staged)
 
     let rebuilt = viewModel.buildDraft(userId: "uid")
 
@@ -351,7 +351,7 @@ struct EditRaceEditionViewModelTests {
     var staged = DraftRaceEdition(from: .taipei2025)
     staged.isPhotoCleared = true
     let viewModel = EditRaceEditionViewModel(
-      mode: .edit, raceId: "test-race", edition: nil, draft: staged)
+      mode: .edit, edition: nil, draft: staged)
 
     let rebuilt = viewModel.buildDraft(userId: "uid")
 
@@ -367,7 +367,7 @@ struct EditRaceEditionViewModelTests {
     var staged = try makeStagedDraft()
     staged.newPhotoData = image.pngData()
     let viewModel = EditRaceEditionViewModel(
-      mode: .edit, raceId: "test-race", edition: nil, draft: staged)
+      mode: .edit, edition: nil, draft: staged)
 
     await viewModel.loadExistingPhoto()
 
@@ -379,7 +379,7 @@ struct EditRaceEditionViewModelTests {
     var staged = DraftRaceEdition(from: .taipei2025)
     staged.existingPhotoUrl = "file:///nonexistent/edition.jpg"
     let viewModel = EditRaceEditionViewModel(
-      mode: .edit, raceId: "test-race", edition: nil, draft: staged)
+      mode: .edit, edition: nil, draft: staged)
     let pickedPhoto = UIImage()
     viewModel.updatePhoto(with: pickedPhoto)
 
@@ -394,7 +394,7 @@ struct EditRaceEditionViewModelTests {
     staged.isOneDay = false
 
     let viewModel = EditRaceEditionViewModel(
-      mode: .edit, raceId: "test-race", edition: nil, draft: staged)
+      mode: .edit, edition: nil, draft: staged)
 
     #expect(viewModel.isOneDay == false)
   }

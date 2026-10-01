@@ -152,31 +152,25 @@ struct EditRaceView: View {
         PlacePickerView { viewModel.place = $0 }
       }
       .sheet(isPresented: $isPresentingAddEdition) {
-        if let raceId = viewModel.raceId {
-          EditRaceEditionView(
-            mode: .add,
-            raceId: raceId,
-            onCommit: { draft in
-              viewModel.stageAddEdition(draft)
-            }
-          )
-          .navigationTransition(.zoom(sourceID: addEdition, in: namespace))
-        }
+        EditRaceEditionView(
+          mode: .add,
+          onCommit: { draft in
+            viewModel.stageAddEdition(draft)
+          }
+        )
+        .navigationTransition(.zoom(sourceID: addEdition, in: namespace))
       }
       .sheet(item: $selectedEdition) { draft in
-        if let raceId = viewModel.raceId {
-          EditRaceEditionView(
-            mode: .edit,
-            raceId: raceId,
-            draft: draft,
-            onCommit: { updatedDraft in
-              viewModel.stageUpdateEdition(updatedDraft)
-            },
-            onDelete: {
-              viewModel.stageDeleteEdition(id: draft.id)
-            }
-          )
-        }
+        EditRaceEditionView(
+          mode: .edit,
+          draft: draft,
+          onCommit: { updatedDraft in
+            viewModel.stageUpdateEdition(updatedDraft)
+          },
+          onDelete: {
+            viewModel.stageDeleteEdition(id: draft.id)
+          }
+        )
       }
       .sheet(
         item: $errorWrapper,

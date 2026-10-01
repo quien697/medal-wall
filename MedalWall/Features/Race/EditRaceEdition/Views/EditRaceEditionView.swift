@@ -25,21 +25,19 @@ struct EditRaceEditionView: View {
   @State private var viewModel: EditRaceEditionViewModel
 
   // MARK: - Properties
-  private let onCommit: ((DraftRaceEdition) -> Void)?
+  private let onCommit: (DraftRaceEdition) -> Void
   private let onDelete: (() -> Void)?
 
   // MARK: - Init
   init(
     mode: ItemEditMode,
-    raceId: String,
     edition: RaceEdition? = nil,
     draft: DraftRaceEdition? = nil,
-    onCommit: ((DraftRaceEdition) -> Void)? = nil,
+    onCommit: @escaping (DraftRaceEdition) -> Void,
     onDelete: (() -> Void)? = nil
   ) {
     self._viewModel = State(
-      initialValue: EditRaceEditionViewModel(
-        mode: mode, raceId: raceId, edition: edition, draft: draft))
+      initialValue: EditRaceEditionViewModel(mode: mode, edition: edition, draft: draft))
     self.onCommit = onCommit
     self.onDelete = onDelete
   }
@@ -108,30 +106,17 @@ struct EditRaceEditionView: View {
         }  // ToolbarItem
 
         ToolbarItem(placement: .confirmationAction) {
-          if viewModel.isLoading {
-            ProgressView()
-          } else {
-            Button(role: .confirm) {
-              guard let userId = userManager.currentUserID else {
-                errorWrapper = ErrorWrapper(error: AppError.notSignedIn)
-                return
-              }
-
-              if let onCommit {
-                let draft = viewModel.buildDraft(userId: userId)
-                onCommit(draft)
-                dismiss()
-              } else {
-                Task {
-                  await viewModel.save(by: userId)
-                  if viewModel.error == nil {
-                    dismiss()
-                  }
-                }
-              }
+          Button(role: .confirm) {
+            guard let userId = userManager.currentUserID else {
+              errorWrapper = ErrorWrapper(error: AppError.notSignedIn)
+              return
             }
-            .disabled(!viewModel.isFormValid)
+
+            let draft = viewModel.buildDraft(userId: userId)
+            onCommit(draft)
+            dismiss()
           }
+          .disabled(!viewModel.isFormValid)
         }  // ToolbarItem
       }  // toolbar
       .task {
@@ -139,15 +124,8 @@ struct EditRaceEditionView: View {
       }
       .alert(isPresented: $isPresentingDeleteConfirm) {
         .deleteConfirmation(.edition(year: viewModel.originalYear)) {
-          if let onDelete {
-            onDelete()
-            dismiss()
-          } else {
-            Task {
-              await viewModel.deleteEdition()
-              if viewModel.error == nil { dismiss() }
-            }
-          }
+          onDelete?()
+          dismiss()
         }
       }
       .photosPicker(
@@ -167,9 +145,6 @@ struct EditRaceEditionView: View {
             errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
           }
         }
-      }
-      .onChange(of: viewModel.error) { _, error in
-        if let error { errorWrapper = ErrorWrapper(error: error) }
       }
       .sheet(
         isPresented: $isPresentingCropImageView,
@@ -198,7 +173,6 @@ struct EditRaceEditionView: View {
       }
       .sheet(
         item: $errorWrapper,
-        onDismiss: { viewModel.error = nil },
         content: { wrapper in
           ErrorView(errorWrapper: wrapper)
         }
@@ -208,15 +182,16 @@ struct EditRaceEditionView: View {
 }
 
 #Preview("Add Mode") {
-  EditRaceEditionView(mode: .add, raceId: "preview-race-id")
+  EditRaceEditionView(mode: .add, onCommit: { _ in })
     .environment(UserManager())
 }
 
 #Preview("Edit Mode") {
   EditRaceEditionView(
     mode: .edit,
-    raceId: RaceEdition.taipei2019.raceId,
-    edition: RaceEdition.taipei2019
+    edition: RaceEdition.taipei2019,
+    onCommit: { _ in },
+    onDelete: {}
   )
   .environment(UserManager())
 }

@@ -21,33 +21,22 @@ final class EditRaceEditionViewModel {
 
   // MARK: - State
   var isPhotoChanged = false
-  var isLoading = false
-  var error: AppError?
 
   // MARK: - Dependencies
   let mode: ItemEditMode
-  private let raceId: String
   private let edition: RaceEdition?
   /// The staged edition being re-edited, carrying changes the race save hasn't written yet.
   private let draft: DraftRaceEdition?
-  private let repository: any RaceRepository
-  private let storageService: any PhotoStorage
 
   // MARK: - Init
   init(
     mode: ItemEditMode,
-    raceId: String,
     edition: RaceEdition?,
-    draft: DraftRaceEdition? = nil,
-    repository: (any RaceRepository)? = nil,
-    storageService: (any PhotoStorage)? = nil
+    draft: DraftRaceEdition? = nil
   ) {
     self.mode = mode
-    self.raceId = raceId
     self.edition = edition
     self.draft = draft
-    self.repository = repository ?? RaceFirestoreRepository()
-    self.storageService = storageService ?? StorageService()
 
     if let draft, mode == .edit {
       self.year = draft.year
@@ -203,68 +192,6 @@ final class EditRaceEditionViewModel {
         }
       }
       return updated
-    }
-  }
-
-  /// Creates or updates the edition in Firestore, uploading the photo only when it was changed.
-  func save(by userID: String) async {
-    isLoading = true
-    defer { isLoading = false }
-
-    do {
-      switch mode {
-      case .add:
-        var newEdition = RaceEdition(
-          raceId: raceId,
-          year: year,
-          startDate: startDate,
-          endDate: endDate,
-          distances: distances,
-          createdBy: userID
-        )
-        if let photo {
-          newEdition.photoUrl = try await storageService.uploadRaceEditionLogo(
-            raceId: raceId, editionId: newEdition.id, image: photo
-          )
-        }
-        try await repository.createEdition(newEdition)
-
-      case .edit:
-        guard var edition else { return }
-        edition.year = year
-        edition.startDate = startDate
-        edition.endDate = endDate
-        edition.distances = distances
-        if isPhotoChanged {
-          if let photo {
-            edition.photoUrl = try await storageService.uploadRaceEditionLogo(
-              raceId: raceId, editionId: edition.id, image: photo
-            )
-          } else {
-            try? await storageService.deleteRaceEditionLogo(raceId: raceId, editionId: edition.id)
-            edition.photoUrl = nil
-          }
-        }
-        try await repository.updateEdition(edition)
-      }
-    } catch {
-      self.error = .editionSaveFailed
-    }
-  }
-
-  /// Deletes the edition from Firestore and cleans up its photo from Storage.
-  func deleteEdition() async {
-    guard let edition else { return }
-    isLoading = true
-    defer { isLoading = false }
-
-    do {
-      if edition.photoUrl != nil {
-        try? await storageService.deleteRaceEditionLogo(raceId: raceId, editionId: edition.id)
-      }
-      try await repository.deleteEdition(raceId: raceId, editionId: edition.id)
-    } catch {
-      self.error = .editionDeleteFailed
     }
   }
 }
