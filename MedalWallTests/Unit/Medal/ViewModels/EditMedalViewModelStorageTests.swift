@@ -65,6 +65,33 @@ struct EditMedalViewModelStorageTests {
     #expect(await repository.updatedMedals.first?.photoUrl == nil)
   }
 
+  @Test("a removed cover photo is deleted from Storage once the medal saves")
+  func testRemovedPhotoDeletedAfterSave() async throws {
+    let repository = StubMedalRepository(medals: [makeMedal()])
+    let storage = StubPhotoStorage()
+    let viewModel = makeViewModel(repository: repository, storage: storage)
+    viewModel.clearPhoto()
+
+    try await viewModel.save(by: "uid", userManager: makeUserManager())
+
+    #expect(await storage.medalPhotoDeleteCount == 1)
+  }
+
+  @Test("a removed cover photo stays in Storage when the medal fails to save")
+  func testRemovedPhotoKeptWhenSaveFails() async {
+    let repository = StubMedalRepository(
+      medals: [makeMedal()], writeOutcome: .failure(.medalSaveFailed))
+    let storage = StubPhotoStorage()
+    let viewModel = makeViewModel(repository: repository, storage: storage)
+    viewModel.clearPhoto()
+
+    await #expect(throws: AppError.medalSaveFailed) {
+      try await viewModel.save(by: "uid", userManager: makeUserManager())
+    }
+
+    #expect(await storage.medalPhotoDeleteCount == 0)
+  }
+
   @Test("a newly picked cover photo is uploaded")
   func testPickedPhotoIsUploaded() async throws {
     let repository = StubMedalRepository(medals: [makeMedal()])

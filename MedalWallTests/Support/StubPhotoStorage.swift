@@ -21,6 +21,7 @@ actor StubPhotoStorage: PhotoStorage {
 
   // MARK: - Recorded calls
   private(set) var uploadCallCount = 0
+  private(set) var medalPhotoDeleteCount = 0
 
   // MARK: - Init
   init(uploadOutcome: Result<String, AppError> = .success("https://example.com/uploaded.jpg")) {
@@ -52,7 +53,9 @@ actor StubPhotoStorage: PhotoStorage {
     try recordUpload()
   }
 
-  func deleteMedalPhoto(userId: String, medalId: String) async throws {}
+  func deleteMedalPhoto(userId: String, medalId: String) async throws {
+    medalPhotoDeleteCount += 1
+  }
 
   func uploadMedalEventPhoto(
     userId: String, medalId: String, photoId: String, image: UIImage

@@ -165,6 +165,9 @@ final class EditMedalViewModel {
       updated.tags = tags
       updated.eventPhotos = eventPhotos
       try await repository.updateMedal(updated)
+      if isPhotoChanged, photo == nil, medal.photoUrl != nil {
+        try? await storageService.deleteMedalPhoto(userId: userID, medalId: medalId)
+      }
     } else {
       let newMedal = Medal(
         id: medalId,
@@ -197,15 +200,11 @@ final class EditMedalViewModel {
   }
 
   /// Returns the final cover photo URL: the existing one while the photo is unchanged, an
-  /// upload of a newly picked one, or `nil` once a removed photo is deleted from Storage.
+  /// upload of a newly picked one, or `nil` for a removed one. A removed photo is deleted from
+  /// Storage only after the medal saves, so a failed save never points at a deleted file.
   private func resolvedPhotoUrl(userId: String) async throws -> String? {
     guard isPhotoChanged else { return medal?.photoUrl }
-    guard let photo else {
-      if medal?.photoUrl != nil {
-        try? await storageService.deleteMedalPhoto(userId: userId, medalId: medalId)
-      }
-      return nil
-    }
+    guard let photo else { return nil }
 
     return try await storageService.uploadMedalPhoto(
       userId: userId, medalId: medalId, image: photo
