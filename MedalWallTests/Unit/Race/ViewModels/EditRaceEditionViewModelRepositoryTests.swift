@@ -7,6 +7,7 @@
 
 import Foundation
 import Testing
+import UIKit
 
 @testable import MedalWall
 
@@ -94,5 +95,18 @@ struct EditRaceEditionViewModelRepositoryTests {
     #expect(viewModel.error == .editionDeleteFailed)
     #expect(await repository.editions[raceId]?.count == 1)
     #expect(await repository.races.first?.editionCount == 1)
+  }
+
+  @Test("a new edition's photo is uploaded and its URL saved")
+  func testSaveUploadsPhoto() async {
+    let repository = StubRaceRepository(races: [makeRace()])
+    let storage = StubPhotoStorage()
+    let viewModel = EditRaceEditionViewModel(
+      mode: .add, raceId: raceId, edition: nil, repository: repository, storageService: storage)
+    viewModel.updatePhoto(with: UIImage())
+
+    await viewModel.save(by: "uid")
+
+    #expect(await repository.createdEditions.first?.photoUrl == "https://example.com/uploaded.jpg")
   }
 }

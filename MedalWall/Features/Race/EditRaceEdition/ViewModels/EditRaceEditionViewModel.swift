@@ -31,7 +31,7 @@ final class EditRaceEditionViewModel {
   /// The staged edition being re-edited, carrying changes the race save hasn't written yet.
   private let draft: DraftRaceEdition?
   private let repository: any RaceRepository
-  private let storageService = StorageService()
+  private let storageService: any PhotoStorage
 
   // MARK: - Init
   init(
@@ -39,13 +39,15 @@ final class EditRaceEditionViewModel {
     raceId: String,
     edition: RaceEdition?,
     draft: DraftRaceEdition? = nil,
-    repository: (any RaceRepository)? = nil
+    repository: (any RaceRepository)? = nil,
+    storageService: (any PhotoStorage)? = nil
   ) {
     self.mode = mode
     self.raceId = raceId
     self.edition = edition
     self.draft = draft
     self.repository = repository ?? RaceFirestoreRepository()
+    self.storageService = storageService ?? StorageService()
 
     if let draft, mode == .edit {
       self.year = draft.year
