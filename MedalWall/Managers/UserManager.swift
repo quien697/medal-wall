@@ -109,7 +109,7 @@ class UserManager {
         guard let self else { return }
         self.firebaseUser = user
         if let user {
-          await self.loadOrFetchUser(firebaseUser: user)
+          self.currentUser = await self.loadOrFetchUser(uid: user.uid, email: user.email)
         } else {
           self.currentUser = nil
         }
@@ -118,18 +118,23 @@ class UserManager {
     }
   }
 
-  /// Loads the Firestore profile for the signed-in user, or creates one if it doesn't exist yet.
-  private func loadOrFetchUser(firebaseUser: FirebaseAuth.User) async {
+  /// Returns the Firestore profile for the signed-in user, creating one if it doesn't exist yet.
+  ///
+  /// The create is not awaited. The launch gate waits on this, and a write waits for the
+  /// server, so a connection lost at first sign-in would otherwise hold the app on its loading
+  /// screen. The new profile is used locally meanwhile, as it is when the lookup fails.
+  func loadOrFetchUser(uid: String, email: String?) async -> User {
     do {
-      if let existing = try await repository.fetchUser(uid: firebaseUser.uid) {
-        self.currentUser = existing
-      } else {
-        let newUser = User(uid: firebaseUser.uid, email: firebaseUser.email)
-        try await repository.createUser(newUser)
-        self.currentUser = newUser
+      if let existing = try await repository.fetchUser(uid: uid) {
+        return existing
       }
+      let newUser = User(uid: uid, email: email)
+      Task { [repository] in
+        try? await repository.createUser(newUser)
+      }
+      return newUser
     } catch {
-      self.currentUser = User(uid: firebaseUser.uid, email: firebaseUser.email)
+      return User(uid: uid, email: email)
     }
   }
 }

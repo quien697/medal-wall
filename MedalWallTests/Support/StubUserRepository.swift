@@ -19,6 +19,10 @@ actor StubUserRepository: UserRepository {
   private(set) var user: User?
   private let fetchOutcome: Result<Void, AppError>
   private let writeOutcome: Result<Void, AppError>
+  /// When true, a create waits for `releaseCreates()` — a write the server has not
+  /// acknowledged yet, as when the connection drops right after the profile lookup.
+  private var holdsCreates: Bool
+  private var heldCreates: [CheckedContinuation<Void, Never>] = []
 
   // MARK: - Recorded calls
   private(set) var fetchCallCount = 0
@@ -29,11 +33,23 @@ actor StubUserRepository: UserRepository {
   init(
     user: User? = nil,
     fetchOutcome: Result<Void, AppError> = .success(()),
-    writeOutcome: Result<Void, AppError> = .success(())
+    writeOutcome: Result<Void, AppError> = .success(()),
+    holdsCreates: Bool = false
   ) {
     self.user = user
     self.fetchOutcome = fetchOutcome
     self.writeOutcome = writeOutcome
+    self.holdsCreates = holdsCreates
+  }
+
+  // MARK: - Script control
+  /// Lets every held create, and any later one, go through.
+  func releaseCreates() {
+    holdsCreates = false
+    for heldCreate in heldCreates {
+      heldCreate.resume()
+    }
+    heldCreates.removeAll()
   }
 
   // MARK: - UserRepository
@@ -44,6 +60,9 @@ actor StubUserRepository: UserRepository {
   }
 
   func createUser(_ user: User) async throws {
+    if holdsCreates {
+      await withCheckedContinuation { heldCreates.append($0) }
+    }
     try writeOutcome.get()
     createdUsers.append(user)
     self.user = user
