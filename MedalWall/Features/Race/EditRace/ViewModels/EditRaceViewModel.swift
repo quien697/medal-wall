@@ -127,6 +127,8 @@ final class EditRaceViewModel {
   }
 
   /// Creates or updates the race in Firestore, uploading the logo only when the photo was changed.
+  /// A removed logo is deleted from Storage only after the race saves, so a failed save never
+  /// points at a deleted file.
   func save(by userID: String) async {
     isLoading = true
     defer { isLoading = false }
@@ -163,7 +165,6 @@ final class EditRaceViewModel {
             return
           }
         } else {
-          try? await storageService.deleteRaceLogo(raceId: race.id)
           race.photoUrl = nil
         }
       }
@@ -172,6 +173,9 @@ final class EditRaceViewModel {
       } catch {
         self.error = .raceSaveFailed
         return
+      }
+      if self.race?.photoUrl != nil, race.photoUrl == nil {
+        try? await storageService.deleteRaceLogo(raceId: race.id)
       }
       await commitPendingEditions(raceId: race.id)
     }
@@ -182,19 +186,19 @@ final class EditRaceViewModel {
   /// Each delete and create that succeeds is recorded in the staged state, so saving again
   /// after a partial failure retries only what failed: repeating one would move the race's
   /// edition count a second time. A failed create or update is reported over a failed delete.
+  /// An edition's photo is deleted from Storage only after its write succeeds.
   private func commitPendingEditions(raceId: String) async {
     var anyDeleteFailed = false
     var anySaveFailed = false
 
     // Deletes
     for id in editionIdsToDelete where originalEditionIds.contains(id) {
-      if let original = originalEditions.first(where: { $0.id == id }), original.photoUrl != nil {
-        try? await storageService.deleteRaceEditionLogo(raceId: raceId, editionId: id)
-      }
-
       do {
         try await repository.deleteEdition(raceId: raceId, editionId: id)
         originalEditionIds.remove(id)
+        if let original = originalEditions.first(where: { $0.id == id }), original.photoUrl != nil {
+          try? await storageService.deleteRaceEditionLogo(raceId: raceId, editionId: id)
+        }
       } catch {
         anyDeleteFailed = true
       }
@@ -230,6 +234,7 @@ final class EditRaceViewModel {
     where draft.sourceEditionId != nil && draft.isModified && !editionIdsToDelete.contains(draft.id)
     {
       guard var edition = originalEditions.first(where: { $0.id == draft.id }) else { continue }
+      let previousPhotoUrl = edition.photoUrl
 
       edition.year = draft.year
       edition.startDate = draft.startDate
@@ -240,12 +245,12 @@ final class EditRaceViewModel {
         if let photoUrl = try await uploadNewPhoto(of: draft, raceId: raceId) {
           edition.photoUrl = photoUrl
         } else if draft.isPhotoCleared {
-          if edition.photoUrl != nil {
-            try? await storageService.deleteRaceEditionLogo(raceId: raceId, editionId: edition.id)
-          }
           edition.photoUrl = nil
         }
         try await repository.updateEdition(edition)
+        if previousPhotoUrl != nil, edition.photoUrl == nil {
+          try? await storageService.deleteRaceEditionLogo(raceId: raceId, editionId: edition.id)
+        }
       } catch {
         anySaveFailed = true
       }

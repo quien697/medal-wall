@@ -60,6 +60,112 @@ struct EditRaceViewModelStorageTests {
     #expect(await repository.races.first?.photoUrl == logoUrl)
   }
 
+  @Test("a removed race logo is deleted from Storage once the race saves")
+  func testRemovedLogoDeletedAfterSave() async {
+    let race = makeRace()
+    let repository = StubRaceRepository(races: [race])
+    let storage = StubPhotoStorage()
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, storageService: storage)
+    viewModel.clearPhoto()
+
+    await viewModel.save(by: "uid")
+
+    #expect(await storage.raceLogoDeleteCount == 1)
+    #expect(await repository.races.first?.photoUrl == nil)
+  }
+
+  @Test("a removed race logo stays in Storage when the race fails to save")
+  func testRemovedLogoKeptWhenSaveFails() async {
+    let race = makeRace()
+    let repository = StubRaceRepository(races: [race], writeOutcome: .failure(.raceSaveFailed))
+    let storage = StubPhotoStorage()
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, storageService: storage)
+    viewModel.clearPhoto()
+
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .raceSaveFailed)
+    #expect(await storage.raceLogoDeleteCount == 0)
+  }
+
+  @Test("a deleted edition's photo is deleted from Storage once the edition is deleted")
+  func testDeletedEditionPhotoDeletedAfterDelete() async throws {
+    let race = makeRace()
+    let edition = try makeEdition()
+    let repository = StubRaceRepository(races: [race], editions: [race.id: [edition]])
+    let storage = StubPhotoStorage()
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, storageService: storage)
+    await viewModel.loadEditions()
+    viewModel.stageDeleteEdition(id: edition.id)
+
+    await viewModel.save(by: "uid")
+
+    #expect(await storage.deletedEditionLogoIDs == [edition.id])
+  }
+
+  @Test("a deleted edition's photo stays in Storage when the edition fails to delete")
+  func testDeletedEditionPhotoKeptWhenDeleteFails() async throws {
+    let race = makeRace()
+    let edition = try makeEdition()
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [edition]],
+      deleteOutcome: .failure(.editionDeleteFailed))
+    let storage = StubPhotoStorage()
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, storageService: storage)
+    await viewModel.loadEditions()
+    viewModel.stageDeleteEdition(id: edition.id)
+
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .editionDeleteFailed)
+    #expect(await storage.deletedEditionLogoIDs.isEmpty)
+  }
+
+  @Test("a removed edition photo is deleted from Storage once the edition saves")
+  func testRemovedEditionPhotoDeletedAfterSave() async throws {
+    let race = makeRace()
+    let edition = try makeEdition()
+    let repository = StubRaceRepository(races: [race], editions: [race.id: [edition]])
+    let storage = StubPhotoStorage()
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, storageService: storage)
+    await viewModel.loadEditions()
+    var draft = DraftRaceEdition(from: edition)
+    draft.isPhotoCleared = true
+    draft.isModified = true
+    viewModel.stageUpdateEdition(draft)
+
+    await viewModel.save(by: "uid")
+
+    #expect(await storage.deletedEditionLogoIDs == [edition.id])
+    #expect(await repository.editions[race.id]?.first?.photoUrl == nil)
+  }
+
+  @Test("a removed edition photo stays in Storage when the edition fails to save")
+  func testRemovedEditionPhotoKeptWhenSaveFails() async throws {
+    let race = makeRace()
+    let edition = try makeEdition()
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [edition]], failingEditionUpdateIDs: [edition.id])
+    let storage = StubPhotoStorage()
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, storageService: storage)
+    await viewModel.loadEditions()
+    var draft = DraftRaceEdition(from: edition)
+    draft.isPhotoCleared = true
+    draft.isModified = true
+    viewModel.stageUpdateEdition(draft)
+
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .editionSaveFailed)
+    #expect(await storage.deletedEditionLogoIDs.isEmpty)
+  }
+
   @Test("a failed photo upload keeps an edition's photo and fails the save")
   func testFailedEditionUploadKeepsPhoto() async throws {
     let race = makeRace()

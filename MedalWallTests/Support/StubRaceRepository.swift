@@ -26,6 +26,8 @@ actor StubRaceRepository: RaceRepository {
   private let writeOutcome: Result<Void, AppError>
   /// Editions whose create fails while every other write follows `writeOutcome`.
   private let failingEditionCreateIDs: Set<String>
+  /// Editions whose update fails while every other write follows `writeOutcome`.
+  private let failingEditionUpdateIDs: Set<String>
   private let deleteOutcome: Result<Void, AppError>
 
   // MARK: - Recorded calls
@@ -45,6 +47,7 @@ actor StubRaceRepository: RaceRepository {
     failingEditionRaceIDs: Set<String> = [],
     writeOutcome: Result<Void, AppError> = .success(()),
     failingEditionCreateIDs: Set<String> = [],
+    failingEditionUpdateIDs: Set<String> = [],
     deleteOutcome: Result<Void, AppError> = .success(())
   ) {
     self.races = races
@@ -53,6 +56,7 @@ actor StubRaceRepository: RaceRepository {
     self.failingEditionRaceIDs = failingEditionRaceIDs
     self.writeOutcome = writeOutcome
     self.failingEditionCreateIDs = failingEditionCreateIDs
+    self.failingEditionUpdateIDs = failingEditionUpdateIDs
     self.deleteOutcome = deleteOutcome
   }
 
@@ -113,6 +117,9 @@ actor StubRaceRepository: RaceRepository {
 
   func updateEdition(_ edition: RaceEdition) async throws {
     try writeOutcome.get()
+    if failingEditionUpdateIDs.contains(edition.id) {
+      throw AppError.editionSaveFailed
+    }
     updatedEditions.append(edition)
     guard let index = editions[edition.raceId]?.firstIndex(where: { $0.id == edition.id })
     else { return }
