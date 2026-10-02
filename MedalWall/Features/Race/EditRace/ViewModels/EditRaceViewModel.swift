@@ -181,9 +181,10 @@ final class EditRaceViewModel {
   ///
   /// Each delete and create that succeeds is recorded in the staged state, so saving again
   /// after a partial failure retries only what failed: repeating one would move the race's
-  /// edition count a second time.
+  /// edition count a second time. A failed create or update is reported over a failed delete.
   private func commitPendingEditions(raceId: String) async {
-    var anyFailed = false
+    var anyDeleteFailed = false
+    var anySaveFailed = false
 
     // Deletes
     for id in editionIdsToDelete where originalEditionIds.contains(id) {
@@ -195,7 +196,7 @@ final class EditRaceViewModel {
         try await repository.deleteEdition(raceId: raceId, editionId: id)
         originalEditionIds.remove(id)
       } catch {
-        anyFailed = true
+        anyDeleteFailed = true
       }
     }
 
@@ -220,7 +221,7 @@ final class EditRaceViewModel {
           draftEditions[index] = DraftRaceEdition(from: newEdition)
         }
       } catch {
-        anyFailed = true
+        anySaveFailed = true
       }
     }
 
@@ -246,11 +247,15 @@ final class EditRaceViewModel {
         }
         try await repository.updateEdition(edition)
       } catch {
-        anyFailed = true
+        anySaveFailed = true
       }
     }
 
-    if anyFailed { error = .editionSaveFailed }
+    if anySaveFailed {
+      error = .editionSaveFailed
+    } else if anyDeleteFailed {
+      error = .editionDeleteFailed
+    }
   }
 
   /// Uploads the photo newly picked for a draft and returns its URL, or `nil` when it has none.

@@ -140,6 +140,23 @@ struct EditRaceViewModelRepositoryTests {
       createdBy: "uid")
   }
 
+  @Test("a failed edition delete surfaces editionDeleteFailed and keeps the edition")
+  func testFailedDeleteSurfacesDeleteError() async {
+    let race = makeRace(editionCount: 1)
+    let existing = makeExistingEdition()
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [existing]],
+      deleteOutcome: .failure(.editionDeleteFailed))
+    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+    await viewModel.loadEditions()
+    viewModel.stageDeleteEdition(id: existing.id)
+
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .editionDeleteFailed)
+    #expect(await repository.editions[race.id]?.map(\.id) == [existing.id])
+  }
+
   @Test("retrying a save after a failed delete does not create an edition twice")
   func testRetryDoesNotRecreateEdition() async {
     let race = makeRace(editionCount: 1)
@@ -157,7 +174,7 @@ struct EditRaceViewModelRepositoryTests {
     viewModel.error = nil  // what dismissing the error sheet does
     await viewModel.save(by: "uid")
 
-    #expect(viewModel.error == .editionSaveFailed)
+    #expect(viewModel.error == .editionDeleteFailed)
     #expect(await repository.createdEditions.map(\.id) == [added.id])
     #expect(await repository.races.first?.editionCount == 2)
   }
