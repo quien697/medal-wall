@@ -80,6 +80,27 @@ struct EditRaceViewModelStorageTests {
     #expect(await repository.editions[race.id]?.first?.photoUrl == editionPhotoUrl)
   }
 
+  @Test("a new edition's photo is uploaded under its id and its URL saved")
+  func testNewEditionUploadSavesPhotoUrl() async throws {
+    let race = makeRace()
+    let repository = StubRaceRepository(races: [race])
+    let storage = StubPhotoStorage()
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, storageService: storage)
+    let edition = try makeEdition()
+    var draft = DraftRaceEdition(
+      year: edition.year, isOneDay: true, startDate: edition.startDate,
+      endDate: edition.endDate, distances: [], createdBy: "uid")
+    draft.newPhotoData = try makePhotoData()
+    viewModel.stageAddEdition(draft)
+
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == nil)
+    #expect(await storage.uploadedEditionLogoIDs == [draft.id])
+    #expect(await repository.createdEditions.first?.photoUrl == "https://example.com/uploaded.jpg")
+  }
+
   @Test("a failed photo upload for a new edition leaves it unsaved and fails the save")
   func testFailedNewEditionUploadSkipsCreate() async throws {
     let race = makeRace()
