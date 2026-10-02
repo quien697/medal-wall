@@ -116,7 +116,7 @@ struct EditRaceViewModelRepositoryTests {
     viewModel.stageAddEdition(added)
 
     let editor = EditRaceEditionViewModel(
-      mode: .edit, edition: nil, draft: added)
+      mode: .edit, draft: added)
     editor.updateStartDate(raceDay.addingTimeInterval(86_400))
     viewModel.stageUpdateEdition(editor.buildDraft(userId: "uid"))
     await viewModel.save(by: "uid")

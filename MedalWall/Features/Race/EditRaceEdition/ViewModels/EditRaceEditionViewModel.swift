@@ -24,18 +24,12 @@ final class EditRaceEditionViewModel {
 
   // MARK: - Dependencies
   let mode: ItemEditMode
-  private let edition: RaceEdition?
   /// The staged edition being re-edited, carrying changes the race save hasn't written yet.
   private let draft: DraftRaceEdition?
 
   // MARK: - Init
-  init(
-    mode: ItemEditMode,
-    edition: RaceEdition?,
-    draft: DraftRaceEdition? = nil
-  ) {
+  init(mode: ItemEditMode, draft: DraftRaceEdition?) {
     self.mode = mode
-    self.edition = edition
     self.draft = draft
 
     if let draft, mode == .edit {
@@ -45,12 +39,6 @@ final class EditRaceEditionViewModel {
       self.endDate = draft.endDate
       self.distances = draft.distances
       self.photo = draft.displayPhoto
-    } else if let edition, mode == .edit {
-      self.year = edition.year
-      self.isOneDay = edition.isOneDay
-      self.startDate = edition.startDate
-      self.endDate = edition.endDate
-      self.distances = edition.distances
     } else {
       let currentYear = Date.now.year
       self.year = currentYear
@@ -86,14 +74,13 @@ final class EditRaceEditionViewModel {
   /// The year the edition had when the form opened — what a delete removes, whatever `year`
   /// has since been edited to.
   var originalYear: Int {
-    draft?.year ?? edition?.year ?? year
+    draft?.year ?? year
   }
 
   // MARK: - Functions
   /// Downloads the existing edition photo into `photo` so the picker shows the current image.
   func loadExistingPhoto() async {
-    let photoUrl = if let draft { draft.displayPhotoUrl } else { edition?.photoUrl }
-    guard let photoUrl else { return }
+    guard let photoUrl = draft?.displayPhotoUrl else { return }
 
     let existingPhoto = await UIImage.load(from: photoUrl)
     guard !isPhotoChanged else { return }
@@ -170,7 +157,7 @@ final class EditRaceEditionViewModel {
       return draft
 
     case .edit:
-      guard var updated = draft ?? edition.map({ DraftRaceEdition(from: $0) }) else {
+      guard var updated = draft else {
         return DraftRaceEdition(
           year: year, isOneDay: isOneDay, startDate: startDate,
           endDate: endDate, distances: distances, createdBy: userId

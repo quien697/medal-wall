@@ -29,15 +29,21 @@ struct EditRaceEditionView: View {
   private let onDelete: (() -> Void)?
 
   // MARK: - Init
+  /// Opens the editor on a new edition, handed to `onCommit` when confirmed.
+  init(onCommit: @escaping (DraftRaceEdition) -> Void) {
+    self._viewModel = State(initialValue: EditRaceEditionViewModel(mode: .add, draft: nil))
+    self.onCommit = onCommit
+    self.onDelete = nil
+  }
+
+  /// Opens the editor on a staged edition: `onCommit` receives the edited draft, and `onDelete`
+  /// runs when the user confirms deleting it.
   init(
-    mode: ItemEditMode,
-    edition: RaceEdition? = nil,
-    draft: DraftRaceEdition? = nil,
+    editing draft: DraftRaceEdition,
     onCommit: @escaping (DraftRaceEdition) -> Void,
-    onDelete: (() -> Void)? = nil
+    onDelete: @escaping () -> Void
   ) {
-    self._viewModel = State(
-      initialValue: EditRaceEditionViewModel(mode: mode, edition: edition, draft: draft))
+    self._viewModel = State(initialValue: EditRaceEditionViewModel(mode: .edit, draft: draft))
     self.onCommit = onCommit
     self.onDelete = onDelete
   }
@@ -182,14 +188,13 @@ struct EditRaceEditionView: View {
 }
 
 #Preview("Add Mode") {
-  EditRaceEditionView(mode: .add, onCommit: { _ in })
+  EditRaceEditionView(onCommit: { _ in })
     .environment(UserManager())
 }
 
 #Preview("Edit Mode") {
   EditRaceEditionView(
-    mode: .edit,
-    edition: RaceEdition.taipei2019,
+    editing: DraftRaceEdition(from: .taipei2019),
     onCommit: { _ in },
     onDelete: {}
   )

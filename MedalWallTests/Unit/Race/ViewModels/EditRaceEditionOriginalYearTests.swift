@@ -12,21 +12,11 @@ import Testing
 @MainActor
 struct EditRaceEditionOriginalYearTests {
 
-  @Test("originalYear keeps a saved edition's year while its year is edited")
-  func testOriginalYearIgnoresEditedYear() {
-    let viewModel = EditRaceEditionViewModel(
-      mode: .edit, edition: .taipei2019)
-
-    viewModel.updateYear(2020)
-
-    #expect(viewModel.originalYear == 2019)
-  }
-
   @Test("originalYear keeps a staged edition's year while its year is edited")
   func testOriginalYearIgnoresEditedYearOfStagedEdition() {
     let staged = DraftRaceEdition(from: .taipei2025)
     let viewModel = EditRaceEditionViewModel(
-      mode: .edit, edition: nil, draft: staged)
+      mode: .edit, draft: staged)
 
     viewModel.updateYear(2026)
 

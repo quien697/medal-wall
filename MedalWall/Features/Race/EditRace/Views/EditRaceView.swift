@@ -152,8 +152,7 @@ struct EditRaceView: View {
         PlacePickerView { viewModel.place = $0 }
       }
       .sheet(isPresented: $isPresentingAddEdition) {
-        EditRaceEditionView(
-          mode: .add,
+        AddRaceEditionView(
           onCommit: { draft in
             viewModel.stageAddEdition(draft)
           }
@@ -162,8 +161,7 @@ struct EditRaceView: View {
       }
       .sheet(item: $selectedEdition) { draft in
         EditRaceEditionView(
-          mode: .edit,
-          draft: draft,
+          editing: draft,
           onCommit: { updatedDraft in
             viewModel.stageUpdateEdition(updatedDraft)
           },
