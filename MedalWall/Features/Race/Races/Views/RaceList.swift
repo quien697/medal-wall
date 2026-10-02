@@ -15,7 +15,8 @@ struct RaceList: View {
   var body: some View {
     Group {
       if races.isEmpty && searchText.isEmpty {
-        RaceEmptyState()
+        EmptyState(
+          title: "No Race Events", description: "Tap the + button to add your first race event!")
       } else if races.isEmpty {
         RaceNoResultState(searchText: searchText)
       } else {

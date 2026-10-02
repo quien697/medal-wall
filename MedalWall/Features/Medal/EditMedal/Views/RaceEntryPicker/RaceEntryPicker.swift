@@ -37,15 +37,7 @@ struct RaceEntryPicker: View {
           ProgressView()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if viewModel.races.isEmpty {
-          ContentUnavailableView {
-            Label("No Race Events", systemImage: "flag.fill")
-              .font(.TypeScale.title2)
-              .foregroundStyle(Color.Text.primary)
-          } description: {
-            Text("Add race events to use auto-fill")
-              .font(.TypeScale.body)
-              .foregroundStyle(Color.Text.secondary)
-          }  // ContentUnavailableView
+          EmptyState(title: "No Race Events", description: "Add race events to use auto-fill")
         } else {
           RaceEntryList(
             races: viewModel.races, editions: viewModel.editions, selection: $selection)

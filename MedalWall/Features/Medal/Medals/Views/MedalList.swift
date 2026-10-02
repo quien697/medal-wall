@@ -22,7 +22,7 @@ struct MedalList: View {
   var body: some View {
     Group {
       if viewModel.isEmpty && !viewModel.isLoading {
-        MedalEmptyState()
+        EmptyState(title: "No Medals", description: "Tap the + button to add your first medal!")
       } else {
         ScrollView {
           LazyVStack(alignment: .leading, spacing: .Space.section) {
