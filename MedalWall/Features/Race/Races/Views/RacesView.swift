@@ -85,7 +85,7 @@ struct RacesView: View {
           }
         },
         content: {
-          EditRaceView(mode: .add)
+          AddRaceView()
             .navigationTransition(.zoom(sourceID: addRace, in: namespace))
         }
       )
