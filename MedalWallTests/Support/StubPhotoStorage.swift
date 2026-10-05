@@ -21,6 +21,7 @@ actor StubPhotoStorage: PhotoStorage {
 
   // MARK: - Recorded calls
   private(set) var uploadCallCount = 0
+  private(set) var avatarDeleteCount = 0
   private(set) var uploadedEditionLogoIDs: [String] = []
   private(set) var raceLogoDeleteCount = 0
   private(set) var deletedEditionLogoIDs: [String] = []
@@ -36,7 +37,9 @@ actor StubPhotoStorage: PhotoStorage {
     try recordUpload()
   }
 
-  func deleteUserAvatar(uid: String) async throws {}
+  func deleteUserAvatar(uid: String) async throws {
+    avatarDeleteCount += 1
+  }
 
   func uploadRaceLogo(raceId: String, image: UIImage) async throws -> String {
     try recordUpload()

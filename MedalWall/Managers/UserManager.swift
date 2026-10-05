@@ -13,7 +13,7 @@ class UserManager {
   private let repository: any UserRepository
   private let authService: any AuthService
   private let networkMonitor: any NetworkMonitor
-  private let storageService = StorageService()
+  private let storageService: any PhotoStorage
   private let defaults: UserDefaults
   private var currentUserEmail: String?
   /// Why the profile could not load; nil while it is loading or once it has.
@@ -48,12 +48,14 @@ class UserManager {
     repository: (any UserRepository)? = nil,
     authService: (any AuthService)? = nil,
     networkMonitor: (any NetworkMonitor)? = nil,
+    storageService: (any PhotoStorage)? = nil,
     defaults: UserDefaults = .standard
   ) {
     self.defaults = defaults
     self.repository = repository ?? UserFirestoreRepository()
     self.authService = authService ?? FirebaseAuthService()
     self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
+    self.storageService = storageService ?? StorageService()
     self.authService.observeAuthState { [weak self] account in
       await self?.authStateDidChange(account)
     }
@@ -89,17 +91,20 @@ class UserManager {
     try authService.signOut()
   }
 
-  /// Persists an updated profile to Firestore, uploading a new photo to Storage first if provided,
-  /// or deleting the existing one if the photo was cleared.
+  /// Persists an updated profile to Firestore, uploading a new photo to Storage first if provided.
+  /// A cleared photo is deleted only once the save succeeds, so a failed save never leaves the
+  /// profile pointing at a deleted file.
   func updateUser(_ user: User, photo: UIImage? = nil) async throws {
     var updatedUser = user
+    let clearsPhoto = photo == nil && user.photoUrl == nil && currentUser?.photoUrl != nil
     if let photo {
       updatedUser.photoUrl = try await storageService.uploadUserAvatar(uid: user.uid, image: photo)
-    } else if user.photoUrl == nil, currentUser?.photoUrl != nil {
-      try? await storageService.deleteUserAvatar(uid: user.uid)
     }
     try await repository.updateUser(updatedUser)
     self.currentUser = updatedUser
+    if clearsPhoto {
+      try? await storageService.deleteUserAvatar(uid: user.uid)
+    }
   }
 
   /// Ratchets the user's persisted milestone counts upward based on live medal

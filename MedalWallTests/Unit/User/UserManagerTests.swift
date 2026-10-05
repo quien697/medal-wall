@@ -17,8 +17,8 @@ struct UserManagerTests {
   private let email = "runner@example.com"
 
   // MARK: - Support
-  private func makeProfile() -> User {
-    User(uid: uid, email: email, firstName: "Mei")
+  private func makeProfile(photoUrl: String? = nil) -> User {
+    User(uid: uid, email: email, firstName: "Mei", photoUrl: photoUrl)
   }
 
   /// A private defaults suite, optionally holding the email a sign-in link was sent to.
@@ -266,6 +266,48 @@ struct UserManagerTests {
     await manager.validateSession()
 
     #expect(manager.canEditProfile)
+  }
+
+  // MARK: - Profile photo
+  @Test("a removed profile photo is deleted once the profile saves")
+  func testRemovedPhotoIsDeletedAfterSave() async throws {
+    let repository = StubUserRepository(
+      user: makeProfile(photoUrl: "https://example.com/avatar.jpg"))
+    let storage = StubPhotoStorage()
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService,
+      networkMonitor: StubNetworkMonitor(), storageService: storage)
+    await authService.report((uid: uid, email: email))
+    var edited = try #require(manager.currentUser)
+    edited.photoUrl = nil
+
+    try await manager.updateUser(edited)
+
+    #expect(await storage.avatarDeleteCount == 1)
+    #expect(await repository.updatedUsers.map(\.photoUrl) == [nil])
+  }
+
+  @Test("a removed profile photo is kept when the profile save fails")
+  func testRemovedPhotoIsKeptWhenSaveFails() async throws {
+    let repository = StubUserRepository(
+      user: makeProfile(photoUrl: "https://example.com/avatar.jpg"),
+      writeOutcome: .failure(.userSaveFailed))
+    let storage = StubPhotoStorage()
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService,
+      networkMonitor: StubNetworkMonitor(), storageService: storage)
+    await authService.report((uid: uid, email: email))
+    var edited = try #require(manager.currentUser)
+    edited.photoUrl = nil
+
+    await #expect(throws: AppError.userSaveFailed) {
+      try await manager.updateUser(edited)
+    }
+
+    #expect(await storage.avatarDeleteCount == 0)
+    #expect(manager.currentUser?.photoUrl == "https://example.com/avatar.jpg")
   }
 
   // MARK: - Email sign-in link
