@@ -14,9 +14,10 @@ import Foundation
 /// `?? UserFirestoreRepository()` inside `init`, because a default argument expression is
 /// evaluated in a nonisolated context and cannot construct a `@MainActor` type.
 protocol UserRepository {
-  /// Fetches the user document, or nil when the server confirms it does not exist. Throws
+  /// Fetches the user document and whether it came from the phone's copy rather than the
+  /// server, or nil when the server confirms it does not exist. Throws
   /// `AppError.noInternetConnection` when the device is offline and has no copy of it.
-  func fetchUser(uid: String) async throws -> User?
+  func fetchUser(uid: String) async throws -> (user: User, isFromCache: Bool)?
 
   /// Creates a user document. Callers map a failure to `AppError.userSaveFailed`.
   func createUser(_ user: User) async throws
@@ -32,7 +33,7 @@ final class UserFirestoreRepository: UserRepository {
   /// Fetches the user document, falling back to the phone's copy when offline. Returns nil
   /// if the server confirms the document does not exist; throws
   /// `AppError.noInternetConnection` when neither the server nor the copy has it.
-  func fetchUser(uid: String) async throws -> User? {
+  func fetchUser(uid: String) async throws -> (user: User, isFromCache: Bool)? {
     let snapshot: DocumentSnapshot
     do {
       snapshot = try await db.collection(collection).document(uid).getDocument()
@@ -52,17 +53,28 @@ final class UserFirestoreRepository: UserRepository {
       .setData(Firestore.Encoder().encode(user))
   }
 
-  /// Reads a fetched snapshot: the profile, or nil when the server confirms there is none.
+  /// Replaces the user document with the updated User and stamps updatedAt.
+  func updateUser(_ user: User) async throws {
+    var updated = user
+    updated.updatedAt = Date()
+    try await db.collection(collection).document(updated.uid)
+      .setData(Firestore.Encoder().encode(updated))
+  }
+
+  /// Reads a fetched snapshot: the profile and whether it came from the phone's copy, or
+  /// nil when the server confirms there is none.
   ///
   /// Only the server can say a profile doesn't exist. The phone's copy may simply not hold
   /// it, so a document missing from the copy reads as offline — otherwise a first-sign-in
   /// create could overwrite a profile the server already has.
-  static func profile(exists: Bool, isFromCache: Bool, decode: () throws -> User) throws -> User? {
+  static func profile(
+    exists: Bool, isFromCache: Bool, decode: () throws -> User
+  ) throws -> (user: User, isFromCache: Bool)? {
     guard exists else {
       if isFromCache { throw AppError.noInternetConnection }
       return nil
     }
-    return try decode()
+    return (try decode(), isFromCache)
   }
 
   /// Maps Firestore's "server unreachable" error to `AppError.noInternetConnection`, so a
@@ -74,13 +86,5 @@ final class UserFirestoreRepository: UserRepository {
     else { return error }
 
     return AppError.noInternetConnection
-  }
-
-  /// Replaces the user document with the updated User and stamps updatedAt.
-  func updateUser(_ user: User) async throws {
-    var updated = user
-    updated.updatedAt = Date()
-    try await db.collection(collection).document(updated.uid)
-      .setData(Firestore.Encoder().encode(updated))
   }
 }

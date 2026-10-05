@@ -21,6 +21,18 @@ struct UserManagerTests {
     User(uid: uid, email: email, firstName: "Mei")
   }
 
+  /// One full-marathon medal: enough to earn the first full-marathon milestone.
+  private func makeFullMarathonMedal() -> Medal {
+    Medal(
+      name: "Taipei Marathon",
+      date: .now,
+      bibNumber: "1",
+      place: Place(countryCode: "TW", city: "Taipei City"),
+      distance: RaceDistance(category: .full, type: .inPerson),
+      userID: uid
+    )
+  }
+
   // MARK: - First sign-in
   @Test("a first sign-in writes the new profile before it returns")
   func testFirstSignInWritesProfile() async {
@@ -143,5 +155,89 @@ struct UserManagerTests {
 
     #expect(manager.sessionState == .ready)
     #expect(manager.currentUser?.firstName == "Mei")
+  }
+
+  // MARK: - Phone's copy
+  @Test("a profile read from the phone's copy opens the app but can't be edited")
+  func testCachedProfileIsNotEditable() async {
+    let repository = StubUserRepository(user: makeProfile(), fetchesFromCache: true)
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+
+    await authService.report((uid: uid, email: email))
+
+    #expect(manager.sessionState == .ready)
+    #expect(!manager.canEditProfile)
+  }
+
+  @Test("a profile from the server can be edited")
+  func testServerProfileIsEditable() async {
+    let repository = StubUserRepository(user: makeProfile())
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+
+    await authService.report((uid: uid, email: email))
+
+    #expect(manager.canEditProfile)
+  }
+
+  @Test("milestones are written to a profile from the server")
+  func testServerProfileGetsMilestones() async {
+    let repository = StubUserRepository(user: makeProfile())
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+    await authService.report((uid: uid, email: email))
+
+    await manager.refreshAchievementMilestones(medals: [makeFullMarathonMedal()])
+
+    #expect(await repository.updatedUsers.map(\.highestFullMilestone) == [1])
+  }
+
+  @Test("milestones are not written to a profile read from the phone's copy")
+  func testCachedProfileSkipsMilestones() async {
+    let repository = StubUserRepository(user: makeProfile(), fetchesFromCache: true)
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+    await authService.report((uid: uid, email: email))
+
+    await manager.refreshAchievementMilestones(medals: [makeFullMarathonMedal()])
+
+    #expect(await repository.updatedUsers.isEmpty)
+  }
+
+  @Test("the server's profile replaces the phone's copy when the connection returns")
+  func testReconnectReplacesCachedProfile() async {
+    let repository = StubUserRepository(user: makeProfile(), fetchesFromCache: true)
+    let authService = StubAuthService()
+    let networkMonitor = StubNetworkMonitor()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: networkMonitor)
+    await networkMonitor.report(isConnected: false)
+    await authService.report((uid: uid, email: email))
+    #expect(!manager.canEditProfile)
+
+    await repository.setFetchesFromCache(false)
+    await networkMonitor.report(isConnected: true)
+
+    #expect(manager.canEditProfile)
+  }
+
+  @Test("coming back to the app replaces the phone's copy with the server's profile")
+  func testForegroundReplacesCachedProfile() async {
+    let repository = StubUserRepository(user: makeProfile(), fetchesFromCache: true)
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+    await authService.report((uid: uid, email: email))
+    #expect(!manager.canEditProfile)
+
+    await repository.setFetchesFromCache(false)
+    await manager.validateSession()
+
+    #expect(manager.canEditProfile)
   }
 }

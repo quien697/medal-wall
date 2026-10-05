@@ -38,7 +38,16 @@ struct UserFirestoreRepositoryTests {
     let fetched = try UserFirestoreRepository.profile(
       exists: true, isFromCache: false, decode: { profile })
 
-    #expect(fetched?.firstName == "Mei")
+    #expect(fetched?.user.firstName == "Mei")
+    #expect(fetched?.isFromCache == false)
+  }
+
+  @Test("a document read from the phone's copy says so")
+  func testCachedIsMarked() throws {
+    let fetched = try UserFirestoreRepository.profile(
+      exists: true, isFromCache: true, decode: { profile })
+
+    #expect(fetched?.isFromCache == true)
   }
 
   // MARK: - Errors

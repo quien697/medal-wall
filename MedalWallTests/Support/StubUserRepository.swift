@@ -18,6 +18,8 @@ actor StubUserRepository: UserRepository {
   /// The user a fetch returns; nil stands for "no document yet".
   private(set) var user: User?
   private var fetchOutcome: Result<Void, AppError>
+  /// Whether a fetch reports the user as read from the phone's copy rather than the server.
+  private var fetchesFromCache: Bool
   private let writeOutcome: Result<Void, AppError>
   /// How long a create takes to be acknowledged by the server.
   private let createLatency: Duration
@@ -32,10 +34,12 @@ actor StubUserRepository: UserRepository {
     user: User? = nil,
     fetchOutcome: Result<Void, AppError> = .success(()),
     writeOutcome: Result<Void, AppError> = .success(()),
-    createLatency: Duration = .zero
+    createLatency: Duration = .zero,
+    fetchesFromCache: Bool = false
   ) {
     self.user = user
     self.fetchOutcome = fetchOutcome
+    self.fetchesFromCache = fetchesFromCache
     self.writeOutcome = writeOutcome
     self.createLatency = createLatency
   }
@@ -46,11 +50,18 @@ actor StubUserRepository: UserRepository {
     fetchOutcome = outcome
   }
 
+  /// Changes whether later fetches come from the phone's copy, as when the server is
+  /// reachable again.
+  func setFetchesFromCache(_ isFromCache: Bool) {
+    fetchesFromCache = isFromCache
+  }
+
   // MARK: - UserRepository
-  func fetchUser(uid: String) async throws -> User? {
+  func fetchUser(uid: String) async throws -> (user: User, isFromCache: Bool)? {
     fetchCallCount += 1
     try fetchOutcome.get()
-    return user?.uid == uid ? user : nil
+    guard let user, user.uid == uid else { return nil }
+    return (user, fetchesFromCache)
   }
 
   func createUser(_ user: User) async throws {

@@ -69,6 +69,7 @@ struct ProfileView: View {
             } label: {
               Label("Edit Profile", systemImage: "square.and.pencil")
             }  // Button
+            .disabled(!userManager.canEditProfile)
           } label: {
             Image(systemName: "ellipsis")
           }  // Menu

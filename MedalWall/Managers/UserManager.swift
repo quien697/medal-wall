@@ -17,12 +17,18 @@ class UserManager {
   private var currentUserEmail: String?
   /// Why the profile could not load; nil while it is loading or once it has.
   private var profileLoadError: AppError?
+  /// Whether `currentUser` was read from the phone's copy rather than the server. Such a
+  /// profile may be older than the server's, so it is shown but never written.
+  private var isProfileFromCache = false
   private var isConnected = true
   private(set) var currentUserID: String?
   private(set) var currentUser: User?
   private(set) var isLoadingAuth = true
 
   // MARK: - Computed
+  /// Whether the profile may be edited: only once it has come from the server.
+  var canEditProfile: Bool { currentUser != nil && !isProfileFromCache }
+
   /// Which root screen the app shows. A signed-in user reaches the app only once their
   /// profile has loaded.
   var sessionState: SessionState {
@@ -52,10 +58,10 @@ class UserManager {
 
   // MARK: - Functions
   /// Validates the current Firebase session, signing out if the token is invalid, and
-  /// tries again to load a profile that couldn't load.
+  /// loads the profile again if it couldn't load or came from the phone's copy.
   func validateSession() async {
     await authService.validateSession()
-    await reloadProfileIfFailed()
+    await reloadProfileIfNeeded()
   }
 
   /// Completes a sign-in from a URL the app was opened with — a Google Sign-In redirect or
@@ -92,9 +98,10 @@ class UserManager {
 
   /// Ratchets the user's persisted milestone counts upward based on live medal
   /// counts, never decreasing an already-earned tier. Call after a medal is
-  /// created or edited; never after a delete.
+  /// created or edited; never after a delete. Skipped while the profile is the phone's
+  /// copy; the next medal saved after the server's profile loads catches up.
   func refreshAchievementMilestones(medals: [Medal]) async {
-    guard let user = currentUser else { return }
+    guard let user = currentUser, !isProfileFromCache else { return }
 
     let newFullMilestone = AchievementProgress.ratchetedMilestone(
       persisted: user.highestFullMilestone ?? 0,
@@ -141,6 +148,7 @@ class UserManager {
     currentUserEmail = account?.email
     currentUser = nil
     profileLoadError = nil
+    isProfileFromCache = false
     isLoadingAuth = false
     guard account != nil else { return }
 
@@ -154,29 +162,34 @@ class UserManager {
 
     profileLoadError = nil
     do {
-      if let existing = try await repository.fetchUser(uid: uid) {
-        currentUser = existing
+      if let fetched = try await repository.fetchUser(uid: uid) {
+        currentUser = fetched.user
+        isProfileFromCache = fetched.isFromCache
       } else {
         let newUser = User(uid: uid, email: currentUserEmail)
         try await repository.createUser(newUser)
         currentUser = newUser
+        isProfileFromCache = false
       }
     } catch {
       profileLoadError = error as? AppError ?? .unknown
     }
   }
 
-  /// Records whether the device is online, and retries a profile that couldn't load once it is.
+  /// Records whether the device is online, and once it is, loads the profile again if it
+  /// couldn't load or came from the phone's copy.
   private func connectivityDidChange(_ isConnected: Bool) async {
     self.isConnected = isConnected
     guard isConnected else { return }
 
-    await reloadProfileIfFailed()
+    await reloadProfileIfNeeded()
   }
 
-  /// Loads the profile again if the last attempt failed.
-  private func reloadProfileIfFailed() async {
-    guard currentUser == nil, profileLoadError != nil else { return }
+  /// Loads the profile again if the last attempt failed, or replaces the phone's copy with
+  /// the server's.
+  private func reloadProfileIfNeeded() async {
+    let didFail = currentUser == nil && profileLoadError != nil
+    guard didFail || isProfileFromCache else { return }
 
     await loadProfile()
   }
