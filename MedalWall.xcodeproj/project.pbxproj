@@ -106,7 +106,7 @@
 				Repositories/UserFirestoreRepository.swift,
 				"Resources/SampleData/Medal+SampleData.swift",
 				"Resources/SampleData/Race+SampleData.swift",
-				Services/AuthService.swift,
+				Services/FirebaseAuthService.swift,
 				Services/MapKitPlaceSearchService.swift,
 				Services/StorageService.swift,
 				Shared/Components/PlacePicker/Models/PlaceSearchStatus.swift,

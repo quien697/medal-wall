@@ -19,11 +19,12 @@ struct UserManagerTests {
   @Test("a first sign-in writes the new profile before it returns")
   func testFirstSignInWritesProfile() async {
     let repository = StubUserRepository(createLatency: .milliseconds(200))
-    let manager = UserManager(repository: repository)
+    let authService = StubAuthService()
+    let manager = UserManager(repository: repository, authService: authService)
 
-    let user = await manager.loadOrFetchUser(uid: uid, email: email)
+    await authService.report((uid: uid, email: email))
 
-    #expect(user.email == email)
+    #expect(manager.currentUser?.email == email)
     #expect(await repository.createdUsers.map(\.uid) == [uid])
   }
 }

@@ -27,7 +27,7 @@ final class LoginViewModel {
   var error: AppError?
 
   // MARK: - Dependencies
-  private let authService = AuthService()
+  private let authService = FirebaseAuthService()
 
   // MARK: - Computed
   var isEmailValid: Bool {
@@ -78,7 +78,7 @@ final class LoginViewModel {
 
     do {
       try await authService.sendSignInLink(to: email)
-      UserDefaults.standard.set(email, forKey: AuthService.pendingEmailSignInKey)
+      UserDefaults.standard.set(email, forKey: FirebaseAuthService.pendingEmailSignInKey)
       isEmailLinkSent = true
     } catch {
       self.error = .sendEmailSignInLinkFailed(error.localizedDescription)

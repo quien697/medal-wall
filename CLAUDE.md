@@ -76,7 +76,7 @@ for trivial changes. Full details: `docs/development-workflow.md`.
 - Repositories are stateless — they return values, never hold state.
 - ViewModels load data with async calls on appear and hold results in memory; filtering/sorting is done in-memory, not via Firestore query predicates.
 - `UserManager` is the single source of truth for auth state and the current `User`; it is injected via `@Environment` — never accessed as a singleton.
-- `AuthService` wraps Firebase Auth. `StorageService` handles all Firebase Storage uploads and returns download URLs.
+- `FirebaseAuthService` (behind the `AuthService` protocol) wraps Firebase Auth. `StorageService` handles all Firebase Storage uploads and returns download URLs.
 - **Draft pattern:** Edit ViewModels stage changes in local draft structs; writes only reach Firestore on explicit save. `EditRaceViewModel` diffs original vs. draft editions on save (delete → create → update in sequential loops — no `WriteBatch`).
 - Photos are uploaded to Firebase Storage via `StorageService`; the download URL is stored as `photoUrl: String?` on the model.
 - Throw `AppError` from repositories and ViewModels; views present errors via `ErrorWrapper` + `ErrorView`.

@@ -5,26 +5,32 @@
 //  Created by Quien on 2026-03-07.
 //
 
-import FirebaseAuth
 import SwiftUI
 
 @Observable
 class UserManager {
   // MARK: - Properties
   private let repository: any UserRepository
-  private let authService = AuthService()
+  private let authService: any AuthService
   private let storageService = StorageService()
-  private var firebaseUser: FirebaseAuth.User?
+  private(set) var currentUserID: String?
   private(set) var currentUser: User?
   private(set) var isLoadingAuth = true
 
   // MARK: - Computed
-  var isLoggedIn: Bool { firebaseUser != nil }
+  /// Which root screen the app shows.
+  var sessionState: SessionState {
+    if isLoadingAuth { return .loading }
+    return currentUserID == nil ? .signedOut : .ready
+  }
 
   // MARK: - Init
-  init(repository: (any UserRepository)? = nil) {
+  init(repository: (any UserRepository)? = nil, authService: (any AuthService)? = nil) {
     self.repository = repository ?? UserFirestoreRepository()
-    addAuthListener()
+    self.authService = authService ?? FirebaseAuthService()
+    self.authService.observeAuthState { [weak self] account in
+      await self?.authStateDidChange(account)
+    }
   }
 
   // MARK: - Functions
@@ -93,29 +99,26 @@ class UserManager {
   // MARK: - Private Functions
   /// Completes an email link sign-in using the URL opened by the user.
   private func handleEmailLink(_ link: String) async {
-    guard let email = UserDefaults.standard.string(forKey: AuthService.pendingEmailSignInKey) else {
+    guard
+      let email = UserDefaults.standard.string(forKey: FirebaseAuthService.pendingEmailSignInKey)
+    else {
       return
     }
     do {
       try await authService.signInWithEmailLink(email: email, link: link)
-      UserDefaults.standard.removeObject(forKey: AuthService.pendingEmailSignInKey)
+      UserDefaults.standard.removeObject(forKey: FirebaseAuthService.pendingEmailSignInKey)
     } catch {}
   }
 
-  /// Registers a Firebase Auth state listener; called once on init.
-  private func addAuthListener() {
-    _ = Auth.auth().addStateDidChangeListener { [weak self] _, user in
-      Task { [weak self] in
-        guard let self else { return }
-        self.firebaseUser = user
-        if let user {
-          self.currentUser = await self.loadOrFetchUser(uid: user.uid, email: user.email)
-        } else {
-          self.currentUser = nil
-        }
-        self.isLoadingAuth = false
-      }
+  /// Follows a sign-in or sign-out reported by `authService`.
+  private func authStateDidChange(_ account: (uid: String, email: String?)?) async {
+    currentUserID = account?.uid
+    if let account {
+      currentUser = await loadOrFetchUser(uid: account.uid, email: account.email)
+    } else {
+      currentUser = nil
     }
+    isLoadingAuth = false
   }
 
   /// Returns the Firestore profile for the signed-in user, creating one if it doesn't exist yet.
@@ -135,6 +138,15 @@ class UserManager {
 
 // MARK: - Convenience
 extension UserManager {
-  var currentUserID: String? { firebaseUser?.uid }
   var currentUserName: String { currentUser?.name ?? .appLocalized("Runner") }
+}
+
+// MARK: - SessionState
+extension UserManager {
+  /// The root screens the app moves between as the session and profile load.
+  enum SessionState {
+    case loading
+    case signedOut
+    case ready
+  }
 }

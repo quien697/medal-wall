@@ -20,14 +20,13 @@ struct MedalWallApp: App {
   var body: some Scene {
     WindowGroup {
       Group {
-        if let userManager, !userManager.isLoadingAuth {
-          if userManager.isLoggedIn {
-            ContentView()
-          } else {
-            LoginView()
-          }
-        } else {
+        switch userManager?.sessionState ?? .loading {
+        case .loading:
           LoadingView(text: "Loading...")
+        case .signedOut:
+          LoginView()
+        case .ready:
+          ContentView()
         }
       }  // Group
       .environment(userManager)

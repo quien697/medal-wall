@@ -1,5 +1,5 @@
 //
-//  AuthService.swift
+//  FirebaseAuthService.swift
 //  MedalWall
 //
 //  Created by Quien on 2026-04-28.
@@ -12,10 +12,48 @@ import Foundation
 import GoogleSignIn
 import UIKit
 
-final class AuthService {
+/// The session `UserManager` follows, behind a protocol so it can be tested against a stub.
+///
+/// `UserManager` takes this as `(any AuthService)? = nil` and resolves it with
+/// `?? FirebaseAuthService()` inside `init`, for the same reason the repositories do.
+protocol AuthService {
+  /// Calls `onChange` with the signed-in account now and on every sign-in or sign-out;
+  /// nil means signed out.
+  func observeAuthState(
+    _ onChange: @escaping @MainActor ((uid: String, email: String?)?) async -> Void)
+
+  /// Signs out if the server no longer accepts the signed-in account.
+  func validateSession() async
+
+  /// Ends the session on this device.
+  func signOut() throws
+
+  /// Hands a URL the app was opened with to Google Sign-In.
+  func handleGoogleSignInURL(_ url: URL)
+
+  /// Whether the URL is a Firebase email sign-in link.
+  func isSignInLink(_ url: URL) -> Bool
+
+  /// Signs in with an email sign-in link sent to `email`.
+  func signInWithEmailLink(email: String, link: String) async throws
+}
+
+final class FirebaseAuthService: AuthService {
   static let pendingEmailSignInKey = "pendingEmailSignIn"
 
   // MARK: - Functions
+  /// Registers a Firebase Auth state listener that reports the account to `onChange`.
+  func observeAuthState(
+    _ onChange: @escaping @MainActor ((uid: String, email: String?)?) async -> Void
+  ) {
+    _ = Auth.auth().addStateDidChangeListener { _, user in
+      let account = user.map { (uid: $0.uid, email: $0.email) }
+      Task {
+        await onChange(account)
+      }
+    }
+  }
+
   func signOut() throws {
     try Auth.auth().signOut()
   }
@@ -54,9 +92,8 @@ final class AuthService {
     Auth.auth().isSignIn(withEmailLink: url.absoluteString)
   }
 
-  @discardableResult
-  func signInWithEmailLink(email: String, link: String) async throws -> AuthDataResult {
-    try await Auth.auth().signIn(withEmail: email, link: link)
+  func signInWithEmailLink(email: String, link: String) async throws {
+    _ = try await Auth.auth().signIn(withEmail: email, link: link)
   }
 
   // MARK: - Functions -> Sign in Apple
