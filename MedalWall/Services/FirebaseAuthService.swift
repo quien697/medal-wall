@@ -140,7 +140,7 @@ final class FirebaseAuthService: AuthService {
     let result: GIDSignInResult
     do {
       result = try await GIDSignIn.sharedInstance.signIn(withPresenting: viewController)
-    } catch let error as NSError where error.code == GIDSignInError.Code.canceled.rawValue {
+    } catch  where Self.isGoogleCancellation(error) {
       throw CancellationError()
     }
 
@@ -149,6 +149,13 @@ final class FirebaseAuthService: AuthService {
     }
 
     return (idToken, result.user.accessToken.tokenString)
+  }
+
+  /// Whether an error is Google Sign-In reporting that the user closed its sheet. Casting to
+  /// `GIDSignInError` checks Google's error domain, so another error that happens to share
+  /// the code is not mistaken for a cancel.
+  static func isGoogleCancellation(_ error: Error) -> Bool {
+    (error as? GIDSignInError)?.code == .canceled
   }
 
   @discardableResult
