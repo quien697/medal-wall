@@ -21,7 +21,6 @@ class UserManager {
   /// Whether `currentUser` was read from the phone's copy rather than the server. Such a
   /// profile may be older than the server's, so it is shown but never written.
   private var isProfileFromCache = false
-  private var isConnected = true
   private(set) var currentUserID: String?
   private(set) var currentUser: User?
   private(set) var isLoadingAuth = true
@@ -34,13 +33,11 @@ class UserManager {
   var canEditProfile: Bool { currentUser != nil && !isProfileFromCache }
 
   /// Which root screen the app shows. A signed-in user reaches the app only once their
-  /// profile has loaded.
+  /// profile has loaded; until then the profile keeps loading, whatever stopped it.
   var sessionState: SessionState {
-    if isLoadingAuth { return .loading }
+    if isLoadingAuth { return .checkingSession }
     guard currentUserID != nil else { return .signedOut }
-    if currentUser != nil { return .ready }
-    if profileLoadError == .noInternetConnection || !isConnected { return .waitingForConnection }
-    return profileLoadError == nil ? .loading : .profileUnavailable
+    return currentUser == nil ? .loadingProfile : .ready
   }
 
   // MARK: - Init
@@ -79,11 +76,6 @@ class UserManager {
     guard authService.isSignInLink(url) else { return }
 
     await handleEmailLink(url.absoluteString)
-  }
-
-  /// Tries again to load a profile that failed to load.
-  func retryProfileLoad() async {
-    await loadProfile()
   }
 
   /// Signs the current user out of Firebase.
@@ -196,10 +188,9 @@ class UserManager {
     }
   }
 
-  /// Records whether the device is online, and once it is, loads the profile again if it
-  /// couldn't load or came from the phone's copy.
+  /// Once the device is back online, loads the profile again if it couldn't load or came
+  /// from the phone's copy.
   private func connectivityDidChange(_ isConnected: Bool) async {
-    self.isConnected = isConnected
     guard isConnected else { return }
 
     await reloadProfileIfNeeded()
@@ -224,10 +215,12 @@ extension UserManager {
 extension UserManager {
   /// The root screens the app moves between as the session and profile load.
   enum SessionState {
-    case loading
+    /// Launch, before the app knows whether anyone is signed in.
+    case checkingSession
     case signedOut
-    case waitingForConnection
-    case profileUnavailable
+    /// Signed in, with the profile still loading. It is retried when the connection returns
+    /// or the app comes back to the foreground.
+    case loadingProfile
     case ready
   }
 }

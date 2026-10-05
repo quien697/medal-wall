@@ -58,6 +58,15 @@ struct UserManagerTests {
     #expect(await repository.createdUsers.map(\.uid) == [uid])
   }
 
+  @Test("the app checks the session before anyone is known to be signed in")
+  func testLaunchChecksSession() {
+    let manager = UserManager(
+      repository: StubUserRepository(), authService: StubAuthService(),
+      networkMonitor: StubNetworkMonitor())
+
+    #expect(manager.sessionState == .checkingSession)
+  }
+
   @Test("signing in shows the loading screen until the new profile is created")
   func testSignInWaitsForProfileCreate() async throws {
     let repository = StubUserRepository(createLatency: .milliseconds(300))
@@ -69,26 +78,9 @@ struct UserManagerTests {
     let signIn = Task { await authService.report((uid: uid, email: email)) }
     try await Task.sleep(for: .milliseconds(100))
 
-    #expect(manager.sessionState == .loading)
+    #expect(manager.sessionState == .loadingProfile)
     await signIn.value
     #expect(manager.sessionState == .ready)
-  }
-
-  @Test("a new profile still waiting for the server while offline shows waiting for a connection")
-  func testPendingCreateOfflineWaitsForConnection() async throws {
-    let repository = StubUserRepository(createLatency: .milliseconds(300))
-    let authService = StubAuthService()
-    let networkMonitor = StubNetworkMonitor()
-    let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: networkMonitor)
-    await authService.report(nil)
-    await networkMonitor.report(isConnected: false)
-
-    let signIn = Task { await authService.report((uid: uid, email: email)) }
-    try await Task.sleep(for: .milliseconds(100))
-
-    #expect(manager.sessionState == .waitingForConnection)
-    await signIn.value
   }
 
   @Test("a profile that finishes loading after sign-out is dropped")
@@ -108,10 +100,12 @@ struct UserManagerTests {
   }
 
   // MARK: - Profile that can't load
-  @Test("a profile that can't load offline leaves no blank profile and waits for a connection")
-  func testOfflineLoadWaitsForConnection() async {
-    let repository = StubUserRepository(
-      user: makeProfile(), fetchOutcome: .failure(.noInternetConnection))
+  @Test(
+    "a profile that can't load leaves no blank profile and keeps the loading screen",
+    arguments: [AppError.noInternetConnection, .unknown]
+  )
+  func testFailedLoadKeepsLoading(error: AppError) async {
+    let repository = StubUserRepository(user: makeProfile(), fetchOutcome: .failure(error))
     let authService = StubAuthService()
     let manager = UserManager(
       repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
@@ -119,21 +113,8 @@ struct UserManagerTests {
     await authService.report((uid: uid, email: email))
 
     #expect(manager.currentUser == nil)
-    #expect(manager.sessionState == .waitingForConnection)
+    #expect(manager.sessionState == .loadingProfile)
     #expect(await repository.createdUsers.isEmpty)
-  }
-
-  @Test("a profile that can't load for another reason shows that it can't load")
-  func testFailedLoadIsUnavailable() async {
-    let repository = StubUserRepository(user: makeProfile(), fetchOutcome: .failure(.unknown))
-    let authService = StubAuthService()
-    let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
-
-    await authService.report((uid: uid, email: email))
-
-    #expect(manager.currentUser == nil)
-    #expect(manager.sessionState == .profileUnavailable)
   }
 
   @Test("the profile loads when the connection returns")
@@ -167,21 +148,6 @@ struct UserManagerTests {
     await manager.validateSession()
 
     #expect(manager.sessionState == .ready)
-  }
-
-  @Test("Retry loads a profile that failed to load")
-  func testRetryLoadsProfile() async {
-    let repository = StubUserRepository(user: makeProfile(), fetchOutcome: .failure(.unknown))
-    let authService = StubAuthService()
-    let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
-    await authService.report((uid: uid, email: email))
-
-    await repository.setFetchOutcome(.success(()))
-    await manager.retryProfileLoad()
-
-    #expect(manager.sessionState == .ready)
-    #expect(manager.currentUser?.firstName == "Mei")
   }
 
   // MARK: - Phone's copy

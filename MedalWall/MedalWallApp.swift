@@ -20,24 +20,13 @@ struct MedalWallApp: App {
   var body: some Scene {
     WindowGroup {
       Group {
-        switch userManager?.sessionState ?? .loading {
-        case .loading:
+        switch userManager?.sessionState ?? .checkingSession {
+        case .checkingSession:
           LoadingView(text: "Loading...")
         case .signedOut:
           LoginView()
-        case .waitingForConnection:
-          ProfileUnavailableView(
-            title: "Waiting for a Connection",
-            description: "Your profile will load as soon as you're back online.",
-            systemImage: "wifi.slash"
-          )
-        case .profileUnavailable:
-          ProfileUnavailableView(
-            title: "Couldn't Load Your Profile",
-            description: "Something went wrong while loading your profile.",
-            systemImage: "exclamationmark.triangle",
-            onRetry: { await userManager?.retryProfileLoad() }
-          )
+        case .loadingProfile:
+          ProfileLoadingView()
         case .ready:
           ContentView()
         }

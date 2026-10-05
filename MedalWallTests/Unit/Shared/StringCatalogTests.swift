@@ -92,21 +92,6 @@ struct StringCatalogTests {
 
   /// The division label is composed, so the translation must keep its placeholder or the
   /// group silently vanishes from the label.
-  @Test("The profile-loading screens' zh-TW strings ship translated")
-  func testProfileLoadingKeysAreTranslated() {
-    let keys = [
-      "Waiting for a Connection",
-      "Your profile will load as soon as you're back online.",
-      "Couldn't Load Your Profile",
-      "Something went wrong while loading your profile.",
-      "Try Again"
-    ]
-
-    for key in keys {
-      #expect(zhTWTable[key] != nil, "missing zh-TW entry for \(key)")
-    }
-  }
-
   @Test("The email sign-in link errors' zh-TW strings ship translated")
   func testEmailLinkErrorKeysAreTranslated() {
     let keys = [
