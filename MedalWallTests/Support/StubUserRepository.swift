@@ -17,7 +17,7 @@ actor StubUserRepository: UserRepository {
   // MARK: - Script
   /// The user a fetch returns; nil stands for "no document yet".
   private(set) var user: User?
-  private let fetchOutcome: Result<Void, AppError>
+  private var fetchOutcome: Result<Void, AppError>
   private let writeOutcome: Result<Void, AppError>
   /// How long a create takes to be acknowledged by the server.
   private let createLatency: Duration
@@ -38,6 +38,12 @@ actor StubUserRepository: UserRepository {
     self.fetchOutcome = fetchOutcome
     self.writeOutcome = writeOutcome
     self.createLatency = createLatency
+  }
+
+  // MARK: - Script control
+  /// Changes what later fetches do, as when the connection comes back.
+  func setFetchOutcome(_ outcome: Result<Void, AppError>) {
+    fetchOutcome = outcome
   }
 
   // MARK: - UserRepository

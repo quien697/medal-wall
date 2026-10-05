@@ -25,6 +25,19 @@ struct MedalWallApp: App {
           LoadingView(text: "Loading...")
         case .signedOut:
           LoginView()
+        case .waitingForConnection:
+          ProfileUnavailableView(
+            title: "Waiting for a Connection",
+            description: "Your profile will load as soon as you're back online.",
+            systemImage: "wifi.slash"
+          )
+        case .profileUnavailable:
+          ProfileUnavailableView(
+            title: "Couldn't Load Your Profile",
+            description: "Something went wrong while loading your profile.",
+            systemImage: "exclamationmark.triangle",
+            onRetry: { await userManager?.retryProfileLoad() }
+          )
         case .ready:
           ContentView()
         }

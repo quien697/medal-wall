@@ -12,31 +12,50 @@ class UserManager {
   // MARK: - Properties
   private let repository: any UserRepository
   private let authService: any AuthService
+  private let networkMonitor: any NetworkMonitor
   private let storageService = StorageService()
+  private var currentUserEmail: String?
+  /// Why the profile could not load; nil while it is loading or once it has.
+  private var profileLoadError: AppError?
+  private var isConnected = true
   private(set) var currentUserID: String?
   private(set) var currentUser: User?
   private(set) var isLoadingAuth = true
 
   // MARK: - Computed
-  /// Which root screen the app shows.
+  /// Which root screen the app shows. A signed-in user reaches the app only once their
+  /// profile has loaded.
   var sessionState: SessionState {
     if isLoadingAuth { return .loading }
-    return currentUserID == nil ? .signedOut : .ready
+    guard currentUserID != nil else { return .signedOut }
+    if currentUser != nil { return .ready }
+    if profileLoadError == .noInternetConnection || !isConnected { return .waitingForConnection }
+    return profileLoadError == nil ? .loading : .profileUnavailable
   }
 
   // MARK: - Init
-  init(repository: (any UserRepository)? = nil, authService: (any AuthService)? = nil) {
+  init(
+    repository: (any UserRepository)? = nil,
+    authService: (any AuthService)? = nil,
+    networkMonitor: (any NetworkMonitor)? = nil
+  ) {
     self.repository = repository ?? UserFirestoreRepository()
     self.authService = authService ?? FirebaseAuthService()
+    self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
     self.authService.observeAuthState { [weak self] account in
       await self?.authStateDidChange(account)
+    }
+    self.networkMonitor.observe { [weak self] isConnected in
+      await self?.connectivityDidChange(isConnected)
     }
   }
 
   // MARK: - Functions
-  /// Validates the current Firebase session, signing out if the token is invalid.
+  /// Validates the current Firebase session, signing out if the token is invalid, and
+  /// tries again to load a profile that couldn't load.
   func validateSession() async {
     await authService.validateSession()
+    await reloadProfileIfFailed()
   }
 
   /// Completes a sign-in from a URL the app was opened with — a Google Sign-In redirect or
@@ -46,6 +65,11 @@ class UserManager {
     guard authService.isSignInLink(url) else { return }
 
     await handleEmailLink(url.absoluteString)
+  }
+
+  /// Tries again to load a profile that failed to load.
+  func retryProfileLoad() async {
+    await loadProfile()
   }
 
   /// Signs the current user out of Firebase.
@@ -110,29 +134,51 @@ class UserManager {
     } catch {}
   }
 
-  /// Follows a sign-in or sign-out reported by `authService`.
+  /// Follows a sign-in or sign-out reported by `authService`, then loads the new account's
+  /// profile.
   private func authStateDidChange(_ account: (uid: String, email: String?)?) async {
     currentUserID = account?.uid
-    if let account {
-      currentUser = await loadOrFetchUser(uid: account.uid, email: account.email)
-    } else {
-      currentUser = nil
-    }
+    currentUserEmail = account?.email
+    currentUser = nil
+    profileLoadError = nil
     isLoadingAuth = false
+    guard account != nil else { return }
+
+    await loadProfile()
   }
 
-  /// Returns the Firestore profile for the signed-in user, creating one if it doesn't exist yet.
-  func loadOrFetchUser(uid: String, email: String?) async -> User {
+  /// Loads the signed-in user's profile, creating it on first sign-in. When it can't load,
+  /// no profile stands in for it: `currentUser` stays nil and `profileLoadError` says why.
+  private func loadProfile() async {
+    guard let uid = currentUserID else { return }
+
+    profileLoadError = nil
     do {
       if let existing = try await repository.fetchUser(uid: uid) {
-        return existing
+        currentUser = existing
+      } else {
+        let newUser = User(uid: uid, email: currentUserEmail)
+        try await repository.createUser(newUser)
+        currentUser = newUser
       }
-      let newUser = User(uid: uid, email: email)
-      try await repository.createUser(newUser)
-      return newUser
     } catch {
-      return User(uid: uid, email: email)
+      profileLoadError = error as? AppError ?? .unknown
     }
+  }
+
+  /// Records whether the device is online, and retries a profile that couldn't load once it is.
+  private func connectivityDidChange(_ isConnected: Bool) async {
+    self.isConnected = isConnected
+    guard isConnected else { return }
+
+    await reloadProfileIfFailed()
+  }
+
+  /// Loads the profile again if the last attempt failed.
+  private func reloadProfileIfFailed() async {
+    guard currentUser == nil, profileLoadError != nil else { return }
+
+    await loadProfile()
   }
 }
 
@@ -147,6 +193,8 @@ extension UserManager {
   enum SessionState {
     case loading
     case signedOut
+    case waitingForConnection
+    case profileUnavailable
     case ready
   }
 }

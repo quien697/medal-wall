@@ -341,6 +341,16 @@
         }
       }
     },
+    "Couldn't Load Your Profile" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法載入個人資料"
+          }
+        }
+      }
+    },
     "Custom" : {
       "localizations" : {
         "zh-TW" : {
@@ -1658,6 +1668,16 @@
         }
       }
     },
+    "Something went wrong while loading your profile." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "載入個人資料時發生問題。"
+          }
+        }
+      }
+    },
     "Start Date" : {
       "localizations" : {
         "zh-TW" : {
@@ -1811,6 +1831,16 @@
         }
       }
     },
+    "Try Again" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再試一次"
+          }
+        }
+      }
+    },
     "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus %@." : {
       "localizations" : {
         "zh-TW" : {
@@ -1847,6 +1877,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "使用者資料儲存失敗"
+          }
+        }
+      }
+    },
+    "Waiting for a Connection" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等待網路連線"
           }
         }
       }
@@ -2067,6 +2107,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "我的收藏"
+          }
+        }
+      }
+    },
+    "Your profile will load as soon as you're back online." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢復連線後，就會載入你的個人資料。"
           }
         }
       }

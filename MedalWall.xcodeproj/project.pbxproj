@@ -108,6 +108,7 @@
 				"Resources/SampleData/Race+SampleData.swift",
 				Services/FirebaseAuthService.swift,
 				Services/MapKitPlaceSearchService.swift,
+				Services/NWPathNetworkMonitor.swift,
 				Services/StorageService.swift,
 				Shared/Components/PlacePicker/Models/PlaceSearchStatus.swift,
 				Shared/Components/PlacePicker/Models/PlaceSuggestion.swift,
