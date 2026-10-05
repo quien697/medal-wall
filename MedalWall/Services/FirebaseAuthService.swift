@@ -58,18 +58,24 @@ final class FirebaseAuthService: AuthService {
     try Auth.auth().signOut()
   }
 
-  /// Reloads the current user from Firebase to verify the account still exists.
-  /// Signs out locally if the account was deleted — e.g. removed from the Firebase console.
+  /// Reloads the current user from Firebase to verify the account can still be used.
+  /// Signs out locally if the account was deleted or disabled — e.g. in the Firebase console.
   func validateSession() async {
     guard let user = Auth.auth().currentUser else { return }
 
     do {
       try await user.reload()
     } catch let error as NSError {
-      if AuthErrorCode(rawValue: error.code) == .userNotFound {
+      if Self.endsSession(error) {
         try? signOut()
       }
     }
+  }
+
+  /// Whether a failed reload means the account can no longer be used on this device.
+  static func endsSession(_ error: NSError) -> Bool {
+    let code = AuthErrorCode(rawValue: error.code)
+    return code == .userNotFound || code == .userDisabled
   }
 
   // MARK: - Functions -> Sign in with Email Link
