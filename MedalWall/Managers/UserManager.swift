@@ -157,21 +157,28 @@ class UserManager {
 
   /// Loads the signed-in user's profile, creating it on first sign-in. When it can't load,
   /// no profile stands in for it: `currentUser` stays nil and `profileLoadError` says why.
+  /// A result that arrives after the account has changed is dropped.
   private func loadProfile() async {
     guard let uid = currentUserID else { return }
+    let email = currentUserEmail
 
     profileLoadError = nil
     do {
+      let profile: User
+      let isFromCache: Bool
       if let fetched = try await repository.fetchUser(uid: uid) {
-        currentUser = fetched.user
-        isProfileFromCache = fetched.isFromCache
+        profile = fetched.user
+        isFromCache = fetched.isFromCache
       } else {
-        let newUser = User(uid: uid, email: currentUserEmail)
-        try await repository.createUser(newUser)
-        currentUser = newUser
-        isProfileFromCache = false
+        profile = User(uid: uid, email: email)
+        try await repository.createUser(profile)
+        isFromCache = false
       }
+      guard currentUserID == uid else { return }
+      currentUser = profile
+      isProfileFromCache = isFromCache
     } catch {
+      guard currentUserID == uid else { return }
       profileLoadError = error as? AppError ?? .unknown
     }
   }

@@ -80,6 +80,22 @@ struct UserManagerTests {
     await signIn.value
   }
 
+  @Test("a profile that finishes loading after sign-out is dropped")
+  func testProfileLoadedAfterSignOutIsDropped() async throws {
+    let repository = StubUserRepository(createLatency: .milliseconds(300))
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+    let signIn = Task { await authService.report((uid: uid, email: email)) }
+    try await Task.sleep(for: .milliseconds(100))
+
+    await authService.report(nil)
+    await signIn.value
+
+    #expect(manager.currentUser == nil)
+    #expect(manager.sessionState == .signedOut)
+  }
+
   // MARK: - Profile that can't load
   @Test("a profile that can't load offline leaves no blank profile and waits for a connection")
   func testOfflineLoadWaitsForConnection() async {
