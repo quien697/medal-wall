@@ -21,6 +21,17 @@ struct UserManagerTests {
     User(uid: uid, email: email, firstName: "Mei")
   }
 
+  /// A private defaults suite, optionally holding the email a sign-in link was sent to.
+  private func makeDefaults(pendingEmail: String?, function: String = #function) throws
+    -> UserDefaults
+  {
+    let suiteName = "UserManagerTests.\(function).\(UUID().uuidString)"
+    let defaults = try #require(UserDefaults(suiteName: suiteName))
+    defaults.removePersistentDomain(forName: suiteName)
+    defaults.set(pendingEmail, forKey: FirebaseAuthService.pendingEmailSignInKey)
+    return defaults
+  }
+
   /// One full-marathon medal: enough to earn the first full-marathon milestone.
   private func makeFullMarathonMedal() -> Medal {
     Medal(
@@ -255,5 +266,52 @@ struct UserManagerTests {
     await manager.validateSession()
 
     #expect(manager.canEditProfile)
+  }
+
+  // MARK: - Email sign-in link
+  @Test("a sign-in link that signs in clears the saved email and reports nothing")
+  func testEmailLinkSignInSucceeds() async throws {
+    let authService = StubAuthService(treatsURLsAsSignInLinks: true)
+    let defaults = try makeDefaults(pendingEmail: email)
+    let manager = UserManager(
+      repository: StubUserRepository(), authService: authService,
+      networkMonitor: StubNetworkMonitor(), defaults: defaults)
+
+    await manager.handleOpenURL(
+      try #require(URL(string: "https://medal-wall-4697.firebaseapp.com")))
+
+    #expect(authService.emailLinkSignInEmails == [email])
+    #expect(manager.signInError == nil)
+    #expect(defaults.string(forKey: FirebaseAuthService.pendingEmailSignInKey) == nil)
+  }
+
+  @Test("a sign-in link that fails says so and keeps the saved email for another try")
+  func testEmailLinkSignInFailureIsReported() async throws {
+    let authService = StubAuthService(
+      treatsURLsAsSignInLinks: true, emailLinkOutcome: .failure(.unknown))
+    let defaults = try makeDefaults(pendingEmail: email)
+    let manager = UserManager(
+      repository: StubUserRepository(), authService: authService,
+      networkMonitor: StubNetworkMonitor(), defaults: defaults)
+
+    await manager.handleOpenURL(
+      try #require(URL(string: "https://medal-wall-4697.firebaseapp.com")))
+
+    #expect(manager.signInError == .emailLinkSignInFailed)
+    #expect(defaults.string(forKey: FirebaseAuthService.pendingEmailSignInKey) == email)
+  }
+
+  @Test("a sign-in link opened where it wasn't requested says so")
+  func testEmailLinkFromAnotherDeviceIsReported() async throws {
+    let authService = StubAuthService(treatsURLsAsSignInLinks: true)
+    let manager = UserManager(
+      repository: StubUserRepository(), authService: authService,
+      networkMonitor: StubNetworkMonitor(), defaults: try makeDefaults(pendingEmail: nil))
+
+    await manager.handleOpenURL(
+      try #require(URL(string: "https://medal-wall-4697.firebaseapp.com")))
+
+    #expect(manager.signInError == .emailLinkFromAnotherDevice)
+    #expect(authService.emailLinkSignInEmails.isEmpty)
   }
 }

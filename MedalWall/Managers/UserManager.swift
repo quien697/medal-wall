@@ -14,6 +14,7 @@ class UserManager {
   private let authService: any AuthService
   private let networkMonitor: any NetworkMonitor
   private let storageService = StorageService()
+  private let defaults: UserDefaults
   private var currentUserEmail: String?
   /// Why the profile could not load; nil while it is loading or once it has.
   private var profileLoadError: AppError?
@@ -24,6 +25,9 @@ class UserManager {
   private(set) var currentUserID: String?
   private(set) var currentUser: User?
   private(set) var isLoadingAuth = true
+  /// A sign-in that failed outside the login screen's own buttons — an email sign-in link
+  /// opened from Mail. The login screen shows it and resets it to nil.
+  var signInError: AppError?
 
   // MARK: - Computed
   /// Whether the profile may be edited: only once it has come from the server.
@@ -43,8 +47,10 @@ class UserManager {
   init(
     repository: (any UserRepository)? = nil,
     authService: (any AuthService)? = nil,
-    networkMonitor: (any NetworkMonitor)? = nil
+    networkMonitor: (any NetworkMonitor)? = nil,
+    defaults: UserDefaults = .standard
   ) {
+    self.defaults = defaults
     self.repository = repository ?? UserFirestoreRepository()
     self.authService = authService ?? FirebaseAuthService()
     self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
@@ -128,17 +134,19 @@ class UserManager {
   }
 
   // MARK: - Private Functions
-  /// Completes an email link sign-in using the URL opened by the user.
+  /// Completes an email link sign-in using the URL opened by the user, reporting a failure
+  /// in `signInError`. The saved email is kept after a failure so the link can be tried again.
   private func handleEmailLink(_ link: String) async {
-    guard
-      let email = UserDefaults.standard.string(forKey: FirebaseAuthService.pendingEmailSignInKey)
-    else {
+    guard let email = defaults.string(forKey: FirebaseAuthService.pendingEmailSignInKey) else {
+      signInError = .emailLinkFromAnotherDevice
       return
     }
     do {
       try await authService.signInWithEmailLink(email: email, link: link)
-      UserDefaults.standard.removeObject(forKey: FirebaseAuthService.pendingEmailSignInKey)
-    } catch {}
+      defaults.removeObject(forKey: FirebaseAuthService.pendingEmailSignInKey)
+    } catch {
+      signInError = .emailLinkSignInFailed
+    }
   }
 
   /// Follows a sign-in or sign-out reported by `authService`, then loads the new account's

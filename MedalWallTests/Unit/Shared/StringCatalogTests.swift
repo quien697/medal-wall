@@ -107,6 +107,20 @@ struct StringCatalogTests {
     }
   }
 
+  @Test("The email sign-in link errors' zh-TW strings ship translated")
+  func testEmailLinkErrorKeysAreTranslated() {
+    let keys = [
+      "We couldn't sign you in with this link.",
+      "This sign-in link wasn't requested on this device.",
+      "Please check your connection, or request a new link.",
+      "Please request a new link on this device."
+    ]
+
+    for key in keys {
+      #expect(zhTWTable[key] != nil, "missing zh-TW entry for \(key)")
+    }
+  }
+
   @Test("The composed division label keeps its placeholder in zh-TW")
   func testDivisionLabelKeepsPlaceholder() {
     #expect(zhTWTable["Division (%@)"]?.contains("%@") == true)

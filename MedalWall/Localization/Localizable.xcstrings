@@ -1378,6 +1378,16 @@
         }
       }
     },
+    "Please check your connection, or request a new link." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請檢查網路連線，或重新寄送登入連結。"
+          }
+        }
+      }
+    },
     "Please check your email address and try again." : {
       "localizations" : {
         "zh-TW" : {
@@ -1394,6 +1404,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "請輸入大於 0 的距離。"
+          }
+        }
+      }
+    },
+    "Please request a new link on this device." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請在此裝置上重新寄送登入連結。"
           }
         }
       }
@@ -1821,6 +1841,16 @@
         }
       }
     },
+    "This sign-in link wasn't requested on this device." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這個登入連結不是在此裝置上申請的。"
+          }
+        }
+      }
+    },
     "Total" : {
       "localizations" : {
         "zh-TW" : {
@@ -2017,6 +2047,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "我們無法將登入連結寄送到你的電子郵件。%@"
+          }
+        }
+      }
+    },
+    "We couldn't sign you in with this link." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法使用這個連結登入。"
           }
         }
       }

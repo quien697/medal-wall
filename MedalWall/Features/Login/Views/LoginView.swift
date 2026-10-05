@@ -83,6 +83,13 @@ struct LoginView: View {
         viewModel.error = nil
       }
     }
+    // `initial`: a link that opened the app may have failed before this screen appeared.
+    .onChange(of: userManager.signInError, initial: true) { _, newError in
+      if let newError {
+        errorWrapper = ErrorWrapper(error: newError)
+        userManager.signInError = nil
+      }
+    }
   }
 }
 

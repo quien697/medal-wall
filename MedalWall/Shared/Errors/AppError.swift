@@ -21,6 +21,8 @@ nonisolated enum AppError: LocalizedError, Equatable {
   case signInFailed
   case noInternetConnection
   case sendEmailSignInLinkFailed(String)
+  case emailLinkSignInFailed
+  case emailLinkFromAnotherDevice
 
   // Repository / Persistence Errors
   case raceFetchFailed(String)
@@ -97,7 +99,9 @@ nonisolated enum AppError: LocalizedError, Equatable {
       .missingIdentityToken,
       .nonceFailed,
       .tokenSerializationFailed,
-      .signInFailed:
+      .signInFailed,
+      .emailLinkSignInFailed,
+      .emailLinkFromAnotherDevice:
       .appLocalized("Sign In Failed")
     case .unknown:
       .appLocalized("Unexpected Error")
@@ -151,6 +155,10 @@ nonisolated enum AppError: LocalizedError, Equatable {
       .appLocalized("You're not connected to the internet.")
     case .signInFailed:
       .appLocalized("We couldn't sign you in.")
+    case .emailLinkSignInFailed:
+      .appLocalized("We couldn't sign you in with this link.")
+    case .emailLinkFromAnotherDevice:
+      .appLocalized("This sign-in link wasn't requested on this device.")
     case .unknown:
       .appLocalized("Something unexpected happened.")
     }
@@ -175,6 +183,10 @@ nonisolated enum AppError: LocalizedError, Equatable {
       .appLocalized("Please try choosing a different image.")
     case .sendEmailSignInLinkFailed:
       .appLocalized("Please check your email address and try again.")
+    case .emailLinkSignInFailed:
+      .appLocalized("Please check your connection, or request a new link.")
+    case .emailLinkFromAnotherDevice:
+      .appLocalized("Please request a new link on this device.")
     case .invalidCredential,
       .missingIdentityToken,
       .nonceFailed,
