@@ -1,11 +1,5 @@
-# auth Specification
+## MODIFIED Requirements
 
-## Purpose
-Authenticate users into MedalWall through multiple Firebase-backed sign-in methods
-(email link, Google, Apple), keep the local session honest by validating it against the
-server, and let users sign out. Until a signed-in user's profile has loaded, the app stays on
-its launch screen.
-## Requirements
 ### Requirement: Email Link Sign-In
 The system SHALL allow a user to sign in by requesting a sign-in link sent to their
 email address, without a password. Requesting a link SHALL require a connection. Opening the
@@ -110,6 +104,8 @@ local copy of the user's data stays on the device.
 - **WHEN** a signed-in user signs out while the device has no connection
 - **THEN** the session ends and the login screen appears
 
+## ADDED Requirements
+
 ### Requirement: Persistent Session
 A signed-in session SHALL persist on the device until the user signs out or session
 validation ends it. Restoring the session SHALL NOT need a connection.
@@ -179,4 +175,3 @@ that finishes loading after the signed-in account has changed SHALL be discarded
 #### Scenario: Sign-out while the profile loads
 - **WHEN** the user signs out before their profile finishes loading
 - **THEN** the profile that arrives afterwards is discarded
-

@@ -1,10 +1,5 @@
-# profile Specification
+## MODIFIED Requirements
 
-## Purpose
-Let a signed-in user view and edit their personal profile, and surface race statistics
-computed on the fly from their medal list rather than stored on the `User` record. A profile
-read from the device's local copy is shown but never written.
-## Requirements
 ### Requirement: Editable Profile
 The system SHALL allow a signed-in user to view and edit their profile: first name,
 last name, photo, bio, gender, and birthday. A removed photo SHALL be deleted from storage
@@ -31,15 +26,7 @@ only after the profile save succeeds. When two devices edit the profile, the las
 - **WHEN** the same profile is saved from two devices
 - **THEN** the save the server receives last replaces the profile
 
-### Requirement: Computed Race Statistics
-The system SHALL compute and display, from the user's medal list, the total number of
-medals, the count of full and half marathon medals, and the best (lowest) finish time
-recorded for full and half marathon distances.
-
-#### Scenario: Stats update as medals change
-- **WHEN** a user adds or deletes a medal with a full or half marathon distance
-- **THEN** the displayed total medal count, distance counts, and best times reflect
-  the change without being separately stored on the `User` record
+## ADDED Requirements
 
 ### Requirement: Cached Profile Is Read-Only
 A profile read from the device's local copy rather than the server can be older than the
@@ -61,4 +48,3 @@ the foreground.
 - **WHEN** the connection returns, or the app comes back to the foreground, while the
   profile is the device's copy
 - **THEN** the system loads the server's profile and Edit Profile becomes available
-
