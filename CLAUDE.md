@@ -32,10 +32,10 @@ the source cannot carry:
   when no role fits, add a role. Gold is never tappable — `Record` only ever describes
   something earned.
 - `Font+Extensions.swift` — `Font.TypeScale`. Line height, tracking and uppercasing
-  are **not** in it (`Font` cannot carry them); apply `.tracking()` / `.textCase()`
-  at the call site.
-- `CGFloat+Extensions.swift` — `.Radius` and `.Space`. There is no `pill` constant;
-  SwiftUI expresses it as `.capsule`, which stays correct at any height.
+  are **not** in it (`Font` cannot carry them); apply `.tracking(.Tracking.…)` /
+  `.textCase()` at the call site.
+- `CGFloat+Extensions.swift` — `.Radius`, `.Space` and `.Tracking`. There is no `pill`
+  constant; SwiftUI expresses it as `.capsule`, which stays correct at any height.
 - `ActionViewModifier.swift` — `.actionStyle(…)`. Pressed and disabled are states,
   never cases.
 - `ChipViewModifier.swift` — `.chipStyle(…)`, capsule, for things that *name*

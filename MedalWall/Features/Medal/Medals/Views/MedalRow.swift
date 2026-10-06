@@ -15,7 +15,7 @@ import SwiftUI
 /// that is the champagne tag, and only the fastest medal at a distance carries it.
 struct MedalRow: View {
   // MARK: - Properties
-  private let metadataTracking: CGFloat = 1.4
+  private let metadataTracking: CGFloat = .Tracking.label
   let photoUrl: String?
   let date: String
   let name: String

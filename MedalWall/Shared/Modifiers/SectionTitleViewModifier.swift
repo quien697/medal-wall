@@ -21,7 +21,7 @@ struct SectionTitleViewModifier: ViewModifier {
       .font(.TypeScale.callout)
       .fontWeight(.heavy)
       .textCase(.uppercase)
-      .tracking(1)
+      .tracking(.Tracking.sectionTitle)
       .foregroundStyle(Color.Text.secondary)
   }
 }

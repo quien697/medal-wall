@@ -29,5 +29,13 @@ extension Font {
       static let medium = Font.system(size: 20, weight: .bold).monospacedDigit()
       static let small = Font.system(size: 15, weight: .semibold).monospacedDigit()
     }
+
+    struct Wordmark {
+      /// The app name — Launch and Login only.
+      static let name = Font.system(size: 32, weight: .black)
+      /// The MW letters inside the medal ring and the avatar seal. Scales with its container;
+      /// the default 28 sits in the 108 ring, elsewhere it tracks ~26% of the seal's diameter.
+      static let monogram = Font.system(size: 28, weight: .black)
+    }
   }
 }

@@ -13,7 +13,6 @@ import SwiftUI
 /// own — the race type under the distance — so the list stays four rows rather than five.
 struct MedalDetailInfoRow: View {
   // MARK: - Properties
-  private let labelTracking: CGFloat = 1.4
   let label: String
   let value: String
   let secondaryValue: String?
@@ -23,7 +22,7 @@ struct MedalDetailInfoRow: View {
     HStack(alignment: .firstTextBaseline, spacing: .Space.gutter) {
       Text(label)
         .font(.TypeScale.overline)
-        .tracking(labelTracking)
+        .tracking(.Tracking.label)
         .textCase(.uppercase)
         .foregroundStyle(Color.Text.secondary)
 

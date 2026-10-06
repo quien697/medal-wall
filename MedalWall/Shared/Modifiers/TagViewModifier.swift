@@ -66,7 +66,7 @@ enum TagStyle {
   fileprivate var tracking: CGFloat {
     switch self {
     case .neutralInCard, .neutralOnPage: 0
-    case .record, .success, .error: 0.6
+    case .record, .success, .error: .Tracking.tag
     }
   }
 }

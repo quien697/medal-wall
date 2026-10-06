@@ -41,7 +41,7 @@ struct StatCard: View {
 
       Text(subtitle)
         .font(.TypeScale.overline)
-        .tracking(1.4)
+        .tracking(.Tracking.label)
         .textCase(.uppercase)
         .foregroundStyle(Color.Text.tertiary)
         .lineLimit(1)

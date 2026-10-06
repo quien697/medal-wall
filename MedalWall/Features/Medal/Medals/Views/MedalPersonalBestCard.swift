@@ -16,8 +16,8 @@ import SwiftUI
 /// Everything arrives pre-formatted. The card decides nothing about what a record is.
 struct MedalPersonalBestCard: View {
   // MARK: - Properties
-  private let titleTracking: CGFloat = 1
-  private let metadataTracking: CGFloat = 1.4
+  private let titleTracking: CGFloat = .Tracking.sectionTitle
+  private let metadataTracking: CGFloat = .Tracking.label
   private let dotSize: CGFloat = 6
   private let dimmedDot: Double = 0.3
   let distance: String

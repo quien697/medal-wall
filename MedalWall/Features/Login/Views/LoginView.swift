@@ -19,15 +19,15 @@ struct LoginView: View {
       VStack {
         RingSeal(.record, size: .hero) {
           Text(verbatim: "MW")
-            .font(.system(size: 28, weight: .black))
-            .tracking(-1.12)
+            .font(.TypeScale.Wordmark.monogram)
+            .tracking(.Tracking.monogram)
             .foregroundStyle(Color.Record.earned)
         }  // RingSeal
         .padding(.bottom, 16)
 
         Text("Medal Wall")
-          .font(.TypeScale.display)
-          .tracking(-1.12)
+          .font(.TypeScale.Wordmark.name)
+          .tracking(.Tracking.wordmark)
           .foregroundStyle(Color.Text.primary)
           .padding(.bottom, 8)
 

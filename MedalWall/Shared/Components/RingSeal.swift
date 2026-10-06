@@ -98,8 +98,8 @@ struct RingSeal<Content: View>: View {
 #Preview("Hero") {
   RingSeal(.record, size: .hero) {
     Text(verbatim: "MW")
-      .font(.system(size: 28, weight: .black))
-      .tracking(-1.12)
+      .font(.TypeScale.Wordmark.monogram)
+      .tracking(.Tracking.monogram)
       .foregroundStyle(Color.Record.earned)
   }  // RingSeal
   .padding()

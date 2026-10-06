@@ -18,7 +18,6 @@ import SwiftUI
 /// a time is a value, not an award.
 struct MedalDetailResultItem: View {
   // MARK: - Properties
-  private let labelTracking: CGFloat = 1.4
   let label: String
   let value: String
   let suffix: String?
@@ -28,7 +27,7 @@ struct MedalDetailResultItem: View {
     VStack(alignment: .leading, spacing: .Space.inline) {
       Text(label)
         .font(.TypeScale.overline)
-        .tracking(labelTracking)
+        .tracking(.Tracking.label)
         .textCase(.uppercase)
         .foregroundStyle(Color.Text.secondary)
         .lineLimit(1)
