@@ -20,13 +20,11 @@ struct MedalWallApp: App {
   var body: some Scene {
     WindowGroup {
       Group {
-        switch userManager?.sessionState ?? .checkingSession {
-        case .checkingSession:
-          LoadingView(text: "Loading...")
+        switch userManager?.sessionState ?? .loading {
+        case .loading:
+          LaunchView()
         case .signedOut:
           LoginView()
-        case .loadingProfile:
-          ProfileLoadingView()
         case .ready:
           ContentView()
         }

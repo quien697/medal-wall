@@ -58,13 +58,13 @@ struct UserManagerTests {
     #expect(await repository.createdUsers.map(\.uid) == [uid])
   }
 
-  @Test("the app checks the session before anyone is known to be signed in")
-  func testLaunchChecksSession() {
+  @Test("the app is loading before anyone is known to be signed in")
+  func testLaunchIsLoading() {
     let manager = UserManager(
       repository: StubUserRepository(), authService: StubAuthService(),
       networkMonitor: StubNetworkMonitor())
 
-    #expect(manager.sessionState == .checkingSession)
+    #expect(manager.sessionState == .loading)
   }
 
   @Test("signing in shows the loading screen until the new profile is created")
@@ -78,7 +78,7 @@ struct UserManagerTests {
     let signIn = Task { await authService.report((uid: uid, email: email)) }
     try await Task.sleep(for: .milliseconds(100))
 
-    #expect(manager.sessionState == .loadingProfile)
+    #expect(manager.sessionState == .loading)
     await signIn.value
     #expect(manager.sessionState == .ready)
   }
@@ -113,7 +113,7 @@ struct UserManagerTests {
     await authService.report((uid: uid, email: email))
 
     #expect(manager.currentUser == nil)
-    #expect(manager.sessionState == .loadingProfile)
+    #expect(manager.sessionState == .loading)
     #expect(await repository.createdUsers.isEmpty)
   }
 

@@ -933,12 +933,12 @@
         }
       }
     },
-    "Loading..." : {
+    "Loading your collection" : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "載入中…"
+            "value" : "正在載入我的收藏"
           }
         }
       }

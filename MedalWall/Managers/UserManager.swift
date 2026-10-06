@@ -33,11 +33,11 @@ class UserManager {
   var canEditProfile: Bool { currentUser != nil && !isProfileFromCache }
 
   /// Which root screen the app shows. A signed-in user reaches the app only once their
-  /// profile has loaded; until then the profile keeps loading, whatever stopped it.
+  /// profile has loaded; until then the app stays loading, whatever stopped the profile.
   var sessionState: SessionState {
-    if isLoadingAuth { return .checkingSession }
+    if isLoadingAuth { return .loading }
     guard currentUserID != nil else { return .signedOut }
-    return currentUser == nil ? .loadingProfile : .ready
+    return currentUser == nil ? .loading : .ready
   }
 
   // MARK: - Init
@@ -215,12 +215,10 @@ extension UserManager {
 extension UserManager {
   /// The root screens the app moves between as the session and profile load.
   enum SessionState {
-    /// Launch, before the app knows whether anyone is signed in.
-    case checkingSession
+    /// Working out who is signed in, then loading their profile. A profile that can't load
+    /// is retried when the connection returns or the app comes back to the foreground.
+    case loading
     case signedOut
-    /// Signed in, with the profile still loading. It is retried when the connection returns
-    /// or the app comes back to the foreground.
-    case loadingProfile
     case ready
   }
 }
