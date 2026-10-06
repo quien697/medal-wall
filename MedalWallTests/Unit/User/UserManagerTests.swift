@@ -322,4 +322,36 @@ struct UserManagerTests {
     #expect(manager.signInError == .emailLinkFromAnotherDevice)
     #expect(authService.emailLinkSignInEmails.isEmpty)
   }
+
+  @Test(
+    "a sign-in link opened while signed in is ignored",
+    arguments: [nil, "runner@example.com"] as [String?]
+  )
+  func testEmailLinkWhileSignedInIsIgnored(pendingEmail: String?) async throws {
+    let authService = StubAuthService(treatsURLsAsSignInLinks: true)
+    let manager = UserManager(
+      repository: StubUserRepository(user: makeProfile()), authService: authService,
+      networkMonitor: StubNetworkMonitor(), defaults: try makeDefaults(pendingEmail: pendingEmail))
+    await authService.report((uid: uid, email: email))
+
+    await manager.handleOpenURL(
+      try #require(URL(string: "https://medal-wall-4697.firebaseapp.com")))
+
+    #expect(manager.signInError == nil)
+    #expect(authService.emailLinkSignInEmails.isEmpty)
+  }
+
+  @Test("a link error from before the session was known is dropped once it turns out signed in")
+  func testEarlyLinkErrorIsDroppedBySignIn() async throws {
+    let authService = StubAuthService(treatsURLsAsSignInLinks: true)
+    let manager = UserManager(
+      repository: StubUserRepository(user: makeProfile()), authService: authService,
+      networkMonitor: StubNetworkMonitor(), defaults: try makeDefaults(pendingEmail: nil))
+
+    await manager.handleOpenURL(
+      try #require(URL(string: "https://medal-wall-4697.firebaseapp.com")))
+    await authService.report((uid: uid, email: email))
+
+    #expect(manager.signInError == nil)
+  }
 }

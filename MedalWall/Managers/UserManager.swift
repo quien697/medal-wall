@@ -70,10 +70,11 @@ class UserManager {
   }
 
   /// Completes a sign-in from a URL the app was opened with — a Google Sign-In redirect or
-  /// a Firebase email sign-in link.
+  /// a Firebase email sign-in link. An email link opened while someone is signed in is ignored,
+  /// so an old link can neither switch accounts nor leave an error for the next login screen.
   func handleOpenURL(_ url: URL) async {
     authService.handleGoogleSignInURL(url)
-    guard authService.isSignInLink(url) else { return }
+    guard currentUserID == nil, authService.isSignInLink(url) else { return }
 
     await handleEmailLink(url.absoluteString)
   }
@@ -147,8 +148,10 @@ class UserManager {
   }
 
   /// Follows a sign-in or sign-out reported by `authService`, then loads the new account's
-  /// profile.
+  /// profile. A sign-in drops any link error still waiting for the login screen — one raised
+  /// at launch, before the session was known to be signed in.
   private func authStateDidChange(_ account: (uid: String, email: String?)?) async {
+    if account != nil { signInError = nil }
     currentUserID = account?.uid
     currentUserEmail = account?.email
     currentUser = nil

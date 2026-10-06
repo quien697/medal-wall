@@ -4,7 +4,9 @@
 The system SHALL allow a user to sign in by requesting a sign-in link sent to their
 email address, without a password. Requesting a link SHALL require a connection. Opening the
 link SHALL complete the sign-in whether or not the app was running, and a link that cannot
-sign the user in SHALL be reported on the login screen rather than ignored.
+sign the user in SHALL be reported on the login screen rather than ignored. A link opened
+while someone is signed in SHALL be ignored, so it can neither switch accounts nor leave an
+error for a later login screen.
 
 #### Scenario: Sign in via email link
 - **WHEN** a user enters their email, requests a sign-in link, and opens it
@@ -32,6 +34,10 @@ sign the user in SHALL be reported on the login screen rather than ignored.
   device, or the same device after reinstalling
 - **THEN** the login screen shows `AppError.emailLinkFromAnotherDevice` and no sign-in is
   attempted
+
+#### Scenario: Link opened while signed in
+- **WHEN** a signed-in user opens an email sign-in link
+- **THEN** no sign-in is attempted and no error is shown, now or after a later sign-out
 
 ### Requirement: Google Sign-In
 The system SHALL allow a user to sign in using their Google account via the

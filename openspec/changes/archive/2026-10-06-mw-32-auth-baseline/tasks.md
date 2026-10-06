@@ -2,7 +2,8 @@
 
 - [x] 1.1 Confirm email-link failures match `UserManager.handleEmailLink` —
   `testEmailLinkSignInSucceeds`, `testEmailLinkSignInFailureIsReported`,
-  `testEmailLinkFromAnotherDeviceIsReported`
+  `testEmailLinkFromAnotherDeviceIsReported`, `testEmailLinkWhileSignedInIsIgnored`,
+  `testEarlyLinkErrorIsDroppedBySignIn`
 - [x] 1.2 Confirm the offline check and send failure match `LoginViewModel.signInWithEmailLink`
   and `sendEmailLink` (code reading)
 - [x] 1.3 Confirm Google's cancel check matches `FirebaseAuthService.isGoogleCancellation` —
