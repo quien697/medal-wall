@@ -95,6 +95,7 @@ iOSInjectionProject/
 # AI Agent
 CLAUDE.local.md
 .claude/**/*.local.*
+.claude/scratch/
 .superpowers/
 
 # Secrets
