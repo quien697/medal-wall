@@ -90,6 +90,13 @@ extension Color {
     static let lockedIcon = Pigment.mist
   }
 
+  /// `ProgressBar`: tier progress and the launch screen's loading bar. The fill is ink,
+  /// never gilt — a bar is not something earned.
+  struct Progress {
+    static let track = Pigment.stone
+    static let fill = Pigment.inkNavy
+  }
+
   struct Status {
     static let success = Pigment.laurel
     static let error = Pigment.cinnabar
