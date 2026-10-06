@@ -39,6 +39,13 @@ struct ProgressBar: View {
     self.value = nil
   }
 
+  // MARK: - Functions
+  /// The share of the track to fill for `value`: clamped to 0…1, with NaN read as empty, so no
+  /// value can give the fill a negative or overflowing width.
+  static func filledFraction(_ value: Double) -> Double {
+    value.isNaN ? 0 : min(max(value, 0), 1)
+  }
+
   // MARK: - Body
   var body: some View {
     GeometryReader { proxy in
@@ -49,7 +56,7 @@ struct ProgressBar: View {
         if let value {
           RoundedRectangle(cornerRadius: .Radius.progressTrack)
             .fill(Color.Progress.fill)
-            .frame(width: proxy.size.width * value)
+            .frame(width: proxy.size.width * Self.filledFraction(value))
         } else {
           RoundedRectangle(cornerRadius: .Radius.progressTrack)
             .fill(Color.Progress.fill)

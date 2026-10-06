@@ -54,6 +54,7 @@ final class FirebaseAuthService: AuthService {
     }
   }
 
+  /// Ends the Firebase Auth session on this device. Needs no connection.
   func signOut() throws {
     try Auth.auth().signOut()
   }
@@ -79,6 +80,7 @@ final class FirebaseAuthService: AuthService {
   }
 
   // MARK: - Functions -> Sign in with Email Link
+  /// Emails a sign-in link to `email` that opens back into the app.
   func sendSignInLink(to email: String) async throws {
     guard let bundleID = Bundle.main.bundleIdentifier else { throw AppError.unknown }
 
@@ -98,11 +100,13 @@ final class FirebaseAuthService: AuthService {
     Auth.auth().isSignIn(withEmailLink: url.absoluteString)
   }
 
+  /// Signs in with an email sign-in link sent to `email`.
   func signInWithEmailLink(email: String, link: String) async throws {
     _ = try await Auth.auth().signIn(withEmail: email, link: link)
   }
 
   // MARK: - Functions -> Sign in Apple
+  /// Signs in to Firebase with the identity token and nonce from Sign in with Apple.
   @discardableResult
   func signInWithApple(
     idTokenString: String,
@@ -158,6 +162,7 @@ final class FirebaseAuthService: AuthService {
     (error as? GIDSignInError)?.code == .canceled
   }
 
+  /// Signs in to Firebase with the tokens from Google Sign-In.
   @discardableResult
   func signInWithGoogle(idToken: String, accessToken: String) async throws -> AuthDataResult {
     let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
