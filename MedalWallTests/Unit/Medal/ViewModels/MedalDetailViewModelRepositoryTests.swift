@@ -51,14 +51,31 @@ struct MedalDetailViewModelRepositoryTests {
   }
 
   @Test("a reload picks up an edit made elsewhere")
-  func testReloadUpdatesMedal() async {
+  func testReloadUpdatesMedal() async throws {
     let medal = makeMedal()
     let repository = StubMedalRepository(medals: [medal])
     let viewModel = MedalDetailViewModel(medal: medal, repository: repository)
     try? await repository.updateMedal(makeMedal(name: "Taipei Marathon 2019"))
 
-    await viewModel.reloadMedal()
+    try await viewModel.reloadMedal()
 
     #expect(viewModel.medal.name == "Taipei Marathon 2019")
+  }
+
+  @Test("a reload that fails says so and keeps the medal on screen")
+  func testFailedReloadThrows() async {
+    let medal = makeMedal()
+    let repository = StubMedalRepository(medals: [medal], fetchOutcome: .failure(.unknown))
+    let viewModel = MedalDetailViewModel(medal: medal, repository: repository)
+
+    let error = await #expect(throws: AppError.self) {
+      try await viewModel.reloadMedal()
+    }
+
+    guard case .medalFetchFailed = error else {
+      Issue.record("expected medalFetchFailed, got \(String(describing: error))")
+      return
+    }
+    #expect(viewModel.medal.name == "Taipei Marathon")
   }
 }

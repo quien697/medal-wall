@@ -127,14 +127,19 @@ final class MedalDetailViewModel {
   /// The two fetches run concurrently through methods on `self` rather than `async let` on
   /// the repository directly: `self` is main-actor isolated and so can cross into a child
   /// task, where the injected `any MedalRepository` existential cannot.
-  func reloadMedal() async {
+  ///
+  /// Whatever loads is applied. A failed fetch throws `AppError.medalFetchFailed`, so the
+  /// screen can say it is out of date rather than quietly keep showing the pre-edit medal.
+  func reloadMedal() async throws(AppError) {
     async let updatedMedal = fetchMedal()
     async let allMedals = fetchAllMedals()
-    guard let updated = try? await updatedMedal else { return }
-
-    medal = updated
-    if let all = try? await allMedals {
-      personalRecordIDs = all.personalRecordIDs
+    do {
+      if let updated = try await updatedMedal {
+        medal = updated
+      }
+      personalRecordIDs = try await allMedals.personalRecordIDs
+    } catch {
+      throw .medalFetchFailed(error.localizedDescription)
     }
   }
 

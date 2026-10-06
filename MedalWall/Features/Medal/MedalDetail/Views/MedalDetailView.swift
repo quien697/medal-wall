@@ -103,7 +103,13 @@ struct MedalDetailView: View {
     .sheet(
       isPresented: $isPresentingEditMedal,
       onDismiss: {
-        Task { await viewModel.reloadMedal() }
+        Task {
+          do throws(AppError) {
+            try await viewModel.reloadMedal()
+          } catch {
+            errorWrapper = ErrorWrapper(error: error)
+          }
+        }
       },
       content: {
         EditMedalView(mode: .edit, medal: viewModel.medal)
