@@ -28,6 +28,7 @@ final class StubAuthService: AuthService {
   // MARK: - Recorded calls
   private(set) var emailLinkSignInEmails: [String] = []
   private(set) var sentLinkEmails: [String] = []
+  private(set) var signOutCount = 0
 
   // MARK: - Init
   init(
@@ -56,7 +57,9 @@ final class StubAuthService: AuthService {
 
   func validateSession() async {}
 
-  func signOut() throws {}
+  func signOut() throws {
+    signOutCount += 1
+  }
 
   func handleGoogleSignInURL(_ url: URL) {}
 

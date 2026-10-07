@@ -265,4 +265,26 @@ struct UserManagerTests {
     #expect(await storage.avatarDeleteCount == 0)
     #expect(manager.currentUser?.photoUrl == "https://example.com/avatar.jpg")
   }
+
+  // MARK: - Sign out
+  @Test(
+    "signing out ends the session and returns to the login screen, online or offline",
+    arguments: [true, false]
+  )
+  func testSignOutReturnsToLogin(isConnected: Bool) async throws {
+    let authService = StubAuthService()
+    let networkMonitor = StubNetworkMonitor()
+    networkMonitor.isConnectedNow = isConnected
+    let manager = UserManager(
+      repository: StubUserRepository(user: makeProfile()), authService: authService,
+      networkMonitor: networkMonitor)
+    await authService.report((uid: uid, email: email))
+
+    try manager.signOut()
+    await authService.report(nil)
+
+    #expect(authService.signOutCount == 1)
+    #expect(manager.sessionState == .signedOut)
+    #expect(manager.currentUser == nil)
+  }
 }

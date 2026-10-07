@@ -24,6 +24,33 @@ struct LoginViewModelTests {
     return defaults
   }
 
+  // MARK: - Opening the email sheet
+  @Test("continuing with email offline shows no connection and keeps the sheet closed")
+  func testContinueOfflineKeepsSheetClosed() async throws {
+    let networkMonitor = StubNetworkMonitor()
+    networkMonitor.isConnectedNow = false
+    let viewModel = LoginViewModel(
+      emailAuthService: StubAuthService(), networkMonitor: networkMonitor,
+      defaults: try makeDefaults())
+
+    await viewModel.signInWithEmailLink()
+
+    #expect(viewModel.error == .noInternetConnection)
+    #expect(!viewModel.isPresentingEmailSignIn)
+  }
+
+  @Test("continuing with email online opens the sheet")
+  func testContinueOnlineOpensSheet() async throws {
+    let viewModel = LoginViewModel(
+      emailAuthService: StubAuthService(), networkMonitor: StubNetworkMonitor(),
+      defaults: try makeDefaults())
+
+    await viewModel.signInWithEmailLink()
+
+    #expect(viewModel.isPresentingEmailSignIn)
+    #expect(viewModel.error == nil)
+  }
+
   // MARK: - Sending the email link
   @Test("sending offline shows no connection on the sheet and sends nothing")
   func testSendOfflineIsRefused() async throws {
