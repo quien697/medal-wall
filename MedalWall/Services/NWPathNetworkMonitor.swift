@@ -17,6 +17,9 @@ protocol NetworkMonitor {
   /// Calls `onChange` with whether the device has a usable network path, now and on every
   /// change.
   func observe(_ onChange: @escaping @MainActor (Bool) async -> Void)
+
+  /// Whether the device has a usable network path right now.
+  func isConnected() async -> Bool
 }
 
 final class NWPathNetworkMonitor: NetworkMonitor {
@@ -31,5 +34,17 @@ final class NWPathNetworkMonitor: NetworkMonitor {
       }
     }
     monitor.start(queue: DispatchQueue(label: "NWPathNetworkMonitor"))
+  }
+
+  /// Reads the device's network path once, with a monitor of its own so `observe` is untouched.
+  func isConnected() async -> Bool {
+    await withCheckedContinuation { continuation in
+      let oneOffMonitor = NWPathMonitor()
+      oneOffMonitor.pathUpdateHandler = { path in
+        oneOffMonitor.cancel()
+        continuation.resume(returning: path.status == .satisfied)
+      }
+      oneOffMonitor.start(queue: .global())
+    }
   }
 }

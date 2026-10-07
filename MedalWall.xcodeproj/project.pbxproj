@@ -60,6 +60,7 @@
 		605C9AA02ECB0935007D3A96 /* Exceptions for "MedalWall" folder in "MedalWallTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Features/Login/ViewModels/LoginViewModel.swift,
 				Features/Medal/EditMedal/ViewModels/EditMedalViewModel.swift,
 				Features/Medal/EditMedal/ViewModels/RaceEntryPickerViewModel.swift,
 				Features/Medal/MedalDetail/ViewModels/MedalDetailViewModel.swift,
@@ -106,6 +107,7 @@
 				Repositories/UserFirestoreRepository.swift,
 				"Resources/SampleData/Medal+SampleData.swift",
 				"Resources/SampleData/Race+SampleData.swift",
+				Services/AppleSignInDelegate.swift,
 				Services/FirebaseAuthService.swift,
 				Services/MapKitPlaceSearchService.swift,
 				Services/NWPathNetworkMonitor.swift,

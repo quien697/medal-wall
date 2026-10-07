@@ -11,8 +11,13 @@ struct SignInWithEmailLinkView: View {
   // MARK: - Environment
   @Environment(\.dismiss) private var dismiss
 
+  // MARK: - State
+  @State private var errorWrapper: ErrorWrapper?
+
   // MARK: - Properties
   @Binding var email: String
+  /// An error from sending the link, shown over this sheet and reset to nil once closed.
+  @Binding var error: AppError?
   let isEmailLinkSent: Bool
   let isEmailValid: Bool
   let isSendingEmail: Bool
@@ -46,6 +51,19 @@ struct SignInWithEmailLinkView: View {
         }
       }  // toolbar
     }  // NavigationStack
+    .sheet(
+      item: $errorWrapper,
+      onDismiss: { error = nil },
+      content: { wrapper in
+        ErrorView(errorWrapper: wrapper)
+      }
+    )
+    // `initial`: lets a preview open with an error already set.
+    .onChange(of: error, initial: true) { _, newError in
+      if let newError {
+        errorWrapper = ErrorWrapper(error: newError)
+      }
+    }
   }
 }
 
@@ -54,6 +72,7 @@ struct SignInWithEmailLinkView: View {
 
   SignInWithEmailLinkView(
     email: $email,
+    error: .constant(nil),
     isEmailLinkSent: false,
     isEmailValid: false,
     isSendingEmail: false,
@@ -66,6 +85,7 @@ struct SignInWithEmailLinkView: View {
 
   SignInWithEmailLinkView(
     email: $email,
+    error: .constant(nil),
     isEmailLinkSent: false,
     isEmailValid: true,
     isSendingEmail: true,
@@ -78,7 +98,22 @@ struct SignInWithEmailLinkView: View {
 
   SignInWithEmailLinkView(
     email: $email,
+    error: .constant(nil),
     isEmailLinkSent: true,
+    isEmailValid: true,
+    isSendingEmail: false,
+    onSendLink: {}
+  )
+}
+
+#Preview("Send failed") {
+  @Previewable @State var email = "you@example.com"
+  @Previewable @State var error: AppError? = .noInternetConnection
+
+  SignInWithEmailLinkView(
+    email: $email,
+    error: $error,
+    isEmailLinkSent: false,
     isEmailValid: true,
     isSendingEmail: false,
     onSendLink: {}

@@ -17,6 +17,8 @@ final class StubNetworkMonitor: NetworkMonitor {
 
   // MARK: - Script
   private var onConnectivityChange: (@MainActor (Bool) async -> Void)?
+  /// What a one-off connection check reports.
+  var isConnectedNow = true
 
   // MARK: - Script control
   /// Reports the connection going up or down and waits until the observer has handled it.
@@ -28,4 +30,6 @@ final class StubNetworkMonitor: NetworkMonitor {
   func observe(_ onChange: @escaping @MainActor (Bool) async -> Void) {
     onConnectivityChange = onChange
   }
+
+  func isConnected() async -> Bool { await isConnectedNow }
 }

@@ -8,12 +8,14 @@
 import AuthenticationServices
 import CryptoKit
 import Foundation
-import Network
 
 enum ActiveSignIn {
   case apple, google
 }
 
+/// `@MainActor` spelled out: the app target already defaults to it, but this file is also compiled
+/// into the test module, which doesn't, and its Apple and Google flows touch UIKit.
+@MainActor
 @Observable
 final class LoginViewModel {
   // MARK: - Data
@@ -25,9 +27,27 @@ final class LoginViewModel {
   var isEmailLinkSent = false
   var isPresentingEmailSignIn = false
   var error: AppError?
+  /// An error from sending the link, shown over the email sheet while it is open.
+  var emailSheetError: AppError?
 
   // MARK: - Dependencies
+  /// Signs in with Apple and Google.
   private let authService = FirebaseAuthService()
+  /// Sends email sign-in links.
+  private let emailAuthService: any AuthService
+  private let networkMonitor: any NetworkMonitor
+  private let defaults: UserDefaults
+
+  // MARK: - Init
+  init(
+    emailAuthService: (any AuthService)? = nil,
+    networkMonitor: (any NetworkMonitor)? = nil,
+    defaults: UserDefaults = .standard
+  ) {
+    self.emailAuthService = emailAuthService ?? FirebaseAuthService()
+    self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
+    self.defaults = defaults
+  }
 
   // MARK: - Computed
   var isEmailValid: Bool {
@@ -48,40 +68,32 @@ final class LoginViewModel {
     return windowScene?.windows.first(where: { $0.isKeyWindow })
   }
 
-  // MARK: - Functions
-  /// Reports whether the device currently has a usable network path.
-  private func isConnected() async -> Bool {
-    await withCheckedContinuation { continuation in
-      let monitor = NWPathMonitor()
-      monitor.pathUpdateHandler = { path in
-        monitor.cancel()
-        continuation.resume(returning: path.status == .satisfied)
-      }
-      monitor.start(queue: .global())
-    }
-  }
-
   // MARK: - Functions -> Sign in with Email link
   /// Shows the email sign-in sheet if the device is online, otherwise surfaces a connection error.
   func signInWithEmailLink() async {
-    if await isConnected() {
+    if await networkMonitor.isConnected() {
       isPresentingEmailSignIn = true
     } else {
       error = .noInternetConnection
     }
   }
 
-  /// Sends a Firebase sign-in link to the given email address.
+  /// Sends a Firebase sign-in link to the given email address. Fails at once when offline, and
+  /// reports any failure in `emailSheetError`, so it shows over the sheet the user is still on.
   func sendEmailLink() async {
     isSendingEmail = true
     defer { isSendingEmail = false }
 
+    guard await networkMonitor.isConnected() else {
+      emailSheetError = .noInternetConnection
+      return
+    }
     do {
-      try await authService.sendSignInLink(to: email)
-      UserDefaults.standard.set(email, forKey: FirebaseAuthService.pendingEmailSignInKey)
+      try await emailAuthService.sendSignInLink(to: email)
+      defaults.set(email, forKey: FirebaseAuthService.pendingEmailSignInKey)
       isEmailLinkSent = true
     } catch {
-      self.error = .sendEmailSignInLinkFailed(error.localizedDescription)
+      emailSheetError = .sendEmailSignInLinkFailed(error.localizedDescription)
     }
   }
 
@@ -89,6 +101,7 @@ final class LoginViewModel {
   func resetEmailFlow() {
     email = ""
     isEmailLinkSent = false
+    emailSheetError = nil
   }
 
   // MARK: - Functions -> Sign in with Apple

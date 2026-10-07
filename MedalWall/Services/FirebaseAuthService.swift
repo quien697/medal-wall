@@ -36,6 +36,9 @@ protocol AuthService {
 
   /// Signs in with an email sign-in link sent to `email`.
   func signInWithEmailLink(email: String, link: String) async throws
+
+  /// Emails a sign-in link to `email` that opens back into the app.
+  func sendSignInLink(to email: String) async throws
 }
 
 final class FirebaseAuthService: AuthService {
