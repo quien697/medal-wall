@@ -3,8 +3,8 @@
 ## Purpose
 Authenticate users into MedalWall through multiple Firebase-backed sign-in methods
 (email link, Google, Apple), keep the local session honest by validating it against the
-server, and let users sign out. Until a signed-in user's profile has loaded, the app stays on
-its launch screen.
+server, and let users sign out. The launch screen covers only the check for a saved session;
+a signed-in user's profile loads inside the app.
 ## Requirements
 ### Requirement: Email Link Sign-In
 The system SHALL allow a user to sign in by requesting a sign-in link sent to their
@@ -12,14 +12,18 @@ email address, without a password. Requesting a link SHALL require a connection.
 link SHALL complete the sign-in whether or not the app was running, and a link that cannot
 sign the user in SHALL be reported on the login screen rather than ignored. A link opened
 while someone is signed in SHALL be ignored, so it can neither switch accounts nor leave an
-error for a later login screen.
+error for a later login screen. A link that opens the app before the saved session is known
+SHALL be held until it is, then used only if nobody is signed in. A sign-in by any method
+SHALL forget the email a link was sent to, so an unused link cannot sign in after a later
+sign-out.
 
 #### Scenario: Sign in via email link
 - **WHEN** a user enters their email, requests a sign-in link, and opens it
 - **THEN** the system authenticates the user via Firebase Auth's email-link flow
 
 #### Scenario: Link opened while the app is not running
-- **WHEN** the app is closed entirely and the user opens the sign-in link from their email
+- **WHEN** the app is closed entirely, nobody is signed in, and the user opens the sign-in
+  link from their email
 - **THEN** the app launches and completes the sign-in
 
 #### Scenario: Continuing with email offline
@@ -28,7 +32,8 @@ error for a later login screen.
 
 #### Scenario: Sending the link fails
 - **WHEN** the system cannot send the sign-in link
-- **THEN** it shows `AppError.sendEmailSignInLinkFailed` with the underlying reason
+- **THEN** it shows `AppError.sendEmailSignInLinkFailed` with the underlying reason over the
+  email sheet (see Email Sheet Errors)
 
 #### Scenario: Link cannot sign the user in
 - **WHEN** the user opens a sign-in link that fails — offline, already used, or expired
@@ -44,6 +49,18 @@ error for a later login screen.
 #### Scenario: Link opened while signed in
 - **WHEN** a signed-in user opens an email sign-in link
 - **THEN** no sign-in is attempted and no error is shown, now or after a later sign-out
+
+#### Scenario: Link opens the app while a session is saved
+- **WHEN** a signed-in user's app is closed entirely and they open an email sign-in link —
+  for example one requested before signing in with Apple instead
+- **THEN** once the saved session is restored, no sign-in is attempted and no error is shown,
+  now or after a later sign-out
+
+#### Scenario: Signed in another way after requesting a link
+- **WHEN** a user requests a sign-in link, signs in with Apple or Google instead, later signs
+  out, and then opens the link
+- **THEN** no sign-in is attempted and the login screen shows
+  `AppError.emailLinkFromAnotherDevice`
 
 ### Requirement: Google Sign-In
 The system SHALL allow a user to sign in using their Google account via the
@@ -129,10 +146,10 @@ validation ends it. Restoring the session SHALL NOT need a connection.
 - **THEN** the session is restored from the device
 
 ### Requirement: Launch Screen
-While the app works out whether anyone is signed in, and while a signed-in user's profile
-loads, the system SHALL show the launch screen: the MW seal, the app name, and a loading bar
-over "Loading your collection". The launch screen SHALL offer no actions, and the app's tabs
-SHALL NOT appear until the signed-in user's profile has loaded.
+While the app works out whether anyone is signed in, the system SHALL show the launch screen:
+the MW seal, the app name, and a loading bar over "Loading your collection". The launch screen
+SHALL offer no actions. Once the check completes, a signed-in user SHALL see the app's tabs
+whether or not their profile has loaded.
 
 #### Scenario: Nobody is signed in
 - **WHEN** the app opens with no saved session
@@ -140,16 +157,17 @@ SHALL NOT appear until the signed-in user's profile has loaded.
 
 #### Scenario: App opened with a saved session
 - **WHEN** a signed-in user opens the app
-- **THEN** the launch screen shows until their profile has loaded, then the tabs appear
+- **THEN** the launch screen shows until the saved session is restored, then the tabs appear
+  without waiting for the profile
 
 #### Scenario: Signing in
 - **WHEN** a user completes any sign-in method
-- **THEN** the launch screen replaces the login screen until their profile has loaded
+- **THEN** the tabs replace the login screen without waiting for the profile
 
 #### Scenario: Profile cannot load
 - **WHEN** the signed-in user's profile cannot load, whatever the reason
-- **THEN** the launch screen stays, and the profile is loaded again when the connection
-  returns or the app comes back to the foreground
+- **THEN** the tabs still appear, and the profile is loaded again when the connection returns
+  or the app comes back to the foreground
 
 #### Scenario: Reduce Motion is on
 - **WHEN** the launch screen shows while Reduce Motion is on
@@ -161,10 +179,11 @@ SHALL NOT appear until the signed-in user's profile has loaded.
 
 ### Requirement: Profile Load at Sign-In
 After a sign-in, or when the app opens with a saved session, the system SHALL load the
-signed-in user's profile, creating it on first sign-in. It SHALL wait for the server to
-accept a new profile before using it, SHALL create a profile only when the server confirms
-none exists, and SHALL NOT use a blank profile in place of one that cannot load. A profile
-that finishes loading after the signed-in account has changed SHALL be discarded.
+signed-in user's profile in the background, creating it on first sign-in. It SHALL wait for
+the server to accept a new profile before using it, SHALL create a profile only when the
+server confirms none exists, and SHALL NOT use a blank profile in place of one that cannot
+load. A profile that finishes loading after the signed-in account has changed SHALL be
+discarded.
 
 #### Scenario: First sign-in
 - **WHEN** a user signs in and the server has no profile for them
@@ -180,9 +199,30 @@ that finishes loading after the signed-in account has changed SHALL be discarded
 
 #### Scenario: Profile cannot load
 - **WHEN** fetching the profile fails
-- **THEN** no profile is used in its place and the launch screen stays
+- **THEN** no profile is used in its place, and the tabs show with the You tab blank
 
 #### Scenario: Sign-out while the profile loads
 - **WHEN** the user signs out before their profile finishes loading
 - **THEN** the profile that arrives afterwards is discarded
+
+### Requirement: Email Sheet Errors
+An error from sending an email sign-in link SHALL be shown over the email sheet while it is open,
+not held until the sheet closes. Sending SHALL check the connection first and, when offline,
+SHALL show `AppError.noInternetConnection` without attempting to send. Errors raised outside the
+email sheet SHALL still be shown on the login screen.
+
+#### Scenario: Device goes offline after the sheet opens
+- **WHEN** the user opens the email sheet, the device goes offline, and the user taps Send
+- **THEN** `AppError.noInternetConnection` appears over the sheet at once, no link is sent, and
+  no email is saved
+
+#### Scenario: Sending fails while online
+- **WHEN** the user taps Send and sending the link fails
+- **THEN** `AppError.sendEmailSignInLinkFailed` with the underlying reason appears over the
+  sheet, and the sheet stays open so the user can try again
+
+#### Scenario: Error closed
+- **WHEN** the user closes the error shown over the sheet
+- **THEN** the email sheet is still open with the email they entered, and no error appears on
+  the login screen afterwards
 

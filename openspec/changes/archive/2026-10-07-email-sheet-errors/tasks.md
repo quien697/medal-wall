@@ -20,5 +20,5 @@
 ## 3. Verify
 
 - [x] 3.1 Run the full test suite and SwiftLint
-- [ ] 3.2 In the simulator, offline after opening the sheet: tapping Send shows the error over
+- [x] 3.2 In the simulator, offline after opening the sheet: tapping Send shows the error over
       the sheet at once

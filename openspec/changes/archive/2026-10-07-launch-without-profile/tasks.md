@@ -30,5 +30,5 @@
 ## 3. Verify
 
 - [x] 3.1 Run the full test suite
-- [ ] 3.2 Build, then check in the simulator: launch signed in shows the tabs at once, and the
+- [x] 3.2 Build, then check in the simulator: launch signed in shows the tabs at once, and the
       You tab is blank, with Settings reachable, while offline with no cached profile

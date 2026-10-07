@@ -1,17 +1,20 @@
-## ADDED Requirements
+# design-system-sync Specification
 
+## Purpose
+TBD - created by archiving change design-system-drift-check. Update Purpose after archive.
+## Requirements
 ### Requirement: Token Capture From The Newest Design System Document
 The check SHALL read the design system's tokens from the highest-versioned
 `Medal Wall Design System v*.html` in the design system folder, and record them in
-`openspec/design-system/tokens.json`. The record SHALL cover five token families — `color`,
-`type`, `radius`, `space`, and `component` — and SHALL name the source file, its version
-string, and a hash of its content.
+`openspec/design-system/tokens.json`. The record SHALL cover six token families — `color`,
+`type`, `radius`, `elevation`, `space`, and `component` — and SHALL name the source file, its
+version string, and a hash of its content.
 
 `tokens.json` is committed, and its diff between runs is the design system's changelog. It is
 the only record that survives a design system version being replaced in place.
 
 #### Scenario: Reading the current version
-- **WHEN** the check runs against a design system document containing all five families
+- **WHEN** the check runs against a design system document containing all six families
 - **THEN** `tokens.json` records every family, and names the source file, version, and
   content hash
 
@@ -52,8 +55,8 @@ agreement. Counts make an absence visible instead of leaving it to be inferred.
 
 ### Requirement: Implementation Comparison
 The check SHALL compare the recorded tokens against the iOS implementation — the asset
-catalog colour sets, `CGFloat.Radius`, `CGFloat.Space`, `Font.TypeScale`, and the
-`ActionStyle`, `ChipStyle`, and `TagStyle` enums — and SHALL assign every token exactly one
+catalog colour sets, `CGFloat.Radius`, `CGFloat.Space`, `Font.TypeScale`, `Elevation`, and
+the `ActionStyle`, `ChipStyle`, and `TagStyle` enums — and SHALL assign every token exactly one
 verdict:
 
 | Verdict | Condition | Reported as |
@@ -71,6 +74,10 @@ either.
 Values SHALL be compared by what the platform renders, not by how the file spells them. In
 particular, a colour set with no dark appearance renders its light value in both modes and
 SHALL be treated as equal to a design system token whose light and dark values are the same.
+
+`elevation` SHALL be compared by level name only. The design system states each level as a CSS
+`box-shadow`, which SwiftUI cannot express exactly, so `Elevation` approximates every level; a
+level present in one side and absent from the other is the signal, not its shadow values.
 
 Where a design system token name and its code counterpart differ by convention — `fieldLabel`
 against `Field.label`, `numericL` against `Numeric.large`, `label` against `overline` — the
@@ -98,6 +105,11 @@ The check SHALL conclude with an explicit statement of whether any `drift` or
 #### Scenario: The design system names a token code has not built
 - **WHEN** the design system contains a token with no counterpart in code
 - **THEN** the check reports `unimplemented` and does not treat it as a problem
+
+#### Scenario: An elevation level's shadow differs from its CSS value
+- **WHEN** an elevation level exists in both the design system and `Elevation`, with different
+  shadow values
+- **THEN** the check reports `match`, because levels are compared by name
 
 #### Scenario: Names differ by convention
 - **WHEN** a design system token and its code counterpart are spelled differently
@@ -230,3 +242,4 @@ over the others.
 #### Scenario: Internal inconsistency is not code drift
 - **WHEN** the only findings are internal inconsistencies
 - **THEN** the check reports the implementation as agreeing with the design system
+
