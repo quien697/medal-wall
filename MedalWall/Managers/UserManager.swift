@@ -21,6 +21,8 @@ class UserManager {
   /// Whether `currentUser` was read from the phone's copy rather than the server. Such a
   /// profile may be older than the server's, so it is shown but never written.
   private var isProfileFromCache = false
+  /// An email sign-in link that opened the app before the session was known, kept until it is.
+  private var pendingSignInLink: String?
   private(set) var currentUserID: String?
   private(set) var currentUser: User?
   private(set) var isLoadingAuth = true
@@ -32,12 +34,11 @@ class UserManager {
   /// Whether the profile may be edited: only once it has come from the server.
   var canEditProfile: Bool { currentUser != nil && !isProfileFromCache }
 
-  /// Which root screen the app shows. A signed-in user reaches the app only once their
-  /// profile has loaded; until then the app stays loading, whatever stopped the profile.
+  /// Which root screen the app shows. A signed-in user reaches the app as soon as the session
+  /// is known; their profile loads inside it.
   var sessionState: SessionState {
     if isLoadingAuth { return .loading }
-    guard currentUserID != nil else { return .signedOut }
-    return currentUser == nil ? .loading : .ready
+    return currentUserID == nil ? .signedOut : .ready
   }
 
   // MARK: - Init
@@ -72,9 +73,14 @@ class UserManager {
   /// Completes a sign-in from a URL the app was opened with — a Google Sign-In redirect or
   /// a Firebase email sign-in link. An email link opened while someone is signed in is ignored,
   /// so an old link can neither switch accounts nor leave an error for the next login screen.
+  /// A link that arrives before the session is known waits until it is.
   func handleOpenURL(_ url: URL) async {
     authService.handleGoogleSignInURL(url)
     guard currentUserID == nil, authService.isSignInLink(url) else { return }
+    guard !isLoadingAuth else {
+      pendingSignInLink = url.absoluteString
+      return
+    }
 
     await handleEmailLink(url.absoluteString)
   }
@@ -148,17 +154,26 @@ class UserManager {
   }
 
   /// Follows a sign-in or sign-out reported by `authService`, then loads the new account's
-  /// profile. A sign-in drops any link error still waiting for the login screen — one raised
-  /// at launch, before the session was known to be signed in.
+  /// profile. A sign-in, by any method, drops any link error still waiting for the login
+  /// screen and forgets the email a link was sent to, so an unused link can't sign in after a
+  /// later sign-out. A link held from launch is used only when nobody is signed in.
   private func authStateDidChange(_ account: (uid: String, email: String?)?) async {
-    if account != nil { signInError = nil }
+    if account != nil {
+      signInError = nil
+      defaults.removeObject(forKey: FirebaseAuthService.pendingEmailSignInKey)
+    }
     currentUserID = account?.uid
     currentUserEmail = account?.email
     currentUser = nil
     profileLoadError = nil
     isProfileFromCache = false
     isLoadingAuth = false
-    guard account != nil else { return }
+    let heldLink = pendingSignInLink
+    pendingSignInLink = nil
+    guard account != nil else {
+      if let heldLink { await handleEmailLink(heldLink) }
+      return
+    }
 
     await loadProfile()
   }
@@ -209,17 +224,11 @@ class UserManager {
   }
 }
 
-// MARK: - Convenience
-extension UserManager {
-  var currentUserName: String { currentUser?.name ?? .appLocalized("Runner") }
-}
-
 // MARK: - SessionState
 extension UserManager {
-  /// The root screens the app moves between as the session and profile load.
+  /// The root screens the app moves between as the session loads.
   enum SessionState {
-    /// Working out who is signed in, then loading their profile. A profile that can't load
-    /// is retried when the connection returns or the app comes back to the foreground.
+    /// Working out who is signed in.
     case loading
     case signedOut
     case ready

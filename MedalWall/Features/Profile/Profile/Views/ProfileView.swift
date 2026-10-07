@@ -20,25 +20,27 @@ struct ProfileView: View {
   var body: some View {
     NavigationStack {
       ScrollView {
-        ProfileHeaderSection(
-          photoUrl: userManager.currentUser?.photoUrl,
-          userName: userManager.currentUserName,
-          bio: userManager.currentUser?.bio
-        )
+        if let user = userManager.currentUser {
+          ProfileHeaderSection(
+            photoUrl: user.photoUrl,
+            userName: user.name,
+            bio: user.bio
+          )
 
-        ProfileSummarySection(
-          totalMedals: viewModel.totalMedals,
-          fullCount: viewModel.fullCount,
-          halfCount: viewModel.halfCount,
-          bestFullTime: viewModel.bestFullTime,
-          bestHalfTime: viewModel.bestHalfTime
-        )
+          ProfileSummarySection(
+            totalMedals: viewModel.totalMedals,
+            fullCount: viewModel.fullCount,
+            halfCount: viewModel.halfCount,
+            bestFullTime: viewModel.bestFullTime,
+            bestHalfTime: viewModel.bestHalfTime
+          )
 
-        ProfileAchievementsSection(
-          fullMarathonProgress: viewModel.fullMarathonProgress(user: userManager.currentUser),
-          halfMarathonProgress: viewModel.halfMarathonProgress(user: userManager.currentUser)
-        )
-        .padding(.bottom, 10)
+          ProfileAchievementsSection(
+            fullMarathonProgress: viewModel.fullMarathonProgress(user: user),
+            halfMarathonProgress: viewModel.halfMarathonProgress(user: user)
+          )
+          .padding(.bottom, 10)
+        }
       }  // ScrollView
       .scrollIndicators(.hidden)
       .navigationTitle("Profile")
@@ -96,7 +98,7 @@ struct ProfileView: View {
   }
 }
 
-#Preview {
+#Preview("No profile") {
   ProfileView()
     .environment(UserManager())
 }

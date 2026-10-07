@@ -67,8 +67,8 @@ struct UserManagerTests {
     #expect(manager.sessionState == .loading)
   }
 
-  @Test("signing in shows the loading screen until the new profile is created")
-  func testSignInWaitsForProfileCreate() async throws {
+  @Test("signing in opens the tabs while the new profile is still being created")
+  func testSignInOpensTabsBeforeProfile() async throws {
     let repository = StubUserRepository(createLatency: .milliseconds(300))
     let authService = StubAuthService()
     let manager = UserManager(
@@ -78,9 +78,10 @@ struct UserManagerTests {
     let signIn = Task { await authService.report((uid: uid, email: email)) }
     try await Task.sleep(for: .milliseconds(100))
 
-    #expect(manager.sessionState == .loading)
-    await signIn.value
     #expect(manager.sessionState == .ready)
+    #expect(manager.currentUser == nil)
+    await signIn.value
+    #expect(manager.currentUser?.uid == uid)
   }
 
   @Test("a profile that finishes loading after sign-out is dropped")
@@ -101,10 +102,10 @@ struct UserManagerTests {
 
   // MARK: - Profile that can't load
   @Test(
-    "a profile that can't load leaves no blank profile and keeps the loading screen",
+    "a profile that can't load leaves no blank profile and still opens the tabs",
     arguments: [AppError.noInternetConnection, .unknown]
   )
-  func testFailedLoadKeepsLoading(error: AppError) async {
+  func testFailedLoadOpensTabs(error: AppError) async {
     let repository = StubUserRepository(user: makeProfile(), fetchOutcome: .failure(error))
     let authService = StubAuthService()
     let manager = UserManager(
@@ -113,7 +114,7 @@ struct UserManagerTests {
     await authService.report((uid: uid, email: email))
 
     #expect(manager.currentUser == nil)
-    #expect(manager.sessionState == .loading)
+    #expect(manager.sessionState == .ready)
     #expect(await repository.createdUsers.isEmpty)
   }
 
@@ -284,6 +285,7 @@ struct UserManagerTests {
     let manager = UserManager(
       repository: StubUserRepository(), authService: authService,
       networkMonitor: StubNetworkMonitor(), defaults: defaults)
+    await authService.report(nil)
 
     await manager.handleOpenURL(
       try #require(URL(string: "https://medal-wall-4697.firebaseapp.com")))
@@ -301,6 +303,7 @@ struct UserManagerTests {
     let manager = UserManager(
       repository: StubUserRepository(), authService: authService,
       networkMonitor: StubNetworkMonitor(), defaults: defaults)
+    await authService.report(nil)
 
     await manager.handleOpenURL(
       try #require(URL(string: "https://medal-wall-4697.firebaseapp.com")))
@@ -315,6 +318,7 @@ struct UserManagerTests {
     let manager = UserManager(
       repository: StubUserRepository(), authService: authService,
       networkMonitor: StubNetworkMonitor(), defaults: try makeDefaults(pendingEmail: nil))
+    await authService.report(nil)
 
     await manager.handleOpenURL(
       try #require(URL(string: "https://medal-wall-4697.firebaseapp.com")))
@@ -339,6 +343,54 @@ struct UserManagerTests {
 
     #expect(manager.signInError == nil)
     #expect(authService.emailLinkSignInEmails.isEmpty)
+  }
+
+  @Test("a link that opens the app is not used once a saved session is restored")
+  func testEarlyLinkIsDroppedBySavedSession() async throws {
+    let authService = StubAuthService(treatsURLsAsSignInLinks: true)
+    let manager = UserManager(
+      repository: StubUserRepository(user: makeProfile()), authService: authService,
+      networkMonitor: StubNetworkMonitor(), defaults: try makeDefaults(pendingEmail: email))
+
+    await manager.handleOpenURL(
+      try #require(URL(string: "https://medal-wall-4697.firebaseapp.com")))
+    await authService.report((uid: uid, email: email))
+
+    #expect(authService.emailLinkSignInEmails.isEmpty)
+    #expect(manager.signInError == nil)
+  }
+
+  @Test("a link that opens the app signs in once the session turns out signed out")
+  func testEarlyLinkIsUsedWhenSignedOut() async throws {
+    let authService = StubAuthService(treatsURLsAsSignInLinks: true)
+    let manager = UserManager(
+      repository: StubUserRepository(), authService: authService,
+      networkMonitor: StubNetworkMonitor(), defaults: try makeDefaults(pendingEmail: email))
+
+    await manager.handleOpenURL(
+      try #require(URL(string: "https://medal-wall-4697.firebaseapp.com")))
+    #expect(authService.emailLinkSignInEmails.isEmpty)
+    await authService.report(nil)
+
+    #expect(authService.emailLinkSignInEmails == [email])
+  }
+
+  @Test("signing in any way forgets the email a link was sent to")
+  func testSignInClearsSavedEmail() async throws {
+    let authService = StubAuthService(treatsURLsAsSignInLinks: true)
+    let defaults = try makeDefaults(pendingEmail: email)
+    let manager = UserManager(
+      repository: StubUserRepository(user: makeProfile()), authService: authService,
+      networkMonitor: StubNetworkMonitor(), defaults: defaults)
+
+    await authService.report((uid: uid, email: email))
+
+    #expect(defaults.string(forKey: FirebaseAuthService.pendingEmailSignInKey) == nil)
+    await authService.report(nil)
+    await manager.handleOpenURL(
+      try #require(URL(string: "https://medal-wall-4697.firebaseapp.com")))
+    #expect(authService.emailLinkSignInEmails.isEmpty)
+    #expect(manager.signInError == .emailLinkFromAnotherDevice)
   }
 
   @Test("a link error from before the session was known is dropped once it turns out signed in")
