@@ -28,17 +28,20 @@ nonisolated enum DeletePrompt: Equatable {
     }
   }
 
-  /// What the delete takes with it.
+  /// What the delete takes with it, or when it happens.
   ///
-  /// Only a race says more than that it cannot be undone, because only a race deletion
-  /// reaches further than itself: `deleteRace` removes every edition first, while medals
-  /// survive on purpose — they hold no reference back to the race.
+  /// A race says more than that it cannot be undone, because a race deletion reaches further
+  /// than itself: `deleteRace` removes every edition first, while medals survive on purpose —
+  /// they hold no reference back to the race. An edition is only staged for deletion in the
+  /// race editor, so it says the delete waits for the race save, which Cancel still undoes.
   var message: String {
     switch self {
     case .race:
       .appLocalized("Deleting it also deletes all editions. Medals you've added are kept.")
-    case .medal, .edition:
+    case .medal:
       .appLocalized("This can't be undone.")
+    case .edition:
+      .appLocalized("It's deleted when you save the race.")
     }
   }
 }

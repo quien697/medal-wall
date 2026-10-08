@@ -214,18 +214,19 @@ struct LocalizedDisplayStringTests {
     #expect(translated("Delete \("2026") edition?") == "刪除2026年屆次？")
   }
 
-  @Test("Only the race prompt spells out what else a delete takes with it")
+  @Test("A delete prompt says what the delete takes with it, or when it happens")
   func testDeletePromptMessages() {
     #expect(
       DeletePrompt.race(name: "Taipei Marathon").message
         == "Deleting it also deletes all editions. Medals you've added are kept."
     )
     #expect(DeletePrompt.medal(name: "Taipei Marathon 2019").message == "This can't be undone.")
-    #expect(DeletePrompt.edition(year: 2026).message == "This can't be undone.")
+    #expect(DeletePrompt.edition(year: 2026).message == "It's deleted when you save the race.")
     #expect(
       translated("Deleting it also deletes all editions. Medals you've added are kept.")
         == "刪除後，所有屆次也會一併刪除。你已新增的獎牌會保留。"
     )
     #expect(translated("This can't be undone.") == "此操作無法復原。")
+    #expect(translated("It's deleted when you save the race.") == "儲存賽事後才會刪除。")
   }
 }

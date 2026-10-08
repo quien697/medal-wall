@@ -883,6 +883,16 @@
         }
       }
     },
+    "It's deleted when you save the race." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存賽事後才會刪除。"
+          }
+        }
+      }
+    },
     "Kilometers" : {
       "localizations" : {
         "zh-TW" : {
