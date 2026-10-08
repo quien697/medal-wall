@@ -27,8 +27,9 @@ final class RaceEntryPickerViewModel {
   // MARK: - Functions
   /// Loads every race and its editions, newest edition first.
   ///
-  /// A race whose editions fail to load is still listed and the failure is reported, so one
-  /// bad fetch does not hide every other race.
+  /// Every race's editions are fetched at once, so the wait is one round trip rather than one
+  /// per race. A race whose editions fail to load is still listed and the failure is reported,
+  /// so one bad fetch does not hide every other race.
   func load() async {
     isLoading = true
     defer { isLoading = false }
@@ -42,15 +43,33 @@ final class RaceEntryPickerViewModel {
     }
 
     var loaded: [String: [RaceEdition]] = [:]
-    for race in fetched {
-      do {
-        loaded[race.id] = try await repository.fetchEditions(raceId: race.id)
-          .sorted { $0.year > $1.year }
-      } catch {
-        self.error = .raceFetchFailed(error.localizedDescription)
+    await withTaskGroup(of: (String, Result<[RaceEdition], AppError>).self) { group in
+      for raceId in fetched.map(\.id) {
+        // A strong `self`: a child task cannot outlive this call, so it cannot hold a cycle.
+        group.addTask {
+          (raceId, await self.fetchEditions(raceId: raceId))
+        }
+      }
+      for await (raceId, result) in group {
+        switch result {
+        case .success(let editions):
+          loaded[raceId] = editions
+        case .failure(let error):
+          self.error = error
+        }
       }
     }
     races = fetched
     editions = loaded
+  }
+
+  /// Fetches one race's editions, newest first.
+  private func fetchEditions(raceId: String) async -> Result<[RaceEdition], AppError> {
+    do {
+      let editions = try await repository.fetchEditions(raceId: raceId)
+      return .success(editions.sorted { $0.year > $1.year })
+    } catch {
+      return .failure(.raceFetchFailed(error.localizedDescription))
+    }
   }
 }

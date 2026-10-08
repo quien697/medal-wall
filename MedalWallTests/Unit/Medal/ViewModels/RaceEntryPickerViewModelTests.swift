@@ -89,4 +89,18 @@ struct RaceEntryPickerViewModelTests {
 
     #expect(viewModel.isLoading == false)
   }
+
+  @Test("every race's editions are fetched at once rather than one race after another")
+  func testEditionsFetchConcurrently() async {
+    let races = ["race-taipei", "race-tokyo", "race-seoul"].map {
+      Race(id: $0, name: $0, place: race.place, createdBy: "uid")
+    }
+    let repository = StubRaceRepository(races: races, editionFetchLatency: .milliseconds(100))
+    let viewModel = RaceEntryPickerViewModel(repository: repository)
+
+    await viewModel.load()
+
+    #expect(await repository.maxConcurrentEditionFetches == races.count)
+    #expect(viewModel.editions.count == races.count)
+  }
 }

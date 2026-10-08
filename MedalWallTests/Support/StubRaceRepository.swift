@@ -29,6 +29,8 @@ actor StubRaceRepository: RaceRepository {
   /// Editions whose update fails while every other write follows `writeOutcome`.
   private let failingEditionUpdateIDs: Set<String>
   private let deleteOutcome: Result<Void, AppError>
+  /// How long each edition fetch takes to answer.
+  private let editionFetchLatency: Duration
 
   // MARK: - Recorded calls
   private(set) var fetchCallCount = 0
@@ -38,6 +40,9 @@ actor StubRaceRepository: RaceRepository {
   private(set) var createdEditions: [RaceEdition] = []
   private(set) var updatedEditions: [RaceEdition] = []
   private(set) var deletedEditionIDs: [String] = []
+  /// The most edition fetches that were in flight at the same moment.
+  private(set) var maxConcurrentEditionFetches = 0
+  private var editionFetchesInFlight = 0
 
   // MARK: - Init
   init(
@@ -48,7 +53,8 @@ actor StubRaceRepository: RaceRepository {
     writeOutcome: Result<Void, AppError> = .success(()),
     failingEditionCreateIDs: Set<String> = [],
     failingEditionUpdateIDs: Set<String> = [],
-    deleteOutcome: Result<Void, AppError> = .success(())
+    deleteOutcome: Result<Void, AppError> = .success(()),
+    editionFetchLatency: Duration = .zero
   ) {
     self.races = races
     self.editions = editions
@@ -58,6 +64,7 @@ actor StubRaceRepository: RaceRepository {
     self.failingEditionCreateIDs = failingEditionCreateIDs
     self.failingEditionUpdateIDs = failingEditionUpdateIDs
     self.deleteOutcome = deleteOutcome
+    self.editionFetchLatency = editionFetchLatency
   }
 
   // MARK: - RaceRepository
@@ -98,6 +105,12 @@ actor StubRaceRepository: RaceRepository {
 
   func fetchEditions(raceId: String) async throws -> [RaceEdition] {
     fetchCallCount += 1
+    editionFetchesInFlight += 1
+    maxConcurrentEditionFetches = max(maxConcurrentEditionFetches, editionFetchesInFlight)
+    defer { editionFetchesInFlight -= 1 }
+    if editionFetchLatency > .zero {
+      try await Task.sleep(for: editionFetchLatency)
+    }
     try fetchOutcome.get()
     if failingEditionRaceIDs.contains(raceId) {
       throw AppError.raceFetchFailed("editions unavailable")
