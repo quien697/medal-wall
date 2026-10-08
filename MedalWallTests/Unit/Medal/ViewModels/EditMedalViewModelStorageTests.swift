@@ -104,4 +104,46 @@ struct EditMedalViewModelStorageTests {
     #expect(await storage.uploadCallCount == 1)
     #expect(await repository.updatedMedals.first?.photoUrl == "https://example.com/uploaded.jpg")
   }
+
+  // MARK: - Event photos
+  private func makeMedalWithEventPhotos() -> Medal {
+    var medal = makeMedal()
+    medal.eventPhotos = [
+      EventPhoto(id: "event-start", imageUrl: "https://example.com/start.jpg", sortOrder: 0),
+      EventPhoto(id: "event-finish", imageUrl: "https://example.com/finish.jpg", sortOrder: 1)
+    ]
+    return medal
+  }
+
+  @Test("a removed event photo is deleted from Storage once the medal saves")
+  func testRemovedEventPhotoDeletedAfterSave() async throws {
+    let medal = makeMedalWithEventPhotos()
+    let repository = StubMedalRepository(medals: [medal])
+    let storage = StubPhotoStorage()
+    let viewModel = EditMedalViewModel(
+      mode: .edit, medal: medal, repository: repository, storageService: storage)
+    viewModel.removeEventPhoto(id: "event-start")
+
+    try await viewModel.save(by: "uid", userManager: makeUserManager())
+
+    #expect(await storage.deletedEventPhotoIDs == ["event-start"])
+    #expect(await repository.updatedMedals.first?.eventPhotos.map(\.id) == ["event-finish"])
+  }
+
+  @Test("a removed event photo stays in Storage when the medal fails to save")
+  func testRemovedEventPhotoKeptWhenSaveFails() async {
+    let medal = makeMedalWithEventPhotos()
+    let repository = StubMedalRepository(
+      medals: [medal], writeOutcome: .failure(.medalSaveFailed))
+    let storage = StubPhotoStorage()
+    let viewModel = EditMedalViewModel(
+      mode: .edit, medal: medal, repository: repository, storageService: storage)
+    viewModel.removeEventPhoto(id: "event-start")
+
+    await #expect(throws: AppError.medalSaveFailed) {
+      try await viewModel.save(by: "uid", userManager: makeUserManager())
+    }
+
+    #expect(await storage.deletedEventPhotoIDs.isEmpty)
+  }
 }

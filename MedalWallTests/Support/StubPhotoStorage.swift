@@ -26,6 +26,7 @@ actor StubPhotoStorage: PhotoStorage {
   private(set) var raceLogoDeleteCount = 0
   private(set) var deletedEditionLogoIDs: [String] = []
   private(set) var medalPhotoDeleteCount = 0
+  private(set) var deletedEventPhotoIDs: [String] = []
 
   // MARK: - Init
   init(uploadOutcome: Result<String, AppError> = .success("https://example.com/uploaded.jpg")) {
@@ -74,7 +75,9 @@ actor StubPhotoStorage: PhotoStorage {
     try recordUpload()
   }
 
-  func deleteMedalEventPhoto(userId: String, medalId: String, photoId: String) async throws {}
+  func deleteMedalEventPhoto(userId: String, medalId: String, photoId: String) async throws {
+    deletedEventPhotoIDs.append(photoId)
+  }
 
   // MARK: - Private
   private func recordUpload() throws -> String {

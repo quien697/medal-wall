@@ -138,6 +138,8 @@ final class EditMedalViewModel {
 
   /// Saves the medal to Firestore, uploading any new photos to Firebase Storage first,
   /// then ratchets the user's achievement milestones based on the updated medal list.
+  /// A removed cover or event photo is deleted from Storage only after the medal saves, so a
+  /// failed save never points at a deleted file.
   func save(by userID: String, userManager: UserManager) async throws {
     isLoading = true
     defer { isLoading = false }
@@ -167,6 +169,11 @@ final class EditMedalViewModel {
       try await repository.updateMedal(updated)
       if isPhotoChanged, photo == nil, medal.photoUrl != nil {
         try? await storageService.deleteMedalPhoto(userId: userID, medalId: medalId)
+      }
+      let keptEventPhotoIDs = Set(eventPhotos.map(\.id))
+      for removed in medal.eventPhotos where !keptEventPhotoIDs.contains(removed.id) {
+        try? await storageService.deleteMedalEventPhoto(
+          userId: userID, medalId: medalId, photoId: removed.id)
       }
     } else {
       let newMedal = Medal(
