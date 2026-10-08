@@ -98,4 +98,49 @@ struct RacesViewModelRepositoryTests {
     #expect(viewModel.races.map(\.id) == ["b"])
     #expect(await repository.deletedRaceIDs == ["a"])
   }
+
+  // MARK: - Photos
+  /// A race with a logo, one edition with a logo and one without.
+  private func makeRepositoryWithLogos(deleteOutcome: Result<Void, AppError> = .success(()))
+    -> (Race, StubRaceRepository)
+  {
+    var race = makeRace(id: "a")
+    race.photoUrl = "https://example.com/logo.jpg"
+    let raceDay = Date(timeIntervalSince1970: 1_577_836_800)
+    let withLogo = RaceEdition(
+      id: "edition-logo", raceId: race.id, year: 2019, startDate: raceDay, endDate: raceDay,
+      photoUrl: "https://example.com/edition.jpg", distances: [], createdBy: "uid")
+    let withoutLogo = RaceEdition(
+      id: "edition-plain", raceId: race.id, year: 2018, startDate: raceDay, endDate: raceDay,
+      createdBy: "uid")
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [withLogo, withoutLogo]], deleteOutcome: deleteOutcome)
+    return (race, repository)
+  }
+
+  @Test("a deleted race's logos are deleted from Storage once the race is deleted")
+  func testDeletedRaceLogosDeletedAfterDelete() async {
+    let (race, repository) = makeRepositoryWithLogos()
+    let storage = StubPhotoStorage()
+    let viewModel = RacesViewModel(repository: repository, storageService: storage)
+    await viewModel.loadRaces()
+
+    await viewModel.deleteRace(race)
+
+    #expect(await storage.raceLogoDeleteCount == 1)
+    #expect(await storage.deletedEditionLogoIDs == ["edition-logo"])
+  }
+
+  @Test("a race's logos stay in Storage when the race fails to delete")
+  func testRaceLogosKeptWhenDeleteFails() async {
+    let (race, repository) = makeRepositoryWithLogos(deleteOutcome: .failure(.raceDeleteFailed))
+    let storage = StubPhotoStorage()
+    let viewModel = RacesViewModel(repository: repository, storageService: storage)
+    await viewModel.loadRaces()
+
+    await viewModel.deleteRace(race)
+
+    #expect(await storage.raceLogoDeleteCount == 0)
+    #expect(await storage.deletedEditionLogoIDs.isEmpty)
+  }
 }

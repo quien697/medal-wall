@@ -96,4 +96,45 @@ struct RaceDetailViewModelRepositoryTests {
       Issue.record("expected raceFetchFailed, got \(String(describing: viewModel.error))")
     }
   }
+
+  // MARK: - Photos
+  /// A race with a logo, one edition with a logo and one without.
+  private func makeRepositoryWithLogos(deleteOutcome: Result<Void, AppError> = .success(()))
+    -> (Race, StubRaceRepository)
+  {
+    var race = makeRace()
+    race.photoUrl = "https://example.com/logo.jpg"
+    var withLogo = makeEdition(id: "a")
+    withLogo.photoUrl = "https://example.com/edition.jpg"
+    let repository = StubRaceRepository(
+      races: [race], editions: [raceId: [withLogo, makeEdition(id: "b")]],
+      deleteOutcome: deleteOutcome)
+    return (race, repository)
+  }
+
+  @Test("a deleted race's logos are deleted from Storage once the race is deleted")
+  func testDeletedRaceLogosDeletedAfterDelete() async {
+    let (race, repository) = makeRepositoryWithLogos()
+    let storage = StubPhotoStorage()
+    let viewModel = RaceDetailViewModel(
+      race: race, repository: repository, storageService: storage)
+
+    await viewModel.deleteRace()
+
+    #expect(await storage.raceLogoDeleteCount == 1)
+    #expect(await storage.deletedEditionLogoIDs == ["a"])
+  }
+
+  @Test("a race's logos stay in Storage when the race fails to delete")
+  func testRaceLogosKeptWhenDeleteFails() async {
+    let (race, repository) = makeRepositoryWithLogos(deleteOutcome: .failure(.raceDeleteFailed))
+    let storage = StubPhotoStorage()
+    let viewModel = RaceDetailViewModel(
+      race: race, repository: repository, storageService: storage)
+
+    await viewModel.deleteRace()
+
+    #expect(await storage.raceLogoDeleteCount == 0)
+    #expect(await storage.deletedEditionLogoIDs.isEmpty)
+  }
 }

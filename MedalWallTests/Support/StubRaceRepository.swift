@@ -96,11 +96,13 @@ actor StubRaceRepository: RaceRepository {
     races[index] = stored
   }
 
-  func deleteRace(id: String) async throws {
+  func deleteRace(id: String) async throws -> [RaceEdition] {
     try deleteOutcome.get()
     deletedRaceIDs.append(id)
+    let deleted = editions[id] ?? []
     editions[id] = nil
     races.removeAll { $0.id == id }
+    return deleted
   }
 
   func fetchEditions(raceId: String) async throws -> [RaceEdition] {

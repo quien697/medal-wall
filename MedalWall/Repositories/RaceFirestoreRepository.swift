@@ -27,9 +27,10 @@ protocol RaceRepository {
   /// Updates a race's own fields. Callers map a failure to `AppError.raceSaveFailed`.
   func updateRace(_ race: Race) async throws
 
-  /// Deletes a race and all of its editions. Callers map a failure to
-  /// `AppError.raceDeleteFailed`.
-  func deleteRace(id: String) async throws
+  /// Deletes a race and all of its editions, and returns the editions it deleted so a caller
+  /// can clean up their photos. Callers map a failure to `AppError.raceDeleteFailed`.
+  @discardableResult
+  func deleteRace(id: String) async throws -> [RaceEdition]
 
   /// Fetches all editions for a race. Callers map a failure to `AppError.raceFetchFailed`.
   func fetchEditions(raceId: String) async throws -> [RaceEdition]
@@ -137,9 +138,10 @@ final class RaceFirestoreRepository: RaceRepository {
   /// cascade-delete subcollections.
   ///
   /// No count updates: decrementing a document this same batch deletes is work for nothing.
-  func deleteRace(id: String) async throws {
-    let editionIds = try await fetchEditions(raceId: id).map { $0.id }
-    let chunks = Self.deletionChunks(editionIds: editionIds)
+  @discardableResult
+  func deleteRace(id: String) async throws -> [RaceEdition] {
+    let editions = try await fetchEditions(raceId: id)
+    let chunks = Self.deletionChunks(editionIds: editions.map { $0.id })
 
     for (index, chunk) in chunks.enumerated() {
       let batch = db.batch()
@@ -151,6 +153,7 @@ final class RaceFirestoreRepository: RaceRepository {
       }
       try await batch.commit()
     }
+    return editions
   }
 
   /// Splits edition ids into batches that leave room for the race delete, which always goes

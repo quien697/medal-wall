@@ -9,17 +9,27 @@ import Foundation
 
 @Observable
 final class RaceDetailViewModel {
-  // MARK: - Properties
+  // MARK: - Data
   var race: Race
   var editions: [RaceEdition] = []
+
+  // MARK: - State
   var isLoading = false
   var error: AppError?
+
+  // MARK: - Dependencies
   private let repository: any RaceRepository
+  private let storageService: any PhotoStorage
 
   // MARK: - Init
-  init(race: Race, repository: (any RaceRepository)? = nil) {
+  init(
+    race: Race,
+    repository: (any RaceRepository)? = nil,
+    storageService: (any PhotoStorage)? = nil
+  ) {
     self.race = race
     self.repository = repository ?? RaceFirestoreRepository()
+    self.storageService = storageService ?? StorageService()
   }
 
   // MARK: - Functions
@@ -47,10 +57,11 @@ final class RaceDetailViewModel {
     }
   }
 
-  /// Deletes the race and all its editions from Firestore.
+  /// Deletes the race and all its editions from Firestore, then their logos from Storage.
   func deleteRace() async {
     do {
-      try await repository.deleteRace(id: race.id)
+      let deletedEditions = try await repository.deleteRace(id: race.id)
+      await storageService.deleteLogos(of: race, editions: deletedEditions)
     } catch {
       self.error = .raceDeleteFailed
     }

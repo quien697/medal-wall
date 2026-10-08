@@ -47,6 +47,20 @@ protocol PhotoStorage {
   func deleteMedalEventPhoto(userId: String, medalId: String, photoId: String) async throws
 }
 
+extension PhotoStorage {
+  /// Deletes a deleted race's logo and each of its editions' logos. Call only once the race is
+  /// gone, so a failed delete never leaves it pointing at deleted files; a logo that fails to
+  /// delete is left behind rather than failing a delete that already happened.
+  func deleteLogos(of race: Race, editions: [RaceEdition]) async {
+    if race.photoUrl != nil {
+      try? await deleteRaceLogo(raceId: race.id)
+    }
+    for edition in editions where edition.photoUrl != nil {
+      try? await deleteRaceEditionLogo(raceId: race.id, editionId: edition.id)
+    }
+  }
+}
+
 final class StorageService: PhotoStorage {
   private var storage: Storage { Storage.storage() }
 

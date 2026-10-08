@@ -18,17 +18,20 @@ final class MedalDetailViewModel {
   /// the "PR" tag should follow the latest state without the user popping the screen.
   var personalRecordIDs: Set<String>
   private let repository: any MedalRepository
+  private let storageService: any PhotoStorage
   private static let unfilled = "—"
 
   // MARK: - Init
   init(
     medal: Medal,
     personalRecordIDs: Set<String> = [],
-    repository: (any MedalRepository)? = nil
+    repository: (any MedalRepository)? = nil,
+    storageService: (any PhotoStorage)? = nil
   ) {
     self.medal = medal
     self.personalRecordIDs = personalRecordIDs
     self.repository = repository ?? MedalFirestoreRepository()
+    self.storageService = storageService ?? StorageService()
   }
 
   // MARK: - Computed
@@ -153,8 +156,18 @@ final class MedalDetailViewModel {
     try await repository.fetchMedals(userId: medal.userID)
   }
 
-  /// Deletes the medal from Firestore.
+  /// Deletes the medal from Firestore, then its cover and event photos from Storage. The
+  /// photos go only once the medal is gone, so a failed delete never leaves the medal pointing
+  /// at deleted files; a photo that fails to delete is left behind rather than failing a
+  /// delete that already happened.
   func deleteMedal() async throws {
     try await repository.deleteMedal(id: medal.id, userId: medal.userID)
+    if medal.photoUrl != nil {
+      try? await storageService.deleteMedalPhoto(userId: medal.userID, medalId: medal.id)
+    }
+    for eventPhoto in medal.eventPhotos {
+      try? await storageService.deleteMedalEventPhoto(
+        userId: medal.userID, medalId: medal.id, photoId: eventPhoto.id)
+    }
   }
 }

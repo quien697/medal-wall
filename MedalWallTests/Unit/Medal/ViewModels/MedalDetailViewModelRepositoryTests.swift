@@ -78,4 +78,46 @@ struct MedalDetailViewModelRepositoryTests {
     }
     #expect(viewModel.medal.name == "Taipei Marathon")
   }
+
+  // MARK: - Photos
+  private func makeMedalWithPhotos() -> Medal {
+    var medal = makeMedal()
+    medal.photoUrl = "https://example.com/medal.jpg"
+    medal.eventPhotos = [
+      EventPhoto(id: "event-start", imageUrl: "https://example.com/start.jpg", sortOrder: 0),
+      EventPhoto(id: "event-finish", imageUrl: "https://example.com/finish.jpg", sortOrder: 1)
+    ]
+    return medal
+  }
+
+  @Test("a deleted medal's photos are deleted from Storage once the medal is deleted")
+  func testDeletedMedalPhotosDeletedAfterDelete() async throws {
+    let medal = makeMedalWithPhotos()
+    let storage = StubPhotoStorage()
+    let viewModel = MedalDetailViewModel(
+      medal: medal, repository: StubMedalRepository(medals: [medal]), storageService: storage)
+
+    try await viewModel.deleteMedal()
+
+    #expect(await storage.medalPhotoDeleteCount == 1)
+    #expect(await storage.deletedEventPhotoIDs == ["event-start", "event-finish"])
+  }
+
+  @Test("a medal's photos stay in Storage when the medal fails to delete")
+  func testMedalPhotosKeptWhenDeleteFails() async {
+    let medal = makeMedalWithPhotos()
+    let storage = StubPhotoStorage()
+    let viewModel = MedalDetailViewModel(
+      medal: medal,
+      repository: StubMedalRepository(
+        medals: [medal], deleteOutcome: .failure(.medalDeleteFailed)),
+      storageService: storage)
+
+    await #expect(throws: AppError.medalDeleteFailed) {
+      try await viewModel.deleteMedal()
+    }
+
+    #expect(await storage.medalPhotoDeleteCount == 0)
+    #expect(await storage.deletedEventPhotoIDs.isEmpty)
+  }
 }
