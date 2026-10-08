@@ -16,4 +16,4 @@
 ## 4. Verify
 
 - [x] 4.1 Full test suite passes with no new SwiftLint warnings
-- [ ] 4.2 Manual check on a device or simulator: edit a profile, a medal and an edition, including clearing an optional value, and confirm in the Firestore console that an extra field added by hand survives and the cleared value is gone
+- [x] 4.2 Manual check on a device or simulator: edit a profile, a medal and an edition, including clearing an optional value, and confirm in the Firestore console that an extra field added by hand survives and the cleared value is gone
