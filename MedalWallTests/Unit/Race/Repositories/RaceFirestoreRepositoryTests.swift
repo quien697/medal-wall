@@ -63,6 +63,35 @@ struct RaceFirestoreRepositoryTests {
     #expect(Set(fields.keys).subtracting(covered).isEmpty)
   }
 
+  // MARK: - Edition update fields
+  private func makeEdition(photoUrl: String?) -> RaceEdition {
+    RaceEdition(
+      id: "edition-2025", raceId: "race-taipei", year: 2025, startDate: .now, endDate: .now,
+      photoUrl: photoUrl, distances: [RaceDistance(category: .full, type: .inPerson)],
+      createdBy: "uid")
+  }
+
+  @Test("an edition update deletes a photo the edition no longer holds")
+  func testClearedEditionPhotoIsDeleted() throws {
+    let storedKeys = try RaceFirestoreRepository.updateFields(
+      for: makeEdition(photoUrl: "https://example.com/edition.png")
+    ).keys
+    let fields = try RaceFirestoreRepository.updateFields(for: makeEdition(photoUrl: nil))
+
+    #expect(Set(fields.keys) == Set(storedKeys))
+    #expect(fields["photoUrl"] as? String == nil)
+  }
+
+  @Test("every stored edition field is covered by the update field list")
+  func testEditionUpdateFieldListCoversTheModel() throws {
+    let fields = try RaceFirestoreRepository.updateFields(
+      for: makeEdition(photoUrl: "https://example.com/edition.png"))
+
+    // Fails when `RaceEdition` gains a field that nobody added to `editionUpdateFields`,
+    // which would then never be deleted when cleared.
+    #expect(Set(fields.keys).subtracting(RaceFirestoreRepository.editionUpdateFields).isEmpty)
+  }
+
   // MARK: - Deletion chunks
   @Test("a race with no editions still commits one batch for the race itself")
   func testNoEditionsStillCommitsOnce() {

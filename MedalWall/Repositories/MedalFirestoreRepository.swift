@@ -33,6 +33,34 @@ protocol MedalRepository {
 final class MedalFirestoreRepository: MedalRepository {
   private var db: Firestore { Firestore.firestore() }
 
+  /// Every medal field an update writes. A cleared optional in this list is deleted from the
+  /// stored document; a field missing from it is never touched.
+  ///
+  /// `MedalFirestoreRepositoryTests` fails if `Medal` gains a field missing from this list.
+  static let medalUpdateFields = [
+    "id",
+    "name",
+    "date",
+    "bibNumber",
+    "photoUrl",
+    "place",
+    "distance",
+    "finishTime",
+    "overallPlacement",
+    "totalParticipants",
+    "division",
+    "divisionPlacement",
+    "divisionTotal",
+    "genderPlacement",
+    "genderTotal",
+    "note",
+    "tags",
+    "eventPhotos",
+    "userID",
+    "createdAt",
+    "updatedAt"
+  ]
+
   private func medalsRef(userId: String) -> CollectionReference {
     db.collection("users").document(userId).collection("medals")
   }
@@ -57,12 +85,27 @@ final class MedalFirestoreRepository: MedalRepository {
       .setData(Firestore.Encoder().encode(medal))
   }
 
-  /// Replaces the medal document with the updated Medal and stamps updatedAt.
+  /// Updates the medal's own fields and stamps updatedAt.
+  ///
+  /// An update rather than a replace, so a field another client stored that `Medal` does not
+  /// declare survives the edit. It fails if the medal no longer exists rather than
+  /// recreating one deleted elsewhere.
   func updateMedal(_ medal: Medal) async throws {
     var updated = medal
     updated.updatedAt = Date()
     try await medalsRef(userId: updated.userID).document(updated.id)
-      .setData(Firestore.Encoder().encode(updated))
+      .updateData(Self.updateFields(for: updated))
+  }
+
+  /// The fields a medal update writes: everything encoded, plus an explicit delete for each
+  /// updatable field the medal no longer carries, so clearing a finish time or a note removes
+  /// the stored value instead of leaving it behind.
+  static func updateFields(for medal: Medal) throws -> [String: Any] {
+    var fields = try Firestore.Encoder().encode(medal)
+    for field in medalUpdateFields where fields[field] == nil {
+      fields[field] = FieldValue.delete()
+    }
+    return fields
   }
 
   /// Deletes a medal document.

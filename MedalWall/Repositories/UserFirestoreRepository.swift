@@ -30,6 +30,25 @@ final class UserFirestoreRepository: UserRepository {
   private var db: Firestore { Firestore.firestore() }
   private let collection = "users"
 
+  /// Every user field an update writes. A cleared optional in this list is deleted from the
+  /// stored document; a field missing from it is never touched.
+  ///
+  /// `UserFirestoreRepositoryTests` fails if `User` gains a field missing from this list.
+  static let userUpdateFields = [
+    "uid",
+    "email",
+    "firstName",
+    "lastName",
+    "photoUrl",
+    "bio",
+    "gender",
+    "birthday",
+    "createdAt",
+    "updatedAt",
+    "highestFullMilestone",
+    "highestHalfMilestone"
+  ]
+
   /// Fetches the user document, falling back to the phone's copy when offline. Returns nil
   /// if the server confirms the document does not exist; throws
   /// `AppError.noInternetConnection` when neither the server nor the copy has it.
@@ -53,12 +72,27 @@ final class UserFirestoreRepository: UserRepository {
       .setData(Firestore.Encoder().encode(user))
   }
 
-  /// Replaces the user document with the updated User and stamps updatedAt.
+  /// Updates the user's own fields and stamps updatedAt.
+  ///
+  /// An update rather than a replace, so a field another client stored that `User` does not
+  /// declare survives the edit. It fails if the profile no longer exists rather than
+  /// recreating it.
   func updateUser(_ user: User) async throws {
     var updated = user
     updated.updatedAt = Date()
     try await db.collection(collection).document(updated.uid)
-      .setData(Firestore.Encoder().encode(updated))
+      .updateData(Self.updateFields(for: updated))
+  }
+
+  /// The fields a user update writes: everything encoded, plus an explicit delete for each
+  /// updatable field the user no longer carries, so clearing a bio or a photo removes the
+  /// stored value instead of leaving it behind.
+  static func updateFields(for user: User) throws -> [String: Any] {
+    var fields = try Firestore.Encoder().encode(user)
+    for field in userUpdateFields where fields[field] == nil {
+      fields[field] = FieldValue.delete()
+    }
+    return fields
   }
 
   /// Reads a fetched snapshot: the profile and whether it came from the phone's copy, or

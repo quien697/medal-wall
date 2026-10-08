@@ -71,6 +71,23 @@ final class RaceFirestoreRepository: RaceRepository {
     "updatedAt"
   ]
 
+  /// Every edition field an update writes. A cleared optional in this list is deleted from
+  /// the stored document; a field missing from it is never touched.
+  ///
+  /// `RaceFirestoreRepositoryTests` fails if `RaceEdition` gains a field missing from this list.
+  static let editionUpdateFields = [
+    "id",
+    "raceId",
+    "year",
+    "startDate",
+    "endDate",
+    "photoUrl",
+    "distances",
+    "createdBy",
+    "createdAt",
+    "updatedAt"
+  ]
+
   // MARK: - Race
   /// Fetches all races created.
   func fetchRaces() async throws -> [Race] {
@@ -172,12 +189,27 @@ final class RaceFirestoreRepository: RaceRepository {
     try await batch.commit()
   }
 
-  /// Replaces the edition document with the updated RaceEdition and stamps updatedAt.
+  /// Updates the edition's own fields and stamps updatedAt.
+  ///
+  /// An update rather than a replace, so a field another client stored that `RaceEdition`
+  /// does not declare survives the edit. It fails if the edition no longer exists rather than
+  /// recreating one deleted elsewhere, which would also leave the race's count one short.
   func updateEdition(_ edition: RaceEdition) async throws {
     var updated = edition
     updated.updatedAt = Date()
     try await editionsRef(raceId: updated.raceId).document(updated.id)
-      .setData(Firestore.Encoder().encode(updated))
+      .updateData(Self.updateFields(for: updated))
+  }
+
+  /// The fields an edition update writes: everything encoded, plus an explicit delete for
+  /// each updatable field the edition no longer carries, so clearing a photo removes the
+  /// stored URL instead of leaving it behind.
+  static func updateFields(for edition: RaceEdition) throws -> [String: Any] {
+    var fields = try Firestore.Encoder().encode(edition)
+    for field in editionUpdateFields where fields[field] == nil {
+      fields[field] = FieldValue.delete()
+    }
+    return fields
   }
 
   /// Deletes a single edition and decrements the race's edition count, both in one batch so
