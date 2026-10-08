@@ -199,4 +199,30 @@ struct EditRaceViewModelRepositoryTests {
     #expect(await repository.deletedEditionIDs == [existing.id])
     #expect(await repository.races.first?.editionCount == 0)
   }
+
+  @Test("retrying a save after a failed update does not update a saved edition twice")
+  func testRetryDoesNotReupdateEdition() async {
+    let race = makeRace(editionCount: 2)
+    let saved = makeExistingEdition()
+    let failing = RaceEdition(
+      id: "edition-2018", raceId: race.id, year: 2018, startDate: raceDay, endDate: raceDay,
+      createdBy: "uid")
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [saved, failing]],
+      failingEditionUpdateIDs: [failing.id])
+    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+    await viewModel.loadEditions()
+    for edition in [saved, failing] {
+      var draft = DraftRaceEdition(from: edition)
+      draft.isModified = true
+      viewModel.stageUpdateEdition(draft)
+    }
+
+    await viewModel.save(by: "uid")
+    viewModel.error = nil  // what dismissing the error sheet does
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .editionSaveFailed)
+    #expect(await repository.updatedEditions.map(\.id) == [saved.id])
+  }
 }

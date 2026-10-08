@@ -183,10 +183,11 @@ final class EditRaceViewModel {
 
   /// Writes all pending edition creates, updates, and deletes to Firestore.
   ///
-  /// Each delete and create that succeeds is recorded in the staged state, so saving again
-  /// after a partial failure retries only what failed: repeating one would move the race's
-  /// edition count a second time. A failed create or update is reported over a failed delete.
-  /// An edition's photo is deleted from Storage only after its write succeeds.
+  /// Each delete, create and update that succeeds is recorded in the staged state, so saving
+  /// again after a partial failure retries only what failed: repeating one would move the race's
+  /// edition count a second time, or upload or delete an edition's photo twice. A failed create
+  /// or update is reported over a failed delete. An edition's photo is deleted from Storage only
+  /// after its write succeeds.
   private func commitPendingEditions(raceId: String) async {
     var anyDeleteFailed = false
     var anySaveFailed = false
@@ -219,11 +220,7 @@ final class EditRaceViewModel {
       do {
         newEdition.photoUrl = try await uploadNewPhoto(of: draft, raceId: raceId)
         try await repository.createEdition(newEdition)
-        originalEditions.append(newEdition)
-        originalEditionIds.insert(newEdition.id)
-        if let index = draftEditions.firstIndex(where: { $0.id == newEdition.id }) {
-          draftEditions[index] = DraftRaceEdition(from: newEdition)
-        }
+        recordSaved(newEdition)
       } catch {
         anySaveFailed = true
       }
@@ -248,6 +245,7 @@ final class EditRaceViewModel {
           edition.photoUrl = nil
         }
         try await repository.updateEdition(edition)
+        recordSaved(edition)
         if previousPhotoUrl != nil, edition.photoUrl == nil {
           try? await storageService.deleteRaceEditionLogo(raceId: raceId, editionId: edition.id)
         }
@@ -260,6 +258,20 @@ final class EditRaceViewModel {
       error = .editionSaveFailed
     } else if anyDeleteFailed {
       error = .editionDeleteFailed
+    }
+  }
+
+  /// Records an edition that reached Firestore as the new original, so a later save starts
+  /// from it.
+  private func recordSaved(_ edition: RaceEdition) {
+    if let index = originalEditions.firstIndex(where: { $0.id == edition.id }) {
+      originalEditions[index] = edition
+    } else {
+      originalEditions.append(edition)
+    }
+    originalEditionIds.insert(edition.id)
+    if let index = draftEditions.firstIndex(where: { $0.id == edition.id }) {
+      draftEditions[index] = DraftRaceEdition(from: edition)
     }
   }
 

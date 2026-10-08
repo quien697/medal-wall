@@ -226,4 +226,60 @@ struct EditRaceViewModelStorageTests {
     #expect(viewModel.error == .editionSaveFailed)
     #expect(await repository.createdEditions.isEmpty)
   }
+
+  // MARK: - Retrying a partly failed save
+  /// Stages an update to `edition` with a new photo, plus an update that fails to save.
+  private func makeViewModelWithFailingSibling(
+    of edition: RaceEdition, storage: StubPhotoStorage, stage: (inout DraftRaceEdition) -> Void
+  ) async -> EditRaceViewModel {
+    let race = makeRace()
+    let failing = RaceEdition(
+      id: "edition-2024", raceId: race.id, year: 2024, startDate: edition.startDate,
+      endDate: edition.endDate, distances: [], createdBy: "uid")
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [edition, failing]],
+      failingEditionUpdateIDs: [failing.id])
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, storageService: storage)
+    await viewModel.loadEditions()
+    var draft = DraftRaceEdition(from: edition)
+    stage(&draft)
+    draft.isModified = true
+    viewModel.stageUpdateEdition(draft)
+    var failingDraft = DraftRaceEdition(from: failing)
+    failingDraft.isModified = true
+    viewModel.stageUpdateEdition(failingDraft)
+    return viewModel
+  }
+
+  @Test("retrying a save after a failed update does not upload a saved edition's photo twice")
+  func testRetryDoesNotReuploadEditionPhoto() async throws {
+    let edition = try makeEdition()
+    let photoData = try makePhotoData()
+    let storage = StubPhotoStorage()
+    let viewModel = await makeViewModelWithFailingSibling(of: edition, storage: storage) {
+      $0.newPhotoData = photoData
+    }
+
+    await viewModel.save(by: "uid")
+    viewModel.error = nil  // what dismissing the error sheet does
+    await viewModel.save(by: "uid")
+
+    #expect(await storage.uploadedEditionLogoIDs == [edition.id])
+  }
+
+  @Test("retrying a save after a failed update does not delete a saved edition's photo twice")
+  func testRetryDoesNotRedeleteEditionPhoto() async throws {
+    let edition = try makeEdition()
+    let storage = StubPhotoStorage()
+    let viewModel = await makeViewModelWithFailingSibling(of: edition, storage: storage) {
+      $0.isPhotoCleared = true
+    }
+
+    await viewModel.save(by: "uid")
+    viewModel.error = nil  // what dismissing the error sheet does
+    await viewModel.save(by: "uid")
+
+    #expect(await storage.deletedEditionLogoIDs == [edition.id])
+  }
 }
