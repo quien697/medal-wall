@@ -11,6 +11,12 @@ identified by name, place, an optional photo, and an optional website URL. A rac
 SHALL follow the shape defined by the `place-entry` capability, which owns the representation
 of a place and how one is chosen.
 
+A logo the race no longer holds — a removed race or edition logo, a deleted edition's logo, or
+every logo of a deleted race — SHALL be deleted from storage, and only after the Firestore
+write or delete succeeds, so a race or edition never points at a deleted file. A logo that
+fails to delete after that is left in storage rather than failing a write that already
+happened. Medals are untouched: they hold no reference to a race.
+
 #### Scenario: Create a race
 - **WHEN** a user submits a new race with a name and place
 - **THEN** the system creates a `Race` record and it appears in the race list
@@ -24,6 +30,16 @@ of a place and how one is chosen.
 - **WHEN** the commit deleting a race and its editions is rejected
 - **THEN** the race and every one of its editions remain, and the user is shown a delete
   error rather than a race left without some of its editions
+
+#### Scenario: Delete a race removes its logos
+- **WHEN** a user deletes a race and the delete succeeds
+- **THEN** the system deletes the race's logo and every edition's logo from storage; if the
+  delete fails, every logo remains
+
+#### Scenario: Remove a race or edition logo
+- **WHEN** a user removes a race's logo or an edition's logo, or deletes an edition, and the
+  race save succeeds
+- **THEN** the system deletes that logo from storage; if the save fails, the logo remains
 
 ### Requirement: Edition Count Integrity
 `Race.editionCount` SHALL be maintained only by the operations that create and delete
