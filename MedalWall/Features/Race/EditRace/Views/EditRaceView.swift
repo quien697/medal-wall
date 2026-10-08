@@ -78,8 +78,7 @@ struct EditRaceView: View {
       .scrollContentBackground(.hidden)
       .background(Color.Background.primary)
       .task {
-        await viewModel.loadExistingPhoto()
-        await viewModel.loadEditions()
+        await viewModel.load()
       }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {

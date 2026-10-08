@@ -32,23 +32,27 @@ final class EditRaceViewModel {
   private let race: Race?
   private let repository: any RaceRepository
   private let storageService: any PhotoStorage
+  private let loadImage: (String?) async -> UIImage?
 
   // MARK: - Init
   init(
     mode: ItemEditMode,
     race: Race?,
     repository: (any RaceRepository)? = nil,
-    storageService: (any PhotoStorage)? = nil
+    storageService: (any PhotoStorage)? = nil,
+    loadImage: ((String?) async -> UIImage?)? = nil
   ) {
     self.mode = mode
     self.race = race
     self.repository = repository ?? RaceFirestoreRepository()
     self.storageService = storageService ?? StorageService()
+    self.loadImage = loadImage ?? { await UIImage.load(from: $0) }
 
     if let race, mode == .edit {
       self.name = race.name
       self.place = race.place
       self.websiteUrl = race.websiteUrl ?? ""
+      self.isEditionsLoading = true
     }
   }
 
@@ -66,6 +70,14 @@ final class EditRaceViewModel {
   }
 
   // MARK: - Functions
+  /// Loads the existing logo and the editions side by side, so a slow logo download never
+  /// holds the edition list back.
+  func load() async {
+    async let photo: Void = loadExistingPhoto()
+    await loadEditions()
+    await photo
+  }
+
   /// Loads editions from Firestore into the draft state, keeping any new edition staged
   /// before the load finished.
   func loadEditions() async {
@@ -108,7 +120,7 @@ final class EditRaceViewModel {
 
   /// Downloads the existing race photo into `photo` so the picker shows the current image.
   func loadExistingPhoto() async {
-    let existingPhoto = await UIImage.load(from: race?.photoUrl)
+    let existingPhoto = await loadImage(race?.photoUrl)
     guard !isPhotoChanged else { return }
 
     photo = existingPhoto

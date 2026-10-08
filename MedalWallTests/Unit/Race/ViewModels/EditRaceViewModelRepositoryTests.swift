@@ -225,4 +225,38 @@ struct EditRaceViewModelRepositoryTests {
     #expect(viewModel.error == .editionSaveFailed)
     #expect(await repository.updatedEditions.map(\.id) == [saved.id])
   }
+
+  // MARK: - Loading
+  @Test("an existing race's editions count as loading before the first load starts")
+  func testEditionsLoadingBeforeFirstLoad() {
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: makeRace(), repository: StubRaceRepository())
+
+    #expect(viewModel.isEditionsLoading)
+  }
+
+  @Test("editions load while the race logo is still downloading")
+  func testEditionsLoadDuringLogoDownload() async throws {
+    var race = makeRace(editionCount: 1)
+    race.photoUrl = "https://example.com/logo.jpg"
+    let existing = makeExistingEdition()
+    let repository = StubRaceRepository(races: [race], editions: [race.id: [existing]])
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository,
+      loadImage: { _ in
+        try? await Task.sleep(for: .seconds(5))  // a slow connection
+        return nil
+      })
+
+    let loading = Task { await viewModel.load() }
+    let deadline = ContinuousClock.now + .seconds(2)
+    while viewModel.displayedEditions.isEmpty, ContinuousClock.now < deadline {
+      try await Task.sleep(for: .milliseconds(10))
+    }
+    let editionIDs = viewModel.displayedEditions.map(\.id)
+    loading.cancel()
+    await loading.value
+
+    #expect(editionIDs == [existing.id])
+  }
 }
