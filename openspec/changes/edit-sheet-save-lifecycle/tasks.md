@@ -1,6 +1,7 @@
 ## 1. Photo storage
 
 - [x] 1.1 `PhotoStorage.deletePhoto(url:)` replaces the five path-based deletes; `StorageService` resolves it with `reference(for: URL)`; uploads go to unique paths; `maxUploadRetryTime = 30`. Update `deleteLogos(of:editions:)`, `MedalDetailViewModel.deleteMedal`, the existing removal clean-up, and `StubPhotoStorage` (records deleted URLs). Existing tests updated to assert URLs; full suite green
+- [x] 1.2 Failing tests: `PhotoOwner.owns(path:)` accepts each owner's folders and old fixed file, and rejects another user's, another record's, and a race's editions' paths; each delete call passes its record as owner. Then `deletePhoto(url:ownedBy:)` refuses a resolved path its owner does not own
 
 ## 2. Replace and failed-save clean-up (TDD)
 

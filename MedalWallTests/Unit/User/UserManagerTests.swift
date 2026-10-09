@@ -244,6 +244,7 @@ struct UserManagerTests {
     try await manager.updateUser(edited, photo: UIImage())
 
     #expect(await storage.deletedURLs == ["https://example.com/avatar.jpg"])
+    #expect(await storage.deletedOwners == [.user(uid: uid)])
     #expect(manager.currentUser?.photoUrl == "https://example.com/uploaded.jpg")
   }
 

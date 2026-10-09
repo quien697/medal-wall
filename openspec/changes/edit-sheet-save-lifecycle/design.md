@@ -67,6 +67,17 @@ documents other clients may write.
 *Alternative — keep fixed paths and upload to a temp path, then move:* Storage has no move;
 it would be a copy plus two deletes.
 
+### Delete only within the record's folders
+Deleting by URL lets a record aim a delete anywhere: a race whose `photoUrl` was edited to
+point at someone's avatar would get it deleted by whoever next replaces or deletes the race.
+So `deletePhoto(url:ownedBy:)` takes a `PhotoOwner` (`user`, `race`, `edition`, `medal`) and
+refuses a path outside that owner's folders, including each one's pre-change fixed file. A
+race owns `raceLogo/` and its old `logo.jpg` but not its editions' folders. The path checked is
+the one Storage itself resolves from the URL (`StorageReference.fullPath`).
+
+This is a second line behind Storage rules, not a replacement: `Race.id` is read from a
+document field, so a tampered race document can still name another race's folder.
+
 ### One clean-up rule in each ViewModel
 After the write succeeds: delete every old URL the record no longer holds (removed or
 replaced). If the write fails: delete every URL uploaded for this save. Both use `try?`, as the

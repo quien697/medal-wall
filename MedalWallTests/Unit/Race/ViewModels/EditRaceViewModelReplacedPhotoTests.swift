@@ -58,6 +58,7 @@ struct EditRaceViewModelReplacedPhotoTests {
     await viewModel.save(by: "uid")
 
     #expect(await storage.deletedURLs == [logoUrl])
+    #expect(await storage.deletedOwners == [.race(raceId: "race-taipei")])
   }
 
   @Test("a replaced race logo stays in Storage and the new upload is deleted when the save fails")
@@ -109,6 +110,8 @@ struct EditRaceViewModelReplacedPhotoTests {
     await viewModel.save(by: "uid")
 
     #expect(await storage.deletedURLs == [editionPhotoUrl])
+    #expect(
+      await storage.deletedOwners == [.edition(raceId: "race-taipei", editionId: "edition-2025")])
   }
 
   @Test("an edition photo uploaded for a failed edition update is deleted")

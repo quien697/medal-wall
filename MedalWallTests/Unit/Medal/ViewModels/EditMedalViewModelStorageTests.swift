@@ -120,6 +120,7 @@ struct EditMedalViewModelStorageTests {
     try await viewModel.save(by: "uid")
 
     #expect(await storage.deletedURLs == [photoUrl])
+    #expect(await storage.deletedOwners == [.medal(userId: "uid", medalId: "medal-taipei")])
   }
 
   @Test("a replaced cover photo stays in Storage and the new upload is deleted when the save fails")
@@ -181,6 +182,7 @@ struct EditMedalViewModelStorageTests {
     try await viewModel.save(by: "uid")
 
     #expect(await storage.deletedURLs == ["https://example.com/start.jpg"])
+    #expect(await storage.deletedOwners == [.medal(userId: "uid", medalId: "medal-taipei")])
     #expect(await repository.updatedMedals.first?.eventPhotos.map(\.id) == ["event-finish"])
   }
 

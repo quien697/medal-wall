@@ -104,6 +104,8 @@ struct MedalDetailViewModelRepositoryTests {
         "https://example.com/medal.jpg", "https://example.com/start.jpg",
         "https://example.com/finish.jpg"
       ])
+    let owner = PhotoOwner.medal(userId: "uid", medalId: "medal-a")
+    #expect(await storage.deletedOwners == [owner, owner, owner])
   }
 
   @Test("a medal's photos stay in Storage when the medal fails to delete")

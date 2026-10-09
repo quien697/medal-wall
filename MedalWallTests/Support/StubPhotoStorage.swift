@@ -23,6 +23,7 @@ actor StubPhotoStorage: PhotoStorage {
   private(set) var uploadCallCount = 0
   private(set) var uploadedEditionLogoIDs: [String] = []
   private(set) var deletedURLs: [String] = []
+  private(set) var deletedOwners: [PhotoOwner] = []
 
   // MARK: - Init
   init(uploadOutcome: Result<String, AppError> = .success("https://example.com/uploaded.jpg")) {
@@ -55,8 +56,9 @@ actor StubPhotoStorage: PhotoStorage {
     try recordUpload()
   }
 
-  func deletePhoto(url: String) async throws {
+  func deletePhoto(url: String, ownedBy owner: PhotoOwner) async throws {
     deletedURLs.append(url)
+    deletedOwners.append(owner)
   }
 
   // MARK: - Private

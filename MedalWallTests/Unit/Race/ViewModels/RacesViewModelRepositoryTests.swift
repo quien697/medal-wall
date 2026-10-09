@@ -131,6 +131,10 @@ struct RacesViewModelRepositoryTests {
       await storage.deletedURLs == [
         "https://example.com/logo.jpg", "https://example.com/edition.jpg"
       ])
+    #expect(
+      await storage.deletedOwners == [
+        .race(raceId: "a"), .edition(raceId: "a", editionId: "edition-logo")
+      ])
   }
 
   @Test("a race's logos stay in Storage when the race fails to delete")

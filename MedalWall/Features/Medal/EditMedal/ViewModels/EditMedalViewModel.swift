@@ -150,6 +150,7 @@ final class EditMedalViewModel {
 
     guard await networkMonitor.isConnected() else { throw AppError.noInternetConnection }
 
+    let owner = PhotoOwner.medal(userId: userID, medalId: medalId)
     var uploadedUrls: [String] = []
     do {
       let photoUrl = try await resolvedPhotoUrl(userId: userID, uploadedUrls: &uploadedUrls)
@@ -176,11 +177,11 @@ final class EditMedalViewModel {
         updated.eventPhotos = eventPhotos
         try await repository.updateMedal(updated)
         if let oldPhotoUrl = medal.photoUrl, oldPhotoUrl != photoUrl {
-          try? await storageService.deletePhoto(url: oldPhotoUrl)
+          try? await storageService.deletePhoto(url: oldPhotoUrl, ownedBy: owner)
         }
         let keptEventPhotoIDs = Set(eventPhotos.map(\.id))
         for removed in medal.eventPhotos where !keptEventPhotoIDs.contains(removed.id) {
-          try? await storageService.deletePhoto(url: removed.imageUrl)
+          try? await storageService.deletePhoto(url: removed.imageUrl, ownedBy: owner)
         }
       } else {
         let newMedal = Medal(
@@ -208,7 +209,7 @@ final class EditMedalViewModel {
       }
     } catch {
       for url in uploadedUrls {
-        try? await storageService.deletePhoto(url: url)
+        try? await storageService.deletePhoto(url: url, ownedBy: owner)
       }
       throw error
     }

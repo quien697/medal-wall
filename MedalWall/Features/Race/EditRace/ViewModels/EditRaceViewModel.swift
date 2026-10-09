@@ -171,7 +171,7 @@ final class EditRaceViewModel {
         }
         try await repository.createRace(newRace)
       } catch {
-        await deletePhoto(newRace.photoUrl)
+        await deletePhoto(newRace.photoUrl, ownedBy: .race(raceId: newRace.id))
         self.error = .raceSaveFailed
       }
 
@@ -199,14 +199,14 @@ final class EditRaceViewModel {
       do {
         try await repository.updateRace(race)
       } catch {
-        await deletePhoto(uploadedPhotoUrl)
+        await deletePhoto(uploadedPhotoUrl, ownedBy: .race(raceId: race.id))
         self.error = .raceSaveFailed
         return
       }
       self.race = race
       isPhotoChanged = false
       if previousPhotoUrl != race.photoUrl {
-        await deletePhoto(previousPhotoUrl)
+        await deletePhoto(previousPhotoUrl, ownedBy: .race(raceId: race.id))
       }
       await commitPendingEditions(raceId: race.id)
     }
@@ -228,7 +228,8 @@ final class EditRaceViewModel {
       do {
         try await repository.deleteEdition(raceId: raceId, editionId: id)
         originalEditionIds.remove(id)
-        await deletePhoto(originalEditions.first(where: { $0.id == id })?.photoUrl)
+        let photoUrl = originalEditions.first(where: { $0.id == id })?.photoUrl
+        await deletePhoto(photoUrl, ownedBy: .edition(raceId: raceId, editionId: id))
       } catch {
         anyDeleteFailed = true
       }
@@ -251,7 +252,8 @@ final class EditRaceViewModel {
         try await repository.createEdition(newEdition)
         recordSaved(newEdition)
       } catch {
-        await deletePhoto(newEdition.photoUrl)
+        await deletePhoto(
+          newEdition.photoUrl, ownedBy: .edition(raceId: raceId, editionId: newEdition.id))
         anySaveFailed = true
       }
     }
@@ -262,6 +264,7 @@ final class EditRaceViewModel {
     {
       guard var edition = originalEditions.first(where: { $0.id == draft.id }) else { continue }
       let previousPhotoUrl = edition.photoUrl
+      let owner = PhotoOwner.edition(raceId: raceId, editionId: edition.id)
 
       edition.year = draft.year
       edition.startDate = draft.startDate
@@ -279,10 +282,10 @@ final class EditRaceViewModel {
         try await repository.updateEdition(edition)
         recordSaved(edition)
         if previousPhotoUrl != edition.photoUrl {
-          await deletePhoto(previousPhotoUrl)
+          await deletePhoto(previousPhotoUrl, ownedBy: owner)
         }
       } catch {
-        await deletePhoto(uploadedPhotoUrl)
+        await deletePhoto(uploadedPhotoUrl, ownedBy: owner)
         anySaveFailed = true
       }
     }
@@ -310,9 +313,9 @@ final class EditRaceViewModel {
 
   /// Deletes a photo from Storage when there is one. A photo that fails to delete is left
   /// behind rather than failing a write that already happened.
-  private func deletePhoto(_ url: String?) async {
+  private func deletePhoto(_ url: String?, ownedBy owner: PhotoOwner) async {
     guard let url else { return }
-    try? await storageService.deletePhoto(url: url)
+    try? await storageService.deletePhoto(url: url, ownedBy: owner)
   }
 
   /// Uploads the photo newly picked for a draft and returns its URL, or `nil` when it has none.

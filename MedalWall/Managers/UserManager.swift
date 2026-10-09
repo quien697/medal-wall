@@ -105,13 +105,13 @@ class UserManager {
       try await repository.updateUser(updatedUser)
     } catch {
       if let uploadedPhotoUrl {
-        try? await storageService.deletePhoto(url: uploadedPhotoUrl)
+        try? await storageService.deletePhoto(url: uploadedPhotoUrl, ownedBy: .user(uid: user.uid))
       }
       throw error
     }
     self.currentUser = updatedUser
     if let previousPhotoUrl, previousPhotoUrl != updatedUser.photoUrl {
-      try? await storageService.deletePhoto(url: previousPhotoUrl)
+      try? await storageService.deletePhoto(url: previousPhotoUrl, ownedBy: .user(uid: user.uid))
     }
   }
 

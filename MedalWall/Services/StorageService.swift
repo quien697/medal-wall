@@ -31,8 +31,8 @@ protocol PhotoStorage {
     userId: String, medalId: String, photoId: String, image: UIImage
   ) async throws -> String
 
-  /// Deletes the photo stored at a download URL.
-  func deletePhoto(url: String) async throws
+  /// Deletes the photo stored at a download URL, if it lies in its owner's folders.
+  func deletePhoto(url: String, ownedBy owner: PhotoOwner) async throws
 }
 
 extension PhotoStorage {
@@ -41,12 +41,38 @@ extension PhotoStorage {
   /// delete is left behind rather than failing a delete that already happened.
   func deleteLogos(of race: Race, editions: [RaceEdition]) async {
     if let photoUrl = race.photoUrl {
-      try? await deletePhoto(url: photoUrl)
+      try? await deletePhoto(url: photoUrl, ownedBy: .race(raceId: race.id))
     }
     for edition in editions {
       if let photoUrl = edition.photoUrl {
-        try? await deletePhoto(url: photoUrl)
+        try? await deletePhoto(
+          url: photoUrl, ownedBy: .edition(raceId: race.id, editionId: edition.id))
       }
+    }
+  }
+}
+
+/// The record a stored photo belongs to. A photo is deleted only from its owner's folders, so
+/// a record whose photo URL was pointed elsewhere, such as at another user's avatar, cannot get
+/// that file deleted by whoever next saves or deletes the record.
+enum PhotoOwner: Equatable {
+  case user(uid: String)
+  case race(raceId: String)
+  case edition(raceId: String, editionId: String)
+  case medal(userId: String, medalId: String)
+
+  /// Whether a Storage path lies in this owner's folders, including the fixed file names used
+  /// before uploads got unique names.
+  func owns(path: String) -> Bool {
+    switch self {
+    case .user(let uid):
+      path.hasPrefix("users/\(uid)/avatar/")
+    case .race(let raceId):
+      path.hasPrefix("races/\(raceId)/raceLogo/") || path == "races/\(raceId)/logo.jpg"
+    case .edition(let raceId, let editionId):
+      path.hasPrefix("races/\(raceId)/editions/\(editionId)/")
+    case .medal(let userId, let medalId):
+      path.hasPrefix("users/\(userId)/medals/\(medalId)/")
     }
   }
 }
@@ -127,12 +153,15 @@ final class StorageService: PhotoStorage {
   }
 
   // MARK: - Functions -> Common
-  /// Deletes the photo at a download URL from Firebase Storage. Uses the throwing
-  /// `reference(for:)`: `reference(forURL:)` stops the app on a malformed URL or one from
-  /// another bucket, and photo URLs come from documents other clients may write.
-  func deletePhoto(url: String) async throws {
+  /// Deletes the photo at a download URL from Firebase Storage, refusing one outside its
+  /// owner's folders. Uses the throwing `reference(for:)`: `reference(forURL:)` stops the app on
+  /// a malformed URL or one from another bucket, and photo URLs come from documents other
+  /// clients may write.
+  func deletePhoto(url: String, ownedBy owner: PhotoOwner) async throws {
     guard let photoURL = URL(string: url) else { throw AppError.photoDataInvalid }
-    try await storage.reference(for: photoURL).delete()
+    let reference = try storage.reference(for: photoURL)
+    guard owner.owns(path: reference.fullPath) else { throw AppError.photoDataInvalid }
+    try await reference.delete()
   }
 
   private func upload(image: UIImage, to path: String) async throws -> String {

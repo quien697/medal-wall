@@ -162,11 +162,12 @@ final class MedalDetailViewModel {
   /// delete that already happened.
   func deleteMedal() async throws {
     try await repository.deleteMedal(id: medal.id, userId: medal.userID)
+    let owner = PhotoOwner.medal(userId: medal.userID, medalId: medal.id)
     if let photoUrl = medal.photoUrl {
-      try? await storageService.deletePhoto(url: photoUrl)
+      try? await storageService.deletePhoto(url: photoUrl, ownedBy: owner)
     }
     for eventPhoto in medal.eventPhotos {
-      try? await storageService.deletePhoto(url: eventPhoto.imageUrl)
+      try? await storageService.deletePhoto(url: eventPhoto.imageUrl, ownedBy: owner)
     }
   }
 }
