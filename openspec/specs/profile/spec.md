@@ -46,18 +46,12 @@ loaded (see Profile Not Yet Loaded).
 ### Requirement: Cached Profile Is Read-Only
 A profile read from the device's local copy rather than the server can be older than the
 server's copy. The system SHALL show it but SHALL NOT write it: Edit Profile SHALL be
-disabled and milestone updates SHALL be skipped until the server's profile has loaded. The
-system SHALL load the server's profile when the connection returns or the app comes back to
-the foreground.
+disabled until the server's profile has loaded. The system SHALL load the server's profile
+when the connection returns or the app comes back to the foreground.
 
 #### Scenario: App opened offline with a cached profile
 - **WHEN** the app opens with the profile read from the device's local copy
 - **THEN** the profile is shown and Edit Profile is disabled
-
-#### Scenario: Medal saved against a cached profile
-- **WHEN** a medal save would raise a milestone while the profile is the device's copy
-- **THEN** no milestone is written, and the next medal saved after the server's profile has
-  loaded catches it up
 
 #### Scenario: Connection returns
 - **WHEN** the connection returns, or the app comes back to the foreground, while the
@@ -68,8 +62,7 @@ the foreground.
 Until the signed-in user's profile has loaded — while it loads, while offline with no copy on
 the device, or after it fails — the system SHALL leave the You tab's content blank: no
 header, no medal statistics, and no achievement progress. The title and toolbar SHALL stay, so
-Settings remains reachable. Edit Profile SHALL be disabled and milestone updates SHALL be
-skipped. No error SHALL be shown.
+Settings remains reachable. Edit Profile SHALL be disabled. No error SHALL be shown.
 
 #### Scenario: Profile has not loaded
 - **WHEN** a signed-in user opens the You tab before their profile has loaded
