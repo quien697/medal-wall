@@ -51,7 +51,8 @@ struct EditRaceViewModelStorageTests {
     let repository = StubRaceRepository(races: [race])
     let storage = StubPhotoStorage(uploadOutcome: .failure(.photoDataInvalid))
     let viewModel = EditRaceViewModel(
-      mode: .edit, race: race, repository: repository, storageService: storage)
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
     viewModel.updatePhoto(with: UIImage())
 
     await viewModel.save(by: "uid")
@@ -66,12 +67,13 @@ struct EditRaceViewModelStorageTests {
     let repository = StubRaceRepository(races: [race])
     let storage = StubPhotoStorage()
     let viewModel = EditRaceViewModel(
-      mode: .edit, race: race, repository: repository, storageService: storage)
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
     viewModel.clearPhoto()
 
     await viewModel.save(by: "uid")
 
-    #expect(await storage.raceLogoDeleteCount == 1)
+    #expect(await storage.deletedURLs == [logoUrl])
     #expect(await repository.races.first?.photoUrl == nil)
   }
 
@@ -81,13 +83,14 @@ struct EditRaceViewModelStorageTests {
     let repository = StubRaceRepository(races: [race], writeOutcome: .failure(.raceSaveFailed))
     let storage = StubPhotoStorage()
     let viewModel = EditRaceViewModel(
-      mode: .edit, race: race, repository: repository, storageService: storage)
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
     viewModel.clearPhoto()
 
     await viewModel.save(by: "uid")
 
     #expect(viewModel.error == .raceSaveFailed)
-    #expect(await storage.raceLogoDeleteCount == 0)
+    #expect(await storage.deletedURLs.isEmpty)
   }
 
   @Test("a deleted edition's photo is deleted from Storage once the edition is deleted")
@@ -97,13 +100,14 @@ struct EditRaceViewModelStorageTests {
     let repository = StubRaceRepository(races: [race], editions: [race.id: [edition]])
     let storage = StubPhotoStorage()
     let viewModel = EditRaceViewModel(
-      mode: .edit, race: race, repository: repository, storageService: storage)
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     viewModel.stageDeleteEdition(id: edition.id)
 
     await viewModel.save(by: "uid")
 
-    #expect(await storage.deletedEditionLogoIDs == [edition.id])
+    #expect(await storage.deletedURLs == [editionPhotoUrl])
   }
 
   @Test("a deleted edition's photo stays in Storage when the edition fails to delete")
@@ -115,14 +119,15 @@ struct EditRaceViewModelStorageTests {
       deleteOutcome: .failure(.editionDeleteFailed))
     let storage = StubPhotoStorage()
     let viewModel = EditRaceViewModel(
-      mode: .edit, race: race, repository: repository, storageService: storage)
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     viewModel.stageDeleteEdition(id: edition.id)
 
     await viewModel.save(by: "uid")
 
     #expect(viewModel.error == .editionDeleteFailed)
-    #expect(await storage.deletedEditionLogoIDs.isEmpty)
+    #expect(await storage.deletedURLs.isEmpty)
   }
 
   @Test("a removed edition photo is deleted from Storage once the edition saves")
@@ -132,7 +137,8 @@ struct EditRaceViewModelStorageTests {
     let repository = StubRaceRepository(races: [race], editions: [race.id: [edition]])
     let storage = StubPhotoStorage()
     let viewModel = EditRaceViewModel(
-      mode: .edit, race: race, repository: repository, storageService: storage)
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     var draft = DraftRaceEdition(from: edition)
     draft.isPhotoCleared = true
@@ -141,7 +147,7 @@ struct EditRaceViewModelStorageTests {
 
     await viewModel.save(by: "uid")
 
-    #expect(await storage.deletedEditionLogoIDs == [edition.id])
+    #expect(await storage.deletedURLs == [editionPhotoUrl])
     #expect(await repository.editions[race.id]?.first?.photoUrl == nil)
   }
 
@@ -153,7 +159,8 @@ struct EditRaceViewModelStorageTests {
       races: [race], editions: [race.id: [edition]], failingEditionUpdateIDs: [edition.id])
     let storage = StubPhotoStorage()
     let viewModel = EditRaceViewModel(
-      mode: .edit, race: race, repository: repository, storageService: storage)
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     var draft = DraftRaceEdition(from: edition)
     draft.isPhotoCleared = true
@@ -163,7 +170,7 @@ struct EditRaceViewModelStorageTests {
     await viewModel.save(by: "uid")
 
     #expect(viewModel.error == .editionSaveFailed)
-    #expect(await storage.deletedEditionLogoIDs.isEmpty)
+    #expect(await storage.deletedURLs.isEmpty)
   }
 
   @Test("a failed photo upload keeps an edition's photo and fails the save")
@@ -173,7 +180,8 @@ struct EditRaceViewModelStorageTests {
     let repository = StubRaceRepository(races: [race], editions: [race.id: [edition]])
     let storage = StubPhotoStorage(uploadOutcome: .failure(.photoDataInvalid))
     let viewModel = EditRaceViewModel(
-      mode: .edit, race: race, repository: repository, storageService: storage)
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     var draft = DraftRaceEdition(from: edition)
     draft.newPhotoData = try makePhotoData()
@@ -192,7 +200,8 @@ struct EditRaceViewModelStorageTests {
     let repository = StubRaceRepository(races: [race])
     let storage = StubPhotoStorage()
     let viewModel = EditRaceViewModel(
-      mode: .edit, race: race, repository: repository, storageService: storage)
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
     let edition = try makeEdition()
     var draft = DraftRaceEdition(
       year: edition.year, isOneDay: true, startDate: edition.startDate,
@@ -213,7 +222,8 @@ struct EditRaceViewModelStorageTests {
     let repository = StubRaceRepository(races: [race])
     let storage = StubPhotoStorage(uploadOutcome: .failure(.photoDataInvalid))
     let viewModel = EditRaceViewModel(
-      mode: .edit, race: race, repository: repository, storageService: storage)
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
     let edition = try makeEdition()
     var draft = DraftRaceEdition(
       year: edition.year, isOneDay: true, startDate: edition.startDate,
@@ -228,6 +238,30 @@ struct EditRaceViewModelStorageTests {
   }
 
   // MARK: - Retrying a partly failed save
+  @Test("retrying a save after a failed edition write does not upload the race logo again")
+  func testRetryDoesNotReuploadRaceLogo() async throws {
+    let race = makeRace()
+    let edition = try makeEdition()
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [edition]], failingEditionUpdateIDs: [edition.id])
+    let storage = StubPhotoStorage()
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
+    await viewModel.loadEditions()
+    viewModel.updatePhoto(with: UIImage())
+    var draft = DraftRaceEdition(from: edition)
+    draft.isModified = true
+    viewModel.stageUpdateEdition(draft)
+
+    await viewModel.save(by: "uid")
+    viewModel.error = nil  // what dismissing the error sheet does
+    await viewModel.save(by: "uid")
+
+    #expect(await storage.uploadCallCount == 1)
+    #expect(await storage.deletedURLs == [logoUrl])
+  }
+
   /// Stages an update to `edition` with a new photo, plus an update that fails to save.
   private func makeViewModelWithFailingSibling(
     of edition: RaceEdition, storage: StubPhotoStorage, stage: (inout DraftRaceEdition) -> Void
@@ -240,7 +274,8 @@ struct EditRaceViewModelStorageTests {
       races: [race], editions: [race.id: [edition, failing]],
       failingEditionUpdateIDs: [failing.id])
     let viewModel = EditRaceViewModel(
-      mode: .edit, race: race, repository: repository, storageService: storage)
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     var draft = DraftRaceEdition(from: edition)
     stage(&draft)
@@ -280,6 +315,26 @@ struct EditRaceViewModelStorageTests {
     viewModel.error = nil  // what dismissing the error sheet does
     await viewModel.save(by: "uid")
 
-    #expect(await storage.deletedEditionLogoIDs == [edition.id])
+    #expect(await storage.deletedURLs == [editionPhotoUrl])
+  }
+
+  // MARK: - Offline
+  @Test("saving offline is refused before anything is uploaded or written")
+  func testOfflineSaveIsRefused() async {
+    let race = makeRace()
+    let repository = StubRaceRepository(races: [race])
+    let storage = StubPhotoStorage()
+    let networkMonitor = StubNetworkMonitor()
+    networkMonitor.isConnectedNow = false
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: networkMonitor)
+    viewModel.updatePhoto(with: UIImage())
+
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .noInternetConnection)
+    #expect(await storage.uploadCallCount == 0)
+    #expect(await repository.updatedRaces.isEmpty)
   }
 }

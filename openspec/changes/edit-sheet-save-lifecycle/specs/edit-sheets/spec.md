@@ -33,7 +33,7 @@ save again or cancel.
 
 #### Scenario: Connection drops during a photo upload
 - **WHEN** the connection is lost while a photo is uploading
-- **THEN** the upload gives up within 60 seconds and the save fails with an error
+- **THEN** the upload gives up within 30 seconds and the save fails with an error
 
 ### Requirement: Offline Save Is Refused
 Before saving, Edit Medal, Edit Race and Edit Profile SHALL check for a connection. Without

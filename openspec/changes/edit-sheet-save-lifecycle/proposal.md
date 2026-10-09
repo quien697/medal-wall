@@ -22,7 +22,7 @@ differently, and some of those moments lose work or photos:
   error is shown and the edits stay.
 - Those three saves check the connection first. Offline, the save is refused with "No internet
   connection" before anything is uploaded or written, and the sheet keeps the edits.
-- Photo uploads give up after 60 seconds without a connection instead of Storage's default
+- Photo uploads give up after 30 seconds without a connection instead of Storage's default
   10 minutes.
 - Every upload goes to a new, unique Storage path, so it never overwrites the file a record
   points at. A photo a record no longer holds — removed **or replaced** — is deleted by its URL
@@ -43,7 +43,7 @@ differently, and some of those moments lose work or photos:
 ## Impact
 
 - `StorageService` / `PhotoStorage`: unique upload paths; one `deletePhoto(url:)` replaces the
-  five path-based deletes; upload retry time set to 60 s. `StubPhotoStorage` records deleted
+  five path-based deletes; upload retry time set to 30 s. `StubPhotoStorage` records deleted
   URLs.
 - `EditMedalViewModel`, `EditRaceViewModel`, `EditProfileViewModel` (and
   `UserManager.updateUser`): photo clean-up after replace and after a failed save; a

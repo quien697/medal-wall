@@ -7,6 +7,7 @@
 
 import Foundation
 import Testing
+import UIKit
 
 @testable import MedalWall
 
@@ -202,7 +203,7 @@ struct UserManagerTests {
 
     try await manager.updateUser(edited)
 
-    #expect(await storage.avatarDeleteCount == 1)
+    #expect(await storage.deletedURLs == ["https://example.com/avatar.jpg"])
     #expect(await repository.updatedUsers.map(\.photoUrl) == [nil])
   }
 
@@ -224,7 +225,46 @@ struct UserManagerTests {
       try await manager.updateUser(edited)
     }
 
-    #expect(await storage.avatarDeleteCount == 0)
+    #expect(await storage.deletedURLs.isEmpty)
+    #expect(manager.currentUser?.photoUrl == "https://example.com/avatar.jpg")
+  }
+
+  @Test("a replaced profile photo is deleted once the profile saves")
+  func testReplacedPhotoIsDeletedAfterSave() async throws {
+    let repository = StubUserRepository(
+      user: makeProfile(photoUrl: "https://example.com/avatar.jpg"))
+    let storage = StubPhotoStorage()
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService,
+      networkMonitor: StubNetworkMonitor(), storageService: storage)
+    await authService.report((uid: uid, email: email))
+    let edited = try #require(manager.currentUser)
+
+    try await manager.updateUser(edited, photo: UIImage())
+
+    #expect(await storage.deletedURLs == ["https://example.com/avatar.jpg"])
+    #expect(manager.currentUser?.photoUrl == "https://example.com/uploaded.jpg")
+  }
+
+  @Test("a replaced profile photo is kept and the new upload deleted when the save fails")
+  func testReplacedPhotoIsKeptWhenSaveFails() async throws {
+    let repository = StubUserRepository(
+      user: makeProfile(photoUrl: "https://example.com/avatar.jpg"),
+      writeOutcome: .failure(.userSaveFailed))
+    let storage = StubPhotoStorage()
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService,
+      networkMonitor: StubNetworkMonitor(), storageService: storage)
+    await authService.report((uid: uid, email: email))
+    let edited = try #require(manager.currentUser)
+
+    await #expect(throws: AppError.userSaveFailed) {
+      try await manager.updateUser(edited, photo: UIImage())
+    }
+
+    #expect(await storage.deletedURLs == ["https://example.com/uploaded.jpg"])
     #expect(manager.currentUser?.photoUrl == "https://example.com/avatar.jpg")
   }
 

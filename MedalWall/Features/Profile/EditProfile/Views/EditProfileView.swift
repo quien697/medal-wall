@@ -67,22 +67,28 @@ struct EditProfileView: View {
           Button(role: .close) {
             dismiss()
           }
+          .disabled(viewModel.isLoading)
         }  // ToolbarItem
 
         ToolbarItem(placement: .confirmationAction) {
-          Button(role: .confirm) {
-            Task {
-              do {
-                try await viewModel.save(userManager: userManager)
-                dismiss()
-              } catch {
-                errorWrapper = ErrorWrapper(error: AppError.userSaveFailed)
+          if viewModel.isLoading {
+            ProgressView()
+          } else {
+            Button(role: .confirm) {
+              Task {
+                do {
+                  try await viewModel.save(userManager: userManager)
+                  dismiss()
+                } catch {
+                  errorWrapper = ErrorWrapper(error: error as? AppError ?? .userSaveFailed)
+                }
               }
             }
+            .disabled(!viewModel.isFormValid)
           }
-          .disabled(!viewModel.isFormValid || viewModel.isLoading)
         }  // ToolbarItem
       }  // toolbar
+      .interactiveDismissDisabled()
       .photosPicker(
         isPresented: $isPresentingPhotoPicker,
         selection: $selectedPhoto,

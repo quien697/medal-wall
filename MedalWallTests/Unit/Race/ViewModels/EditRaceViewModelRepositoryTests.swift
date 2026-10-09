@@ -26,7 +26,8 @@ struct EditRaceViewModelRepositoryTests {
   @Test("a new race is created through the injected repository")
   func testSaveCreatesRace() async {
     let repository = StubRaceRepository()
-    let viewModel = EditRaceViewModel(mode: .add, race: nil, repository: repository)
+    let viewModel = EditRaceViewModel(
+      mode: .add, race: nil, repository: repository, networkMonitor: StubNetworkMonitor())
     viewModel.name = "Vancouver Marathon"
     viewModel.place = Place(countryCode: "CA", city: "Vancouver")
 
@@ -40,7 +41,8 @@ struct EditRaceViewModelRepositoryTests {
   @Test("a failed save surfaces raceSaveFailed")
   func testFailedSaveSurfacesError() async {
     let repository = StubRaceRepository(writeOutcome: .failure(.raceSaveFailed))
-    let viewModel = EditRaceViewModel(mode: .add, race: nil, repository: repository)
+    let viewModel = EditRaceViewModel(
+      mode: .add, race: nil, repository: repository, networkMonitor: StubNetworkMonitor())
     viewModel.name = "Vancouver Marathon"
     viewModel.place = Place(countryCode: "CA", city: "Vancouver")
 
@@ -55,7 +57,8 @@ struct EditRaceViewModelRepositoryTests {
     // The screen opened when the race had one edition; another client has since added two.
     let stale = makeRace(editionCount: 1)
     let repository = StubRaceRepository(races: [makeRace(editionCount: 3)])
-    let viewModel = EditRaceViewModel(mode: .edit, race: stale, repository: repository)
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: stale, repository: repository, networkMonitor: StubNetworkMonitor())
     viewModel.name = "Taipei Marathon 2026"
     viewModel.place = stale.place
 
@@ -71,7 +74,8 @@ struct EditRaceViewModelRepositoryTests {
     let race = makeRace()
     let repository = StubRaceRepository(
       races: [race], fetchOutcome: .failure(.raceFetchFailed("network down")))
-    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
 
     await viewModel.loadEditions()
 
@@ -91,7 +95,8 @@ struct EditRaceViewModelRepositoryTests {
       id: "edition-2025", raceId: race.id, year: 2025, startDate: raceDay,
       endDate: raceDay, createdBy: "uid")
     let repository = StubRaceRepository(races: [race], editions: [race.id: [existing]])
-    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
     let added = DraftRaceEdition(
       year: 2026, isOneDay: true, startDate: raceDay, endDate: raceDay, distances: [],
       createdBy: "uid")
@@ -106,7 +111,8 @@ struct EditRaceViewModelRepositoryTests {
   func testReEditedNewEditionIsCreated() async throws {
     let race = makeRace()
     let repository = StubRaceRepository(races: [race])
-    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
     let raceDay = try #require(
       Calendar.current.date(from: DateComponents(year: 2026, month: 3, day: 1))
     )
@@ -147,7 +153,8 @@ struct EditRaceViewModelRepositoryTests {
     let repository = StubRaceRepository(
       races: [race], editions: [race.id: [existing]],
       deleteOutcome: .failure(.editionDeleteFailed))
-    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     viewModel.stageDeleteEdition(id: existing.id)
 
@@ -165,7 +172,8 @@ struct EditRaceViewModelRepositoryTests {
     let repository = StubRaceRepository(
       races: [race], editions: [race.id: [existing]],
       deleteOutcome: .failure(.editionDeleteFailed))
-    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     viewModel.stageAddEdition(added)
     viewModel.stageDeleteEdition(id: existing.id)
@@ -186,7 +194,8 @@ struct EditRaceViewModelRepositoryTests {
     let added = makeAddedEdition()
     let repository = StubRaceRepository(
       races: [race], editions: [race.id: [existing]], failingEditionCreateIDs: [added.id])
-    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     viewModel.stageAddEdition(added)
     viewModel.stageDeleteEdition(id: existing.id)
@@ -210,7 +219,8 @@ struct EditRaceViewModelRepositoryTests {
     let repository = StubRaceRepository(
       races: [race], editions: [race.id: [saved, failing]],
       failingEditionUpdateIDs: [failing.id])
-    let viewModel = EditRaceViewModel(mode: .edit, race: race, repository: repository)
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     for edition in [saved, failing] {
       var draft = DraftRaceEdition(from: edition)
@@ -230,7 +240,8 @@ struct EditRaceViewModelRepositoryTests {
   @Test("an existing race's editions count as loading before the first load starts")
   func testEditionsLoadingBeforeFirstLoad() {
     let viewModel = EditRaceViewModel(
-      mode: .edit, race: makeRace(), repository: StubRaceRepository())
+      mode: .edit, race: makeRace(), repository: StubRaceRepository(),
+      networkMonitor: StubNetworkMonitor())
 
     #expect(viewModel.isEditionsLoading)
   }
@@ -243,6 +254,7 @@ struct EditRaceViewModelRepositoryTests {
     let repository = StubRaceRepository(races: [race], editions: [race.id: [existing]])
     let viewModel = EditRaceViewModel(
       mode: .edit, race: race, repository: repository,
+      networkMonitor: StubNetworkMonitor(),
       loadImage: { _ in
         try? await Task.sleep(for: .seconds(5))  // a slow connection
         return nil

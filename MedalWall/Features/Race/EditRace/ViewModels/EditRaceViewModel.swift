@@ -29,9 +29,10 @@ final class EditRaceViewModel {
 
   // MARK: - Dependencies
   let mode: ItemEditMode
-  private let race: Race?
+  private var race: Race?
   private let repository: any RaceRepository
   private let storageService: any PhotoStorage
+  private let networkMonitor: any NetworkMonitor
   private let loadImage: (String?) async -> UIImage?
 
   // MARK: - Init
@@ -40,12 +41,14 @@ final class EditRaceViewModel {
     race: Race?,
     repository: (any RaceRepository)? = nil,
     storageService: (any PhotoStorage)? = nil,
+    networkMonitor: (any NetworkMonitor)? = nil,
     loadImage: ((String?) async -> UIImage?)? = nil
   ) {
     self.mode = mode
     self.race = race
     self.repository = repository ?? RaceFirestoreRepository()
     self.storageService = storageService ?? StorageService()
+    self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
     self.loadImage = loadImage ?? { await UIImage.load(from: $0) }
 
     if let race, mode == .edit {
@@ -139,39 +142,52 @@ final class EditRaceViewModel {
   }
 
   /// Creates or updates the race in Firestore, uploading the logo only when the photo was changed.
-  /// A removed logo is deleted from Storage only after the race saves, so a failed save never
-  /// points at a deleted file.
+  /// A removed or replaced logo is deleted from Storage only after the race saves, so a failed
+  /// save never points at a deleted file; a logo uploaded for a failed save is deleted. A saved
+  /// race becomes the new original, so saving again after an edition fails does not upload the
+  /// logo twice. Offline, it reports `AppError.noInternetConnection` before uploading or
+  /// writing anything.
   func save(by userID: String) async {
     isLoading = true
     defer { isLoading = false }
 
+    guard await networkMonitor.isConnected() else {
+      error = .noInternetConnection
+      return
+    }
+
     switch mode {
     case .add:
+      var newRace = Race(
+        name: name,
+        place: place,
+        websiteUrl: websiteUrl.isEmpty ? nil : websiteUrl,
+        createdBy: userID
+      )
       do {
-        var newRace = Race(
-          name: name,
-          place: place,
-          websiteUrl: websiteUrl.isEmpty ? nil : websiteUrl,
-          createdBy: userID
-        )
         if let photo {
           newRace.photoUrl = try await storageService.uploadRaceLogo(
             raceId: newRace.id, image: photo)
         }
         try await repository.createRace(newRace)
       } catch {
+        await deletePhoto(newRace.photoUrl)
         self.error = .raceSaveFailed
       }
 
     case .edit:
       guard var race else { return }
+      let previousPhotoUrl = race.photoUrl
+      var uploadedPhotoUrl: String?
       race.name = name
       race.place = place
       race.websiteUrl = websiteUrl.isEmpty ? nil : websiteUrl
       if isPhotoChanged {
         if let photo {
           do {
-            race.photoUrl = try await storageService.uploadRaceLogo(raceId: race.id, image: photo)
+            uploadedPhotoUrl = try await storageService.uploadRaceLogo(
+              raceId: race.id, image: photo)
+            race.photoUrl = uploadedPhotoUrl
           } catch {
             self.error = .raceSaveFailed
             return
@@ -183,11 +199,14 @@ final class EditRaceViewModel {
       do {
         try await repository.updateRace(race)
       } catch {
+        await deletePhoto(uploadedPhotoUrl)
         self.error = .raceSaveFailed
         return
       }
-      if self.race?.photoUrl != nil, race.photoUrl == nil {
-        try? await storageService.deleteRaceLogo(raceId: race.id)
+      self.race = race
+      isPhotoChanged = false
+      if previousPhotoUrl != race.photoUrl {
+        await deletePhoto(previousPhotoUrl)
       }
       await commitPendingEditions(raceId: race.id)
     }
@@ -198,8 +217,8 @@ final class EditRaceViewModel {
   /// Each delete, create and update that succeeds is recorded in the staged state, so saving
   /// again after a partial failure retries only what failed: repeating one would move the race's
   /// edition count a second time, or upload or delete an edition's photo twice. A failed create
-  /// or update is reported over a failed delete. An edition's photo is deleted from Storage only
-  /// after its write succeeds.
+  /// or update is reported over a failed delete. An edition's removed or replaced photo is deleted
+  /// from Storage only after its write succeeds; a photo uploaded for a failed write is deleted.
   private func commitPendingEditions(raceId: String) async {
     var anyDeleteFailed = false
     var anySaveFailed = false
@@ -209,9 +228,7 @@ final class EditRaceViewModel {
       do {
         try await repository.deleteEdition(raceId: raceId, editionId: id)
         originalEditionIds.remove(id)
-        if let original = originalEditions.first(where: { $0.id == id }), original.photoUrl != nil {
-          try? await storageService.deleteRaceEditionLogo(raceId: raceId, editionId: id)
-        }
+        await deletePhoto(originalEditions.first(where: { $0.id == id })?.photoUrl)
       } catch {
         anyDeleteFailed = true
       }
@@ -234,6 +251,7 @@ final class EditRaceViewModel {
         try await repository.createEdition(newEdition)
         recordSaved(newEdition)
       } catch {
+        await deletePhoto(newEdition.photoUrl)
         anySaveFailed = true
       }
     }
@@ -250,18 +268,21 @@ final class EditRaceViewModel {
       edition.endDate = draft.endDate
       edition.distances = draft.distances
 
+      var uploadedPhotoUrl: String?
       do {
-        if let photoUrl = try await uploadNewPhoto(of: draft, raceId: raceId) {
-          edition.photoUrl = photoUrl
+        uploadedPhotoUrl = try await uploadNewPhoto(of: draft, raceId: raceId)
+        if let uploadedPhotoUrl {
+          edition.photoUrl = uploadedPhotoUrl
         } else if draft.isPhotoCleared {
           edition.photoUrl = nil
         }
         try await repository.updateEdition(edition)
         recordSaved(edition)
-        if previousPhotoUrl != nil, edition.photoUrl == nil {
-          try? await storageService.deleteRaceEditionLogo(raceId: raceId, editionId: edition.id)
+        if previousPhotoUrl != edition.photoUrl {
+          await deletePhoto(previousPhotoUrl)
         }
       } catch {
+        await deletePhoto(uploadedPhotoUrl)
         anySaveFailed = true
       }
     }
@@ -285,6 +306,13 @@ final class EditRaceViewModel {
     if let index = draftEditions.firstIndex(where: { $0.id == edition.id }) {
       draftEditions[index] = DraftRaceEdition(from: edition)
     }
+  }
+
+  /// Deletes a photo from Storage when there is one. A photo that fails to delete is left
+  /// behind rather than failing a write that already happened.
+  private func deletePhoto(_ url: String?) async {
+    guard let url else { return }
+    try? await storageService.deletePhoto(url: url)
   }
 
   /// Uploads the photo newly picked for a draft and returns its URL, or `nil` when it has none.

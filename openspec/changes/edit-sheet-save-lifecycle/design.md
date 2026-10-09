@@ -46,14 +46,14 @@ A connection lost *after* the check still waits for the server. That window is n
 resolves itself on reconnect.
 
 ### Shorten the upload retry time, not the write
-`StorageService` sets `maxUploadRetryTime = 60` on its `Storage` instance (default 600 s).
+`StorageService` sets `maxUploadRetryTime = 30` on its `Storage` instance (default 600 s).
 Unlike a write timeout, a Storage upload that gives up has actually stopped, so the failure is
 truthful. Other operations keep their 120 s default.
 
 ### Unique upload paths; delete by URL
 Uploads append a UUID file name: `users/{uid}/medals/{medalId}/cover/{uuid}.jpg`,
-`users/{uid}/avatar/{uuid}.jpg`, `races/{raceId}/logo/{uuid}.jpg`,
-`races/{raceId}/editions/{editionId}/logo/{uuid}.jpg`. Event photo paths are unchanged. The
+`users/{uid}/avatar/{uuid}.jpg`, `races/{raceId}/raceLogo/{uuid}.jpg`,
+`races/{raceId}/editions/{editionId}/editionLogo/{uuid}.jpg`. Event photo paths are unchanged. The
 upload signatures stay the same.
 
 A single `PhotoStorage.deletePhoto(url:)` replaces `deleteUserAvatar`, `deleteMedalPhoto`,
@@ -85,10 +85,10 @@ they show a thrown `AppError` as itself, so "No internet connection" reads as su
 ## Risks / Trade-offs
 
 - [Storage security rules, not yet written, could be written for the old fixed paths] → the
-  rules are to be added before release; they must allow the new `cover/`, `avatar/` and
-  `logo/` paths.
+  rules are to be added before release; they must allow the new `cover/`, `avatar/`,
+  `raceLogo/` and `editionLogo/` paths.
 - [Swipe never closes a form, even untouched] → Cancel is always in the same place; picker
   sheets keep swipe.
-- [The 60 s limit could give up on a connection that is only briefly flaky] → it bounds how
+- [The 30 s limit could give up on a connection that is only briefly flaky] → it bounds how
   long Storage keeps retrying after a failure, and photos are JPEG-compressed (`uploadData()`,
   quality 0.8) before upload; the user can save again.

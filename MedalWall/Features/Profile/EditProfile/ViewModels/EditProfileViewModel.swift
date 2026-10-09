@@ -22,10 +22,12 @@ final class EditProfileViewModel {
 
   // MARK: - Dependencies
   private let profile: User
+  private let networkMonitor: any NetworkMonitor
 
   // MARK: - Init
-  init(profile: User) {
+  init(profile: User, networkMonitor: (any NetworkMonitor)? = nil) {
     self.profile = profile
+    self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
     self.photo = nil
     self.userName = UserName(
       firstName: profile.firstName ?? "",
@@ -77,10 +79,13 @@ final class EditProfileViewModel {
     return updated
   }
 
-  /// Saves the edited profile, uploading the photo only when it changed.
+  /// Saves the edited profile, uploading the photo only when it changed. Offline, it throws
+  /// `AppError.noInternetConnection` before uploading or writing anything.
   func save(userManager: UserManager) async throws {
     isLoading = true
     defer { isLoading = false }
+
+    guard await networkMonitor.isConnected() else { throw AppError.noInternetConnection }
 
     try await userManager.updateUser(makeUpdatedUser(), photo: photoToUpload)
   }

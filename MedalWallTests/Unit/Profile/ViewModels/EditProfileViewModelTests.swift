@@ -86,4 +86,25 @@ struct EditProfileViewModelTests {
 
     #expect(viewModel.photoToUpload === pickedPhoto)
   }
+
+  @Test("saving offline is refused before anything is uploaded or written")
+  func testOfflineSaveIsRefused() async {
+    let repository = StubUserRepository(user: makeProfile(photoUrl: avatarUrl))
+    let storage = StubPhotoStorage()
+    let manager = UserManager(
+      repository: repository, authService: StubAuthService(),
+      networkMonitor: StubNetworkMonitor(), storageService: storage)
+    let networkMonitor = StubNetworkMonitor()
+    networkMonitor.isConnectedNow = false
+    let viewModel = EditProfileViewModel(
+      profile: makeProfile(photoUrl: avatarUrl), networkMonitor: networkMonitor)
+    viewModel.updatePhoto(with: UIImage())
+
+    await #expect(throws: AppError.noInternetConnection) {
+      try await viewModel.save(userManager: manager)
+    }
+
+    #expect(await storage.uploadCallCount == 0)
+    #expect(await repository.updatedUsers.isEmpty)
+  }
 }

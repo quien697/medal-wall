@@ -37,19 +37,22 @@ final class EditMedalViewModel {
   private let medalId: String
   private let repository: any MedalRepository
   private let storageService: any PhotoStorage
+  private let networkMonitor: any NetworkMonitor
 
   // MARK: - Init
   init(
     mode: ItemEditMode,
     medal: Medal? = nil,
     repository: (any MedalRepository)? = nil,
-    storageService: (any PhotoStorage)? = nil
+    storageService: (any PhotoStorage)? = nil,
+    networkMonitor: (any NetworkMonitor)? = nil
   ) {
     self.mode = mode
     self.medal = medal
     self.medalId = medal?.id ?? UUID().uuidString
     self.repository = repository ?? MedalFirestoreRepository()
     self.storageService = storageService ?? StorageService()
+    self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
 
     if let medal, mode == .edit {
       self.name = medal.name
@@ -137,88 +140,106 @@ final class EditMedalViewModel {
   }
 
   /// Saves the medal to Firestore, uploading any new photos to Firebase Storage first.
-  /// A removed cover or event photo is deleted from Storage only after the medal saves, so a
-  /// failed save never points at a deleted file.
+  /// A removed or replaced cover photo, or a removed event photo, is deleted from Storage only
+  /// after the medal saves, so a failed save never points at a deleted file. A failed save
+  /// deletes the photos uploaded for it. Offline, it throws `AppError.noInternetConnection`
+  /// before uploading or writing anything.
   func save(by userID: String) async throws {
     isLoading = true
     defer { isLoading = false }
 
-    let photoUrl = try await resolvedPhotoUrl(userId: userID)
-    let eventPhotos = try await resolvedEventPhotos(userId: userID)
+    guard await networkMonitor.isConnected() else { throw AppError.noInternetConnection }
 
-    if let medal, mode == .edit {
-      var updated = medal
-      updated.name = name
-      updated.date = date
-      updated.bibNumber = bibNumber
-      updated.photoUrl = photoUrl
-      updated.place = place
-      updated.distance = distance
-      updated.finishTime = finishTime
-      updated.overallPlacement = overallPlacement
-      updated.totalParticipants = totalParticipants
-      updated.division = division?.rawValue
-      updated.divisionPlacement = divisionPlacement
-      updated.divisionTotal = divisionTotal
-      updated.genderPlacement = genderPlacement
-      updated.genderTotal = genderTotal
-      updated.note = note.isEmpty ? nil : note
-      updated.tags = tags
-      updated.eventPhotos = eventPhotos
-      try await repository.updateMedal(updated)
-      if isPhotoChanged, photo == nil, medal.photoUrl != nil {
-        try? await storageService.deleteMedalPhoto(userId: userID, medalId: medalId)
+    var uploadedUrls: [String] = []
+    do {
+      let photoUrl = try await resolvedPhotoUrl(userId: userID, uploadedUrls: &uploadedUrls)
+      let eventPhotos = try await resolvedEventPhotos(userId: userID, uploadedUrls: &uploadedUrls)
+
+      if let medal, mode == .edit {
+        var updated = medal
+        updated.name = name
+        updated.date = date
+        updated.bibNumber = bibNumber
+        updated.photoUrl = photoUrl
+        updated.place = place
+        updated.distance = distance
+        updated.finishTime = finishTime
+        updated.overallPlacement = overallPlacement
+        updated.totalParticipants = totalParticipants
+        updated.division = division?.rawValue
+        updated.divisionPlacement = divisionPlacement
+        updated.divisionTotal = divisionTotal
+        updated.genderPlacement = genderPlacement
+        updated.genderTotal = genderTotal
+        updated.note = note.isEmpty ? nil : note
+        updated.tags = tags
+        updated.eventPhotos = eventPhotos
+        try await repository.updateMedal(updated)
+        if let oldPhotoUrl = medal.photoUrl, oldPhotoUrl != photoUrl {
+          try? await storageService.deletePhoto(url: oldPhotoUrl)
+        }
+        let keptEventPhotoIDs = Set(eventPhotos.map(\.id))
+        for removed in medal.eventPhotos where !keptEventPhotoIDs.contains(removed.id) {
+          try? await storageService.deletePhoto(url: removed.imageUrl)
+        }
+      } else {
+        let newMedal = Medal(
+          id: medalId,
+          name: name,
+          date: date,
+          bibNumber: bibNumber,
+          photoUrl: photoUrl,
+          place: place,
+          distance: distance,
+          finishTime: finishTime,
+          overallPlacement: overallPlacement,
+          totalParticipants: totalParticipants,
+          division: division,
+          divisionPlacement: divisionPlacement,
+          divisionTotal: divisionTotal,
+          genderPlacement: genderPlacement,
+          genderTotal: genderTotal,
+          note: note.isEmpty ? nil : note,
+          tags: tags,
+          eventPhotos: eventPhotos,
+          userID: userID
+        )
+        try await repository.createMedal(newMedal)
       }
-      let keptEventPhotoIDs = Set(eventPhotos.map(\.id))
-      for removed in medal.eventPhotos where !keptEventPhotoIDs.contains(removed.id) {
-        try? await storageService.deleteMedalEventPhoto(
-          userId: userID, medalId: medalId, photoId: removed.id)
+    } catch {
+      for url in uploadedUrls {
+        try? await storageService.deletePhoto(url: url)
       }
-    } else {
-      let newMedal = Medal(
-        id: medalId,
-        name: name,
-        date: date,
-        bibNumber: bibNumber,
-        photoUrl: photoUrl,
-        place: place,
-        distance: distance,
-        finishTime: finishTime,
-        overallPlacement: overallPlacement,
-        totalParticipants: totalParticipants,
-        division: division,
-        divisionPlacement: divisionPlacement,
-        divisionTotal: divisionTotal,
-        genderPlacement: genderPlacement,
-        genderTotal: genderTotal,
-        note: note.isEmpty ? nil : note,
-        tags: tags,
-        eventPhotos: eventPhotos,
-        userID: userID
-      )
-      try await repository.createMedal(newMedal)
+      throw error
     }
   }
 
   /// Returns the final cover photo URL: the existing one while the photo is unchanged, an
   /// upload of a newly picked one, or `nil` for a removed one. A removed photo is deleted from
   /// Storage only after the medal saves, so a failed save never points at a deleted file.
-  private func resolvedPhotoUrl(userId: String) async throws -> String? {
+  private func resolvedPhotoUrl(userId: String, uploadedUrls: inout [String]) async throws
+    -> String?
+  {
     guard isPhotoChanged else { return medal?.photoUrl }
     guard let photo else { return nil }
 
-    return try await storageService.uploadMedalPhoto(
+    let url = try await storageService.uploadMedalPhoto(
       userId: userId, medalId: medalId, image: photo
     )
+    uploadedUrls.append(url)
+    return url
   }
 
   /// Uploads any new event photo drafts to Firebase Storage and returns the final EventPhoto array with stable sort order.
-  private func resolvedEventPhotos(userId: String) async throws -> [EventPhoto] {
+  private func resolvedEventPhotos(userId: String, uploadedUrls: inout [String]) async throws
+    -> [EventPhoto]
+  {
     var result: [EventPhoto] = []
     for (index, draft) in draftEventPhotos.enumerated() {
       if draft.isNew, let image = draft.image {
         let url = try await storageService.uploadMedalEventPhoto(
           userId: userId, medalId: medalId, photoId: draft.id, image: image)
+        uploadedUrls.append(url)
         result.append(EventPhoto(id: draft.id, imageUrl: url, sortOrder: index))
       } else if let url = draft.imageUrl {
         result.append(EventPhoto(id: draft.id, imageUrl: url, sortOrder: index))

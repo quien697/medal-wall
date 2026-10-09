@@ -85,6 +85,7 @@ struct EditRaceView: View {
           Button(role: .cancel) {
             dismiss()
           }
+          .disabled(viewModel.isLoading)
         }  // ToolbarItem
 
         ToolbarItem(placement: .confirmationAction) {
@@ -107,6 +108,7 @@ struct EditRaceView: View {
           }
         }  // ToolbarItem
       }  // toolbar
+      .interactiveDismissDisabled()
       .photosPicker(
         isPresented: $isPresentingPhotoPicker,
         selection: $selectedPhoto,

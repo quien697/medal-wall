@@ -125,6 +125,7 @@ struct EditRaceEditionView: View {
           .disabled(!viewModel.isFormValid)
         }  // ToolbarItem
       }  // toolbar
+      .interactiveDismissDisabled()
       .task {
         await viewModel.loadExistingPhoto()
       }

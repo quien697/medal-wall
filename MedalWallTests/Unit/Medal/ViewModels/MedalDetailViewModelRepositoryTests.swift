@@ -99,8 +99,11 @@ struct MedalDetailViewModelRepositoryTests {
 
     try await viewModel.deleteMedal()
 
-    #expect(await storage.medalPhotoDeleteCount == 1)
-    #expect(await storage.deletedEventPhotoIDs == ["event-start", "event-finish"])
+    #expect(
+      await storage.deletedURLs == [
+        "https://example.com/medal.jpg", "https://example.com/start.jpg",
+        "https://example.com/finish.jpg"
+      ])
   }
 
   @Test("a medal's photos stay in Storage when the medal fails to delete")
@@ -117,7 +120,6 @@ struct MedalDetailViewModelRepositoryTests {
       try await viewModel.deleteMedal()
     }
 
-    #expect(await storage.medalPhotoDeleteCount == 0)
-    #expect(await storage.deletedEventPhotoIDs.isEmpty)
+    #expect(await storage.deletedURLs.isEmpty)
   }
 }

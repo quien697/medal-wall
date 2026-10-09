@@ -125,7 +125,7 @@ struct EditMedalView: View {
                   try await viewModel.save(by: userID)
                   dismiss()
                 } catch {
-                  errorWrapper = ErrorWrapper(error: AppError.medalSaveFailed)
+                  errorWrapper = ErrorWrapper(error: error as? AppError ?? .medalSaveFailed)
                 }
               }
             }
@@ -133,7 +133,7 @@ struct EditMedalView: View {
           }
         }  // ToolbarItem
       }  // toolbar
-      .interactiveDismissDisabled(viewModel.isLoading)
+      .interactiveDismissDisabled()
       .task {
         await viewModel.loadPhoto()
       }

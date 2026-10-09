@@ -121,8 +121,10 @@ struct RaceDetailViewModelRepositoryTests {
 
     await viewModel.deleteRace()
 
-    #expect(await storage.raceLogoDeleteCount == 1)
-    #expect(await storage.deletedEditionLogoIDs == ["a"])
+    #expect(
+      await storage.deletedURLs == [
+        "https://example.com/logo.jpg", "https://example.com/edition.jpg"
+      ])
   }
 
   @Test("a race's logos stay in Storage when the race fails to delete")
@@ -134,7 +136,6 @@ struct RaceDetailViewModelRepositoryTests {
 
     await viewModel.deleteRace()
 
-    #expect(await storage.raceLogoDeleteCount == 0)
-    #expect(await storage.deletedEditionLogoIDs.isEmpty)
+    #expect(await storage.deletedURLs.isEmpty)
   }
 }
