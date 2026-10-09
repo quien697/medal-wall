@@ -18,8 +18,6 @@ struct User: Codable {
   var birthday: Date?
   let createdAt: Date
   var updatedAt: Date?
-  var highestFullMilestone: Int?
-  var highestHalfMilestone: Int?
 
   /// Creates a User. A first sign-in knows only `uid` and `email`; every other field
   /// starts empty until the user edits their profile.
@@ -33,9 +31,7 @@ struct User: Codable {
     gender: Gender? = nil,
     birthday: Date? = nil,
     createdAt: Date = .now,
-    updatedAt: Date? = nil,
-    highestFullMilestone: Int? = nil,
-    highestHalfMilestone: Int? = nil
+    updatedAt: Date? = nil
   ) {
     self.uid = uid
     self.email = email
@@ -47,7 +43,5 @@ struct User: Codable {
     self.birthday = birthday
     self.createdAt = createdAt
     self.updatedAt = updatedAt
-    self.highestFullMilestone = highestFullMilestone
-    self.highestHalfMilestone = highestHalfMilestone
   }
 }

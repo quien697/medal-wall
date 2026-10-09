@@ -21,18 +21,6 @@ struct UserManagerTests {
     User(uid: uid, email: email, firstName: "Mei", photoUrl: photoUrl)
   }
 
-  /// One full-marathon medal: enough to earn the first full-marathon milestone.
-  private func makeFullMarathonMedal() -> Medal {
-    Medal(
-      name: "Taipei Marathon",
-      date: .now,
-      bibNumber: "1",
-      place: Place(countryCode: "TW", city: "Taipei City"),
-      distance: RaceDistance(category: .full, type: .inPerson),
-      userID: uid
-    )
-  }
-
   // MARK: - First sign-in
   @Test("a first sign-in writes the new profile before it returns")
   func testFirstSignInWritesProfile() async {
@@ -164,32 +152,6 @@ struct UserManagerTests {
     await authService.report((uid: uid, email: email))
 
     #expect(manager.canEditProfile)
-  }
-
-  @Test("milestones are written to a profile from the server")
-  func testServerProfileGetsMilestones() async {
-    let repository = StubUserRepository(user: makeProfile())
-    let authService = StubAuthService()
-    let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
-    await authService.report((uid: uid, email: email))
-
-    await manager.refreshAchievementMilestones(medals: [makeFullMarathonMedal()])
-
-    #expect(await repository.updatedUsers.map(\.highestFullMilestone) == [1])
-  }
-
-  @Test("milestones are not written to a profile read from the phone's copy")
-  func testCachedProfileSkipsMilestones() async {
-    let repository = StubUserRepository(user: makeProfile(), fetchesFromCache: true)
-    let authService = StubAuthService()
-    let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
-    await authService.report((uid: uid, email: email))
-
-    await manager.refreshAchievementMilestones(medals: [makeFullMarathonMedal()])
-
-    #expect(await repository.updatedUsers.isEmpty)
   }
 
   @Test("the server's profile replaces the phone's copy when the connection returns")

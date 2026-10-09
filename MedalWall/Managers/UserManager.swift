@@ -106,37 +106,6 @@ class UserManager {
     }
   }
 
-  /// Ratchets the user's persisted milestone counts upward based on live medal
-  /// counts, never decreasing an already-earned tier. Call after a medal is
-  /// created or edited; never after a delete. Skipped while the profile is the phone's
-  /// copy; the next medal saved after the server's profile loads catches up.
-  func refreshAchievementMilestones(medals: [Medal]) async {
-    guard let user = currentUser, !isProfileFromCache else { return }
-
-    let newFullMilestone = AchievementProgress.ratchetedMilestone(
-      persisted: user.highestFullMilestone ?? 0,
-      liveCount: medals.fullCount
-    )
-    let newHalfMilestone = AchievementProgress.ratchetedMilestone(
-      persisted: user.highestHalfMilestone ?? 0,
-      liveCount: medals.halfCount
-    )
-
-    guard
-      newFullMilestone != (user.highestFullMilestone ?? 0)
-        || newHalfMilestone != (user.highestHalfMilestone ?? 0)
-    else { return }
-
-    var updated = user
-    updated.highestFullMilestone = newFullMilestone
-    updated.highestHalfMilestone = newHalfMilestone
-
-    do {
-      try await repository.updateUser(updated)
-      self.currentUser = updated
-    } catch {}
-  }
-
   // MARK: - Private Functions
   /// Completes an email link sign-in using the URL opened by the user, reporting a failure
   /// in `signInError`. The saved email is kept after a failure so the link can be tried again.

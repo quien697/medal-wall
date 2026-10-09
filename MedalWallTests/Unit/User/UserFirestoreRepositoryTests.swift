@@ -70,8 +70,7 @@ struct UserFirestoreRepositoryTests {
   private let fullProfile = User(
     uid: "uid", email: "runner@example.com", firstName: "Mei", lastName: "Lin",
     photoUrl: "https://example.com/avatar.jpg", bio: "Sub-4 or bust", gender: .female,
-    birthday: Date(timeIntervalSince1970: 631_152_000), updatedAt: .now,
-    highestFullMilestone: 5, highestHalfMilestone: 10)
+    birthday: Date(timeIntervalSince1970: 631_152_000), updatedAt: .now)
 
   @Test("a profile update deletes every optional the profile no longer holds")
   func testClearedOptionalsAreDeleted() throws {

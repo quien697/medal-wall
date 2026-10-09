@@ -49,20 +49,20 @@ struct ProfileAchievementRow: View {
 #Preview("Locked") {
   ProfileAchievementRow(
     trackName: "Full Marathon",
-    progress: AchievementProgress.compute(persistedMilestone: 0, liveCount: 0)
+    progress: AchievementProgress.compute(liveCount: 0)
   )
 }
 
 #Preview("In progress") {
   ProfileAchievementRow(
     trackName: "Half Marathon",
-    progress: AchievementProgress.compute(persistedMilestone: 5, liveCount: 7)
+    progress: AchievementProgress.compute(liveCount: 7)
   )
 }
 
 #Preview("Maxed") {
   ProfileAchievementRow(
     trackName: "Full Marathon",
-    progress: AchievementProgress.compute(persistedMilestone: 100, liveCount: 120)
+    progress: AchievementProgress.compute(liveCount: 120)
   )
 }

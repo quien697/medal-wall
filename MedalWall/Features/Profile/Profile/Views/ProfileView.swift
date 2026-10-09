@@ -36,8 +36,8 @@ struct ProfileView: View {
           )
 
           ProfileAchievementsSection(
-            fullMarathonProgress: viewModel.fullMarathonProgress(user: user),
-            halfMarathonProgress: viewModel.halfMarathonProgress(user: user)
+            fullMarathonProgress: viewModel.fullMarathonProgress,
+            halfMarathonProgress: viewModel.halfMarathonProgress
           )
           .padding(.bottom, 10)
         }

@@ -122,7 +122,7 @@ struct EditMedalView: View {
 
               Task {
                 do {
-                  try await viewModel.save(by: userID, userManager: userManager)
+                  try await viewModel.save(by: userID)
                   dismiss()
                 } catch {
                   errorWrapper = ErrorWrapper(error: AppError.medalSaveFailed)

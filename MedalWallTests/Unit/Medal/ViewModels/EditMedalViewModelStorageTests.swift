@@ -36,10 +36,6 @@ struct EditMedalViewModelStorageTests {
       mode: .edit, medal: makeMedal(), repository: repository, storageService: storage)
   }
 
-  private func makeUserManager() -> UserManager {
-    UserManager(repository: StubUserRepository())
-  }
-
   @Test("an unchanged cover photo keeps its URL and is not uploaded again")
   func testUnchangedPhotoIsNotReuploaded() async throws {
     let repository = StubMedalRepository(medals: [makeMedal()])
@@ -47,7 +43,7 @@ struct EditMedalViewModelStorageTests {
     let viewModel = makeViewModel(repository: repository, storage: storage)
     viewModel.photo = UIImage()  // what loadPhoto leaves behind: the existing photo
 
-    try await viewModel.save(by: "uid", userManager: makeUserManager())
+    try await viewModel.save(by: "uid")
 
     #expect(await storage.uploadCallCount == 0)
     #expect(await repository.updatedMedals.first?.photoUrl == photoUrl)
@@ -60,7 +56,7 @@ struct EditMedalViewModelStorageTests {
     let viewModel = makeViewModel(repository: repository, storage: storage)
     viewModel.clearPhoto()
 
-    try await viewModel.save(by: "uid", userManager: makeUserManager())
+    try await viewModel.save(by: "uid")
 
     #expect(await repository.updatedMedals.first?.photoUrl == nil)
   }
@@ -72,7 +68,7 @@ struct EditMedalViewModelStorageTests {
     let viewModel = makeViewModel(repository: repository, storage: storage)
     viewModel.clearPhoto()
 
-    try await viewModel.save(by: "uid", userManager: makeUserManager())
+    try await viewModel.save(by: "uid")
 
     #expect(await storage.medalPhotoDeleteCount == 1)
   }
@@ -86,7 +82,7 @@ struct EditMedalViewModelStorageTests {
     viewModel.clearPhoto()
 
     await #expect(throws: AppError.medalSaveFailed) {
-      try await viewModel.save(by: "uid", userManager: makeUserManager())
+      try await viewModel.save(by: "uid")
     }
 
     #expect(await storage.medalPhotoDeleteCount == 0)
@@ -99,7 +95,7 @@ struct EditMedalViewModelStorageTests {
     let viewModel = makeViewModel(repository: repository, storage: storage)
     viewModel.updatePhoto(with: UIImage())
 
-    try await viewModel.save(by: "uid", userManager: makeUserManager())
+    try await viewModel.save(by: "uid")
 
     #expect(await storage.uploadCallCount == 1)
     #expect(await repository.updatedMedals.first?.photoUrl == "https://example.com/uploaded.jpg")
@@ -124,7 +120,7 @@ struct EditMedalViewModelStorageTests {
       mode: .edit, medal: medal, repository: repository, storageService: storage)
     viewModel.removeEventPhoto(id: "event-start")
 
-    try await viewModel.save(by: "uid", userManager: makeUserManager())
+    try await viewModel.save(by: "uid")
 
     #expect(await storage.deletedEventPhotoIDs == ["event-start"])
     #expect(await repository.updatedMedals.first?.eventPhotos.map(\.id) == ["event-finish"])
@@ -141,7 +137,7 @@ struct EditMedalViewModelStorageTests {
     viewModel.removeEventPhoto(id: "event-start")
 
     await #expect(throws: AppError.medalSaveFailed) {
-      try await viewModel.save(by: "uid", userManager: makeUserManager())
+      try await viewModel.save(by: "uid")
     }
 
     #expect(await storage.deletedEventPhotoIDs.isEmpty)

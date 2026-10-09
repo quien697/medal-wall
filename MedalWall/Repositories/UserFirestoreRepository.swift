@@ -44,9 +44,7 @@ final class UserFirestoreRepository: UserRepository {
     "gender",
     "birthday",
     "createdAt",
-    "updatedAt",
-    "highestFullMilestone",
-    "highestHalfMilestone"
+    "updatedAt"
   ]
 
   /// Fetches the user document, falling back to the phone's copy when offline. Returns nil
