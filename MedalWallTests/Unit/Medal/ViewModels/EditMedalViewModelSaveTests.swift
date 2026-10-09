@@ -1,0 +1,154 @@
+//
+//  EditMedalViewModelSaveTests.swift
+//  MedalWall
+//
+//  Created by Quien on 2026-10-10.
+//
+
+import Foundation
+import Testing
+import UIKit
+
+@testable import MedalWall
+
+@MainActor
+struct EditMedalViewModelSaveTests {
+
+  private let raceDay = Date(timeIntervalSince1970: 1_734_739_200)
+  private let division = Division(gender: .male, ageGroup: .from30to34)
+
+  private func makeMedal() -> Medal {
+    var medal = Medal(
+      id: "medal-taipei",
+      name: "Taipei Marathon",
+      date: Date(timeIntervalSince1970: 1_577_836_800),
+      bibNumber: "00001",
+      place: Place(countryCode: "TW", city: "Taipei City"),
+      distance: .default,
+      note: "Old note",
+      userID: "uid"
+    )
+    medal.eventPhotos = [
+      EventPhoto(id: "event-start", imageUrl: "https://example.com/start.jpg", sortOrder: 0),
+      EventPhoto(id: "event-finish", imageUrl: "https://example.com/finish.jpg", sortOrder: 1)
+    ]
+    return medal
+  }
+
+  private func makeViewModel(
+    mode: ItemEditMode, medal: Medal? = nil, repository: StubMedalRepository
+  ) -> EditMedalViewModel {
+    EditMedalViewModel(
+      mode: mode, medal: medal, repository: repository, storageService: StubPhotoStorage(),
+      networkMonitor: StubNetworkMonitor())
+  }
+
+  /// Fills every form field with a value no other field shares, so a field saved into the
+  /// wrong slot shows up.
+  private func fillForm(_ viewModel: EditMedalViewModel) {
+    viewModel.name = "Tokyo Marathon"
+    viewModel.date = raceDay
+    viewModel.bibNumber = "F1234"
+    viewModel.place = Place(countryCode: "JP", city: "Tokyo")
+    viewModel.distance = RaceDistance(category: .half, type: .virtual)
+    viewModel.finishTime = 12_345
+    viewModel.overallPlacement = 120
+    viewModel.totalParticipants = 3_000
+    viewModel.division = division
+    viewModel.divisionPlacement = 15
+    viewModel.divisionTotal = 400
+    viewModel.genderPlacement = 90
+    viewModel.genderTotal = 1_500
+    viewModel.note = "Rainy start"
+    viewModel.tags = ["pb", "rain"]
+  }
+
+  /// Checks that a saved medal holds exactly what `fillForm` entered.
+  private func expectFilledForm(_ medal: Medal) {
+    #expect(medal.name == "Tokyo Marathon")
+    #expect(medal.date == raceDay)
+    #expect(medal.bibNumber == "F1234")
+    #expect(medal.place == Place(countryCode: "JP", city: "Tokyo"))
+    #expect(medal.distance == RaceDistance(category: .half, type: .virtual))
+    #expect(medal.finishTime == 12_345)
+    #expect(medal.overallPlacement == 120)
+    #expect(medal.totalParticipants == 3_000)
+    #expect(medal.division == division.rawValue)
+    #expect(medal.divisionPlacement == 15)
+    #expect(medal.divisionTotal == 400)
+    #expect(medal.genderPlacement == 90)
+    #expect(medal.genderTotal == 1_500)
+    #expect(medal.note == "Rainy start")
+    #expect(medal.tags == ["pb", "rain"])
+  }
+
+  @Test("a new medal is created with every field from the form")
+  func testCreateSavesEveryField() async throws {
+    let repository = StubMedalRepository()
+    let viewModel = makeViewModel(mode: .add, repository: repository)
+    fillForm(viewModel)
+
+    try await viewModel.save(by: "uid")
+
+    let created = try #require(await repository.createdMedals.first)
+    expectFilledForm(created)
+    #expect(created.userID == "uid")
+    #expect(created.photoUrl == nil)
+    #expect(created.eventPhotos.isEmpty)
+  }
+
+  @Test("an edited medal is saved with every field from the form, keeping its id and owner")
+  func testEditSavesEveryField() async throws {
+    let medal = makeMedal()
+    let repository = StubMedalRepository(medals: [medal])
+    let viewModel = makeViewModel(mode: .edit, medal: medal, repository: repository)
+    fillForm(viewModel)
+
+    try await viewModel.save(by: "uid")
+
+    let updated = try #require(await repository.updatedMedals.first)
+    expectFilledForm(updated)
+    #expect(updated.id == "medal-taipei")
+    #expect(updated.userID == "uid")
+  }
+
+  @Test("a cleared note is saved as no note")
+  func testClearedNoteSavedAsNil() async throws {
+    let medal = makeMedal()
+    let repository = StubMedalRepository(medals: [medal])
+    let viewModel = makeViewModel(mode: .edit, medal: medal, repository: repository)
+    viewModel.note = ""
+
+    try await viewModel.save(by: "uid")
+
+    #expect(await repository.updatedMedals.first?.note == nil)
+  }
+
+  @Test("a new event photo is saved with its draft id and upload URL, and order is renumbered")
+  func testNewEventPhotoSavedInOrder() async throws {
+    let medal = makeMedal()
+    let repository = StubMedalRepository(medals: [medal])
+    let viewModel = makeViewModel(mode: .edit, medal: medal, repository: repository)
+    viewModel.removeEventPhoto(id: "event-start")
+    viewModel.addEventPhotos([try makePhotoData()])
+    let newPhotoID = try #require(viewModel.draftEventPhotos.last?.id)
+
+    try await viewModel.save(by: "uid")
+
+    let eventPhotos = try #require(await repository.updatedMedals.first?.eventPhotos)
+    #expect(eventPhotos.map(\.id) == ["event-finish", newPhotoID])
+    #expect(
+      eventPhotos.map(\.imageUrl) == [
+        "https://example.com/finish.jpg", "https://example.com/uploaded.jpg"
+      ])
+    #expect(eventPhotos.map(\.sortOrder) == [0, 1])
+  }
+
+  private func makePhotoData() throws -> Data {
+    let image = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
+      UIColor.red.setFill()
+      context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+    }
+    return try #require(image.pngData())
+  }
+}
