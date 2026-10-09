@@ -20,16 +20,19 @@ final class RaceDetailViewModel {
   // MARK: - Dependencies
   private let repository: any RaceRepository
   private let storageService: any PhotoStorage
+  private let networkMonitor: any NetworkMonitor
 
   // MARK: - Init
   init(
     race: Race,
     repository: (any RaceRepository)? = nil,
-    storageService: (any PhotoStorage)? = nil
+    storageService: (any PhotoStorage)? = nil,
+    networkMonitor: (any NetworkMonitor)? = nil
   ) {
     self.race = race
     self.repository = repository ?? RaceFirestoreRepository()
     self.storageService = storageService ?? StorageService()
+    self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
   }
 
   // MARK: - Functions
@@ -58,7 +61,13 @@ final class RaceDetailViewModel {
   }
 
   /// Deletes the race and all its editions from Firestore, then their logos from Storage.
+  /// Offline, it reports `noInternetConnection` without deleting anything.
   func deleteRace() async {
+    guard await networkMonitor.isConnected() else {
+      error = .noInternetConnection
+      return
+    }
+
     do {
       let deletedEditions = try await repository.deleteRace(id: race.id)
       await storageService.deleteLogos(of: race, editions: deletedEditions)

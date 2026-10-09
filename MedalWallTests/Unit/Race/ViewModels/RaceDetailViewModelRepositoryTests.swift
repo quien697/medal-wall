@@ -57,7 +57,8 @@ struct RaceDetailViewModelRepositoryTests {
       races: [makeRace()],
       editions: [raceId: [makeEdition(id: "a"), makeEdition(id: "b")]]
     )
-    let viewModel = RaceDetailViewModel(race: makeRace(), repository: repository)
+    let viewModel = RaceDetailViewModel(
+      race: makeRace(), repository: repository, networkMonitor: StubNetworkMonitor())
 
     await viewModel.deleteRace()
 
@@ -73,7 +74,8 @@ struct RaceDetailViewModelRepositoryTests {
       editions: [raceId: [makeEdition(id: "a"), makeEdition(id: "b")]],
       deleteOutcome: .failure(.raceDeleteFailed)
     )
-    let viewModel = RaceDetailViewModel(race: makeRace(), repository: repository)
+    let viewModel = RaceDetailViewModel(
+      race: makeRace(), repository: repository, networkMonitor: StubNetworkMonitor())
 
     await viewModel.deleteRace()
 
@@ -117,7 +119,8 @@ struct RaceDetailViewModelRepositoryTests {
     let (race, repository) = makeRepositoryWithLogos()
     let storage = StubPhotoStorage()
     let viewModel = RaceDetailViewModel(
-      race: race, repository: repository, storageService: storage)
+      race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
 
     await viewModel.deleteRace()
 
@@ -132,10 +135,29 @@ struct RaceDetailViewModelRepositoryTests {
     let (race, repository) = makeRepositoryWithLogos(deleteOutcome: .failure(.raceDeleteFailed))
     let storage = StubPhotoStorage()
     let viewModel = RaceDetailViewModel(
-      race: race, repository: repository, storageService: storage)
+      race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
 
     await viewModel.deleteRace()
 
+    #expect(await storage.deletedURLs.isEmpty)
+  }
+
+  // MARK: - Offline
+  @Test("deleting a race offline is refused before anything is deleted")
+  func testOfflineDeleteIsRefused() async {
+    let (race, repository) = makeRepositoryWithLogos()
+    let storage = StubPhotoStorage()
+    let networkMonitor = StubNetworkMonitor()
+    networkMonitor.isConnectedNow = false
+    let viewModel = RaceDetailViewModel(
+      race: race, repository: repository, storageService: storage,
+      networkMonitor: networkMonitor)
+
+    await viewModel.deleteRace()
+
+    #expect(viewModel.error == .noInternetConnection)
+    #expect(await repository.deletedRaceIDs.isEmpty)
     #expect(await storage.deletedURLs.isEmpty)
   }
 }

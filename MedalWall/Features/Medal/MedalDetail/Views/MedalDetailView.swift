@@ -94,7 +94,7 @@ struct MedalDetailView: View {
               try await viewModel.deleteMedal()
               dismiss()
             } catch {
-              errorWrapper = ErrorWrapper(error: AppError.medalDeleteFailed)
+              errorWrapper = ErrorWrapper(error: error as? AppError ?? .medalDeleteFailed)
             }
           }
         }

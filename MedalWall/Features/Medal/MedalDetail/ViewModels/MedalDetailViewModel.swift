@@ -19,6 +19,7 @@ final class MedalDetailViewModel {
   var personalRecordIDs: Set<String>
   private let repository: any MedalRepository
   private let storageService: any PhotoStorage
+  private let networkMonitor: any NetworkMonitor
   private static let unfilled = "—"
 
   // MARK: - Init
@@ -26,12 +27,14 @@ final class MedalDetailViewModel {
     medal: Medal,
     personalRecordIDs: Set<String> = [],
     repository: (any MedalRepository)? = nil,
-    storageService: (any PhotoStorage)? = nil
+    storageService: (any PhotoStorage)? = nil,
+    networkMonitor: (any NetworkMonitor)? = nil
   ) {
     self.medal = medal
     self.personalRecordIDs = personalRecordIDs
     self.repository = repository ?? MedalFirestoreRepository()
     self.storageService = storageService ?? StorageService()
+    self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
   }
 
   // MARK: - Computed
@@ -159,8 +162,11 @@ final class MedalDetailViewModel {
   /// Deletes the medal from Firestore, then its cover and event photos from Storage. The
   /// photos go only once the medal is gone, so a failed delete never leaves the medal pointing
   /// at deleted files; a photo that fails to delete is left behind rather than failing a
-  /// delete that already happened.
+  /// delete that already happened. Offline, it throws `AppError.noInternetConnection` before
+  /// deleting anything.
   func deleteMedal() async throws {
+    guard await networkMonitor.isConnected() else { throw AppError.noInternetConnection }
+
     try await repository.deleteMedal(id: medal.id, userId: medal.userID)
     let owner = PhotoOwner.medal(userId: medal.userID, medalId: medal.id)
     if let photoUrl = medal.photoUrl {

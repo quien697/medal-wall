@@ -75,7 +75,7 @@ struct RacesViewModelRepositoryTests {
     let race = makeRace(id: "a")
     let repository = StubRaceRepository(
       races: [race], deleteOutcome: .failure(.raceDeleteFailed))
-    let viewModel = RacesViewModel(repository: repository)
+    let viewModel = RacesViewModel(repository: repository, networkMonitor: StubNetworkMonitor())
     await viewModel.loadRaces()
 
     await viewModel.deleteRace(race)
@@ -89,7 +89,7 @@ struct RacesViewModelRepositoryTests {
   func testSuccessfulDelete() async {
     let race = makeRace(id: "a")
     let repository = StubRaceRepository(races: [race, makeRace(id: "b")])
-    let viewModel = RacesViewModel(repository: repository)
+    let viewModel = RacesViewModel(repository: repository, networkMonitor: StubNetworkMonitor())
     await viewModel.loadRaces()
 
     await viewModel.deleteRace(race)
@@ -122,7 +122,8 @@ struct RacesViewModelRepositoryTests {
   func testDeletedRaceLogosDeletedAfterDelete() async {
     let (race, repository) = makeRepositoryWithLogos()
     let storage = StubPhotoStorage()
-    let viewModel = RacesViewModel(repository: repository, storageService: storage)
+    let viewModel = RacesViewModel(
+      repository: repository, storageService: storage, networkMonitor: StubNetworkMonitor())
     await viewModel.loadRaces()
 
     await viewModel.deleteRace(race)
@@ -141,11 +142,31 @@ struct RacesViewModelRepositoryTests {
   func testRaceLogosKeptWhenDeleteFails() async {
     let (race, repository) = makeRepositoryWithLogos(deleteOutcome: .failure(.raceDeleteFailed))
     let storage = StubPhotoStorage()
-    let viewModel = RacesViewModel(repository: repository, storageService: storage)
+    let viewModel = RacesViewModel(
+      repository: repository, storageService: storage, networkMonitor: StubNetworkMonitor())
     await viewModel.loadRaces()
 
     await viewModel.deleteRace(race)
 
+    #expect(await storage.deletedURLs.isEmpty)
+  }
+
+  // MARK: - Offline
+  @Test("deleting a race offline is refused and the race stays in the list")
+  func testOfflineDeleteIsRefused() async {
+    let (race, repository) = makeRepositoryWithLogos()
+    let storage = StubPhotoStorage()
+    let networkMonitor = StubNetworkMonitor()
+    networkMonitor.isConnectedNow = false
+    let viewModel = RacesViewModel(
+      repository: repository, storageService: storage, networkMonitor: networkMonitor)
+    await viewModel.loadRaces()
+
+    await viewModel.deleteRace(race)
+
+    #expect(viewModel.error == .noInternetConnection)
+    #expect(viewModel.races.map(\.id) == [race.id])
+    #expect(await repository.deletedRaceIDs.isEmpty)
     #expect(await storage.deletedURLs.isEmpty)
   }
 }

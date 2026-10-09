@@ -29,7 +29,8 @@ struct MedalDetailViewModelRepositoryTests {
   func testDeleteMedal() async throws {
     let medal = makeMedal()
     let repository = StubMedalRepository(medals: [medal])
-    let viewModel = MedalDetailViewModel(medal: medal, repository: repository)
+    let viewModel = MedalDetailViewModel(
+      medal: medal, repository: repository, networkMonitor: StubNetworkMonitor())
 
     try await viewModel.deleteMedal()
 
@@ -42,7 +43,8 @@ struct MedalDetailViewModelRepositoryTests {
     let medal = makeMedal()
     let repository = StubMedalRepository(
       medals: [medal], deleteOutcome: .failure(.medalDeleteFailed))
-    let viewModel = MedalDetailViewModel(medal: medal, repository: repository)
+    let viewModel = MedalDetailViewModel(
+      medal: medal, repository: repository, networkMonitor: StubNetworkMonitor())
 
     await #expect(throws: AppError.medalDeleteFailed) {
       try await viewModel.deleteMedal()
@@ -95,7 +97,8 @@ struct MedalDetailViewModelRepositoryTests {
     let medal = makeMedalWithPhotos()
     let storage = StubPhotoStorage()
     let viewModel = MedalDetailViewModel(
-      medal: medal, repository: StubMedalRepository(medals: [medal]), storageService: storage)
+      medal: medal, repository: StubMedalRepository(medals: [medal]), storageService: storage,
+      networkMonitor: StubNetworkMonitor())
 
     try await viewModel.deleteMedal()
 
@@ -116,12 +119,32 @@ struct MedalDetailViewModelRepositoryTests {
       medal: medal,
       repository: StubMedalRepository(
         medals: [medal], deleteOutcome: .failure(.medalDeleteFailed)),
-      storageService: storage)
+      storageService: storage, networkMonitor: StubNetworkMonitor())
 
     await #expect(throws: AppError.medalDeleteFailed) {
       try await viewModel.deleteMedal()
     }
 
+    #expect(await storage.deletedURLs.isEmpty)
+  }
+
+  // MARK: - Offline
+  @Test("deleting a medal offline is refused before anything is deleted")
+  func testOfflineDeleteIsRefused() async {
+    let medal = makeMedalWithPhotos()
+    let repository = StubMedalRepository(medals: [medal])
+    let storage = StubPhotoStorage()
+    let networkMonitor = StubNetworkMonitor()
+    networkMonitor.isConnectedNow = false
+    let viewModel = MedalDetailViewModel(
+      medal: medal, repository: repository, storageService: storage,
+      networkMonitor: networkMonitor)
+
+    await #expect(throws: AppError.noInternetConnection) {
+      try await viewModel.deleteMedal()
+    }
+
+    #expect(await repository.deletedMedalIDs.isEmpty)
     #expect(await storage.deletedURLs.isEmpty)
   }
 }
