@@ -16,10 +16,12 @@ struct EditProfileViewModelTests {
 
   private let avatarUrl = "https://example.com/avatar.jpg"
 
-  private func makeProfile(birthday: Date? = nil, photoUrl: String? = nil) -> User {
+  private func makeProfile(
+    birthday: Date? = nil, photoUrl: String? = nil, bio: String? = nil
+  ) -> User {
     User(
       uid: "uid", email: "runner@example.com", firstName: "John", lastName: "Doe",
-      photoUrl: photoUrl, birthday: birthday)
+      photoUrl: photoUrl, bio: bio, birthday: birthday)
   }
 
   @Test("an unset birthday survives a save")
@@ -46,6 +48,24 @@ struct EditProfileViewModelTests {
     viewModel.birthday = nil
 
     #expect(viewModel.makeUpdatedUser().birthday == nil)
+  }
+
+  @Test("a bio is saved without surrounding whitespace or line breaks")
+  func testBioSavedTrimmed() {
+    let viewModel = EditProfileViewModel(profile: makeProfile())
+
+    viewModel.bio = "\n Sub-4 or bust \n"
+
+    #expect(viewModel.makeUpdatedUser().bio == "Sub-4 or bust")
+  }
+
+  @Test("an empty or whitespace-only bio is saved as no bio", arguments: ["", " \n "])
+  func testBlankBioSavedAsNil(bio: String) {
+    let viewModel = EditProfileViewModel(profile: makeProfile(bio: "Sub-4 or bust"))
+
+    viewModel.bio = bio
+
+    #expect(viewModel.makeUpdatedUser().bio == nil)
   }
 
   @Test("a photo picked while the existing one loads is kept")
