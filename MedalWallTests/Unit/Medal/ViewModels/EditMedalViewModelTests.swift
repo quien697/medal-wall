@@ -210,6 +210,26 @@ struct EditMedalViewModelTests {
     #expect(viewModel.tags == ["fun"])
   }
 
+  /// The finish time picker traps on infinity or a value near 1e20, so a stored time the app
+  /// already reads as unrecorded must open the editor empty instead of crashing it.
+  @Test(
+    "init in edit mode leaves an unusable stored finish time empty",
+    arguments: [TimeInterval.infinity, 1e20, 0, -1])
+  func testInitEditModeDropsUnusableFinishTime(finishTime: TimeInterval) {
+    let medal = Medal(
+      name: "Test Race 2025",
+      date: .now,
+      bibNumber: "42",
+      place: Place(countryCode: "JP", city: "Shinjuku"),
+      distance: RaceDistance(category: .full, type: .inPerson),
+      finishTime: finishTime,
+      userID: "user1"
+    )
+    let viewModel = EditMedalViewModel(mode: .edit, medal: medal)
+
+    #expect(viewModel.finishTime == nil)
+  }
+
   // MARK: - Tags
   @Test("addTag trims the whitespace and line breaks around a tag")
   func testAddTagTrims() {

@@ -60,7 +60,7 @@ final class EditMedalViewModel {
       self.bibNumber = medal.bibNumber
       self.place = medal.place
       self.distance = medal.distance
-      self.finishTime = medal.finishTime
+      self.finishTime = medal.recordedFinishTime
       self.overallPlacement = medal.overallPlacement
       self.totalParticipants = medal.totalParticipants
       self.division = medal.parsedDivision
