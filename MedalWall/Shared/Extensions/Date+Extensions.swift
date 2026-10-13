@@ -7,22 +7,26 @@
 
 import Foundation
 
-/// Calendar arithmetic and display formatting for dates, in the user's current calendar.
+/// Year arithmetic and display formatting for dates.
 ///
-/// Anything that reaches for `Calendar.current` or `DateComponents` to answer a question
-/// about a year belongs here rather than in a ViewModel, so the boundaries of a year are
-/// defined once.
+/// Anything that reaches for a `Calendar` or `DateComponents` to answer a question about a
+/// year belongs here rather than in a ViewModel, so the boundaries of a year are defined once.
 extension Date {
 
   // MARK: - Year
-  /// The calendar year this date falls in.
+  /// Years are Gregorian whatever calendar the device uses: an edition's year is stored and
+  /// shared with other clients, and a device set to the ROC, Japanese or Buddhist calendar
+  /// would otherwise read 2026 as 115, 8 or 2569. Days still start in the device's time zone.
+  private static let yearCalendar = Calendar(identifier: .gregorian)
+
+  /// The Gregorian year this date falls in.
   var year: Int {
-    Calendar.current.component(.year, from: self)
+    Self.yearCalendar.component(.year, from: self)
   }
 
-  /// The first instant of `year` — 1 January at 00:00.
+  /// The first instant of the Gregorian `year` — 1 January at 00:00.
   static func startOfYear(_ year: Int) -> Date {
-    Calendar.current.date(from: DateComponents(year: year, month: 1, day: 1)) ?? .now
+    yearCalendar.date(from: DateComponents(year: year, month: 1, day: 1)) ?? .now
   }
 
   /// The last instant of `year` — 31 December at 23:59:59.
