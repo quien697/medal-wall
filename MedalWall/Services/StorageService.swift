@@ -172,9 +172,29 @@ final class StorageService: PhotoStorage {
     let metadata = StorageMetadata()
     metadata.contentType = "image/jpeg"
     let ref = storage.reference().child(path)
-    _ = try await ref.putDataAsync(data, metadata: metadata)
-    let url = try await ref.downloadURL()
+    let url = try await Self.upload(
+      put: { _ = try await ref.putDataAsync(data, metadata: metadata) },
+      downloadURL: { try await ref.downloadURL() },
+      delete: { try await ref.delete() }
+    )
 
     return url.absoluteString
+  }
+
+  /// Stores a file with `put`, then returns its download URL from `downloadURL`. A file stored
+  /// without a URL is deleted before the URL's error is rethrown, since no caller ever learns
+  /// where it is. Takes each step as a closure so the order can be tested without Firebase.
+  static func upload(
+    put: () async throws -> Void,
+    downloadURL: () async throws -> URL,
+    delete: () async throws -> Void
+  ) async throws -> URL {
+    try await put()
+    do {
+      return try await downloadURL()
+    } catch {
+      try? await delete()
+      throw error
+    }
   }
 }
