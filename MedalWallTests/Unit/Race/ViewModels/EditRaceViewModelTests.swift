@@ -72,6 +72,16 @@ struct EditRaceViewModelTests {
     #expect(viewModel.isFormValid == false)
   }
 
+  @Test("isFormValid is false when name is only a pasted line break")
+  func testIsFormValidNewlineName() {
+    let viewModel = EditRaceViewModel(mode: .add, race: nil)
+    viewModel.name = " \n"
+    viewModel.place.countryCode = "CA"
+    viewModel.place.city = "Vancouver"
+
+    #expect(viewModel.isFormValid == false)
+  }
+
   @Test("isFormValid is false when country is only whitespace")
   func testIsFormValidWhitespaceCountry() {
     let viewModel = EditRaceViewModel(mode: .add, race: nil)

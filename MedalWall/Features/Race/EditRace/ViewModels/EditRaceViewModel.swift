@@ -69,7 +69,14 @@ final class EditRaceViewModel {
   }
 
   var isFormValid: Bool {
-    !name.trimmingCharacters(in: .whitespaces).isEmpty && place.isValid
+    !trimmedName.isEmpty && place.isValid
+  }
+
+  private var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
+
+  private var trimmedWebsiteUrl: String? {
+    let trimmed = websiteUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+    return trimmed.isEmpty ? nil : trimmed
   }
 
   // MARK: - Functions
@@ -146,7 +153,8 @@ final class EditRaceViewModel {
   /// save never points at a deleted file; a logo uploaded for a failed save is deleted. A saved
   /// race becomes the new original, so saving again after an edition fails does not upload the
   /// logo twice. Offline, it reports `AppError.noInternetConnection` before uploading or
-  /// writing anything.
+  /// writing anything. Name and website are saved without surrounding whitespace, and a website
+  /// of only whitespace is saved as none.
   func save(by userID: String) async {
     isLoading = true
     defer { isLoading = false }
@@ -159,9 +167,9 @@ final class EditRaceViewModel {
     switch mode {
     case .add:
       var newRace = Race(
-        name: name,
+        name: trimmedName,
         place: place,
-        websiteUrl: websiteUrl.isEmpty ? nil : websiteUrl,
+        websiteUrl: trimmedWebsiteUrl,
         createdBy: userID
       )
       do {
@@ -179,9 +187,9 @@ final class EditRaceViewModel {
       guard var race else { return }
       let previousPhotoUrl = race.photoUrl
       var uploadedPhotoUrl: String?
-      race.name = name
+      race.name = trimmedName
       race.place = place
-      race.websiteUrl = websiteUrl.isEmpty ? nil : websiteUrl
+      race.websiteUrl = trimmedWebsiteUrl
       if isPhotoChanged {
         if let photo {
           do {

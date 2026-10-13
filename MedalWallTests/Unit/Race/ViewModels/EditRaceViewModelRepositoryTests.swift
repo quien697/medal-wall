@@ -69,6 +69,46 @@ struct EditRaceViewModelRepositoryTests {
     #expect(await repository.races.first?.editionCount == 3)
   }
 
+  @Test(
+    "name and website are saved without surrounding whitespace or line breaks",
+    arguments: [ItemEditMode.add, .edit])
+  func testTextFieldsSavedTrimmed(mode: ItemEditMode) async throws {
+    let race = makeRace()
+    let repository = StubRaceRepository(races: [race])
+    let viewModel = EditRaceViewModel(
+      mode: mode, race: mode == .edit ? race : nil, repository: repository,
+      networkMonitor: StubNetworkMonitor())
+    viewModel.name = "  Taipei Marathon\n"
+    viewModel.place = race.place
+    viewModel.websiteUrl = "\n https://www.taipeicitymarathon.com "
+
+    await viewModel.save(by: "uid")
+
+    let saved = try #require(
+      await (mode == .add ? repository.createdRaces : repository.updatedRaces).first)
+    #expect(saved.name == "Taipei Marathon")
+    #expect(saved.websiteUrl == "https://www.taipeicitymarathon.com")
+  }
+
+  @Test("a website of only whitespace is saved as no website", arguments: [ItemEditMode.add, .edit])
+  func testBlankWebsiteSavedAsNil(mode: ItemEditMode) async throws {
+    var race = makeRace()
+    race.websiteUrl = "https://www.taipeicitymarathon.com"
+    let repository = StubRaceRepository(races: [race])
+    let viewModel = EditRaceViewModel(
+      mode: mode, race: mode == .edit ? race : nil, repository: repository,
+      networkMonitor: StubNetworkMonitor())
+    viewModel.name = "Taipei Marathon"
+    viewModel.place = race.place
+    viewModel.websiteUrl = " \n "
+
+    await viewModel.save(by: "uid")
+
+    let saved = try #require(
+      await (mode == .add ? repository.createdRaces : repository.updatedRaces).first)
+    #expect(saved.websiteUrl == nil)
+  }
+
   @Test("a failed editions load surfaces raceFetchFailed")
   func testFailedEditionsLoadSurfacesError() async {
     let race = makeRace()
