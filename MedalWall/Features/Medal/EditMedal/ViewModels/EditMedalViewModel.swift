@@ -87,6 +87,15 @@ final class EditMedalViewModel {
       && place.isValid
   }
 
+  private var trimmedName: String { name.trimmingCharacters(in: .whitespaces) }
+
+  private var trimmedBibNumber: String { bibNumber.trimmingCharacters(in: .whitespaces) }
+
+  private var trimmedNote: String? {
+    let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
+    return trimmed.isEmpty ? nil : trimmed
+  }
+
   // MARK: - Functions
   /// Downloads the existing medal cover photo so the edit form can display it.
   func loadPhoto() async {
@@ -151,9 +160,6 @@ final class EditMedalViewModel {
 
     guard await networkMonitor.isConnected() else { throw AppError.noInternetConnection }
 
-    let trimmedName = name.trimmingCharacters(in: .whitespaces)
-    let trimmedBibNumber = bibNumber.trimmingCharacters(in: .whitespaces)
-    let trimmedNote = note.trimmingCharacters(in: .whitespacesAndNewlines)
     let owner = PhotoOwner.medal(userId: userID, medalId: medalId)
     var uploadedUrls: [String] = []
     do {
@@ -176,7 +182,7 @@ final class EditMedalViewModel {
         updated.divisionTotal = divisionTotal
         updated.genderPlacement = genderPlacement
         updated.genderTotal = genderTotal
-        updated.note = trimmedNote.isEmpty ? nil : trimmedNote
+        updated.note = trimmedNote
         updated.tags = tags
         updated.eventPhotos = eventPhotos
         try await repository.updateMedal(updated)
@@ -204,7 +210,7 @@ final class EditMedalViewModel {
           divisionTotal: divisionTotal,
           genderPlacement: genderPlacement,
           genderTotal: genderTotal,
-          note: trimmedNote.isEmpty ? nil : trimmedNote,
+          note: trimmedNote,
           tags: tags,
           eventPhotos: eventPhotos,
           userID: userID
