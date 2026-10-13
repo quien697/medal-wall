@@ -14,27 +14,37 @@ import UIKit
 @MainActor
 struct EditMedalViewModelSaveTests {
 
+  // MARK: - Helpers
   private let raceDay = Date(timeIntervalSince1970: 1_734_739_200)
   private let division = Division(gender: .male, ageGroup: .from30to34)
 
+  /// A saved medal whose values all differ from what `fillForm` enters, and which also holds
+  /// fields the form doesn't show: a cover photo, a creation date, and captioned event photos.
   private func makeMedal() -> Medal {
     var medal = Medal(
       id: "medal-taipei",
       name: "Taipei Marathon",
       date: Date(timeIntervalSince1970: 1_577_836_800),
       bibNumber: "00001",
+      photoUrl: "https://example.com/cover.jpg",
       place: Place(countryCode: "TW", city: "Taipei City"),
       distance: .default,
       note: "Old note",
-      userID: "uid"
+      userID: "uid",
+      createdAt: Date(timeIntervalSince1970: 1_577_923_200)
     )
     medal.eventPhotos = [
-      EventPhoto(id: "event-start", imageUrl: "https://example.com/start.jpg", sortOrder: 0),
-      EventPhoto(id: "event-finish", imageUrl: "https://example.com/finish.jpg", sortOrder: 1)
+      EventPhoto(
+        id: "event-start", imageUrl: "https://example.com/start.jpg", caption: "Start line",
+        sortOrder: 0, createdAt: Date(timeIntervalSince1970: 1_578_009_600)),
+      EventPhoto(
+        id: "event-finish", imageUrl: "https://example.com/finish.jpg", caption: "Finish line",
+        sortOrder: 1, createdAt: Date(timeIntervalSince1970: 1_578_096_000))
     ]
     return medal
   }
 
+  /// A view model saving through `repository`, with stub storage and a connected network.
   private func makeViewModel(
     mode: ItemEditMode, medal: Medal? = nil, repository: StubMedalRepository
   ) -> EditMedalViewModel {
@@ -82,6 +92,7 @@ struct EditMedalViewModelSaveTests {
     #expect(medal.tags == ["pb", "rain"])
   }
 
+  // MARK: - Medal fields
   @Test("a new medal is created with every field from the form")
   func testCreateSavesEveryField() async throws {
     let repository = StubMedalRepository()
@@ -97,19 +108,21 @@ struct EditMedalViewModelSaveTests {
     #expect(created.eventPhotos.isEmpty)
   }
 
-  @Test("an edited medal is saved with every field from the form, keeping its id and owner")
+  @Test("an edited medal takes every field from the form and keeps the ones it doesn't show")
   func testEditSavesEveryField() async throws {
     let medal = makeMedal()
     let repository = StubMedalRepository(medals: [medal])
     let viewModel = makeViewModel(mode: .edit, medal: medal, repository: repository)
     fillForm(viewModel)
 
-    try await viewModel.save(by: "uid")
+    try await viewModel.save(by: "editor-uid")
 
     let updated = try #require(await repository.updatedMedals.first)
     expectFilledForm(updated)
     #expect(updated.id == "medal-taipei")
     #expect(updated.userID == "uid")
+    #expect(updated.createdAt == Date(timeIntervalSince1970: 1_577_923_200))
+    #expect(updated.photoUrl == "https://example.com/cover.jpg")
   }
 
   @Test("a cleared note is saved as no note")
@@ -122,6 +135,33 @@ struct EditMedalViewModelSaveTests {
     try await viewModel.save(by: "uid")
 
     #expect(await repository.updatedMedals.first?.note == nil)
+  }
+
+  // MARK: - Event photos
+  /// A 1×1 PNG standing in for a photo the user picked.
+  private func makePhotoData() throws -> Data {
+    let image = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
+      UIColor.red.setFill()
+      context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+    }
+    return try #require(image.pngData())
+  }
+
+  @Test("a kept event photo keeps its caption and creation date")
+  func testKeptEventPhotoKeepsStoredFields() async throws {
+    let medal = makeMedal()
+    let repository = StubMedalRepository(medals: [medal])
+    let viewModel = makeViewModel(mode: .edit, medal: medal, repository: repository)
+    viewModel.note = "New note"
+
+    try await viewModel.save(by: "uid")
+
+    let eventPhotos = try #require(await repository.updatedMedals.first?.eventPhotos)
+    #expect(eventPhotos.map(\.caption) == ["Start line", "Finish line"])
+    #expect(
+      eventPhotos.map(\.createdAt) == [
+        Date(timeIntervalSince1970: 1_578_009_600), Date(timeIntervalSince1970: 1_578_096_000)
+      ])
   }
 
   @Test("a new event photo is saved with its draft id and upload URL, and order is renumbered")
@@ -142,13 +182,5 @@ struct EditMedalViewModelSaveTests {
         "https://example.com/finish.jpg", "https://example.com/uploaded.jpg"
       ])
     #expect(eventPhotos.map(\.sortOrder) == [0, 1])
-  }
-
-  private func makePhotoData() throws -> Data {
-    let image = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
-      UIColor.red.setFill()
-      context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
-    }
-    return try #require(image.pngData())
   }
 }

@@ -232,6 +232,7 @@ final class EditMedalViewModel {
   }
 
   /// Uploads any new event photo drafts to Firebase Storage and returns the final EventPhoto array with stable sort order.
+  /// A kept photo keeps every stored field but its order.
   private func resolvedEventPhotos(userId: String, uploadedUrls: inout [String]) async throws
     -> [EventPhoto]
   {
@@ -242,8 +243,9 @@ final class EditMedalViewModel {
           userId: userId, medalId: medalId, photoId: draft.id, image: image)
         uploadedUrls.append(url)
         result.append(EventPhoto(id: draft.id, imageUrl: url, sortOrder: index))
-      } else if let url = draft.imageUrl {
-        result.append(EventPhoto(id: draft.id, imageUrl: url, sortOrder: index))
+      } else if var kept = medal?.eventPhotos.first(where: { $0.id == draft.id }) {
+        kept.sortOrder = index
+        result.append(kept)
       }
     }
     return result
