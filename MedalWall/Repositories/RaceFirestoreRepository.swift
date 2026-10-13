@@ -159,11 +159,12 @@ final class RaceFirestoreRepository: RaceRepository {
   /// Splits edition ids into batches that leave room for the race delete, which always goes
   /// in the last one: an interrupted delete then leaves a race holding fewer editions rather
   /// than editions orphaned under a race that is already gone.
-  static func deletionChunks(editionIds: [String], limit: Int = batchLimit) -> [[String]] {
+  static func deletionChunks(editionIds: [String]) -> [[String]] {
     guard !editionIds.isEmpty else { return [[]] }
 
-    return stride(from: 0, to: editionIds.count, by: limit - 1).map { start in
-      Array(editionIds[start..<min(start + limit - 1, editionIds.count)])
+    let editionsPerChunk = batchLimit - 1
+    return stride(from: 0, to: editionIds.count, by: editionsPerChunk).map { start in
+      Array(editionIds[start..<min(start + editionsPerChunk, editionIds.count)])
     }
   }
 
