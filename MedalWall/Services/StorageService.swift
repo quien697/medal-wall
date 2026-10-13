@@ -82,9 +82,14 @@ final class StorageService: PhotoStorage {
   /// Storage's default 10 minutes, so a save cannot sit on its spinner that long.
   private static let maxUploadRetryTime: TimeInterval = 30
 
+  /// How long any other call, such as fetching a download URL or deleting a file, keeps
+  /// retrying before it fails, instead of Storage's default 2 minutes, for the same reason.
+  private static let maxOperationRetryTime: TimeInterval = 30
+
   private var storage: Storage {
     let storage = Storage.storage()
     storage.maxUploadRetryTime = Self.maxUploadRetryTime
+    storage.maxOperationRetryTime = Self.maxOperationRetryTime
     return storage
   }
 
@@ -164,6 +169,7 @@ final class StorageService: PhotoStorage {
     try await reference.delete()
   }
 
+  /// Uploads `image` as a JPEG to `path` and returns its download URL.
   private func upload(image: UIImage, to path: String) async throws -> String {
     guard let data = image.uploadData() else {
       throw AppError.photoDataInvalid
@@ -172,7 +178,7 @@ final class StorageService: PhotoStorage {
     let metadata = StorageMetadata()
     metadata.contentType = "image/jpeg"
     let ref = storage.reference().child(path)
-    let url = try await Self.upload(
+    let url = try await Self.storeThenFetchURL(
       put: { _ = try await ref.putDataAsync(data, metadata: metadata) },
       downloadURL: { try await ref.downloadURL() },
       delete: { try await ref.delete() }
@@ -181,10 +187,11 @@ final class StorageService: PhotoStorage {
     return url.absoluteString
   }
 
-  /// Stores a file with `put`, then returns its download URL from `downloadURL`. A file stored
-  /// without a URL is deleted before the URL's error is rethrown, since no caller ever learns
-  /// where it is. Takes each step as a closure so the order can be tested without Firebase.
-  static func upload(
+  /// Stores a file with `put`, then returns its download URL from `downloadURL`. If the URL
+  /// cannot be fetched, the stored file is deleted before that error is rethrown, since no
+  /// caller ever learns where it is. Takes each step as a closure so the order can be tested
+  /// without Firebase.
+  static func storeThenFetchURL(
     put: () async throws -> Void,
     downloadURL: () async throws -> URL,
     delete: () async throws -> Void

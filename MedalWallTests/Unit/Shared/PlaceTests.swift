@@ -47,6 +47,12 @@ struct PlaceTests {
     #expect(Place(countryCode: "  ", city: "  ").isValid == false)
   }
 
+  @Test("A country code or city of only line breaks leaves a place invalid")
+  func testIsValidRejectsLineBreaks() {
+    #expect(Place(countryCode: "TW", city: " \n").isValid == false)
+    #expect(Place(countryCode: "\n", city: "臺北市").isValid == false)
+  }
+
   // MARK: - Locale-aware display
   @Test("A place with a region renders city, region, and country")
   func testFormattedWithRegion() {

@@ -23,7 +23,7 @@ struct StorageServiceTests {
     let storedURL = try #require(URL(string: "https://example.com/cover.jpg"))
     var steps: [String] = []
 
-    let url = try await StorageService.upload(
+    let url = try await StorageService.storeThenFetchURL(
       put: { steps.append("put") },
       downloadURL: {
         steps.append("downloadURL")
@@ -41,7 +41,7 @@ struct StorageServiceTests {
     var steps: [String] = []
 
     await #expect(throws: retryLimitExceeded) {
-      try await StorageService.upload(
+      try await StorageService.storeThenFetchURL(
         put: { steps.append("put") },
         downloadURL: {
           steps.append("downloadURL")

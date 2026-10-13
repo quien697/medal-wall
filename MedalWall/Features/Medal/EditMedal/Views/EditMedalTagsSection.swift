@@ -35,7 +35,7 @@ struct EditMedalTagsSection: View {
         TextField("Add tag", text: $input)
           .font(.TypeScale.Field.value)
 
-        if !input.trimmingCharacters(in: .whitespaces).isEmpty {
+        if !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
           Button {
             onAdd(input)
             input = ""

@@ -90,8 +90,10 @@ struct EditRaceViewModelRepositoryTests {
     #expect(saved.websiteUrl == "https://www.taipeicitymarathon.com")
   }
 
-  @Test("a website of only whitespace is saved as no website", arguments: [ItemEditMode.add, .edit])
-  func testBlankWebsiteSavedAsNil(mode: ItemEditMode) async throws {
+  @Test(
+    "an empty or whitespace-only website is saved as no website",
+    arguments: [ItemEditMode.add, .edit], ["", " \n "])
+  func testBlankWebsiteSavedAsNil(mode: ItemEditMode, websiteUrl: String) async throws {
     var race = makeRace()
     race.websiteUrl = "https://www.taipeicitymarathon.com"
     let repository = StubRaceRepository(races: [race])
@@ -100,7 +102,7 @@ struct EditRaceViewModelRepositoryTests {
       networkMonitor: StubNetworkMonitor())
     viewModel.name = "Taipei Marathon"
     viewModel.place = race.place
-    viewModel.websiteUrl = " \n "
+    viewModel.websiteUrl = websiteUrl
 
     await viewModel.save(by: "uid")
 

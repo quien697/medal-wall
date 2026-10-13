@@ -29,8 +29,8 @@ struct Place: Codable, Hashable, Sendable {
   /// Whether the place carries the two fields a saved record needs. `region` is
   /// deliberately not required — most countries have none worth recording.
   var isValid: Bool {
-    !countryCode.trimmingCharacters(in: .whitespaces).isEmpty
-      && !city.trimmingCharacters(in: .whitespaces).isEmpty
+    !countryCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+      && !city.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
   }
 
   /// Renders the place for `locale`, omitting every absent component so no empty separator
