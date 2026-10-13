@@ -47,6 +47,8 @@ final class EditProfileViewModel {
   var photoToUpload: UIImage? { isPhotoChanged ? photo : nil }
 
   // MARK: - Functions
+  /// Downloads the existing profile photo so the form can show it, unless a new one was
+  /// picked while it loaded.
   func loadExistingPhoto() async {
     let existingPhoto = await UIImage.load(from: profile.photoUrl)
     guard !isPhotoChanged else { return }
@@ -54,11 +56,13 @@ final class EditProfileViewModel {
     photo = existingPhoto
   }
 
+  /// Sets the newly picked profile photo and marks it as changed.
   func updatePhoto(with uiImage: UIImage) {
     photo = uiImage
     isPhotoChanged = true
   }
 
+  /// Clears the profile photo and marks it as changed.
   func clearPhoto() {
     photo = nil
     isPhotoChanged = true

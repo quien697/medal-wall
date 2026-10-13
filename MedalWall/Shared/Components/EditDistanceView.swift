@@ -87,7 +87,7 @@ struct EditDistanceView: View {
             Text("Custom")
               .font(.TypeScale.Field.label)
               .tag(RaceDistanceCategory.custom(customKilometers))
-          }
+          }  // Picker
           .pickerStyle(.navigationLink)
 
           if case .custom = draftDistance.category {
@@ -105,7 +105,7 @@ struct EditDistanceView: View {
             ForEach(RaceDistanceType.allCases, id: \.self) { type in
               Text(type.displayName).tag(type)
             }
-          }
+          }  // Picker
           .pickerStyle(.segmented)
         }  // Section
       }  // Form
@@ -114,8 +114,8 @@ struct EditDistanceView: View {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .close) {
             dismiss()
-          }
-        }
+          }  // Button
+        }  // ToolbarItem
 
         ToolbarItem(placement: .confirmationAction) {
           Button(role: .confirm) {
@@ -127,8 +127,8 @@ struct EditDistanceView: View {
             } catch {
               errorWrapper = ErrorWrapper(error: AppError.unknown)
             }
-          }
-        }
+          }  // Button
+        }  // ToolbarItem
       }  // toolbar
       .sheet(item: $errorWrapper) { wrapper in
         ErrorView(errorWrapper: wrapper)

@@ -66,7 +66,7 @@ struct EditProfileView: View {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .close) {
             dismiss()
-          }
+          }  // Button
           .disabled(viewModel.isLoading)
         }  // ToolbarItem
 
@@ -83,7 +83,7 @@ struct EditProfileView: View {
                   errorWrapper = ErrorWrapper(error: error as? AppError ?? .userSaveFailed)
                 }
               }
-            }
+            }  // Button
             .disabled(!viewModel.isFormValid)
           }
         }  // ToolbarItem

@@ -84,7 +84,7 @@ struct EditRaceView: View {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .cancel) {
             dismiss()
-          }
+          }  // Button
           .disabled(viewModel.isLoading)
         }  // ToolbarItem
 
@@ -103,7 +103,7 @@ struct EditRaceView: View {
                   dismiss()
                 }
               }
-            }
+            }  // Button
             .disabled(!viewModel.isFormValid)
           }
         }  // ToolbarItem

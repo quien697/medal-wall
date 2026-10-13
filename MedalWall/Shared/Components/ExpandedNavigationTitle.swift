@@ -18,7 +18,7 @@ struct ExpandedNavigationTitle: View {
         .fixedSize()
 
       Spacer()
-    }
+    }  // HStack
   }
 }
 

@@ -9,7 +9,7 @@ import SwiftUI
 
 @Observable
 final class MedalDetailViewModel {
-  // MARK: - Properties
+  // MARK: - Data
   var medal: Medal
   /// The ids of medals that currently hold a record, taken from the whole collection.
   ///
@@ -17,10 +17,12 @@ final class MedalDetailViewModel {
   /// elsewhere in the collection can demote or promote this medal between reloads, and
   /// the "PR" tag should follow the latest state without the user popping the screen.
   var personalRecordIDs: Set<String>
+  private static let unfilled = "—"
+
+  // MARK: - Dependencies
   private let repository: any MedalRepository
   private let storageService: any PhotoStorage
   private let networkMonitor: any NetworkMonitor
-  private static let unfilled = "—"
 
   // MARK: - Init
   init(

@@ -108,7 +108,7 @@ struct EditRaceEditionView: View {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .cancel) {
             dismiss()
-          }
+          }  // Button
         }  // ToolbarItem
 
         ToolbarItem(placement: .confirmationAction) {
@@ -121,7 +121,7 @@ struct EditRaceEditionView: View {
             let draft = viewModel.buildDraft(userId: userId)
             onCommit(draft)
             dismiss()
-          }
+          }  // Button
           .disabled(!viewModel.isFormValid)
         }  // ToolbarItem
       }  // toolbar

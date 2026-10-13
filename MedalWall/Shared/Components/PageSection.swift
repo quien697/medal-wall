@@ -66,7 +66,7 @@ struct PageSection<Content: View>: View {
       }
 
       content
-    }
+    }  // VStack
     .padding(.horizontal, .Space.gutter)
     .padding(.vertical, .Space.stack)
     .frame(maxWidth: .infinity, alignment: .leading)

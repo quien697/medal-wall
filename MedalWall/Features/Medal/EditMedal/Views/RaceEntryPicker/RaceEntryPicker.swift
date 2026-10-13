@@ -52,7 +52,7 @@ struct RaceEntryPicker: View {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .cancel) {
             dismiss()
-          }
+          }  // Button
         }  // ToolbarItem
 
         if let selection {
@@ -60,7 +60,7 @@ struct RaceEntryPicker: View {
             Button(role: .confirm) {
               onSelect(selection)
               dismiss()
-            }
+            }  // Button
           }  // ToolbarItem
         }
       }  // toolbar

@@ -46,7 +46,7 @@ struct StatCard: View {
         .foregroundStyle(Color.Text.tertiary)
         .lineLimit(1)
         .minimumScaleFactor(0.5)
-    }
+    }  // VStack
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .surfaceStyle(
       vPadding: vPadding,

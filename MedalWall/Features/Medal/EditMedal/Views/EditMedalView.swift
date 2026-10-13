@@ -52,7 +52,7 @@ struct EditMedalView: View {
 
         EditMedalAutoFillSection {
           isPresentingRaceEntryPicker = true
-        }
+        }  // EditMedalAutoFillSection
 
         EditMedalResultSection(finishTime: $viewModel.finishTime)
 
@@ -106,7 +106,7 @@ struct EditMedalView: View {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .close) {
             dismiss()
-          }
+          }  // Button
           .disabled(viewModel.isLoading)
         }  // ToolbarItem
 
@@ -128,7 +128,7 @@ struct EditMedalView: View {
                   errorWrapper = ErrorWrapper(error: error as? AppError ?? .medalSaveFailed)
                 }
               }
-            }
+            }  // Button
             .disabled(!viewModel.isFormValid)
           }
         }  // ToolbarItem

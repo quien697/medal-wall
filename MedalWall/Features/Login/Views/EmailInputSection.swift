@@ -24,7 +24,7 @@ struct EmailInputSection: View {
 
       TextField(text: $email) {
         Text("<you>@example.com")
-      }
+      }  // TextField
       .keyboardType(.emailAddress)
       .textInputAutocapitalization(.never)
       .autocorrectionDisabled()

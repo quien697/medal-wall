@@ -30,7 +30,7 @@ struct SettingsView: View {
       Section {
         Button("Sign out") {
           try? userManager.signOut()
-        }
+        }  // Button
         .actionStyle(.plain, shape: .roundedRectangle)
       }  // Section
       .listRowBackground(Color.Surface.primary)

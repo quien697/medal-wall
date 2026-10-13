@@ -52,7 +52,7 @@ struct EditProfileInfoSection: View {
         } else {
           Button("Not Set") {
             birthday = .now
-          }
+          }  // Button
           .actionStyle(.neutral, font: .TypeScale.Field.value)
         }
       } label: {
