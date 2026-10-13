@@ -11,8 +11,8 @@ import Testing
 @testable import MedalWall
 
 /// Covers the order an upload's steps run in, which is decided in Swift rather than by
-/// Firebase Storage: a file stored without a download URL must be deleted, since no caller
-/// ever learns where it is.
+/// Firebase Storage: a file stored without a download URL must get a delete attempt, since no
+/// caller ever learns where it is.
 struct StorageServiceTests {
 
   private let retryLimitExceeded = NSError(domain: "FIRStorageErrorDomain", code: -13030)
@@ -36,7 +36,7 @@ struct StorageServiceTests {
     #expect(steps == ["put", "downloadURL"])
   }
 
-  @Test("a file stored without a URL is deleted, and the URL's error is the one thrown")
+  @Test("a file stored without a URL gets a delete attempt, and the URL's error is still thrown")
   func testFailedURLDeletesStoredFile() async {
     var steps: [String] = []
 

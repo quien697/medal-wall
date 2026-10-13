@@ -188,9 +188,9 @@ final class StorageService: PhotoStorage {
   }
 
   /// Stores a file with `put`, then returns its download URL from `downloadURL`. If the URL
-  /// cannot be fetched, the stored file is deleted before that error is rethrown, since no
-  /// caller ever learns where it is. Takes each step as a closure so the order can be tested
-  /// without Firebase.
+  /// cannot be fetched, deleting the stored file is attempted before that error is rethrown,
+  /// since no caller ever learns where it is; a delete that fails leaves the file in Storage.
+  /// Takes each step as a closure so the order can be tested without Firebase.
   static func storeThenFetchURL(
     put: () async throws -> Void,
     downloadURL: () async throws -> URL,
