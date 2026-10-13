@@ -143,13 +143,17 @@ final class EditMedalViewModel {
   /// A removed or replaced cover photo, or a removed event photo, is deleted from Storage only
   /// after the medal saves, so a failed save never points at a deleted file. A failed save
   /// deletes the photos uploaded for it. Offline, it throws `AppError.noInternetConnection`
-  /// before uploading or writing anything.
+  /// before uploading or writing anything. Name, bib number and note are saved without
+  /// surrounding whitespace, and a note of only whitespace is saved as none.
   func save(by userID: String) async throws {
     isLoading = true
     defer { isLoading = false }
 
     guard await networkMonitor.isConnected() else { throw AppError.noInternetConnection }
 
+    let trimmedName = name.trimmingCharacters(in: .whitespaces)
+    let trimmedBibNumber = bibNumber.trimmingCharacters(in: .whitespaces)
+    let trimmedNote = note.trimmingCharacters(in: .whitespacesAndNewlines)
     let owner = PhotoOwner.medal(userId: userID, medalId: medalId)
     var uploadedUrls: [String] = []
     do {
@@ -158,9 +162,9 @@ final class EditMedalViewModel {
 
       if let medal, mode == .edit {
         var updated = medal
-        updated.name = name
+        updated.name = trimmedName
         updated.date = date
-        updated.bibNumber = bibNumber
+        updated.bibNumber = trimmedBibNumber
         updated.photoUrl = photoUrl
         updated.place = place
         updated.distance = distance
@@ -172,7 +176,7 @@ final class EditMedalViewModel {
         updated.divisionTotal = divisionTotal
         updated.genderPlacement = genderPlacement
         updated.genderTotal = genderTotal
-        updated.note = note.isEmpty ? nil : note
+        updated.note = trimmedNote.isEmpty ? nil : trimmedNote
         updated.tags = tags
         updated.eventPhotos = eventPhotos
         try await repository.updateMedal(updated)
@@ -186,9 +190,9 @@ final class EditMedalViewModel {
       } else {
         let newMedal = Medal(
           id: medalId,
-          name: name,
+          name: trimmedName,
           date: date,
-          bibNumber: bibNumber,
+          bibNumber: trimmedBibNumber,
           photoUrl: photoUrl,
           place: place,
           distance: distance,
@@ -200,7 +204,7 @@ final class EditMedalViewModel {
           divisionTotal: divisionTotal,
           genderPlacement: genderPlacement,
           genderTotal: genderTotal,
-          note: note.isEmpty ? nil : note,
+          note: trimmedNote.isEmpty ? nil : trimmedNote,
           tags: tags,
           eventPhotos: eventPhotos,
           userID: userID

@@ -73,6 +73,13 @@ struct EditMedalViewModelSaveTests {
     viewModel.tags = ["pb", "rain"]
   }
 
+  /// The medal `save` wrote: the created one when adding, the updated one when editing.
+  private func savedMedal(_ mode: ItemEditMode, in repository: StubMedalRepository) async
+    -> Medal?
+  {
+    mode == .add ? await repository.createdMedals.first : await repository.updatedMedals.first
+  }
+
   /// Checks that a saved medal holds exactly what `fillForm` entered.
   private func expectFilledForm(_ medal: Medal) {
     #expect(medal.name == "Tokyo Marathon")
@@ -135,6 +142,40 @@ struct EditMedalViewModelSaveTests {
     try await viewModel.save(by: "uid")
 
     #expect(await repository.updatedMedals.first?.note == nil)
+  }
+
+  @Test(
+    "name, bib number and note are saved without surrounding whitespace",
+    arguments: [ItemEditMode.add, .edit])
+  func testTextFieldsSavedTrimmed(mode: ItemEditMode) async throws {
+    let medal = makeMedal()
+    let repository = StubMedalRepository(medals: [medal])
+    let viewModel = makeViewModel(
+      mode: mode, medal: mode == .edit ? medal : nil, repository: repository)
+    viewModel.name = "  Tokyo Marathon "
+    viewModel.bibNumber = " F1234  "
+    viewModel.note = "\n Rainy start \n"
+
+    try await viewModel.save(by: "uid")
+
+    let saved = try #require(await savedMedal(mode, in: repository))
+    #expect(saved.name == "Tokyo Marathon")
+    #expect(saved.bibNumber == "F1234")
+    #expect(saved.note == "Rainy start")
+  }
+
+  @Test("a note of only whitespace is saved as no note", arguments: [ItemEditMode.add, .edit])
+  func testBlankNoteSavedAsNil(mode: ItemEditMode) async throws {
+    let medal = makeMedal()
+    let repository = StubMedalRepository(medals: [medal])
+    let viewModel = makeViewModel(
+      mode: mode, medal: mode == .edit ? medal : nil, repository: repository)
+    viewModel.note = "  \n "
+
+    try await viewModel.save(by: "uid")
+
+    let saved = try #require(await savedMedal(mode, in: repository))
+    #expect(saved.note == nil)
   }
 
   // MARK: - Event photos
