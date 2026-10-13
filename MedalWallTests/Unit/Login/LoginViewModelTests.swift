@@ -107,6 +107,86 @@ struct LoginViewModelTests {
     #expect(viewModel.emailSheetError == nil)
   }
 
+  @Test("an email typed with spaces and a line break is sent and saved trimmed")
+  func testSendTrimsEmail() async throws {
+    let authService = StubAuthService()
+    let defaults = try makeDefaults()
+    let viewModel = LoginViewModel(
+      emailAuthService: authService, networkMonitor: StubNetworkMonitor(), defaults: defaults)
+    viewModel.email = "  \(email) \n"
+
+    await viewModel.sendEmailLink()
+
+    #expect(authService.sentLinkEmails == [email])
+    #expect(defaults.string(forKey: FirebaseAuthService.pendingEmailSignInKey) == email)
+  }
+
+  @Test("an address with only a space before the @ is not valid")
+  func testBlankLocalPartIsInvalid() throws {
+    let viewModel = LoginViewModel(
+      emailAuthService: StubAuthService(), networkMonitor: StubNetworkMonitor(),
+      defaults: try makeDefaults())
+
+    viewModel.email = " @example.com"
+
+    #expect(!viewModel.isEmailValid)
+  }
+
+  @Test("closing the sheet mid-send saves the address the link went to and nothing else")
+  func testClosingSheetMidSendKeepsSentAddress() async throws {
+    let authService = StubAuthService()
+    let defaults = try makeDefaults()
+    let viewModel = LoginViewModel(
+      emailAuthService: authService, networkMonitor: StubNetworkMonitor(), defaults: defaults)
+    viewModel.email = email
+    authService.whileSendingLink = { viewModel.resetEmailFlow() }
+
+    await viewModel.sendEmailLink()
+
+    #expect(defaults.string(forKey: FirebaseAuthService.pendingEmailSignInKey) == email)
+    #expect(!viewModel.isEmailLinkSent)
+  }
+
+  @Test("a send that fails after the sheet closed leaves no error for its next opening")
+  func testSendFailingAfterSheetClosedShowsNothing() async throws {
+    let authService = StubAuthService(sendLinkOutcome: .failure(.unknown))
+    let viewModel = LoginViewModel(
+      emailAuthService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: try makeDefaults())
+    viewModel.email = email
+    authService.whileSendingLink = { viewModel.resetEmailFlow() }
+
+    await viewModel.sendEmailLink()
+
+    #expect(viewModel.emailSheetError == nil)
+  }
+
+  // MARK: - Sign-in link errors
+  @Test("a sign-in link error while the email sheet is open shows on the sheet")
+  func testSignInErrorWithSheetOpenShowsOnSheet() throws {
+    let viewModel = LoginViewModel(
+      emailAuthService: StubAuthService(), networkMonitor: StubNetworkMonitor(),
+      defaults: try makeDefaults())
+    viewModel.isPresentingEmailSignIn = true
+
+    viewModel.showSignInError(.emailLinkSignInFailed)
+
+    #expect(viewModel.emailSheetError == .emailLinkSignInFailed)
+    #expect(viewModel.error == nil)
+  }
+
+  @Test("a sign-in link error with the email sheet closed shows on the login screen")
+  func testSignInErrorWithSheetClosedShowsOnLoginScreen() throws {
+    let viewModel = LoginViewModel(
+      emailAuthService: StubAuthService(), networkMonitor: StubNetworkMonitor(),
+      defaults: try makeDefaults())
+
+    viewModel.showSignInError(.emailLinkFromAnotherDevice)
+
+    #expect(viewModel.error == .emailLinkFromAnotherDevice)
+    #expect(viewModel.emailSheetError == nil)
+  }
+
   @Test("closing the email sheet forgets an error it was still showing")
   func testClosingSheetClearsItsError() async throws {
     let networkMonitor = StubNetworkMonitor()

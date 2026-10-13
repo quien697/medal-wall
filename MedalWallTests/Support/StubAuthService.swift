@@ -24,6 +24,10 @@ final class StubAuthService: AuthService {
   private let emailLinkOutcome: Result<Void, AppError>
   /// What sending a sign-in link does: succeed, or throw the error.
   private let sendLinkOutcome: Result<Void, AppError>
+  /// Runs while a sign-in link is being sent, as if the user acted mid-send.
+  var whileSendingLink: (@MainActor () async -> Void)?
+  /// Runs while an email-link sign-in is in flight, as if something else happened meanwhile.
+  var whileSigningInWithEmailLink: (@MainActor () async -> Void)?
 
   // MARK: - Recorded calls
   private(set) var emailLinkSignInEmails: [String] = []
@@ -67,11 +71,13 @@ final class StubAuthService: AuthService {
 
   func signInWithEmailLink(email: String, link: String) async throws {
     await recordEmailLinkSignIn(email)
+    await runWhileSigningInWithEmailLink()
     try emailLinkOutcome.get()
   }
 
   func sendSignInLink(to email: String) async throws {
     await recordSentLink(email)
+    await runWhileSendingLink()
     try sendLinkOutcome.get()
   }
 
@@ -85,5 +91,16 @@ final class StubAuthService: AuthService {
   /// Records a sent link on the main actor, for the same reason as `recordEmailLinkSignIn`.
   private func recordSentLink(_ email: String) {
     sentLinkEmails.append(email)
+  }
+
+  /// Runs `whileSendingLink` on the main actor, for the same reason as `recordEmailLinkSignIn`.
+  private func runWhileSendingLink() async {
+    await whileSendingLink?()
+  }
+
+  /// Runs `whileSigningInWithEmailLink` on the main actor, for the same reason as
+  /// `recordEmailLinkSignIn`.
+  private func runWhileSigningInWithEmailLink() async {
+    await whileSigningInWithEmailLink?()
   }
 }

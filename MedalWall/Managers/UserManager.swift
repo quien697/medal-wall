@@ -118,6 +118,8 @@ class UserManager {
   // MARK: - Private Functions
   /// Completes an email link sign-in using the URL opened by the user, reporting a failure
   /// in `signInError`. The saved email is kept after a failure so the link can be tried again.
+  /// A failure is not reported once someone is signed in, such as by the same link opened
+  /// twice, so no error waits for the next login screen.
   private func handleEmailLink(_ link: String) async {
     guard let email = defaults.string(forKey: FirebaseAuthService.pendingEmailSignInKey) else {
       signInError = .emailLinkFromAnotherDevice
@@ -127,6 +129,7 @@ class UserManager {
       try await authService.signInWithEmailLink(email: email, link: link)
       defaults.removeObject(forKey: FirebaseAuthService.pendingEmailSignInKey)
     } catch {
+      guard currentUserID == nil else { return }
       signInError = .emailLinkSignInFailed
     }
   }

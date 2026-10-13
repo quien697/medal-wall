@@ -27,8 +27,12 @@ final class LoginViewModel {
   var isEmailLinkSent = false
   var isPresentingEmailSignIn = false
   var error: AppError?
-  /// An error from sending the link, shown over the email sheet while it is open.
+  /// An error shown over the email sheet while it is open: from sending the link, or from a
+  /// link opened from Mail meanwhile.
   var emailSheetError: AppError?
+  /// Counts the email sheet's closings, so a send still running when the sheet closed
+  /// cannot change what the sheet shows the next time it opens.
+  private var emailSheetClosings = 0
 
   // MARK: - Dependencies
   /// Signs in with Apple and Google.
@@ -51,9 +55,11 @@ final class LoginViewModel {
 
   // MARK: - Computed
   var isEmailValid: Bool {
-    let parts = email.split(separator: "@")
+    let parts = trimmedEmail.split(separator: "@")
     return parts.count == 2 && parts[1].contains(".")
   }
+
+  private var trimmedEmail: String { email.trimmingCharacters(in: .whitespacesAndNewlines) }
 
   var isSigningIn: Bool {
     activeSignIn != nil
@@ -78,22 +84,39 @@ final class LoginViewModel {
     }
   }
 
-  /// Sends a Firebase sign-in link to the given email address. Fails at once when offline, and
-  /// reports any failure in `emailSheetError`, so it shows over the sheet the user is still on.
+  /// Sends a Firebase sign-in link to the entered address, trimmed of surrounding whitespace.
+  /// Fails at once when offline, and reports any failure in `emailSheetError`, so it shows over
+  /// the sheet the user is still on. A send that outlives its sheet still saves the address the
+  /// link went to, so the link works, but shows nothing.
   func sendEmailLink() async {
     isSendingEmail = true
     defer { isSendingEmail = false }
+    let address = trimmedEmail
+    let closingsAtStart = emailSheetClosings
 
     guard await networkMonitor.isConnected() else {
-      emailSheetError = .noInternetConnection
+      if emailSheetClosings == closingsAtStart { emailSheetError = .noInternetConnection }
       return
     }
     do {
-      try await emailAuthService.sendSignInLink(to: email)
-      defaults.set(email, forKey: FirebaseAuthService.pendingEmailSignInKey)
-      isEmailLinkSent = true
+      try await emailAuthService.sendSignInLink(to: address)
+      defaults.set(address, forKey: FirebaseAuthService.pendingEmailSignInKey)
+      if emailSheetClosings == closingsAtStart { isEmailLinkSent = true }
     } catch {
-      emailSheetError = .sendEmailSignInLinkFailed(error.localizedDescription)
+      if emailSheetClosings == closingsAtStart {
+        emailSheetError = .sendEmailSignInLinkFailed(error.localizedDescription)
+      }
+    }
+  }
+
+  /// Shows a sign-in failure from outside the login buttons — an email link opened from Mail.
+  /// It goes over the email sheet while that is open, since the login screen cannot present
+  /// anything until the sheet closes; otherwise it goes on the login screen.
+  func showSignInError(_ signInError: AppError) {
+    if isPresentingEmailSignIn {
+      emailSheetError = signInError
+    } else {
+      error = signInError
     }
   }
 
@@ -102,6 +125,7 @@ final class LoginViewModel {
     email = ""
     isEmailLinkSent = false
     emailSheetError = nil
+    emailSheetClosings += 1
   }
 
   // MARK: - Functions -> Sign in with Apple

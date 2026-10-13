@@ -16,7 +16,8 @@ struct SignInWithEmailLinkView: View {
 
   // MARK: - Properties
   @Binding var email: String
-  /// An error from sending the link, shown over this sheet and reset to nil once closed.
+  /// An error from sending the link or from a link opened meanwhile, shown over this sheet and
+  /// reset to nil once closed.
   @Binding var error: AppError?
   let isEmailLinkSent: Bool
   let isEmailValid: Bool
@@ -47,8 +48,8 @@ struct SignInWithEmailLinkView: View {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .close) {
             dismiss()
-          }
-        }
+          }  // Button
+        }  // ToolbarItem
       }  // toolbar
     }  // NavigationStack
     .sheet(
