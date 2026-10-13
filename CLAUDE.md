@@ -114,6 +114,7 @@ Key value types (not persisted directly): `RaceDistance`, `RaceDistanceCategory`
 
 ## Patterns
 - **Guard numeric values against out-of-range inputs.** Never assume persisted (Firestore) or externally-derived numbers sit in the expected range — clamp counts/indices/progress to valid bounds (e.g. `max(0, count)`) so a corrupt or malicious value can't produce negative counts, overflow past a max tier, or index out of bounds. Cover these edge cases with tests.
+- **Trim typed text with `.whitespacesAndNewlines`**, the same way in validation and on save; blank optional text is saved as `nil` (`edit-sheets` spec).
 - `defer { isLoading = false }` for loading state cleanup
 - `[weak self]` in closures that capture reference types
 - No logic or computed properties in views — all derived values belong in the ViewModel
