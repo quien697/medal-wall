@@ -132,28 +132,16 @@ struct EditMedalViewModelSaveTests {
     #expect(updated.photoUrl == "https://example.com/cover.jpg")
   }
 
-  @Test("a cleared note is saved as no note")
-  func testClearedNoteSavedAsNil() async throws {
-    let medal = makeMedal()
-    let repository = StubMedalRepository(medals: [medal])
-    let viewModel = makeViewModel(mode: .edit, medal: medal, repository: repository)
-    viewModel.note = ""
-
-    try await viewModel.save(by: "uid")
-
-    #expect(await repository.updatedMedals.first?.note == nil)
-  }
-
   @Test(
-    "name, bib number and note are saved without surrounding whitespace",
+    "name, bib number and note are saved without surrounding whitespace or line breaks",
     arguments: [ItemEditMode.add, .edit])
   func testTextFieldsSavedTrimmed(mode: ItemEditMode) async throws {
     let medal = makeMedal()
     let repository = StubMedalRepository(medals: [medal])
     let viewModel = makeViewModel(
       mode: mode, medal: mode == .edit ? medal : nil, repository: repository)
-    viewModel.name = "  Tokyo Marathon "
-    viewModel.bibNumber = " F1234  "
+    viewModel.name = "  Tokyo Marathon\n"
+    viewModel.bibNumber = "\n F1234  "
     viewModel.note = "\n Rainy start \n"
 
     try await viewModel.save(by: "uid")
@@ -164,13 +152,15 @@ struct EditMedalViewModelSaveTests {
     #expect(saved.note == "Rainy start")
   }
 
-  @Test("a note of only whitespace is saved as no note", arguments: [ItemEditMode.add, .edit])
-  func testBlankNoteSavedAsNil(mode: ItemEditMode) async throws {
+  @Test(
+    "an empty or whitespace-only note is saved as no note",
+    arguments: [ItemEditMode.add, .edit], ["", "  \n "])
+  func testBlankNoteSavedAsNil(mode: ItemEditMode, note: String) async throws {
     let medal = makeMedal()
     let repository = StubMedalRepository(medals: [medal])
     let viewModel = makeViewModel(
       mode: mode, medal: mode == .edit ? medal : nil, repository: repository)
-    viewModel.note = "  \n "
+    viewModel.note = note
 
     try await viewModel.save(by: "uid")
 

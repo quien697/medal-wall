@@ -51,6 +51,16 @@ struct EditMedalViewModelTests {
     #expect(viewModel.isFormValid == false)
   }
 
+  @Test("isFormValid is false when name is only a pasted line break")
+  func testIsFormValidFalseNewlineName() {
+    let viewModel = EditMedalViewModel(mode: .add)
+    viewModel.name = " \n"
+    viewModel.place.countryCode = "TW"
+    viewModel.place.city = "Taipei"
+
+    #expect(viewModel.isFormValid == false)
+  }
+
   @Test("isFormValid is false when country is empty")
   func testIsFormValidFalseEmptyCountry() {
     let viewModel = EditMedalViewModel(mode: .add)
@@ -201,11 +211,11 @@ struct EditMedalViewModelTests {
   }
 
   // MARK: - Tags
-  @Test("addTag trims the spaces around a tag")
+  @Test("addTag trims the whitespace and line breaks around a tag")
   func testAddTagTrims() {
     let viewModel = EditMedalViewModel(mode: .add)
 
-    viewModel.addTag("  taipei ")
+    viewModel.addTag("  taipei \n")
 
     #expect(viewModel.tags == ["taipei"])
   }
@@ -224,7 +234,7 @@ struct EditMedalViewModelTests {
   func testAddTagIgnoresBlank() {
     let viewModel = EditMedalViewModel(mode: .add)
 
-    viewModel.addTag("   ")
+    viewModel.addTag(" \n ")
 
     #expect(viewModel.tags.isEmpty)
   }

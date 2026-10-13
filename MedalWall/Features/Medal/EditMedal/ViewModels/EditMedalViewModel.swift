@@ -83,13 +83,14 @@ final class EditMedalViewModel {
       return true
     }()
 
-    return customDistanceValid && !name.trimmingCharacters(in: .whitespaces).isEmpty
-      && place.isValid
+    return customDistanceValid && !trimmedName.isEmpty && place.isValid
   }
 
-  private var trimmedName: String { name.trimmingCharacters(in: .whitespaces) }
+  private var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
 
-  private var trimmedBibNumber: String { bibNumber.trimmingCharacters(in: .whitespaces) }
+  private var trimmedBibNumber: String {
+    bibNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+  }
 
   private var trimmedNote: String? {
     let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -127,9 +128,9 @@ final class EditMedalViewModel {
     draftEventPhotos.removeAll { $0.id == id }
   }
 
-  /// Adds a tag trimmed of surrounding spaces, ignoring one that is blank or already there.
+  /// Adds a tag trimmed of surrounding whitespace, ignoring one that is blank or already there.
   func addTag(_ input: String) {
-    let tag = input.trimmingCharacters(in: .whitespaces)
+    let tag = input.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !tag.isEmpty, !tags.contains(tag) else { return }
 
     tags.append(tag)
