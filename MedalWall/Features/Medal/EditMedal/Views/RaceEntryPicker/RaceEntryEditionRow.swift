@@ -15,7 +15,7 @@ struct RaceEntryEditionRow: View {
   var body: some View {
     VStack(alignment: .leading) {
       HStack {
-        Text("\(edition.year)")
+        Text(String(edition.year))
           .font(.TypeScale.Numeric.medium)
           .foregroundStyle(Color.Text.primary)
 
