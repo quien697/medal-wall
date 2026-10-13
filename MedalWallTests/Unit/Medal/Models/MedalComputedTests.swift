@@ -52,6 +52,24 @@ struct MedalComputedTests {
     #expect(medal.recordedFinishTime == nil)
   }
 
+  /// Another client or a corrupt document can store any number, and `Duration` traps on
+  /// infinity or a value near 1e20 seconds, so formatting one would crash the app.
+  @Test(
+    "recordedFinishTime is nil when finishTime is infinite or 1,000 hours or more",
+    arguments: [TimeInterval.infinity, 3_600_000, 1e30])
+  func testRecordedFinishTimeNilWhenFinishTimeTooLarge(finishTime: TimeInterval) {
+    let medal = makeMedal(finishTime: finishTime)
+
+    #expect(medal.recordedFinishTime == nil)
+  }
+
+  @Test("recordedFinishTime keeps a time just under 1,000 hours")
+  func testRecordedFinishTimeKeepsTimeUnderLimit() {
+    let medal = makeMedal(finishTime: 3_599_999)
+
+    #expect(medal.recordedFinishTime == 3_599_999)
+  }
+
   @Test("recordedFinishTime returns the value when it is positive")
   func testRecordedFinishTimeReturnsPositiveValue() {
     let medal = makeMedal(finishTime: 12624)
