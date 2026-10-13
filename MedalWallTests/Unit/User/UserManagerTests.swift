@@ -16,6 +16,15 @@ struct UserManagerTests {
 
   private let uid = "uid-new"
   private let email = "runner@example.com"
+  /// A private defaults suite per test, so a simulated sign-in never clears the email a real
+  /// sign-in link was sent to in the app's own defaults.
+  private let defaults: UserDefaults
+
+  init() throws {
+    let suiteName = "UserManagerTests.\(UUID().uuidString)"
+    defaults = try #require(UserDefaults(suiteName: suiteName))
+    defaults.removePersistentDomain(forName: suiteName)
+  }
 
   // MARK: - Support
   private func makeProfile(photoUrl: String? = nil) -> User {
@@ -28,7 +37,8 @@ struct UserManagerTests {
     let repository = StubUserRepository(createLatency: .milliseconds(200))
     let authService = StubAuthService()
     let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
 
     await authService.report((uid: uid, email: email))
 
@@ -40,7 +50,7 @@ struct UserManagerTests {
   func testLaunchIsLoading() {
     let manager = UserManager(
       repository: StubUserRepository(), authService: StubAuthService(),
-      networkMonitor: StubNetworkMonitor())
+      networkMonitor: StubNetworkMonitor(), defaults: defaults)
 
     #expect(manager.sessionState == .loading)
   }
@@ -50,7 +60,8 @@ struct UserManagerTests {
     let repository = StubUserRepository(createLatency: .milliseconds(300))
     let authService = StubAuthService()
     let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
     await authService.report(nil)
 
     let signIn = Task { await authService.report((uid: uid, email: email)) }
@@ -67,7 +78,8 @@ struct UserManagerTests {
     let repository = StubUserRepository(createLatency: .milliseconds(300))
     let authService = StubAuthService()
     let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
     let signIn = Task { await authService.report((uid: uid, email: email)) }
     try await Task.sleep(for: .milliseconds(100))
 
@@ -87,7 +99,8 @@ struct UserManagerTests {
     let repository = StubUserRepository(user: makeProfile(), fetchOutcome: .failure(error))
     let authService = StubAuthService()
     let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
 
     await authService.report((uid: uid, email: email))
 
@@ -103,7 +116,8 @@ struct UserManagerTests {
     let authService = StubAuthService()
     let networkMonitor = StubNetworkMonitor()
     let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: networkMonitor)
+      repository: repository, authService: authService, networkMonitor: networkMonitor,
+      defaults: defaults)
     await networkMonitor.report(isConnected: false)
     await authService.report((uid: uid, email: email))
 
@@ -120,7 +134,8 @@ struct UserManagerTests {
       user: makeProfile(), fetchOutcome: .failure(.noInternetConnection))
     let authService = StubAuthService()
     let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
     await authService.report((uid: uid, email: email))
 
     await repository.setFetchOutcome(.success(()))
@@ -135,7 +150,8 @@ struct UserManagerTests {
     let repository = StubUserRepository(user: makeProfile(), fetchesFromCache: true)
     let authService = StubAuthService()
     let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
 
     await authService.report((uid: uid, email: email))
 
@@ -148,7 +164,8 @@ struct UserManagerTests {
     let repository = StubUserRepository(user: makeProfile())
     let authService = StubAuthService()
     let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
 
     await authService.report((uid: uid, email: email))
 
@@ -161,7 +178,8 @@ struct UserManagerTests {
     let authService = StubAuthService()
     let networkMonitor = StubNetworkMonitor()
     let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: networkMonitor)
+      repository: repository, authService: authService, networkMonitor: networkMonitor,
+      defaults: defaults)
     await networkMonitor.report(isConnected: false)
     await authService.report((uid: uid, email: email))
     #expect(!manager.canEditProfile)
@@ -177,7 +195,8 @@ struct UserManagerTests {
     let repository = StubUserRepository(user: makeProfile(), fetchesFromCache: true)
     let authService = StubAuthService()
     let manager = UserManager(
-      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor())
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
     await authService.report((uid: uid, email: email))
     #expect(!manager.canEditProfile)
 
@@ -196,7 +215,7 @@ struct UserManagerTests {
     let authService = StubAuthService()
     let manager = UserManager(
       repository: repository, authService: authService,
-      networkMonitor: StubNetworkMonitor(), storageService: storage)
+      networkMonitor: StubNetworkMonitor(), storageService: storage, defaults: defaults)
     await authService.report((uid: uid, email: email))
     var edited = try #require(manager.currentUser)
     edited.photoUrl = nil
@@ -216,7 +235,7 @@ struct UserManagerTests {
     let authService = StubAuthService()
     let manager = UserManager(
       repository: repository, authService: authService,
-      networkMonitor: StubNetworkMonitor(), storageService: storage)
+      networkMonitor: StubNetworkMonitor(), storageService: storage, defaults: defaults)
     await authService.report((uid: uid, email: email))
     var edited = try #require(manager.currentUser)
     edited.photoUrl = nil
@@ -237,7 +256,7 @@ struct UserManagerTests {
     let authService = StubAuthService()
     let manager = UserManager(
       repository: repository, authService: authService,
-      networkMonitor: StubNetworkMonitor(), storageService: storage)
+      networkMonitor: StubNetworkMonitor(), storageService: storage, defaults: defaults)
     await authService.report((uid: uid, email: email))
     let edited = try #require(manager.currentUser)
 
@@ -257,7 +276,7 @@ struct UserManagerTests {
     let authService = StubAuthService()
     let manager = UserManager(
       repository: repository, authService: authService,
-      networkMonitor: StubNetworkMonitor(), storageService: storage)
+      networkMonitor: StubNetworkMonitor(), storageService: storage, defaults: defaults)
     await authService.report((uid: uid, email: email))
     let edited = try #require(manager.currentUser)
 
@@ -280,7 +299,7 @@ struct UserManagerTests {
     networkMonitor.isConnectedNow = isConnected
     let manager = UserManager(
       repository: StubUserRepository(user: makeProfile()), authService: authService,
-      networkMonitor: networkMonitor)
+      networkMonitor: networkMonitor, defaults: defaults)
     await authService.report((uid: uid, email: email))
 
     try manager.signOut()
