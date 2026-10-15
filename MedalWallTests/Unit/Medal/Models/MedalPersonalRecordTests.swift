@@ -53,6 +53,15 @@ struct MedalPersonalRecordTests {
     #expect(medals.personalRecordIDs.isEmpty)
   }
 
+  @Test(
+    "a medal whose distance is zero or negative holds no record",
+    arguments: [RaceDistanceCategory.custom(0), .custom(-5)])
+  func testNonPositiveDistanceHoldsNoRecord(category: RaceDistanceCategory) {
+    let medals = [makeMedal(category: category, finishTime: 3600)]
+
+    #expect(medals.personalRecordIDs.isEmpty)
+  }
+
   @Test("personalRecords is empty for an empty collection")
   func testRecordsEmptyCollection() {
     let medals: [Medal] = []

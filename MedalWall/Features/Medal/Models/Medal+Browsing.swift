@@ -78,8 +78,8 @@ extension Array where Element == Medal {
   ///
   /// Only a finish time greater than zero is eligible. A stored zero or negative would
   /// otherwise be the minimum of its category and claim a record it never earned. Nor is a
-  /// distance that is not a finite number: NaN never equals itself, so each such medal would
-  /// key a record of its own.
+  /// distance of zero or less, or one that is not a finite number: NaN never equals itself,
+  /// so each such medal would key a record of its own.
   ///
   /// Iteration follows `sortedForDisplay` so the outcome cannot depend on the order
   /// Firestore returned: within a tied time the earlier date wins, and medals tied on both
@@ -88,7 +88,8 @@ extension Array where Element == Medal {
     var records: [RaceDistanceCategory: Medal] = [:]
 
     for medal in sortedForDisplay {
-      guard let finishTime = medal.recordedFinishTime, medal.distance.category.value.isFinite
+      let kilometers = medal.distance.category.value
+      guard let finishTime = medal.recordedFinishTime, kilometers > 0, kilometers.isFinite
       else { continue }
       let category = RaceDistanceCategory.nearestPreset(forValue: medal.distance.category.value)
 
