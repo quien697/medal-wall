@@ -57,7 +57,7 @@ struct UserManagerTests {
 
   @Test("signing in opens the tabs while the new profile is still being created")
   func testSignInOpensTabsBeforeProfile() async throws {
-    let repository = StubUserRepository(createLatency: .milliseconds(300))
+    let repository = StubUserRepository(holdsCreates: true)
     let authService = StubAuthService()
     let manager = UserManager(
       repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
@@ -65,25 +65,27 @@ struct UserManagerTests {
     await authService.report(nil)
 
     let signIn = Task { await authService.report((uid: uid, email: email)) }
-    try await Task.sleep(for: .milliseconds(100))
+    await repository.waitForCreateToStart()
 
     #expect(manager.sessionState == .ready)
     #expect(manager.currentUser == nil)
+    await repository.releaseCreate()
     await signIn.value
     #expect(manager.currentUser?.uid == uid)
   }
 
   @Test("a profile that finishes loading after sign-out is dropped")
   func testProfileLoadedAfterSignOutIsDropped() async throws {
-    let repository = StubUserRepository(createLatency: .milliseconds(300))
+    let repository = StubUserRepository(holdsCreates: true)
     let authService = StubAuthService()
     let manager = UserManager(
       repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
       defaults: defaults)
     let signIn = Task { await authService.report((uid: uid, email: email)) }
-    try await Task.sleep(for: .milliseconds(100))
+    await repository.waitForCreateToStart()
 
     await authService.report(nil)
+    await repository.releaseCreate()
     await signIn.value
 
     #expect(manager.currentUser == nil)

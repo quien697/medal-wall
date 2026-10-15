@@ -23,6 +23,13 @@ actor StubUserRepository: UserRepository {
   private let writeOutcome: Result<Void, AppError>
   /// How long a create takes to be acknowledged by the server.
   private let createLatency: Duration
+  /// Whether a create waits for `releaseCreate()` before it is acknowledged, so a test can act
+  /// at a known point while it is in flight instead of guessing with a sleep.
+  private let holdsCreates: Bool
+  private var hasCreateStarted = false
+  private var isCreateReleased = false
+  private var createStartWaiter: CheckedContinuation<Void, Never>?
+  private var heldCreate: CheckedContinuation<Void, Never>?
 
   // MARK: - Recorded calls
   private(set) var fetchCallCount = 0
@@ -35,6 +42,7 @@ actor StubUserRepository: UserRepository {
     fetchOutcome: Result<Void, AppError> = .success(()),
     writeOutcome: Result<Void, AppError> = .success(()),
     createLatency: Duration = .zero,
+    holdsCreates: Bool = false,
     fetchesFromCache: Bool = false
   ) {
     self.user = user
@@ -42,6 +50,7 @@ actor StubUserRepository: UserRepository {
     self.fetchesFromCache = fetchesFromCache
     self.writeOutcome = writeOutcome
     self.createLatency = createLatency
+    self.holdsCreates = holdsCreates
   }
 
   // MARK: - Script control
@@ -56,6 +65,19 @@ actor StubUserRepository: UserRepository {
     fetchesFromCache = isFromCache
   }
 
+  /// Waits until a held create has started.
+  func waitForCreateToStart() async {
+    guard !hasCreateStarted else { return }
+    await withCheckedContinuation { createStartWaiter = $0 }
+  }
+
+  /// Lets a held create be acknowledged.
+  func releaseCreate() {
+    isCreateReleased = true
+    heldCreate?.resume()
+    heldCreate = nil
+  }
+
   // MARK: - UserRepository
   func fetchUser(uid: String) async throws -> (user: User, isFromCache: Bool)? {
     fetchCallCount += 1
@@ -66,6 +88,14 @@ actor StubUserRepository: UserRepository {
 
   func createUser(_ user: User) async throws {
     try await Task.sleep(for: createLatency)
+    if holdsCreates {
+      hasCreateStarted = true
+      createStartWaiter?.resume()
+      createStartWaiter = nil
+      if !isCreateReleased {
+        await withCheckedContinuation { heldCreate = $0 }
+      }
+    }
     try writeOutcome.get()
     createdUsers.append(user)
     self.user = user
