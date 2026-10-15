@@ -30,13 +30,21 @@ jobs:
           # ignores the formatter's exit status.
           swift format lint --recursive --parallel --strict .
 
+      - name: Install SwiftLint
+        run: |
+          # `macos-15` resolves to the arm64 image, which ships without SwiftLint (only the Intel
+          # image has it), so `swiftlint` would exit 127. Pinned to the local version so a rule
+          # added upstream cannot fail here before it fails on a developer's machine.
+          curl -sSfL -o "$RUNNER_TEMP/swiftlint.zip" \
+            https://github.com/realm/SwiftLint/releases/download/0.65.1/portable_swiftlint.zip
+          unzip -q "$RUNNER_TEMP/swiftlint.zip" -d "$RUNNER_TEMP/swiftlint"
+          echo "$RUNNER_TEMP/swiftlint" >> "$GITHUB_PATH"
+
       - name: Lint
         run: |
           # --strict: most rules in .swiftlint.yml are warnings, and SwiftLint exits 0 on
           # warnings alone, so without this the step would report violations and still pass.
           # github-actions-logging: violations appear as annotations on the PR diff.
-          # SwiftLint is pre-installed on the runner image; its version can run ahead of the
-          # local one, so a new rule may fail here before it fails on a developer's machine.
           swiftlint lint --strict --reporter github-actions-logging
 
       - name: Cache SPM packages
