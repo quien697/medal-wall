@@ -54,9 +54,6 @@
         }
       }
     },
-    "%lld" : {
-      "shouldTranslate" : false
-    },
     "%lld of %lld" : {
       "localizations" : {
         "zh-TW" : {
