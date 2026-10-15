@@ -73,7 +73,8 @@ sign-out.
 
 #### Scenario: Email entered with spaces around it
 - **WHEN** the user enters " runner@example.com" followed by a line break and sends the link
-- **THEN** the link is sent to, and the address saved as, "runner@example.com"
+- **THEN** the link is sent to, and the address saved as, "runner@example.com", and the
+  confirmation names that address
 
 ### Requirement: Google Sign-In
 The system SHALL allow a user to sign in using their Google account via the
@@ -245,5 +246,5 @@ sent the link, the address SHALL still be saved so the link works.
 #### Scenario: Sheet closed while sending
 - **WHEN** the user taps Send and closes the email sheet before sending finishes
 - **THEN** the address is saved if the link was sent, and the sheet next opens empty with no
-  error and no confirmation
+  error, no confirmation, and a Send button that is not busy
 
