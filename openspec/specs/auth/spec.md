@@ -226,7 +226,8 @@ SHALL show `AppError.noInternetConnection` without attempting to send. A sign-in
 fails while the sheet is open SHALL be reported over the sheet too; other errors raised outside
 the email sheet SHALL still be shown on the login screen. A send still
 running when the sheet closes SHALL NOT change what the sheet shows when it next opens; if it
-sent the link, the address SHALL still be saved so the link works.
+sent the link, the address SHALL still be saved so the link works. A second tap on Send while
+a send is running SHALL be ignored, so one tap sends one email.
 
 #### Scenario: Device goes offline after the sheet opens
 - **WHEN** the user opens the email sheet, the device goes offline, and the user taps Send
@@ -247,4 +248,8 @@ sent the link, the address SHALL still be saved so the link works.
 - **WHEN** the user taps Send and closes the email sheet before sending finishes
 - **THEN** the address is saved if the link was sent, and the sheet next opens empty with no
   error, no confirmation, and a Send button that is not busy
+
+#### Scenario: Send tapped twice
+- **WHEN** the user taps Send twice in quick succession
+- **THEN** one sign-in link is sent, and the Send button stays busy until that send finishes
 
