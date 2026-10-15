@@ -88,8 +88,10 @@ final class LoginViewModel {
   /// Fails at once when offline, and reports any failure in `emailSheetError`, so it shows over
   /// the sheet the user is still on. Once sent, the field holds the address the link went to.
   /// A send that outlives its sheet still saves that address, so the link works, but leaves
-  /// the next opening alone, its Send button included.
+  /// the next opening alone, its Send button included. A second tap while a send is running
+  /// is ignored, so one tap sends one email.
   func sendEmailLink() async {
+    guard !isSendingEmail else { return }
     isSendingEmail = true
     let address = trimmedEmail
     let closingsAtStart = emailSheetClosings

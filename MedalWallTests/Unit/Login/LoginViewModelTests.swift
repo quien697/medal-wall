@@ -210,6 +210,26 @@ struct LoginViewModelTests {
     }
 
     await viewModel.sendEmailLink()
+
+    // An empty field proves the close above ran: a send that kept its sheet fills it in.
+    #expect(viewModel.email.isEmpty)
+  }
+
+  @Test("tapping Send again while a send is running sends only once")
+  func testSecondTapWhileSendingIsIgnored() async throws {
+    let authService = StubAuthService()
+    let viewModel = LoginViewModel(
+      emailAuthService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: try makeDefaults())
+    viewModel.email = email
+    authService.whileSendingLink = {
+      authService.whileSendingLink = nil
+      await viewModel.sendEmailLink()
+    }
+
+    await viewModel.sendEmailLink()
+
+    #expect(authService.sentLinkEmails == [email])
   }
 
   @Test("a send that outlives its sheet leaves the next sheet's own send spinning")
