@@ -43,7 +43,7 @@ struct LoginView: View {
             isLoading: viewModel.activeSignIn == .apple
           ) {
             await viewModel.signInWithApple()
-          }
+          }  // SignInButton
 
           SignInButton(
             title: "Continue with Google",
@@ -51,14 +51,14 @@ struct LoginView: View {
             isLoading: viewModel.activeSignIn == .google
           ) {
             await viewModel.signInWithGoogle()
-          }
+          }  // SignInButton
 
           SignInButton(
             title: "Continue with Email",
             systemImage: "envelope"
           ) {
             await viewModel.signInWithEmailLink()
-          }
+          }  // SignInButton
         }  // VStack
         .allowsHitTesting(!viewModel.isSigningIn)
         .padding(.top)

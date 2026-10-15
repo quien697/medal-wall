@@ -8,7 +8,7 @@
 import SwiftUI
 
 @Observable
-class UserManager {
+final class UserManager {
   // MARK: - Properties
   private let repository: any UserRepository
   private let authService: any AuthService
