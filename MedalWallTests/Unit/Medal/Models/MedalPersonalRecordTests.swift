@@ -40,6 +40,19 @@ struct MedalPersonalRecordTests {
   }
 
   // MARK: - Fastest wins
+  /// NaN never equals itself, so each such medal would key a record of its own and be
+  /// tagged a PR; a distance that is not a number cannot hold a record.
+  @Test("a medal whose distance is not a number holds no record")
+  func testNaNDistanceHoldsNoRecord() {
+    let medals = [
+      makeMedal(category: .custom(.nan), finishTime: 3600),
+      makeMedal(category: .custom(.nan), finishTime: 4000),
+      makeMedal(category: .custom(.nan), finishTime: 5000)
+    ]
+
+    #expect(medals.personalRecordIDs.isEmpty)
+  }
+
   @Test("personalRecords is empty for an empty collection")
   func testRecordsEmptyCollection() {
     let medals: [Medal] = []
