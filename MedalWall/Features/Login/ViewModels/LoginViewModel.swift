@@ -55,8 +55,8 @@ final class LoginViewModel {
 
   // MARK: - Computed
   var isEmailValid: Bool {
-    let parts = trimmedEmail.split(separator: "@")
-    return parts.count == 2 && parts[1].contains(".")
+    let parts = trimmedEmail.split(separator: "@", omittingEmptySubsequences: false)
+    return parts.count == 2 && !parts[0].isEmpty && parts[1].contains(".")
   }
 
   private var trimmedEmail: String { email.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -86,13 +86,14 @@ final class LoginViewModel {
 
   /// Sends a Firebase sign-in link to the entered address, trimmed of surrounding whitespace.
   /// Fails at once when offline, and reports any failure in `emailSheetError`, so it shows over
-  /// the sheet the user is still on. A send that outlives its sheet still saves the address the
-  /// link went to, so the link works, but shows nothing.
+  /// the sheet the user is still on. Once sent, the field holds the address the link went to.
+  /// A send that outlives its sheet still saves that address, so the link works, but leaves
+  /// the next opening alone, its Send button included.
   func sendEmailLink() async {
     isSendingEmail = true
-    defer { isSendingEmail = false }
     let address = trimmedEmail
     let closingsAtStart = emailSheetClosings
+    defer { if emailSheetClosings == closingsAtStart { isSendingEmail = false } }
 
     guard await networkMonitor.isConnected() else {
       if emailSheetClosings == closingsAtStart { emailSheetError = .noInternetConnection }
@@ -101,7 +102,10 @@ final class LoginViewModel {
     do {
       try await emailAuthService.sendSignInLink(to: address)
       defaults.set(address, forKey: FirebaseAuthService.pendingEmailSignInKey)
-      if emailSheetClosings == closingsAtStart { isEmailLinkSent = true }
+      if emailSheetClosings == closingsAtStart {
+        email = address
+        isEmailLinkSent = true
+      }
     } catch {
       if emailSheetClosings == closingsAtStart {
         emailSheetError = .sendEmailSignInLinkFailed(error.localizedDescription)
@@ -125,6 +129,7 @@ final class LoginViewModel {
     email = ""
     isEmailLinkSent = false
     emailSheetError = nil
+    isSendingEmail = false
     emailSheetClosings += 1
   }
 

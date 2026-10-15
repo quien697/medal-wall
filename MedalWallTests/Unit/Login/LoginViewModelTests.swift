@@ -161,6 +161,75 @@ struct LoginViewModelTests {
     #expect(viewModel.emailSheetError == nil)
   }
 
+  @Test("a plain address is valid")
+  func testPlainAddressIsValid() throws {
+    let viewModel = LoginViewModel(
+      emailAuthService: StubAuthService(), networkMonitor: StubNetworkMonitor(),
+      defaults: try makeDefaults())
+
+    viewModel.email = email
+
+    #expect(viewModel.isEmailValid)
+  }
+
+  @Test(
+    "an address with an extra @ is not valid",
+    arguments: ["runner@@example.com", "runner@example.com@", "@runner@example.com"])
+  func testExtraAtSignIsInvalid(address: String) throws {
+    let viewModel = LoginViewModel(
+      emailAuthService: StubAuthService(), networkMonitor: StubNetworkMonitor(),
+      defaults: try makeDefaults())
+
+    viewModel.email = address
+
+    #expect(!viewModel.isEmailValid)
+  }
+
+  @Test("after a send works, the field holds the address the link went to")
+  func testSendShowsTrimmedAddress() async throws {
+    let viewModel = LoginViewModel(
+      emailAuthService: StubAuthService(), networkMonitor: StubNetworkMonitor(),
+      defaults: try makeDefaults())
+    viewModel.email = "  \(email) \n"
+
+    await viewModel.sendEmailLink()
+
+    #expect(viewModel.email == email)
+  }
+
+  @Test("closing the sheet mid-send leaves the next opening's Send button ready")
+  func testClosingSheetMidSendClearsSpinner() async throws {
+    let authService = StubAuthService()
+    let viewModel = LoginViewModel(
+      emailAuthService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: try makeDefaults())
+    viewModel.email = email
+    authService.whileSendingLink = {
+      viewModel.resetEmailFlow()
+      #expect(!viewModel.isSendingEmail)
+    }
+
+    await viewModel.sendEmailLink()
+  }
+
+  @Test("a send that outlives its sheet leaves the next sheet's own send spinning")
+  func testOldSendKeepsNewSendSpinner() async throws {
+    let authService = StubAuthService()
+    let viewModel = LoginViewModel(
+      emailAuthService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: try makeDefaults())
+    viewModel.email = email
+    authService.whileSendingLink = {
+      viewModel.resetEmailFlow()
+      // The reopened sheet starts its own send before the old one finishes.
+      viewModel.isSendingEmail = true
+    }
+
+    await viewModel.sendEmailLink()
+
+    #expect(viewModel.isSendingEmail)
+  }
+
   // MARK: - Sign-in link errors
   @Test("a sign-in link error while the email sheet is open shows on the sheet")
   func testSignInErrorWithSheetOpenShowsOnSheet() throws {
