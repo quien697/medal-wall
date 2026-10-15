@@ -16,8 +16,9 @@ extension Date {
   // MARK: - Year
   /// Years are Gregorian whatever calendar the device uses: an edition's year is stored and
   /// shared with other clients, and a device set to the ROC, Japanese or Buddhist calendar
-  /// would otherwise read 2026 as 115, 8 or 2569. Days still start in the device's time zone.
-  private static let yearCalendar = Calendar(identifier: .gregorian)
+  /// would otherwise read 2026 as 115, 8 or 2569. Built on each use, so days start in the
+  /// device's current time zone even after it changes while the app runs.
+  private static var yearCalendar: Calendar { Calendar(identifier: .gregorian) }
 
   /// The Gregorian year this date falls in.
   var year: Int {
