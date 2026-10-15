@@ -119,6 +119,30 @@ struct MedalComputedTests {
     #expect(medal.averagePace == nil)
   }
 
+  /// The pace is shown through `Int(_:)`, which traps above `Int.max`; a stored distance near
+  /// zero would otherwise give a pace that large and crash every screen that shows it.
+  @Test(
+    "averagePace is nil at 1,000 minutes per kilometre or slower",
+    arguments: [(1e-16, 86_399.0), (0.001, 3_600.0), (0.06, 3_600.0)])
+  func testAveragePaceNilWhenTooSlow(kilometers: Double, finishTime: TimeInterval) {
+    let medal = makeMedal(
+      distance: RaceDistance(category: .custom(kilometers), type: .inPerson),
+      finishTime: finishTime
+    )
+
+    #expect(medal.averagePace == nil)
+  }
+
+  @Test("averagePace is nil when the distance is infinite")
+  func testAveragePaceNilWhenDistanceInfinite() {
+    let medal = makeMedal(
+      distance: RaceDistance(category: .custom(.infinity), type: .inPerson),
+      finishTime: 3600
+    )
+
+    #expect(medal.averagePace == nil)
+  }
+
   @Test("averagePace calculates minutes per km for a full marathon")
   func testAveragePaceCalculation() {
     let finishTime: TimeInterval = 12624

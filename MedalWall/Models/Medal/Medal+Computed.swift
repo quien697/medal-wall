@@ -21,11 +21,19 @@ extension Medal {
 
   private static let finishTimeLimit: TimeInterval = 1_000 * 60 * 60
 
-  /// Average pace in minutes per kilometre
+  /// Average pace in minutes per kilometre, or `nil` when there is no usable one.
+  ///
+  /// A pace of 1,000 minutes per kilometre or slower is not one anyone ran; it comes from a
+  /// distance stored near zero, and showing it through `Int(_:)` would crash the app. An
+  /// infinite distance would give a pace of zero. Both read as no pace.
   var averagePace: Double? {
-    guard let recordedFinishTime, distance.category.value > 0 else { return nil }
-    return (recordedFinishTime / 60) / distance.category.value
+    guard let recordedFinishTime, distance.category.value > 0, distance.category.value.isFinite
+    else { return nil }
+    let pace = (recordedFinishTime / 60) / distance.category.value
+    return pace < Self.paceLimit ? pace : nil
   }
+
+  private static let paceLimit = 1_000.0
 
   /// The stored `division` string as a `Division`, or `nil` when absent or unrecognised.
   ///
