@@ -146,12 +146,16 @@ nonisolated enum DistanceUnit: String, CaseIterable {
   ///
   /// Exists so a caller that sets the value and the unit at different sizes can have both
   /// without splitting `paceText`'s output back apart on its punctuation.
+  ///
+  /// A pace that is not a number, is negative, or is too large for `Int(_:)` returns `nil`:
+  /// `Int(_:)` traps on such a value, and a crash is worse than an unfilled pace.
   func paceValueText(
     minutesPerKilometer pace: Double?,
     defaults: UserDefaults = .standard
   ) -> String? {
     guard let pace else { return nil }
     let converted = self.pace(fromMinutesPerKilometer: pace)
+    guard converted.isFinite, converted >= 0, converted < Double(Int.max) else { return nil }
     let minutes = Int(converted)
     let seconds = Int((converted - Double(minutes)) * 60)
 

@@ -330,6 +330,19 @@ struct DistanceUnitTests {
     )
   }
 
+  /// The minutes are taken with `Int(_:)`, which traps on a value it cannot hold, so a pace
+  /// that is not a number, is negative, or is too large to show returns no pace instead.
+  @Test(
+    "paceValueText returns nil for a pace it cannot show",
+    arguments: [Double.nan, .infinity, -5, 1e30])
+  func testPaceValueTextNilWhenUnshowable(pace: Double) {
+    let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.kilometers.rawValue)
+
+    #expect(
+      DistanceUnit.kilometers.paceValueText(minutesPerKilometer: pace, defaults: defaults) == nil
+    )
+  }
+
   // MARK: - paceText
   @Test("paceText joins the value with the unit abbreviation")
   func testPaceTextComposesValueAndUnit() {
