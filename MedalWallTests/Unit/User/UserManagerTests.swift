@@ -55,7 +55,9 @@ struct UserManagerTests {
     #expect(manager.sessionState == .loading)
   }
 
-  @Test("signing in opens the tabs while the new profile is still being created")
+  @Test(
+    "signing in opens the tabs while the new profile is still being created",
+    .timeLimit(.minutes(1)))
   func testSignInOpensTabsBeforeProfile() async throws {
     let repository = StubUserRepository(holdsCreates: true)
     let authService = StubAuthService()
@@ -74,7 +76,7 @@ struct UserManagerTests {
     #expect(manager.currentUser?.uid == uid)
   }
 
-  @Test("a profile that finishes loading after sign-out is dropped")
+  @Test("a profile that finishes loading after sign-out is dropped", .timeLimit(.minutes(1)))
   func testProfileLoadedAfterSignOutIsDropped() async throws {
     let repository = StubUserRepository(holdsCreates: true)
     let authService = StubAuthService()
