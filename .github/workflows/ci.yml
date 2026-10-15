@@ -59,6 +59,9 @@ jobs:
         run: |
           # CODE_SIGNING_ALLOWED=NO: CI runners have no signing identity, so code signing must be disabled.
           # xcpretty: formats xcodebuild's verbose output into readable pass/fail lines.
+          # pipefail: the default shell is `bash -e` without it, so the step took xcpretty's exit
+          # status and passed even when xcodebuild failed.
+          set -o pipefail
           xcodebuild build \
             -project MedalWall.xcodeproj \
             -scheme MedalWall \
@@ -68,6 +71,7 @@ jobs:
 
       - name: Test
         run: |
+          set -o pipefail
           xcodebuild test \
             -project MedalWall.xcodeproj \
             -scheme MedalWall \
