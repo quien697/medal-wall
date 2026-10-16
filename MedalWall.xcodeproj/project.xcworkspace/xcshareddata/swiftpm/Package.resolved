@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/quien697/CachedAsyncImage",
       "state" : {
-        "revision" : "0712e2dcc0f26d546c66f78d6aeb9835576f782e",
-        "version" : "1.0.1"
+        "revision" : "176e4a7ff9f4f976dcf23e3f521ed6fdcc48c6a7",
+        "version" : "1.0.2"
       }
     },
     {
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/quien697/CropImage",
       "state" : {
-        "revision" : "91eadf802d96df346a7cae450ee55051fc672ae1",
-        "version" : "1.0.0"
+        "revision" : "dcbd135ff2fcb4fcaa5e7f60dece27717a7292c5",
+        "version" : "1.0.1"
       }
     },
     {
@@ -159,8 +159,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/quien697/PhotoViewer",
       "state" : {
-        "revision" : "81e7e458b71a00b070e48b295ec4de314de77d73",
-        "version" : "1.1.0"
+        "revision" : "817ab8cc78fffad49ac69f638dd7f7021606980c",
+        "version" : "1.1.1"
       }
     },
     {
@@ -177,8 +177,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/quien697/TimePicker",
       "state" : {
-        "revision" : "cc0e57fa47f61d60ef3e725a7e2adf7d45687380",
-        "version" : "1.0.0"
+        "revision" : "4e28f182d6c32dcc70f35e50eb18344764df2c8f",
+        "version" : "1.0.1"
       }
     }
   ],
