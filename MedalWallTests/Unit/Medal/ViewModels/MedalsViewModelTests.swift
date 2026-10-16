@@ -282,7 +282,7 @@ struct MedalsViewModelTests {
     #expect(personalBest.medal.finishTime?.formattedHMS == "03:30:24")
     #expect(personalBest.category.description == RaceDistanceCategory.full.description)
     #expect(
-      DistanceUnit.resolved().paceText(
+      DistanceUnit.kilometers.paceText(
         minutesPerKilometer: personalBest.medal.averagePace
       ).contains("4'59\"")
     )
