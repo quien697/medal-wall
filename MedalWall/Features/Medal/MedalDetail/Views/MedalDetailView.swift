@@ -64,7 +64,7 @@ struct MedalDetailView: View {
       if !viewModel.medal.tags.isEmpty {
         MedalDetailTagsSection(tags: viewModel.medal.tags)
       }
-    }
+    }  // ScrollView
     .background(Color.Background.primary)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
@@ -73,7 +73,7 @@ struct MedalDetailView: View {
             isPresentingEditMedal = true
           } label: {
             Label("Edit Medal", systemImage: "square.and.pencil")
-          }
+          }  // Button
 
           Divider()
 
@@ -81,20 +81,20 @@ struct MedalDetailView: View {
             isPresentingDeleteMedalConfirm = true
           } label: {
             Label("Delete Medal", systemImage: "trash")
-          }
-        }
-      }
-    }
+          }  // Button
+        }  // Menu
+      }  // ToolbarItem
+    }  // toolbar
     .alert(isPresented: $isPresentingDeleteMedalConfirm) {
       .deleteConfirmation(
-        name: viewModel.medal.name,
+        .medal(name: viewModel.medal.name),
         onDelete: {
           Task {
             do {
-              try await viewModel.deleteMedal(viewModel.medal)
+              try await viewModel.deleteMedal()
               dismiss()
             } catch {
-              errorWrapper = ErrorWrapper(error: AppError.medalDeleteFailed)
+              errorWrapper = ErrorWrapper(error: error as? AppError ?? .medalDeleteFailed)
             }
           }
         }
@@ -103,7 +103,13 @@ struct MedalDetailView: View {
     .sheet(
       isPresented: $isPresentingEditMedal,
       onDismiss: {
-        Task { await viewModel.reloadMedal() }
+        Task {
+          do throws(AppError) {
+            try await viewModel.reloadMedal()
+          } catch {
+            errorWrapper = ErrorWrapper(error: error)
+          }
+        }
       },
       content: {
         EditMedalView(mode: .edit, medal: viewModel.medal)

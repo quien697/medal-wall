@@ -60,20 +60,24 @@
 		605C9AA02ECB0935007D3A96 /* Exceptions for "MedalWall" folder in "MedalWallTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Features/Login/ViewModels/LoginViewModel.swift,
 				Features/Medal/EditMedal/ViewModels/EditMedalViewModel.swift,
+				Features/Medal/EditMedal/ViewModels/RaceEntryPickerViewModel.swift,
 				Features/Medal/MedalDetail/ViewModels/MedalDetailViewModel.swift,
 				Features/Medal/Medals/ViewModels/MedalsViewModel.swift,
 				Features/Medal/Models/DraftEventPhoto.swift,
+				"Features/Medal/Models/Medal+Browsing.swift",
 				Features/Medal/Models/MedalDistanceFilter.swift,
 				Features/Medal/Models/MedalPersonalBest.swift,
 				Features/Medal/Models/MedalYearGroup.swift,
+				Features/Medal/Models/RaceEntry.swift,
 				Features/Profile/EditProfile/ViewModels/EditProfileViewModel.swift,
+				Features/Profile/Profile/ViewModels/ProfileViewModel.swift,
 				Features/Race/EditRace/ViewModels/EditRaceViewModel.swift,
 				Features/Race/EditRaceEdition/ViewModels/EditRaceEditionViewModel.swift,
 				Features/Race/Models/DraftRaceEdition.swift,
 				Features/Race/RaceDetail/ViewModels/RaceDetailViewModel.swift,
 				Features/Race/Races/ViewModels/RacesViewModel.swift,
-				Localization/AppLanguage.swift,
 				"Localization/String+Localization.swift",
 				Managers/UserManager.swift,
 				Models/Achievement/AchievementProgress.swift,
@@ -84,25 +88,29 @@
 				Models/Medal/Medal.swift,
 				"Models/Medal/Medal+Computed.swift",
 				"Models/Medal/Medal+Stats.swift",
-				Models/Medal/RaceEntry.swift,
 				Models/Race/Race.swift,
 				"Models/Race/Race+Computed.swift",
 				Models/Race/RaceDistance.swift,
 				Models/Race/RaceDistanceCategory.swift,
 				Models/Race/RaceDistanceType.swift,
 				Models/Race/RaceEdition.swift,
+				"Models/Race/RaceEdition+Computed.swift",
 				Models/Shared/Place.swift,
 				Models/User/Gender.swift,
 				Models/User/User.swift,
 				"Models/User/User+Computed.swift",
 				Models/User/UserName.swift,
+				Preferences/AppLanguage.swift,
+				Preferences/DistanceUnit.swift,
 				Repositories/MedalFirestoreRepository.swift,
 				Repositories/RaceFirestoreRepository.swift,
 				Repositories/UserFirestoreRepository.swift,
 				"Resources/SampleData/Medal+SampleData.swift",
 				"Resources/SampleData/Race+SampleData.swift",
-				Services/AuthService.swift,
+				Services/AppleSignInDelegate.swift,
+				Services/FirebaseAuthService.swift,
 				Services/MapKitPlaceSearchService.swift,
+				Services/NWPathNetworkMonitor.swift,
 				Services/StorageService.swift,
 				Shared/Components/PlacePicker/Models/PlaceSearchStatus.swift,
 				Shared/Components/PlacePicker/Models/PlaceSuggestion.swift,
@@ -110,8 +118,9 @@
 				Shared/Errors/AppError.swift,
 				Shared/Errors/ErrorWrapper.swift,
 				"Shared/Extensions/Date+Extensions.swift",
+				"Shared/Extensions/TimeInterval+Extensions.swift",
 				"Shared/Extensions/UIImage+Extensions.swift",
-				Shared/UIModels/DistanceUnit.swift,
+				Shared/UIModels/DeletePrompt.swift,
 				Shared/UIModels/ItemEditMode.swift,
 			);
 			target = 60B570BE2EA616CA000B3FDE /* MedalWallTests */;
@@ -296,7 +305,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2600;
-				LastUpgradeCheck = 2610;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					60B570AF2EA616C8000B3FDE = {
 						CreatedOnToolsVersion = 26.0.1;
@@ -407,6 +416,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -472,6 +482,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";

@@ -71,6 +71,14 @@ struct LocalizedDisplayStringTests {
     #expect(AgeGroup.from60to69.displayName == "60–69")
   }
 
+  @Test(
+    "Every age group bracket separates its range with an en dash, never a hyphen",
+    arguments: AgeGroup.allCases
+  )
+  func testAgeGroupDisplayNameUsesEnDash(ageGroup: AgeGroup) {
+    #expect(!ageGroup.displayName.contains("-"))
+  }
+
   // MARK: - Division
   @Test("Division display name composes gender and age group")
   func testDivisionDisplayName() {
@@ -169,5 +177,56 @@ struct LocalizedDisplayStringTests {
       translated("We couldn't load your races. \("network down")")
         == "我們無法載入你的賽事。network down"
     )
+  }
+
+  @Test("A missing session reads as signed out, not as a failed load")
+  func testNotSignedInStrings() {
+    let error = AppError.notSignedIn
+
+    #expect(error.title == "Not Signed In")
+    #expect(error.message == "You're not signed in.")
+    #expect(error.guidance == "Please sign in and try again.")
+    #expect(translated("Not Signed In") == "尚未登入")
+    #expect(translated("You're not signed in.") == "你目前尚未登入。")
+    #expect(translated("Please sign in and try again.") == "請登入後再試一次。")
+  }
+
+  @Test("An error bridged through `any Error` still reads its own message and guidance")
+  func testAppErrorLocalizedDescription() {
+    let error: any Error = AppError.raceFetchFailed("network down")
+
+    #expect(error.localizedDescription == "We couldn't load your races. network down")
+    #expect(
+      (error as? LocalizedError)?.recoverySuggestion
+        == "Please check your connection and try again."
+    )
+  }
+
+  // MARK: - DeletePrompt
+  @Test("A delete prompt names its subject in the title")
+  func testDeletePromptTitles() {
+    #expect(DeletePrompt.race(name: "Taipei Marathon").title == "Delete Taipei Marathon?")
+    #expect(
+      DeletePrompt.medal(name: "Taipei Marathon 2019").title == "Delete Taipei Marathon 2019?"
+    )
+    #expect(DeletePrompt.edition(year: 2026).title == "Delete 2026 edition?")
+    #expect(translated("Delete \("Taipei Marathon")?") == "刪除Taipei Marathon？")
+    #expect(translated("Delete \("2026") edition?") == "刪除2026年屆次？")
+  }
+
+  @Test("A delete prompt says what the delete takes with it, or when it happens")
+  func testDeletePromptMessages() {
+    #expect(
+      DeletePrompt.race(name: "Taipei Marathon").message
+        == "Deleting it also deletes all editions. Medals you've added are kept."
+    )
+    #expect(DeletePrompt.medal(name: "Taipei Marathon 2019").message == "This can't be undone.")
+    #expect(DeletePrompt.edition(year: 2026).message == "It's deleted when you save the race.")
+    #expect(
+      translated("Deleting it also deletes all editions. Medals you've added are kept.")
+        == "刪除後，所有屆次也會一併刪除。你已新增的獎牌會保留。"
+    )
+    #expect(translated("This can't be undone.") == "此操作無法復原。")
+    #expect(translated("It's deleted when you save the race.") == "儲存賽事後才會刪除。")
   }
 }

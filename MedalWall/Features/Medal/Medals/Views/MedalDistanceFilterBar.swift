@@ -50,7 +50,7 @@ struct MedalDistanceFilterBar: View {
           }  // Button
           .chipStyle(
             selection == filter ? .primary : .secondary,
-            font: .TypeScale.microLabel)
+            font: .TypeScale.overline)
         }  // ForEach
       }  // HStack
       .padding(.horizontal, .Space.gutter)

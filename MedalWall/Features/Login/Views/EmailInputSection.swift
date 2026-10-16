@@ -19,19 +19,19 @@ struct EmailInputSection: View {
     VStack(alignment: .center, spacing: 16) {
       EmailSignInHeader(
         title: "What's your email?",
-        subTitle: "Enter your email address and we'll send you a sign-in link. No password needed."
+        subtitle: "Enter your email address and we'll send you a sign-in link. No password needed."
       )
 
       TextField(text: $email) {
         Text("<you>@example.com")
-      }
+      }  // TextField
       .keyboardType(.emailAddress)
       .textInputAutocapitalization(.never)
       .autocorrectionDisabled()
       .padding()
       .background(Color.Surface.quaternary)
       .clipShape(.rect(cornerRadius: .Radius.field))
-      .tint(Color.Pigment.inkNavy)
+      .tint(Color.Accent.primary)
 
       Button {
         Task {

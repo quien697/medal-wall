@@ -25,19 +25,25 @@ struct EditRaceEditionView: View {
   @State private var viewModel: EditRaceEditionViewModel
 
   // MARK: - Properties
-  private let onCommit: ((DraftRaceEdition) -> Void)?
+  private let onCommit: (DraftRaceEdition) -> Void
   private let onDelete: (() -> Void)?
 
   // MARK: - Init
+  /// Opens the editor on a new edition, handed to `onCommit` when confirmed.
+  init(onCommit: @escaping (DraftRaceEdition) -> Void) {
+    self._viewModel = State(initialValue: EditRaceEditionViewModel(mode: .add, draft: nil))
+    self.onCommit = onCommit
+    self.onDelete = nil
+  }
+
+  /// Opens the editor on a staged edition: `onCommit` receives the edited draft, and `onDelete`
+  /// runs when the user confirms deleting it.
   init(
-    mode: ItemEditMode,
-    raceId: String,
-    edition: RaceEdition? = nil,
-    onCommit: ((DraftRaceEdition) -> Void)? = nil,
-    onDelete: (() -> Void)? = nil
+    editing draft: DraftRaceEdition,
+    onCommit: @escaping (DraftRaceEdition) -> Void,
+    onDelete: @escaping () -> Void
   ) {
-    self._viewModel = State(
-      initialValue: EditRaceEditionViewModel(mode: mode, raceId: raceId, edition: edition))
+    self._viewModel = State(initialValue: EditRaceEditionViewModel(mode: .edit, draft: draft))
     self.onCommit = onCommit
     self.onDelete = onDelete
   }
@@ -89,7 +95,7 @@ struct EditRaceEditionView: View {
               } label: {
                 Text("Delete Edition")
                   .frame(maxWidth: .infinity, alignment: .center)
-              }
+              }  // Button
             }  // Section
           }
         }  // Form
@@ -102,50 +108,31 @@ struct EditRaceEditionView: View {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .cancel) {
             dismiss()
-          }
+          }  // Button
         }  // ToolbarItem
 
         ToolbarItem(placement: .confirmationAction) {
-          if viewModel.isLoading {
-            ProgressView()
-          } else {
-            Button(role: .confirm) {
-              if let onCommit {
-                let draft = viewModel.buildDraft(userId: userManager.currentUserID ?? "")
-                onCommit(draft)
-                dismiss()
-              } else {
-                guard let userId = userManager.currentUserID else {
-                  errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
-                  return
-                }
-
-                Task {
-                  await viewModel.save(by: userId)
-                  if viewModel.error == nil {
-                    dismiss()
-                  }
-                }
-              }
+          Button(role: .confirm) {
+            guard let userId = userManager.currentUserID else {
+              errorWrapper = ErrorWrapper(error: AppError.notSignedIn)
+              return
             }
-            .disabled(!viewModel.isFormValid)
-          }
+
+            let draft = viewModel.buildDraft(userId: userId)
+            onCommit(draft)
+            dismiss()
+          }  // Button
+          .disabled(!viewModel.isFormValid)
         }  // ToolbarItem
       }  // toolbar
+      .interactiveDismissDisabled()
       .task {
         await viewModel.loadExistingPhoto()
       }
       .alert(isPresented: $isPresentingDeleteConfirm) {
-        .deleteConfirmation(name: .appLocalized("Edition")) {
-          if let onDelete {
-            onDelete()
-            dismiss()
-          } else {
-            Task {
-              await viewModel.deleteEdition()
-              if viewModel.error == nil { dismiss() }
-            }
-          }
+        .deleteConfirmation(.edition(year: viewModel.originalYear)) {
+          onDelete?()
+          dismiss()
         }
       }
       .photosPicker(
@@ -166,9 +153,6 @@ struct EditRaceEditionView: View {
           }
         }
       }
-      .onChange(of: viewModel.error) { _, error in
-        if let error { errorWrapper = ErrorWrapper(error: error) }
-      }
       .sheet(
         isPresented: $isPresentingCropImageView,
         onDismiss: {
@@ -185,14 +169,17 @@ struct EditRaceEditionView: View {
         }
       )
       .sheet(isPresented: $isPresentingAddDistance) {
-        AddDistanceView { newDistance in
-          try viewModel.addDistance(newDistance)
-        }
+        EditDistanceView(
+          mode: .add,
+          distance: .default,
+          onAction: { newDistance in
+            try viewModel.addDistance(newDistance)
+          }
+        )
         .presentationDetents([.medium])
       }
       .sheet(
         item: $errorWrapper,
-        onDismiss: { viewModel.error = nil },
         content: { wrapper in
           ErrorView(errorWrapper: wrapper)
         }
@@ -202,15 +189,15 @@ struct EditRaceEditionView: View {
 }
 
 #Preview("Add Mode") {
-  EditRaceEditionView(mode: .add, raceId: "preview-race-id")
+  EditRaceEditionView(onCommit: { _ in })
     .environment(UserManager())
 }
 
 #Preview("Edit Mode") {
   EditRaceEditionView(
-    mode: .edit,
-    raceId: RaceEdition.sampleData.first!.raceId,
-    edition: RaceEdition.sampleData.first!
+    editing: DraftRaceEdition(from: .taipei2019),
+    onCommit: { _ in },
+    onDelete: {}
   )
   .environment(UserManager())
 }

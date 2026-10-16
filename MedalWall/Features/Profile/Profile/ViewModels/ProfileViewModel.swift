@@ -12,8 +12,16 @@ final class ProfileViewModel {
   // MARK: - Data
   var medals: [Medal] = []
 
+  // MARK: - State
+  var error: AppError?
+
   // MARK: - Dependencies
-  private let repository = MedalFirestoreRepository()
+  private let repository: any MedalRepository
+
+  // MARK: - Init
+  init(repository: (any MedalRepository)? = nil) {
+    self.repository = repository ?? MedalFirestoreRepository()
+  }
 
   // MARK: - Computed
   var totalMedals: Int { medals.count }
@@ -22,21 +30,19 @@ final class ProfileViewModel {
   var bestFullTime: String { medals.bestFullTime?.formattedHMS ?? "-" }
   var bestHalfTime: String { medals.bestHalfTime?.formattedHMS ?? "-" }
 
+  /// Full Marathon achievement progress, from the loaded medals.
+  var fullMarathonProgress: AchievementProgress { .compute(liveCount: fullCount) }
+
+  /// Half Marathon achievement progress, from the loaded medals.
+  var halfMarathonProgress: AchievementProgress { .compute(liveCount: halfCount) }
+
   // MARK: - Functions
-  /// Loads all medals for the given user from Firestore.
+  /// Loads all medals for the given user from Firestore, keeping the current ones if the fetch fails.
   func loadMedals(userId: String) async {
-    medals = (try? await repository.fetchMedals(userId: userId)) ?? []
-  }
-
-  /// Computes Full Marathon achievement progress from the loaded medals and the given user's persisted milestone.
-  func fullMarathonProgress(user: User?) -> AchievementProgress {
-    AchievementProgress.compute(
-      persistedMilestone: user?.highestFullMilestone ?? 0, liveCount: fullCount)
-  }
-
-  /// Computes Half Marathon achievement progress from the loaded medals and the given user's persisted milestone.
-  func halfMarathonProgress(user: User?) -> AchievementProgress {
-    AchievementProgress.compute(
-      persistedMilestone: user?.highestHalfMilestone ?? 0, liveCount: halfCount)
+    do {
+      medals = try await repository.fetchMedals(userId: userId)
+    } catch {
+      self.error = .medalFetchFailed(error.localizedDescription)
+    }
   }
 }

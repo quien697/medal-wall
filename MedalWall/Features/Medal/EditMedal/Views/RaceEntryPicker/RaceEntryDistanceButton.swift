@@ -34,7 +34,7 @@ struct RaceEntryDistanceButton: View {
         Text(distance.displayLabel)
           .chipStyle(.secondary)
       }
-    }
+    }  // Button
     .buttonStyle(.plain)
     .animation(.easeInOut(duration: 0.15), value: isSelected)
   }

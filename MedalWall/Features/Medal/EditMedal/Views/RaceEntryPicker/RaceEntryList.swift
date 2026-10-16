@@ -31,7 +31,7 @@ struct RaceEntryList: View {
               .font(.TypeScale.caption)
               .foregroundStyle(Color.Text.secondary)
 
-            Text("\(raceEditions.count) editions")
+            Text("^[\(raceEditions.count) edition](inflect: true)")
               .font(.TypeScale.caption)
               .foregroundStyle(Color.Text.tertiary)
           }  // VStack
@@ -39,14 +39,14 @@ struct RaceEntryList: View {
 
         if !raceEditions.isEmpty {
           VStack(alignment: .leading, spacing: 16) {
-            ForEach(raceEditions.sorted { $0.year > $1.year }) { edition in
+            ForEach(raceEditions) { edition in
               RaceEntryEditionRow(
                 race: race,
                 edition: edition,
                 selection: $selection
               )
-            }
-          }
+            }  // ForEach
+          }  // VStack
           .frame(maxWidth: .infinity, alignment: .leading)
           .surfaceStyle(vPadding: 12, hPadding: 12)
         }

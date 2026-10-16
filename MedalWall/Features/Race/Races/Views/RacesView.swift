@@ -8,9 +8,6 @@
 import SwiftUI
 
 struct RacesView: View {
-  // MARK: - Environment
-  @Environment(UserManager.self) private var userManager
-
   // MARK: - State
   @State private var viewModel = RacesViewModel()
   @State private var errorWrapper: ErrorWrapper?
@@ -60,14 +57,14 @@ struct RacesView: View {
             isPresentingAddRace = true
           } label: {
             Image(systemName: "plus")
-          }
+          }  // Button
           .matchedTransitionSource(id: addRace, in: namespace)
           .buttonStyle(.glassProminent)
         }  // ToolbarItem
       }  // toolbar
       .alert(isPresented: $isPresentingDeleteConfirm) {
         .deleteConfirmation(
-          name: selectedRace?.name ?? .appLocalized("Race"),
+          .race(name: selectedRace?.name ?? .appLocalized("Race")),
           onDelete: {
             if let race = selectedRace {
               Task { await viewModel.deleteRace(race) }
@@ -88,7 +85,7 @@ struct RacesView: View {
           }
         },
         content: {
-          EditRaceView(mode: .add)
+          AddRaceView()
             .navigationTransition(.zoom(sourceID: addRace, in: namespace))
         }
       )

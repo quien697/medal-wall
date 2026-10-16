@@ -9,7 +9,7 @@ import SwiftUI
 
 @Observable
 final class MedalDetailViewModel {
-  // MARK: - Properties
+  // MARK: - Data
   var medal: Medal
   /// The ids of medals that currently hold a record, taken from the whole collection.
   ///
@@ -17,13 +17,26 @@ final class MedalDetailViewModel {
   /// elsewhere in the collection can demote or promote this medal between reloads, and
   /// the "PR" tag should follow the latest state without the user popping the screen.
   var personalRecordIDs: Set<String>
-  private let repository = MedalFirestoreRepository()
   private static let unfilled = "—"
 
+  // MARK: - Dependencies
+  private let repository: any MedalRepository
+  private let storageService: any PhotoStorage
+  private let networkMonitor: any NetworkMonitor
+
   // MARK: - Init
-  init(medal: Medal, personalRecordIDs: Set<String> = []) {
+  init(
+    medal: Medal,
+    personalRecordIDs: Set<String> = [],
+    repository: (any MedalRepository)? = nil,
+    storageService: (any PhotoStorage)? = nil,
+    networkMonitor: (any NetworkMonitor)? = nil
+  ) {
     self.medal = medal
     self.personalRecordIDs = personalRecordIDs
+    self.repository = repository ?? MedalFirestoreRepository()
+    self.storageService = storageService ?? StorageService()
+    self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
   }
 
   // MARK: - Computed
@@ -65,7 +78,7 @@ final class MedalDetailViewModel {
   /// The division field's label, naming the group the placement was run within so the two
   /// read as one fact rather than two measurements.
   var divisionLabel: String {
-    guard let division = medal.divisionEnum else { return .appLocalized("Division") }
+    guard let division = medal.parsedDivision else { return .appLocalized("Division") }
     return .appLocalized("Division (\(division.displayName))")
   }
 
@@ -118,19 +131,51 @@ final class MedalDetailViewModel {
   /// Reloads the medal from Firestore and updates the local state, including the live
   /// record set so an edit elsewhere in the collection that demotes or promotes this
   /// medal is reflected on the "PR" tag without the user leaving the screen.
-  func reloadMedal() async {
-    async let updatedMedal = repository.fetchMedal(id: medal.id, userId: medal.userID)
-    async let allMedals = repository.fetchMedals(userId: medal.userID)
-    guard let updated = try? await updatedMedal else { return }
-
-    medal = updated
-    if let all = try? await allMedals {
-      personalRecordIDs = all.personalRecordIDs
+  ///
+  /// The two fetches run concurrently through methods on `self` rather than `async let` on
+  /// the repository directly: `self` is main-actor isolated and so can cross into a child
+  /// task, where the injected `any MedalRepository` existential cannot.
+  ///
+  /// Whatever loads is applied. A failed fetch throws `AppError.medalFetchFailed`, so the
+  /// screen can say it is out of date rather than quietly keep showing the pre-edit medal.
+  func reloadMedal() async throws(AppError) {
+    async let updatedMedal = fetchMedal()
+    async let allMedals = fetchAllMedals()
+    do {
+      if let updated = try await updatedMedal {
+        medal = updated
+      }
+      personalRecordIDs = try await allMedals.personalRecordIDs
+    } catch {
+      throw .medalFetchFailed(error.localizedDescription)
     }
   }
 
-  /// Deletes the medal from Firestore.
-  func deleteMedal(_ medal: Medal) async throws {
+  /// Fetches this medal on its own, for the concurrent reload above.
+  private func fetchMedal() async throws -> Medal? {
+    try await repository.fetchMedal(id: medal.id, userId: medal.userID)
+  }
+
+  /// Fetches the owner's whole collection, for the concurrent reload above.
+  private func fetchAllMedals() async throws -> [Medal] {
+    try await repository.fetchMedals(userId: medal.userID)
+  }
+
+  /// Deletes the medal from Firestore, then its cover and event photos from Storage. The
+  /// photos go only once the medal is gone, so a failed delete never leaves the medal pointing
+  /// at deleted files; a photo that fails to delete is left behind rather than failing a
+  /// delete that already happened. Offline, it throws `AppError.noInternetConnection` before
+  /// deleting anything.
+  func deleteMedal() async throws {
+    guard await networkMonitor.isConnected() else { throw AppError.noInternetConnection }
+
     try await repository.deleteMedal(id: medal.id, userId: medal.userID)
+    let owner = PhotoOwner.medal(userId: medal.userID, medalId: medal.id)
+    if let photoUrl = medal.photoUrl {
+      try? await storageService.deletePhoto(url: photoUrl, ownedBy: owner)
+    }
+    for eventPhoto in medal.eventPhotos {
+      try? await storageService.deletePhoto(url: eventPhoto.imageUrl, ownedBy: owner)
+    }
   }
 }

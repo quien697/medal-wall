@@ -36,7 +36,7 @@ enum AgeGroup: String, Codable, CaseIterable, Identifiable {
 
   var id: String { rawValue }
 
-  nonisolated var displayName: String {
+  var displayName: String {
     switch self {
     case .under20: return .appLocalized("Under 20")
     case .from20to24: return "20–24"
@@ -57,17 +57,17 @@ enum AgeGroup: String, Codable, CaseIterable, Identifiable {
     case .from40to49: return "40–49"
     case .from50to59: return "50–59"
     case .from60to69: return "60–69"
-    case .from70to79: return "70-79"
+    case .from70to79: return "70–79"
     }
   }
 
-  static var fiveYearCases: [AgeGroup] = [
+  static let fiveYearCases: [AgeGroup] = [
     .under20, .from20to24, .from25to29, .from30to34, .from35to39,
     .from40to44, .from45to49, .from50to54, .from55to59, .from60to64,
     .from65to69, .from70to74, .from75to79, .over80
   ]
 
-  static var tenYearCases: [AgeGroup] = [
+  static let tenYearCases: [AgeGroup] = [
     .from20to29, .from30to39, .from40to49, .from50to59, .from60to69, .from70to79
   ]
 }

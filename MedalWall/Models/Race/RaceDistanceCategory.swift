@@ -5,10 +5,9 @@
 //  Created by Quien on 2025-11-05.
 //
 
-import SwiftUI
+import Foundation
 
-/// Represents standard or custom marathon distance categories,
-/// used to display each distance with a distinct color.
+/// Represents standard or custom marathon distance categories.
 enum RaceDistanceCategory: CustomStringConvertible, Hashable {
   case full
   case half
@@ -59,7 +58,7 @@ extension RaceDistanceCategory {
   /// silently rewrite a genuine custom course into a preset every time a medal or race
   /// round-trips through Firestore. Collapsing near-preset values for display is
   /// `nearestPreset(forValue:)`'s job, not this initializer's.
-  nonisolated init(value: Double) {
+  init(value: Double) {
     switch value {
     case 42.195: self = .full
     case 21.0975: self = .half
@@ -77,7 +76,7 @@ extension RaceDistanceCategory {
   ///
   /// Used only where distances are grouped or filtered for display — the medal
   /// collection's chips and its personal-best derivation — never for decode.
-  nonisolated static func nearestPreset(forValue value: Double) -> RaceDistanceCategory {
+  static func nearestPreset(forValue value: Double) -> RaceDistanceCategory {
     if abs(value - RaceDistanceCategory.full.value) < 0.05 {
       return .full
     } else if abs(value - RaceDistanceCategory.half.value) < 0.05 {

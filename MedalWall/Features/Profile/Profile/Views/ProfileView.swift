@@ -14,31 +14,33 @@ struct ProfileView: View {
   // MARK: - State
   @State private var viewModel = ProfileViewModel()
   @State private var isPresentingEditProfile = false
+  @State private var errorWrapper: ErrorWrapper?
 
   // MARK: - Body
   var body: some View {
     NavigationStack {
       ScrollView {
-        ProfileHeaderSection(
-          photoUrl: userManager.currentUser?.photoUrl,
-          userName: userManager.currentUserName,
-          bio: userManager.currentUser?.bio
-        )
+        if let user = userManager.currentUser {
+          ProfileHeaderSection(
+            photoUrl: user.photoUrl,
+            userName: user.name,
+            bio: user.bio
+          )
 
-        ProfileSummarySection(
-          totalMedals: viewModel.totalMedals,
-          fullCount: viewModel.fullCount,
-          halfCount: viewModel.halfCount,
-          bestFullTime: viewModel.bestFullTime,
-          bestHalfTime: viewModel.bestHalfTime
-        )
+          ProfileSummarySection(
+            totalMedals: viewModel.totalMedals,
+            fullCount: viewModel.fullCount,
+            halfCount: viewModel.halfCount,
+            bestFullTime: viewModel.bestFullTime,
+            bestHalfTime: viewModel.bestHalfTime
+          )
 
-        ProfileAchievementsSection(
-          fullMarathonProgress: viewModel.fullMarathonProgress(user: userManager.currentUser),
-          halfMarathonProgress: viewModel.halfMarathonProgress(user: userManager.currentUser)
-        )
-
-        .padding(.bottom, 10)
+          ProfileAchievementsSection(
+            fullMarathonProgress: viewModel.fullMarathonProgress,
+            halfMarathonProgress: viewModel.halfMarathonProgress
+          )
+          .padding(.bottom, 10)
+        }
       }  // ScrollView
       .scrollIndicators(.hidden)
       .navigationTitle("Profile")
@@ -52,15 +54,15 @@ struct ProfileView: View {
       .toolbar {
         ToolbarItem(placement: .title) {
           ExpandedNavigationTitle(title: "Profile")
-        }
+        }  // ToolbarItem
 
         ToolbarItem(placement: .topBarTrailing) {
           NavigationLink {
             SettingsView()
           } label: {
             Image(systemName: "gearshape")
-          }
-        }
+          }  // NavigationLink
+        }  // ToolbarItem
 
         ToolbarItem(placement: .topBarTrailing) {
           Menu {
@@ -68,22 +70,35 @@ struct ProfileView: View {
               isPresentingEditProfile = true
             } label: {
               Label("Edit Profile", systemImage: "square.and.pencil")
-            }
+            }  // Button
+            .disabled(!userManager.canEditProfile)
           } label: {
             Image(systemName: "ellipsis")
-          }
-        }
+          }  // Menu
+        }  // ToolbarItem
       }  // toolbar
       .sheet(isPresented: $isPresentingEditProfile) {
         if let user = userManager.currentUser {
           EditProfileView(profile: user)
         }
       }
+      .sheet(
+        item: $errorWrapper,
+        onDismiss: { viewModel.error = nil },
+        content: { wrapper in
+          ErrorView(errorWrapper: wrapper)
+        }
+      )
+      .onChange(of: viewModel.error) { _, error in
+        if let error {
+          errorWrapper = ErrorWrapper(error: error)
+        }
+      }
     }  // NavigationStack
   }
 }
 
-#Preview {
+#Preview("No profile") {
   ProfileView()
     .environment(UserManager())
 }

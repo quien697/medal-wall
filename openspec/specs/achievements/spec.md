@@ -1,9 +1,9 @@
 # achievements Specification
 
 ## Purpose
-Recognize repeat marathon accomplishments with sticky, count-based milestone badges for
-the Full Marathon and Half Marathon distances, shown on the user's Profile. An earned
-tier persists against later medal deletion.
+Recognize repeat marathon accomplishments with count-based milestone badges for the Full
+Marathon and Half Marathon distances, shown on the user's Profile. A badge reflects the
+medals the user holds now, so it follows medal deletion down as well as new medals up.
 
 ## Requirements
 ### Requirement: Milestone Achievement Tracks
@@ -21,39 +21,20 @@ and Centurion (100). 10K, 5K, and custom distances are not tracked.
 - **WHEN** a track's qualifying medal count reaches a tier threshold
 - **THEN** that tier becomes the track's current unlocked tier
 
-### Requirement: Sticky Milestone Persistence
-The system SHALL persist the highest milestone threshold reached per track on the `User`
-record (`highestFullMilestone`, `highestHalfMilestone` — optional, treated as `0` when
-unset) using a one-way
-monotonic ratchet: after a medal create or edit succeeds, the persisted value is raised to
-the live count's tier when higher, and is never lowered.
-
-#### Scenario: Earned tier survives medal deletion
-- **WHEN** a user deletes medals so a track's live count falls below a previously reached
-  tier threshold
-- **THEN** the persisted (displayed) tier remains at the reached tier
-
-#### Scenario: Ratchet only advances on create or edit
-- **WHEN** a medal create or edit succeeds and the live count crosses a threshold beyond
-  the persisted value
-- **THEN** the system writes the higher milestone value to the `User` record
-- **AND** a medal deletion never changes the persisted milestone value
-
-#### Scenario: Ratchet is a no-op below the next threshold
-- **WHEN** a medal create or edit succeeds but the live count has not crossed a threshold
-  beyond the persisted value
-- **THEN** the persisted milestone value is unchanged
-
 ### Requirement: Displayed Tier and Progress
-The system SHALL derive the displayed unlocked tier from the greater of the persisted
-milestone and the live medal count, and SHALL compute progress toward the next tier from
-the raw live count. Milestone values and computed progress SHALL be clamped to the valid
-tier range so an out-of-range persisted or derived count cannot select an invalid tier.
+The system SHALL derive a track's unlocked tier from its live medal count — the qualifying
+medals the user holds now — and SHALL compute progress toward the next tier from the same
+count. Nothing about a track SHALL be stored. The count and computed progress SHALL be
+clamped to the valid tier range so an out-of-range count cannot select an invalid tier.
 
-#### Scenario: Live count exceeds persisted value
-- **WHEN** the live medal count implies a higher tier than the persisted value (e.g.
-  before the ratchet write has synced)
-- **THEN** the displayed badge reflects the higher live-derived tier
+#### Scenario: Deleting medals lowers the tier
+- **WHEN** a user deletes medals so a track's live count falls below a tier threshold they
+  had reached
+- **THEN** the displayed badge drops to the tier the remaining medals reach
+
+#### Scenario: Adding a medal raises the tier
+- **WHEN** a medal save brings a track's live count to a tier threshold
+- **THEN** the displayed badge shows that tier
 
 #### Scenario: Progress toward next tier
 - **WHEN** a track has an unlocked tier below Centurion
@@ -90,11 +71,12 @@ layers as the tier rises. Gold/silver/bronze is deliberately not used here — t
 language belongs to real race placement (`overallPlacement`, `divisionPlacement`), and reusing
 it for milestone counts would blur two different ideas.
 
-**Display uses `max(persisted, live)`; progress uses the raw live count.** Only the persisted
-value makes a tier sticky against later deletion. Taking the max for display covers the
-transient case where the ratchet write has not synced yet, without weakening stickiness, since
-a higher live count is ratcheted in on the next successful write. Progress is a truthful count
-of what remains, so it always uses the raw live count.
+**Tiers come from the live count; nothing is stored.** Until 2026-10-09 an earned tier was
+sticky: a milestone stored on the `User` record kept it against later medal deletion. That cost
+a second write path to the user document after every medal save, and a device holding an older
+profile could overwrite the stored value downward. Badges now reflect the medals the user
+holds. Old `highestFullMilestone` / `highestHalfMilestone` values remain in some user documents
+and are ignored.
 
 **Self-reported data is out of scope, not overlooked.** Fabricated medals are not guarded
 against because the whole `Medal` model is self-reported — bib number, finish time, and

@@ -9,19 +9,25 @@ import SwiftUI
 
 @Observable
 final class EditProfileViewModel {
-  // MARK: - Properties
+  // MARK: - Data
   var userName: UserName
   var photo: UIImage?
-  private(set) var isPhotoChanged = false
   var bio: String
   var gender: Gender?
   var birthday: Date?
 
+  // MARK: - State
+  private(set) var isPhotoChanged = false
+  private(set) var isLoading = false
+
+  // MARK: - Dependencies
   private let profile: User
+  private let networkMonitor: any NetworkMonitor
 
   // MARK: - Init
-  init(profile: User) {
+  init(profile: User, networkMonitor: (any NetworkMonitor)? = nil) {
     self.profile = profile
+    self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
     self.photo = nil
     self.userName = UserName(
       firstName: profile.firstName ?? "",
@@ -37,16 +43,26 @@ final class EditProfileViewModel {
     !userName.trimmedFirstName.isEmpty && !userName.trimmedLastName.isEmpty
   }
 
+  /// The photo to upload on save — only a newly picked one, never the existing photo.
+  var photoToUpload: UIImage? { isPhotoChanged ? photo : nil }
+
   // MARK: - Functions
+  /// Downloads the existing profile photo so the form can show it, unless a new one was
+  /// picked while it loaded.
   func loadExistingPhoto() async {
-    photo = await UIImage.load(from: profile.photoUrl)
+    let existingPhoto = await UIImage.load(from: profile.photoUrl)
+    guard !isPhotoChanged else { return }
+
+    photo = existingPhoto
   }
 
+  /// Sets the newly picked profile photo and marks it as changed.
   func updatePhoto(with uiImage: UIImage) {
     photo = uiImage
     isPhotoChanged = true
   }
 
+  /// Clears the profile photo and marks it as changed.
   func clearPhoto() {
     photo = nil
     isPhotoChanged = true
@@ -61,6 +77,20 @@ final class EditProfileViewModel {
     updated.bio = updatedBio.isEmpty ? nil : updatedBio
     updated.gender = gender
     updated.birthday = birthday
+    if isPhotoChanged && photo == nil {
+      updated.photoUrl = nil
+    }
     return updated
+  }
+
+  /// Saves the edited profile, uploading the photo only when it changed. Offline, it throws
+  /// `AppError.noInternetConnection` before uploading or writing anything.
+  func save(userManager: UserManager) async throws {
+    isLoading = true
+    defer { isLoading = false }
+
+    guard await networkMonitor.isConnected() else { throw AppError.noInternetConnection }
+
+    try await userManager.updateUser(makeUpdatedUser(), photo: photoToUpload)
   }
 }

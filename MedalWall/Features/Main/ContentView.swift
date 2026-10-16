@@ -12,19 +12,20 @@ struct ContentView: View {
     TabView {
       Tab("You", systemImage: "person.crop.circle") {
         ProfileView()
-      }
+      }  // Tab
 
       Tab("Medal", systemImage: "medal") {
         MedalsView()
-      }
+      }  // Tab
 
       Tab("Race", systemImage: "figure.run") {
         RacesView()
-      }
-    }
+      }  // Tab
+    }  // TabView
   }
 }
 
 #Preview {
   ContentView()
+    .environment(UserManager())
 }

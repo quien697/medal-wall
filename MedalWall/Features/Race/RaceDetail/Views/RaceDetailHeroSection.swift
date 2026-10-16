@@ -29,13 +29,13 @@ struct RaceDetailHeroSection: View {
           .font(.TypeScale.caption)
           .foregroundStyle(Color.Text.secondary)
 
-        if let url = url, let urlObj = URL(string: url) {
-          Link(destination: urlObj) {
+        if let url, let destination = URL(string: url) {
+          Link(destination: destination) {
             Label(url, systemImage: "link")
               .font(.TypeScale.caption)
               .foregroundStyle(Color.Text.secondary)
               .underline(true, color: Color.Text.secondary)
-          }
+          }  // Link
         }
       }  // VStack
       .frame(maxWidth: .infinity, alignment: .leading)
@@ -45,7 +45,7 @@ struct RaceDetailHeroSection: View {
 }
 
 #Preview {
-  let race = Race.sampleData.first!
+  let race = Race.taipei
 
   ScrollView {
     RaceDetailHeroSection(

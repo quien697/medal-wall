@@ -2,20 +2,20 @@
 //  AddRaceEditionView.swift
 //  MedalWall
 //
-//  Created by Quien on 2026-03-30.
+//  Created by Quien on 2026-10-02.
 //
 
 import SwiftUI
 
 struct AddRaceEditionView: View {
-  let raceId: String
+  let onCommit: (DraftRaceEdition) -> Void
 
   var body: some View {
-    EditRaceEditionView(mode: .add, raceId: raceId)
+    EditRaceEditionView(onCommit: onCommit)
   }
 }
 
 #Preview {
-  AddRaceEditionView(raceId: "preview-race-id")
+  AddRaceEditionView(onCommit: { _ in })
     .environment(UserManager())
 }

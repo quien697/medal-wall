@@ -42,9 +42,28 @@ For any meaningful feature, subsystem, or bug fix:
 5. **Verify** (`superpowers:verification-before-completion`) — run the build and test
    suite, confirm the change actually works. Evidence before claims. Optionally
    `/code-review` before merge.
+   - *If the change touched UI* — colours, fonts, radii, spacing, or the action/chip/tag
+     modifiers — run `design-system-check`. If the change deliberately deviates from the
+     design system, record it in `openspec/design-system/deviations.md` **as part of this
+     change**, not later: an undeclared deviation is indistinguishable from a mistake.
 6. **Archive** (`openspec-archive-change`, or `opsx:archive`) — folds the change's spec
    delta into `openspec/specs/<capability>/spec.md`, the living record of what the app
    does. Update the capability's `Purpose` if the archive left it as `TBD`.
+
+## When the design system updates
+
+A new `Medal Wall Design System v*.html` is its own small loop, separate from the feature
+loop above:
+
+1. Run `design-system-check`. It reads the newest document, compares it against the code,
+   and rewrites `openspec/design-system/tokens.json`.
+2. **Review that file's git diff** — it is the only record of what the version changed.
+   `documents/` is not under version control and each version replaces the last.
+3. Act on the report: `design-system-check apply` transcribes values the ledger does not
+   protect; ledger entries the release resolved get deleted; a `superseded` entry needs a
+   decision, because the design system has now ruled against a deviation that may still
+   rest on device evidence.
+4. If anything user-visible shifted, open an OpenSpec change for it.
 
 ## When to skip OpenSpec
 

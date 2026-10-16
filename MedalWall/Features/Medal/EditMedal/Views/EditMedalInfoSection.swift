@@ -13,38 +13,38 @@ struct EditMedalInfoSection: View {
   @Binding var bib: String
   let place: Place
   let distance: String
-  var onEditPlace: () -> Void
-  var onEditDistance: () -> Void
+  let onEditPlace: () -> Void
+  let onEditDistance: () -> Void
 
   var body: some View {
-    Section("Info") {
+    Section {
       LabeledContent {
         TextField("e.g. Taipei Marathon 2025", text: $name)
-          .fromStyle(.value)
+          .fieldStyle(.value)
       } label: {
         Text("Name")
-          .fromStyle(.label)
-      }
+          .fieldStyle(.label)
+      }  // LabeledContent
 
       DatePicker(
         selection: $date,
         displayedComponents: .date
       ) {
         Text("Date")
-          .fromStyle(.label)
-      }
+          .fieldStyle(.label)
+      }  // DatePicker
 
       LabeledContent {
         TextField("e.g. 4291 (Optional)", text: $bib)
-          .fromStyle(.value)
+          .fieldStyle(.value)
       } label: {
         Text("Bib")
-          .fromStyle(.label)
-      }
+          .fieldStyle(.label)
+      }  // LabeledContent
 
       HStack {
         Text("Distance")
-          .fromStyle(.label)
+          .fieldStyle(.label)
 
         Spacer()
 
@@ -52,22 +52,25 @@ struct EditMedalInfoSection: View {
           onEditDistance()
         } label: {
           Text(distance)
-            .fromStyle(.value)
-        }
+            .fieldStyle(.value)
+        }  // Button
         .buttonStyle(.bordered)
       }  // HStack
 
       LabeledContent {
         Text(place.formatted.isEmpty ? .appLocalized("Choose a place") : place.formatted)
-          .fromStyle(.value)
+          .fieldStyle(.value)
           .foregroundStyle(place.formatted.isEmpty ? .secondary : .primary)
           .onTapGesture {
             onEditPlace()
           }
       } label: {
         Text("Place")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }  // LabeledContent
+    } header: {
+      Text("Info")
+        .sectionTitleStyle()
     }  // Section
   }
 }

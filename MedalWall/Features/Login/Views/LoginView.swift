@@ -19,15 +19,15 @@ struct LoginView: View {
       VStack {
         RingSeal(.record, size: .hero) {
           Text(verbatim: "MW")
-            .font(.system(size: 28, weight: .black))
-            .tracking(-1.12)
-            .foregroundStyle(Color.Record.primary)
+            .font(.TypeScale.Wordmark.monogram)
+            .tracking(.Tracking.monogram)
+            .foregroundStyle(Color.Record.earned)
         }  // RingSeal
         .padding(.bottom, 16)
 
         Text("Medal Wall")
-          .font(.TypeScale.display)
-          .tracking(-1.12)
+          .font(.TypeScale.Wordmark.name)
+          .tracking(.Tracking.wordmark)
           .foregroundStyle(Color.Text.primary)
           .padding(.bottom, 8)
 
@@ -38,27 +38,27 @@ struct LoginView: View {
 
         VStack(spacing: 16) {
           SignInButton(
-            icon: "apple.logo",
             title: "Continue with Apple",
+            systemImage: "apple.logo",
             isLoading: viewModel.activeSignIn == .apple
           ) {
             await viewModel.signInWithApple()
-          }
+          }  // SignInButton
 
           SignInButton(
-            icon: "google-icon",
             title: "Continue with Google",
+            image: "google-icon",
             isLoading: viewModel.activeSignIn == .google
           ) {
             await viewModel.signInWithGoogle()
-          }
+          }  // SignInButton
 
           SignInButton(
-            icon: "envelope",
-            title: "Continue with Email"
+            title: "Continue with Email",
+            systemImage: "envelope"
           ) {
             await viewModel.signInWithEmailLink()
-          }
+          }  // SignInButton
         }  // VStack
         .allowsHitTesting(!viewModel.isSigningIn)
         .padding(.top)
@@ -68,6 +68,7 @@ struct LoginView: View {
     .sheet(isPresented: $viewModel.isPresentingEmailSignIn, onDismiss: viewModel.resetEmailFlow) {
       SignInWithEmailLinkView(
         email: $viewModel.email,
+        error: $viewModel.emailSheetError,
         isEmailLinkSent: viewModel.isEmailLinkSent,
         isEmailValid: viewModel.isEmailValid,
         isSendingEmail: viewModel.isSendingEmail,
@@ -81,6 +82,13 @@ struct LoginView: View {
       if let newError {
         errorWrapper = ErrorWrapper(error: newError)
         viewModel.error = nil
+      }
+    }
+    // `initial`: a link that opened the app may have failed before this screen appeared.
+    .onChange(of: userManager.signInError, initial: true) { _, newError in
+      if let newError {
+        viewModel.showSignInError(newError)
+        userManager.signInError = nil
       }
     }
   }

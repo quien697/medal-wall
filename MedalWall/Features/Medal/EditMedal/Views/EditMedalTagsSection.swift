@@ -8,22 +8,24 @@
 import SwiftUI
 
 struct EditMedalTagsSection: View {
-  @Binding var tags: [String]
   @State private var input: String = ""
+  let tags: [String]
+  let onAdd: (String) -> Void
+  let onRemove: (String) -> Void
 
   var body: some View {
-    Section("Tags") {
+    Section {
       FlowLayout(spacing: 8) {
         ForEach(tags, id: \.self) { tag in
           HStack(spacing: 4) {
             Text(tag)
             Button {
-              tags.removeAll { $0 == tag }
+              onRemove(tag)
             } label: {
               Image(systemName: "xmark")
                 .font(.TypeScale.overline)
-            }
-          }
+            }  // Button
+          }  // HStack
           .chipStyle(.neutral)
           .buttonStyle(.plain)
         }  // ForEach
@@ -33,20 +35,14 @@ struct EditMedalTagsSection: View {
         TextField("Add tag", text: $input)
           .font(.TypeScale.Field.value)
 
-        if !input.trimmingCharacters(in: .whitespaces).isEmpty {
+        if !input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
           Button {
-            let trimmed = input.trimmingCharacters(in: .whitespaces)
-            guard !trimmed.isEmpty, !tags.contains(trimmed) else {
-              input = ""
-              return
-            }
-
-            tags.append(trimmed)
+            onAdd(input)
             input = ""
           } label: {
             Image(systemName: "plus.circle.fill")
               .foregroundStyle(Color.Text.primary)
-          }
+          }  // Button
           .buttonStyle(.plain)
         }
       }  // HStack
@@ -54,12 +50,19 @@ struct EditMedalTagsSection: View {
       .padding(8)
       .background(Color.Surface.secondary)
       .clipShape(.rect(cornerRadius: 8))
+    } header: {
+      Text("Tags")
+        .sectionTitleStyle()
     }  // Section
   }
 }
 
 #Preview {
   Form {
-    EditMedalTagsSection(tags: .constant(["marathon", "taipei", "2026"]))
+    EditMedalTagsSection(
+      tags: ["marathon", "taipei", "2026"],
+      onAdd: { _ in },
+      onRemove: { _ in }
+    )
   }
 }

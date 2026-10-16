@@ -17,19 +17,19 @@ struct EditProfileInfoSection: View {
     Section {
       LabeledContent {
         TextField("First Name", text: $firstName)
-          .fromStyle(.value)
+          .fieldStyle(.value)
       } label: {
         Text("First Name")
-          .fromStyle(.label)
-      }
+          .fieldStyle(.label)
+      }  // LabeledContent
 
       LabeledContent {
         TextField("Last Name", text: $lastName)
-          .fromStyle(.value)
+          .fieldStyle(.value)
       } label: {
         Text("Last Name")
-          .fromStyle(.label)
-      }
+          .fieldStyle(.label)
+      }  // LabeledContent
 
       Picker(selection: $gender) {
         Text("Not Set")
@@ -38,11 +38,11 @@ struct EditProfileInfoSection: View {
         ForEach(Gender.allCases, id: \.self) { genderCase in
           Text(genderCase.displayName)
             .tag(Gender?.some(genderCase))
-        }
+        }  // ForEach
       } label: {
         Text("Gender")
-          .fromStyle(.label)
-      }
+          .fieldStyle(.label)
+      }  // Picker
       .pickerStyle(.menu)
 
       LabeledContent {
@@ -52,13 +52,13 @@ struct EditProfileInfoSection: View {
         } else {
           Button("Not Set") {
             birthday = .now
-          }
+          }  // Button
           .actionStyle(.neutral, font: .TypeScale.Field.value)
         }
       } label: {
         Text("Birthday")
-          .fromStyle(.label)
-      }
+          .fieldStyle(.label)
+      }  // LabeledContent
     } header: {
       Text("Info")
         .sectionTitleStyle()

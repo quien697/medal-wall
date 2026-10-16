@@ -12,16 +12,19 @@ struct EditMedalResultSection: View {
   @Binding var finishTime: TimeInterval?
 
   var body: some View {
-    Section("Result") {
+    Section {
       TimePicker(
         "Finish Time",
         selection: $finishTime
       ) {
         Text("Finish Time")
-          .fromStyle(.label)
-      }
-      .timePickerStyle(accentColor: Color.Record.primary, fontWeight: .bold)
-    }
+          .fieldStyle(.label)
+      }  // TimePicker
+      .timePickerStyle(accentColor: Color.Accent.primary, fontWeight: .bold)
+    } header: {
+      Text("Result")
+        .sectionTitleStyle()
+    }  // Section
   }
 }
 

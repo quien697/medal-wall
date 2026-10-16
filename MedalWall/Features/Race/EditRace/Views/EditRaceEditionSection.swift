@@ -9,15 +9,12 @@ import SwiftUI
 
 struct EditRaceEditionSection: View {
   // MARK: - Properties
-  let raceId: String
   let editions: [DraftRaceEdition]
   let isLoading: Bool
   let namespace: Namespace.ID
   let transitionID: String
   let onTapAddEdition: () -> Void
   let onTapEdition: (DraftRaceEdition) -> Void
-  let onAdd: (DraftRaceEdition) -> Void
-  let onUpdate: (DraftRaceEdition) -> Void
   let onDelete: (String) -> Void
 
   // MARK: - Body
@@ -60,7 +57,7 @@ struct EditRaceEditionSection: View {
                     ForEach(edition.distances.sorted()) { distance in
                       Text(distance.displayLabel)
                         .tagStyle(.neutralInCard)
-                    }
+                    }  // ForEach
                   }  // HStack
                 }  // ScrollView
               }  // VStack
@@ -91,7 +88,7 @@ struct EditRaceEditionSection: View {
 
           Text("Add")
             .textCase(.uppercase)
-        }
+        }  // Button
         .actionStyle(
           .plain,
           font: .TypeScale.callout,
@@ -110,15 +107,12 @@ struct EditRaceEditionSection: View {
 
   Form {
     EditRaceEditionSection(
-      raceId: "race-taipei",
       editions: [],
       isLoading: false,
       namespace: namespace,
       transitionID: "transitionID",
       onTapAddEdition: {},
       onTapEdition: { _ in },
-      onAdd: { _ in },
-      onUpdate: { _ in },
       onDelete: { _ in }
     )
   }
@@ -129,7 +123,6 @@ struct EditRaceEditionSection: View {
 
   Form {
     EditRaceEditionSection(
-      raceId: "race-taipei",
       editions: [
         DraftRaceEdition(from: .taipei2025),
         DraftRaceEdition(from: .taipei2019)
@@ -139,8 +132,6 @@ struct EditRaceEditionSection: View {
       transitionID: "transitionID",
       onTapAddEdition: {},
       onTapEdition: { _ in },
-      onAdd: { _ in },
-      onUpdate: { _ in },
       onDelete: { _ in }
     )
   }

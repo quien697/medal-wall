@@ -1,0 +1,316 @@
+//
+//  EditRaceViewModelRepositoryTests.swift
+//  MedalWall
+//
+//  Created by Quien on 2026-09-22.
+//
+
+import Foundation
+import Testing
+
+@testable import MedalWall
+
+@MainActor
+struct EditRaceViewModelRepositoryTests {
+
+  private func makeRace(editionCount: Int = 0) -> Race {
+    Race(
+      id: "race-taipei",
+      name: "Taipei Marathon",
+      place: Place(countryCode: "TW", city: "Taipei City"),
+      editionCount: editionCount,
+      createdBy: "uid"
+    )
+  }
+
+  @Test("a new race is created through the injected repository")
+  func testSaveCreatesRace() async {
+    let repository = StubRaceRepository()
+    let viewModel = EditRaceViewModel(
+      mode: .add, race: nil, repository: repository, networkMonitor: StubNetworkMonitor())
+    viewModel.name = "Vancouver Marathon"
+    viewModel.place = Place(countryCode: "CA", city: "Vancouver")
+
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == nil)
+    #expect(await repository.createdRaces.count == 1)
+    #expect(await repository.createdRaces.first?.name == "Vancouver Marathon")
+  }
+
+  @Test("a failed save surfaces raceSaveFailed")
+  func testFailedSaveSurfacesError() async {
+    let repository = StubRaceRepository(writeOutcome: .failure(.raceSaveFailed))
+    let viewModel = EditRaceViewModel(
+      mode: .add, race: nil, repository: repository, networkMonitor: StubNetworkMonitor())
+    viewModel.name = "Vancouver Marathon"
+    viewModel.place = Place(countryCode: "CA", city: "Vancouver")
+
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .raceSaveFailed)
+    #expect(await repository.createdRaces.isEmpty)
+  }
+
+  @Test("editing a race leaves an edition count added elsewhere alone")
+  func testEditDoesNotClobberEditionCount() async {
+    // The screen opened when the race had one edition; another client has since added two.
+    let stale = makeRace(editionCount: 1)
+    let repository = StubRaceRepository(races: [makeRace(editionCount: 3)])
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: stale, repository: repository, networkMonitor: StubNetworkMonitor())
+    viewModel.name = "Taipei Marathon 2026"
+    viewModel.place = stale.place
+
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == nil)
+    #expect(await repository.races.first?.name == "Taipei Marathon 2026")
+    #expect(await repository.races.first?.editionCount == 3)
+  }
+
+  @Test(
+    "name and website are saved without surrounding whitespace or line breaks",
+    arguments: [ItemEditMode.add, .edit])
+  func testTextFieldsSavedTrimmed(mode: ItemEditMode) async throws {
+    let race = makeRace()
+    let repository = StubRaceRepository(races: [race])
+    let viewModel = EditRaceViewModel(
+      mode: mode, race: mode == .edit ? race : nil, repository: repository,
+      networkMonitor: StubNetworkMonitor())
+    viewModel.name = "  Taipei Marathon\n"
+    viewModel.place = race.place
+    viewModel.websiteUrl = "\n https://www.taipeicitymarathon.com "
+
+    await viewModel.save(by: "uid")
+
+    let saved = try #require(
+      await (mode == .add ? repository.createdRaces : repository.updatedRaces).first)
+    #expect(saved.name == "Taipei Marathon")
+    #expect(saved.websiteUrl == "https://www.taipeicitymarathon.com")
+  }
+
+  @Test(
+    "an empty or whitespace-only website is saved as no website",
+    arguments: [ItemEditMode.add, .edit], ["", " \n "])
+  func testBlankWebsiteSavedAsNil(mode: ItemEditMode, websiteUrl: String) async throws {
+    var race = makeRace()
+    race.websiteUrl = "https://www.taipeicitymarathon.com"
+    let repository = StubRaceRepository(races: [race])
+    let viewModel = EditRaceViewModel(
+      mode: mode, race: mode == .edit ? race : nil, repository: repository,
+      networkMonitor: StubNetworkMonitor())
+    viewModel.name = "Taipei Marathon"
+    viewModel.place = race.place
+    viewModel.websiteUrl = websiteUrl
+
+    await viewModel.save(by: "uid")
+
+    let saved = try #require(
+      await (mode == .add ? repository.createdRaces : repository.updatedRaces).first)
+    #expect(saved.websiteUrl == nil)
+  }
+
+  @Test("a failed editions load surfaces raceFetchFailed")
+  func testFailedEditionsLoadSurfacesError() async {
+    let race = makeRace()
+    let repository = StubRaceRepository(
+      races: [race], fetchOutcome: .failure(.raceFetchFailed("network down")))
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
+
+    await viewModel.loadEditions()
+
+    if case .raceFetchFailed = viewModel.error {
+    } else {
+      Issue.record("expected raceFetchFailed, got \(String(describing: viewModel.error))")
+    }
+  }
+
+  @Test("an edition added before the editions finish loading is kept")
+  func testEditionStagedDuringLoadIsKept() async throws {
+    let race = makeRace()
+    let raceDay = try #require(
+      Calendar.current.date(from: DateComponents(year: 2026, month: 3, day: 1))
+    )
+    let existing = RaceEdition(
+      id: "edition-2025", raceId: race.id, year: 2025, startDate: raceDay,
+      endDate: raceDay, createdBy: "uid")
+    let repository = StubRaceRepository(races: [race], editions: [race.id: [existing]])
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
+    let added = DraftRaceEdition(
+      year: 2026, isOneDay: true, startDate: raceDay, endDate: raceDay, distances: [],
+      createdBy: "uid")
+    viewModel.stageAddEdition(added)
+
+    await viewModel.loadEditions()
+
+    #expect(Set(viewModel.displayedEditions.map(\.id)) == [existing.id, added.id])
+  }
+
+  @Test("an added edition edited again before saving is still created")
+  func testReEditedNewEditionIsCreated() async throws {
+    let race = makeRace()
+    let repository = StubRaceRepository(races: [race])
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
+    let raceDay = try #require(
+      Calendar.current.date(from: DateComponents(year: 2026, month: 3, day: 1))
+    )
+    let added = DraftRaceEdition(
+      year: 2026, isOneDay: true, startDate: raceDay, endDate: raceDay, distances: [],
+      createdBy: "uid")
+    viewModel.stageAddEdition(added)
+
+    let editor = EditRaceEditionViewModel(
+      mode: .edit, draft: added)
+    editor.updateStartDate(raceDay.addingTimeInterval(86_400))
+    viewModel.stageUpdateEdition(editor.buildDraft(userId: "uid"))
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == nil)
+    #expect(await repository.createdEditions.map(\.id) == [added.id])
+  }
+
+  // MARK: - Retrying a partly failed save
+  private let raceDay = Date(timeIntervalSince1970: 1_577_836_800)
+
+  private func makeExistingEdition() -> RaceEdition {
+    RaceEdition(
+      id: "edition-2019", raceId: "race-taipei", year: 2019, startDate: raceDay,
+      endDate: raceDay, createdBy: "uid")
+  }
+
+  private func makeAddedEdition() -> DraftRaceEdition {
+    DraftRaceEdition(
+      year: 2020, isOneDay: true, startDate: raceDay, endDate: raceDay, distances: [],
+      createdBy: "uid")
+  }
+
+  @Test("a failed edition delete surfaces editionDeleteFailed and keeps the edition")
+  func testFailedDeleteSurfacesDeleteError() async {
+    let race = makeRace(editionCount: 1)
+    let existing = makeExistingEdition()
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [existing]],
+      deleteOutcome: .failure(.editionDeleteFailed))
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
+    await viewModel.loadEditions()
+    viewModel.stageDeleteEdition(id: existing.id)
+
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .editionDeleteFailed)
+    #expect(await repository.editions[race.id]?.map(\.id) == [existing.id])
+  }
+
+  @Test("retrying a save after a failed delete does not create an edition twice")
+  func testRetryDoesNotRecreateEdition() async {
+    let race = makeRace(editionCount: 1)
+    let existing = makeExistingEdition()
+    let added = makeAddedEdition()
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [existing]],
+      deleteOutcome: .failure(.editionDeleteFailed))
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
+    await viewModel.loadEditions()
+    viewModel.stageAddEdition(added)
+    viewModel.stageDeleteEdition(id: existing.id)
+
+    await viewModel.save(by: "uid")
+    viewModel.error = nil  // what dismissing the error sheet does
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .editionDeleteFailed)
+    #expect(await repository.createdEditions.map(\.id) == [added.id])
+    #expect(await repository.races.first?.editionCount == 2)
+  }
+
+  @Test("retrying a save after a failed create does not delete an edition twice")
+  func testRetryDoesNotRedeleteEdition() async {
+    let race = makeRace(editionCount: 1)
+    let existing = makeExistingEdition()
+    let added = makeAddedEdition()
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [existing]], failingEditionCreateIDs: [added.id])
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
+    await viewModel.loadEditions()
+    viewModel.stageAddEdition(added)
+    viewModel.stageDeleteEdition(id: existing.id)
+
+    await viewModel.save(by: "uid")
+    viewModel.error = nil  // what dismissing the error sheet does
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .editionSaveFailed)
+    #expect(await repository.deletedEditionIDs == [existing.id])
+    #expect(await repository.races.first?.editionCount == 0)
+  }
+
+  @Test("retrying a save after a failed update does not update a saved edition twice")
+  func testRetryDoesNotReupdateEdition() async {
+    let race = makeRace(editionCount: 2)
+    let saved = makeExistingEdition()
+    let failing = RaceEdition(
+      id: "edition-2018", raceId: race.id, year: 2018, startDate: raceDay, endDate: raceDay,
+      createdBy: "uid")
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [saved, failing]],
+      failingEditionUpdateIDs: [failing.id])
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, networkMonitor: StubNetworkMonitor())
+    await viewModel.loadEditions()
+    for edition in [saved, failing] {
+      var draft = DraftRaceEdition(from: edition)
+      draft.isModified = true
+      viewModel.stageUpdateEdition(draft)
+    }
+
+    await viewModel.save(by: "uid")
+    viewModel.error = nil  // what dismissing the error sheet does
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .editionSaveFailed)
+    #expect(await repository.updatedEditions.map(\.id) == [saved.id])
+  }
+
+  // MARK: - Loading
+  @Test("an existing race's editions count as loading before the first load starts")
+  func testEditionsLoadingBeforeFirstLoad() {
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: makeRace(), repository: StubRaceRepository(),
+      networkMonitor: StubNetworkMonitor())
+
+    #expect(viewModel.isEditionsLoading)
+  }
+
+  @Test("editions load while the race logo is still downloading")
+  func testEditionsLoadDuringLogoDownload() async throws {
+    var race = makeRace(editionCount: 1)
+    race.photoUrl = "https://example.com/logo.jpg"
+    let existing = makeExistingEdition()
+    let repository = StubRaceRepository(races: [race], editions: [race.id: [existing]])
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository,
+      networkMonitor: StubNetworkMonitor(),
+      loadImage: { _ in
+        try? await Task.sleep(for: .seconds(5))  // a slow connection
+        return nil
+      })
+
+    let loading = Task { await viewModel.load() }
+    let deadline = ContinuousClock.now + .seconds(2)
+    while viewModel.displayedEditions.isEmpty, ContinuousClock.now < deadline {
+      try await Task.sleep(for: .milliseconds(10))
+    }
+    let editionIDs = viewModel.displayedEditions.map(\.id)
+    loading.cancel()
+    await loading.value
+
+    #expect(editionIDs == [existing.id])
+  }
+}

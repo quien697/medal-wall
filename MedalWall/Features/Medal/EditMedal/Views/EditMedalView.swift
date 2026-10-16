@@ -21,19 +21,18 @@ struct EditMedalView: View {
   @State private var isPresentingCropImageView: Bool = false
   @State private var isPresentingRaceEntryPicker: Bool = false
   @State private var isPresentingPlacePicker: Bool = false
-  @State private var shouldDismiss: Bool = false
-  // Medal photo picker
   @State private var isPresentingPhotoPicker: Bool = false
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var rawPickedImage: UIImage?
-  // Event photos picker
   @State private var isPresentingEventPhotosPicker: Bool = false
   @State private var selectedEventPhotos: [PhotosPickerItem] = []
 
+  // MARK: - Init
   init(mode: ItemEditMode, medal: Medal? = nil) {
     self._viewModel = State(initialValue: EditMedalViewModel(mode: mode, medal: medal))
   }
 
+  // MARK: - Body
   var body: some View {
     NavigationStack {
       Form {
@@ -53,7 +52,7 @@ struct EditMedalView: View {
 
         EditMedalAutoFillSection {
           isPresentingRaceEntryPicker = true
-        }
+        }  // EditMedalAutoFillSection
 
         EditMedalResultSection(finishTime: $viewModel.finishTime)
 
@@ -93,7 +92,11 @@ struct EditMedalView: View {
           }
         )
 
-        EditMedalTagsSection(tags: $viewModel.tags)
+        EditMedalTagsSection(
+          tags: viewModel.tags,
+          onAdd: { viewModel.addTag($0) },
+          onRemove: { viewModel.removeTag($0) }
+        )
       }  // Form
       .navigationTitle("\(viewModel.mode.displayName) Medal")
       .navigationBarTitleDisplayMode(.inline)
@@ -103,7 +106,7 @@ struct EditMedalView: View {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .close) {
             dismiss()
-          }
+          }  // Button
           .disabled(viewModel.isLoading)
         }  // ToolbarItem
 
@@ -113,25 +116,24 @@ struct EditMedalView: View {
           } else {
             Button(role: .confirm) {
               guard let userID = userManager.currentUserID else {
-                errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
+                errorWrapper = ErrorWrapper(error: AppError.notSignedIn)
                 return
               }
 
               Task {
                 do {
-                  try await viewModel.save(by: userID, userManager: userManager)
+                  try await viewModel.save(by: userID)
                   dismiss()
                 } catch {
-                  shouldDismiss = true
-                  errorWrapper = ErrorWrapper(error: AppError.medalSaveFailed)
+                  errorWrapper = ErrorWrapper(error: error as? AppError ?? .medalSaveFailed)
                 }
               }
-            }
+            }  // Button
             .disabled(!viewModel.isFormValid)
           }
         }  // ToolbarItem
       }  // toolbar
-      .interactiveDismissDisabled(viewModel.isLoading)
+      .interactiveDismissDisabled()
       .task {
         await viewModel.loadPhoto()
       }
@@ -217,11 +219,6 @@ struct EditMedalView: View {
       }
       .sheet(
         item: $errorWrapper,
-        onDismiss: {
-          if shouldDismiss {
-            dismiss()
-          }
-        },
         content: { wrapper in
           ErrorView(errorWrapper: wrapper)
         }
@@ -232,7 +229,7 @@ struct EditMedalView: View {
 
 #Preview {
   NavigationStack {
-    EditMedalView(mode: .edit, medal: Medal.sampleData.first!)
+    EditMedalView(mode: .edit, medal: Medal.sampleData.first)
   }
   .environment(UserManager())
 }

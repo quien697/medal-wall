@@ -11,6 +11,7 @@ extension CGFloat {
 
   /// The design system's corner radii, named by the role they belong to.
   struct Radius {
+    static let progressTrack: CGFloat = 3
     static let tag: CGFloat = 6
     static let field: CGFloat = 12
     static let button: CGFloat = 14
@@ -32,5 +33,13 @@ extension CGFloat {
     static let gutter: CGFloat = 16
     static let panel: CGFloat = 20
     static let section: CGFloat = 24
+  }
+
+  struct Tracking {
+    static let wordmark: CGFloat = -1.1
+    static let monogram: CGFloat = -1
+    static let tag: CGFloat = 0.6
+    static let label: CGFloat = 1.4
+    static let sectionTitle: CGFloat = 1
   }
 }

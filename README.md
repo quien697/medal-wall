@@ -50,6 +50,7 @@ MedalWall/
 │ ├─ Race/
 │ └─ Setting/
 ├─ Models/
+├─ Preferences/
 ├─ Shared/
 │ ├─ Components/
 │ ├─ Errors/

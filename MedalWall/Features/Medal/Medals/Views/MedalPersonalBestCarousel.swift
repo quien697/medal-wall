@@ -55,7 +55,7 @@ struct MedalPersonalBestCarousel: View {
                 id: Self.transitionID(for: personalBest),
                 in: namespace
               )
-            }
+            }  // NavigationLink
             .containerRelativeFrame(.horizontal, count: 1, spacing: .Space.gutter)
           }  // ForEach
         }  // HStack

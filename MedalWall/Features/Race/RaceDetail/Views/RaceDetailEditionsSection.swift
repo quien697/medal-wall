@@ -21,10 +21,10 @@ struct RaceDetailEditionsSection: View {
           Text("Add editions to track your race history.")
             .font(.TypeScale.body)
             .foregroundStyle(Color.Text.secondary)
-        }
+        }  // ContentUnavailableView
         .surfaceStyle()
       } else {
-        ForEach(editions.sorted(by: { $0.startDate > $1.startDate })) { edition in
+        ForEach(editions) { edition in
           VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
               Text(String(edition.year))
@@ -45,7 +45,7 @@ struct RaceDetailEditionsSection: View {
                 ForEach(edition.distances.sorted()) { distance in
                   Text(distance.displayLabel)
                     .tagStyle(.neutralInCard)
-                }
+                }  // ForEach
               }  // FlowLayout
 
               Spacer()

@@ -11,33 +11,29 @@ import SwiftUI
 ///
 /// The source values are CSS `box-shadow`, whose negative spread has no SwiftUI
 /// equivalent — `shadow(color:radius:x:y:)` cannot shrink a shadow before
-/// blurring it. Each level is therefore approximated with a tighter radius and a
-/// lower opacity than a direct blur conversion would give.
+/// blurring it. Each level is therefore approximated with a tighter radius, a shorter
+/// offset and a lower opacity than a direct blur conversion would give.
+///
+/// The source casts in ink navy (`#0F1B2D`); these cast in black.
+///
+/// `hairline` has no case: it is a border with no shadow, and `surfaceStyle` draws it.
 enum Elevation {
-  case soft
-  case lifted
   case ring
 
   fileprivate var color: Color {
     switch self {
-    case .soft: Color.black.opacity(0.20)
-    case .lifted: Color.black.opacity(0.26)
     case .ring: Color.black.opacity(0.28)
     }
   }
 
   fileprivate var radius: CGFloat {
     switch self {
-    case .soft: 8
-    case .lifted: 14
     case .ring: 6
     }
   }
 
   fileprivate var yOffset: CGFloat {
     switch self {
-    case .soft: 6
-    case .lifted: 12
     case .ring: 4
     }
   }
@@ -67,20 +63,10 @@ extension View {
 }
 
 #Preview {
-  VStack(spacing: 40) {
-    Text("Soft")
-      .surfaceStyle()
-      .elevation(.soft)
-
-    Text("Lifted")
-      .surfaceStyle()
-      .elevation(.lifted)
-
-    Circle()
-      .fill(Color.Surface.primary)
-      .frame(width: 72, height: 72)
-      .elevation(.ring)
-  }  // VStack
-  .padding(40)
-  .background(Color.Background.primary)
+  Circle()
+    .fill(Color.Surface.primary)
+    .frame(width: 72, height: 72)
+    .elevation(.ring)
+    .padding(40)
+    .background(Color.Background.primary)
 }

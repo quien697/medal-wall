@@ -9,17 +9,44 @@ on:
 jobs:
   test:
     name: Build & Test
-    runs-on: macos-15
+    runs-on: macos-26
 
     env:
-      # Pin to a specific Xcode version so CI uses the same toolchain as local development.
-      # macos-15 runners ship with an older Xcode by default; without this the build would
-      # use a different Swift/SDK version than the project targets.
-      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+      # Pin to a specific Xcode version so the build does not change when the image's default
+      # does. Xcode 26.6 is the newest on a non-preview image and ships Swift 6.3, older than
+      # the Swift 6.4 of local development on Xcode 27, which Actions offers only as a preview
+      # image (`xcode-27`). macos-15 tops out at Xcode 26.3 (Swift 6.2.4).
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Check formatting
+        run: |
+          # --strict: without it findings are only warnings and the command exits 0, so a
+          # misformatted file would sail through CI. A config swift-format cannot read also
+          # exits non-zero here, which is how this step earns its keep: formatting was
+          # previously enforced only by the local pre-commit hook, which is untracked and
+          # ignores the formatter's exit status.
+          swift format lint --recursive --parallel --strict .
+
+      - name: Install SwiftLint
+        run: |
+          # The arm64 runner images ship without SwiftLint, so `swiftlint` would exit 127.
+          # Pinned to the local version so a rule added upstream cannot fail here before it
+          # fails on a developer's machine.
+          curl -sSfL -o "$RUNNER_TEMP/swiftlint.zip" \
+            https://github.com/realm/SwiftLint/releases/download/0.65.1/portable_swiftlint.zip
+          unzip -q "$RUNNER_TEMP/swiftlint.zip" -d "$RUNNER_TEMP/swiftlint"
+          echo "$RUNNER_TEMP/swiftlint" >> "$GITHUB_PATH"
+
+      - name: Lint
+        run: |
+          # --strict: most rules in .swiftlint.yml are warnings, and SwiftLint exits 0 on
+          # warnings alone, so without this the step would report violations and still pass.
+          # github-actions-logging: violations appear as annotations on the PR diff.
+          swiftlint lint --strict --reporter github-actions-logging
 
       - name: Cache SPM packages
         uses: actions/cache@v4
@@ -29,10 +56,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
 
+      - name: Provide placeholder Firebase config
+        run: |
+          # GoogleService-Info.plist is gitignored, and FirebaseApp.configure() aborts the app at
+          # launch without it, so the test host crashed before any test ran. The tests use stubs,
+          # not Firebase, so well-formed dummy values are enough and keep CI off the real project.
+          cp .github/ci/GoogleService-Info.placeholder.plist MedalWall/GoogleService-Info.plist
+
       - name: Build
         run: |
           # CODE_SIGNING_ALLOWED=NO: CI runners have no signing identity, so code signing must be disabled.
           # xcpretty: formats xcodebuild's verbose output into readable pass/fail lines.
+          # pipefail: the default shell is `bash -e` without it, so the step took xcpretty's exit
+          # status and passed even when xcodebuild failed.
+          set -o pipefail
           xcodebuild build \
             -project MedalWall.xcodeproj \
             -scheme MedalWall \
@@ -42,6 +79,7 @@ jobs:
 
       - name: Test
         run: |
+          set -o pipefail
           xcodebuild test \
             -project MedalWall.xcodeproj \
             -scheme MedalWall \

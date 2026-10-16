@@ -25,15 +25,15 @@ enum ChipStyle {
 
   fileprivate var foreground: Color {
     switch self {
-    case .primary: Color.Pigment.paper
+    case .primary: Color.Text.inverse
     case .secondary: Color.Text.secondary
-    case .neutral: Color.Pigment.inkNavy
+    case .neutral: Color.Accent.primary
     }
   }
 
   fileprivate var background: Color {
     switch self {
-    case .primary: Color.Pigment.inkNavy
+    case .primary: Color.Accent.primary
     case .secondary: Color.Surface.primary
     case .neutral: Color.Surface.tertiary
     }
@@ -91,6 +91,8 @@ struct ChipViewModifier: ViewModifier {
 extension View {
 
   /// Applies the design system's chip appearance for `style`.
+  ///
+  /// The default padding was measured on device, so it stays off the space scale.
   func chipStyle(
     _ style: ChipStyle,
     font: Font? = nil,

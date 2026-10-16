@@ -19,7 +19,7 @@ enum AchievementTier: Int, CaseIterable {
   case centurion = 100
 
   /// Display name shown in the achievement row.
-  nonisolated var name: String {
+  var name: String {
     switch self {
     case .firstFinish: return .appLocalized("First Finish")
     case .hatTrick: return .appLocalized("Hat Trick")
@@ -32,5 +32,5 @@ enum AchievementTier: Int, CaseIterable {
   }
 
   /// The medal count required to reach this tier.
-  nonisolated var threshold: Int { rawValue }
+  var threshold: Int { rawValue }
 }

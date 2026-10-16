@@ -7,6 +7,7 @@
 
 import Foundation
 import Testing
+import UIKit
 
 @testable import MedalWall
 
@@ -65,6 +66,16 @@ struct EditRaceViewModelTests {
   func testIsFormValidWhitespaceName() {
     let viewModel = EditRaceViewModel(mode: .add, race: nil)
     viewModel.name = "   "
+    viewModel.place.countryCode = "CA"
+    viewModel.place.city = "Vancouver"
+
+    #expect(viewModel.isFormValid == false)
+  }
+
+  @Test("isFormValid is false when name is only a pasted line break")
+  func testIsFormValidNewlineName() {
+    let viewModel = EditRaceViewModel(mode: .add, race: nil)
+    viewModel.name = " \n"
     viewModel.place.countryCode = "CA"
     viewModel.place.city = "Vancouver"
 
@@ -221,5 +232,19 @@ struct EditRaceViewModelTests {
     #expect(viewModel.displayedEditions[0].startDate == d3.startDate)
     #expect(viewModel.displayedEditions[1].startDate == d2.startDate)
     #expect(viewModel.displayedEditions[2].startDate == d1.startDate)
+  }
+
+  // MARK: - Photo
+  @Test("a photo picked while the existing logo loads is kept")
+  func testPickedPhotoSurvivesExistingPhotoLoad() async {
+    var race = Race(name: "Vancouver Marathon", place: place, createdBy: "user-1")
+    race.photoUrl = "file:///nonexistent/logo.jpg"
+    let viewModel = EditRaceViewModel(mode: .edit, race: race)
+    let pickedPhoto = UIImage()
+    viewModel.updatePhoto(with: pickedPhoto)
+
+    await viewModel.loadExistingPhoto()
+
+    #expect(viewModel.photo === pickedPhoto)
   }
 }

@@ -52,6 +52,24 @@ struct MedalComputedTests {
     #expect(medal.recordedFinishTime == nil)
   }
 
+  /// Another client or a corrupt document can store any number, and `Duration` traps on
+  /// infinity or a value near 1e20 seconds, so formatting one would crash the app.
+  @Test(
+    "recordedFinishTime is nil when finishTime is infinite or 1,000 hours or more",
+    arguments: [TimeInterval.infinity, 3_600_000, 1e30])
+  func testRecordedFinishTimeNilWhenFinishTimeTooLarge(finishTime: TimeInterval) {
+    let medal = makeMedal(finishTime: finishTime)
+
+    #expect(medal.recordedFinishTime == nil)
+  }
+
+  @Test("recordedFinishTime keeps a time just under 1,000 hours")
+  func testRecordedFinishTimeKeepsTimeUnderLimit() {
+    let medal = makeMedal(finishTime: 3_599_999)
+
+    #expect(medal.recordedFinishTime == 3_599_999)
+  }
+
   @Test("recordedFinishTime returns the value when it is positive")
   func testRecordedFinishTimeReturnsPositiveValue() {
     let medal = makeMedal(finishTime: 12624)
@@ -101,6 +119,30 @@ struct MedalComputedTests {
     #expect(medal.averagePace == nil)
   }
 
+  /// The pace is shown through `Int(_:)`, which traps above `Int.max`; a stored distance near
+  /// zero would otherwise give a pace that large and crash every screen that shows it.
+  @Test(
+    "averagePace is nil at 1,000 minutes per kilometre or slower",
+    arguments: [(1e-16, 86_399.0), (0.001, 3_600.0), (0.06, 3_600.0)])
+  func testAveragePaceNilWhenTooSlow(kilometers: Double, finishTime: TimeInterval) {
+    let medal = makeMedal(
+      distance: RaceDistance(category: .custom(kilometers), type: .inPerson),
+      finishTime: finishTime
+    )
+
+    #expect(medal.averagePace == nil)
+  }
+
+  @Test("averagePace is nil when the distance is infinite")
+  func testAveragePaceNilWhenDistanceInfinite() {
+    let medal = makeMedal(
+      distance: RaceDistance(category: .custom(.infinity), type: .inPerson),
+      finishTime: 3600
+    )
+
+    #expect(medal.averagePace == nil)
+  }
+
   @Test("averagePace calculates minutes per km for a full marathon")
   func testAveragePaceCalculation() {
     let finishTime: TimeInterval = 12624
@@ -110,28 +152,28 @@ struct MedalComputedTests {
     #expect(medal.averagePace == expected)
   }
 
-  // MARK: - divisionEnum
-  @Test("divisionEnum is nil when division is nil")
-  func testDivisionEnumNilWhenNoDivision() {
+  // MARK: - parsedDivision
+  @Test("parsedDivision is nil when division is nil")
+  func testParsedDivisionNilWhenNoDivision() {
     let medal = makeMedal()
 
-    #expect(medal.divisionEnum == nil)
+    #expect(medal.parsedDivision == nil)
   }
 
-  @Test("divisionEnum reconstructs a valid Division from its stored raw value")
-  func testDivisionEnumValid() {
+  @Test("parsedDivision reconstructs a valid Division from its stored raw value")
+  func testParsedDivisionValid() {
     let division = Division(gender: .male, ageGroup: .from30to34)
     let medal = makeMedal(division: division)
 
-    #expect(medal.divisionEnum?.gender == .male)
-    #expect(medal.divisionEnum?.ageGroup == .from30to34)
+    #expect(medal.parsedDivision?.gender == .male)
+    #expect(medal.parsedDivision?.ageGroup == .from30to34)
   }
 
-  @Test("divisionEnum round-trips through Medal storage for a female division")
-  func testDivisionEnumRoundTripFemale() {
+  @Test("parsedDivision round-trips through Medal storage for a female division")
+  func testParsedDivisionRoundTripFemale() {
     let division = Division(gender: .female, ageGroup: .from40to44)
     let medal = makeMedal(division: division)
 
-    #expect(medal.divisionEnum == division)
+    #expect(medal.parsedDivision == division)
   }
 }

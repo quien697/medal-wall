@@ -12,14 +12,14 @@ struct AppearancePicker: View {
 
   var body: some View {
     Picker(selection: $appTheme) {
-      ForEach(AppTheme.allCases, id: \.self) { scheme in
+      ForEach(AppTheme.allCases, id: \.self) { theme in
         HStack {
-          Image(systemName: scheme.icon)
+          Image(systemName: theme.icon)
 
-          Text(scheme.label)
+          Text(theme.label)
             .font(.TypeScale.Field.value)
         }  // HStack
-        .tag(scheme)
+        .tag(theme)
       }  // ForEach
     } label: {
       Text("Appearance")

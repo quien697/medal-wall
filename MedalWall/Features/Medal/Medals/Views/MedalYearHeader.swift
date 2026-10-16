@@ -14,7 +14,6 @@ import SwiftUI
 /// must never render as "2,025".
 struct MedalYearHeader: View {
   // MARK: - Properties
-  private let countTracking: CGFloat = 1.4
   let year: Int
   let count: Int
 
@@ -31,8 +30,8 @@ struct MedalYearHeader: View {
         Spacer()
 
         Text("^[\(count) medal](inflect: true)")
-          .font(.TypeScale.microLabel)
-          .tracking(countTracking)
+          .font(.TypeScale.overline)
+          .tracking(.Tracking.label)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
       }  // HStack

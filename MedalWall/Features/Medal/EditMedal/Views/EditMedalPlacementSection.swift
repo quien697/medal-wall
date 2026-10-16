@@ -17,7 +17,7 @@ struct EditMedalPlacementSection: View {
   @Binding var divisionTotal: Int?
 
   var body: some View {
-    Section("Placement (Optional)") {
+    Section {
       EditMedalPlacementRow(
         label: "Overall",
         placement: $overallPlacement,
@@ -35,29 +35,29 @@ struct EditMedalPlacementSection: View {
 
         Section("Female") {
           ForEach(AgeGroup.fiveYearCases, id: \.self) { ageGroup in
-            let div = Division(gender: .female, ageGroup: ageGroup)
-            Text(div.displayName).tag(Division?.some(div))
-          }
+            let option = Division(gender: .female, ageGroup: ageGroup)
+            Text(option.displayName).tag(Division?.some(option))
+          }  // ForEach
           ForEach(AgeGroup.tenYearCases, id: \.self) { ageGroup in
-            let div = Division(gender: .female, ageGroup: ageGroup)
-            Text(div.displayName).tag(Division?.some(div))
-          }
-        }
+            let option = Division(gender: .female, ageGroup: ageGroup)
+            Text(option.displayName).tag(Division?.some(option))
+          }  // ForEach
+        }  // Section
 
         Section("Male") {
           ForEach(AgeGroup.fiveYearCases, id: \.self) { ageGroup in
-            let div = Division(gender: .male, ageGroup: ageGroup)
-            Text(div.displayName).tag(Division?.some(div))
-          }
+            let option = Division(gender: .male, ageGroup: ageGroup)
+            Text(option.displayName).tag(Division?.some(option))
+          }  // ForEach
           ForEach(AgeGroup.tenYearCases, id: \.self) { ageGroup in
-            let div = Division(gender: .male, ageGroup: ageGroup)
-            Text(div.displayName).tag(Division?.some(div))
-          }
-        }
+            let option = Division(gender: .male, ageGroup: ageGroup)
+            Text(option.displayName).tag(Division?.some(option))
+          }  // ForEach
+        }  // Section
       } label: {
         Text("Division Group")
-          .fromStyle(.label)
-      }
+          .fieldStyle(.label)
+      }  // Picker
 
       if division != nil {
         EditMedalPlacementRow(
@@ -66,6 +66,9 @@ struct EditMedalPlacementSection: View {
           total: $divisionTotal
         )
       }
+    } header: {
+      Text("Placement (Optional)")
+        .sectionTitleStyle()
     }  // Section
   }
 }
@@ -79,7 +82,7 @@ struct EditMedalPlacementSection: View {
       totalParticipants: .constant(medal.totalParticipants),
       genderPlacement: .constant(medal.genderPlacement),
       genderTotal: .constant(medal.genderTotal),
-      division: .constant(medal.divisionEnum),
+      division: .constant(medal.parsedDivision),
       divisionPlacement: .constant(medal.divisionPlacement),
       divisionTotal: .constant(medal.divisionTotal)
     )

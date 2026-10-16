@@ -34,7 +34,7 @@ struct RaceDetailView: View {
 
       ScrollView {
         RaceDetailEditionsSection(editions: viewModel.editions)
-      }
+      }  // ScrollView
     }  // VStack
     .background(Color.Background.primary)
     .overlay {
@@ -54,7 +54,7 @@ struct RaceDetailView: View {
             isPresentingEditRace = true
           } label: {
             Label("Edit Race", systemImage: "square.and.pencil")
-          }
+          }  // Button
 
           Divider()
 
@@ -62,13 +62,13 @@ struct RaceDetailView: View {
             isPresentingDeleteRaceConfirm = true
           } label: {
             Label("Delete Race", systemImage: "trash")
-          }
+          }  // Button
         }  // Menu
       }  // ToolbarItem
     }  // toolbar
     .alert(isPresented: $isPresentingDeleteRaceConfirm) {
       .deleteConfirmation(
-        name: viewModel.race.name,
+        .race(name: viewModel.race.name),
         onDelete: {
           Task {
             await viewModel.deleteRace()
@@ -108,6 +108,6 @@ struct RaceDetailView: View {
 
 #Preview {
   NavigationStack {
-    RaceDetailView(race: Race.sampleData.first!)
+    RaceDetailView(race: Race.taipei)
   }
 }

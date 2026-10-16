@@ -6,13 +6,13 @@
 //
 
 /// A race division combining gender and age group bracket.
-/// Displayed as e.g. "Male 30-34", "Female Under 20".
-/// Stored as a pipe-separated raw string: "male|30-34".
+/// Displayed as e.g. "M 30–34", "F Under 20".
+/// Stored as a space-separated raw string: "male from30to34".
 struct Division: Hashable, Sendable {
   var gender: Gender
   var ageGroup: AgeGroup
 
-  nonisolated var rawValue: String {
+  var rawValue: String {
     "\(gender.rawValue) \(ageGroup.rawValue)"
   }
 
@@ -27,7 +27,7 @@ struct Division: Hashable, Sendable {
 
   /// Reconstructs a `Division` from its persisted raw value.
   /// Splits on the last space, e.g. `"male from30to34"` → `.male` + `.from30to34`.
-  nonisolated init?(rawValue: String) {
+  init?(rawValue: String) {
     guard let separatorIndex = rawValue.lastIndex(of: " ") else { return nil }
 
     let genderRaw = String(rawValue[rawValue.startIndex..<separatorIndex])

@@ -15,9 +15,10 @@ struct RaceList: View {
   var body: some View {
     Group {
       if races.isEmpty && searchText.isEmpty {
-        RaceEmptyView()
+        EmptyState(
+          title: "No Race Events", description: "Tap the + button to add your first race event!")
       } else if races.isEmpty {
-        RaceNoResultView(searchText: searchText)
+        RaceNoResultState(searchText: searchText)
       } else {
         List(races) { race in
           NavigationLink {
@@ -35,9 +36,9 @@ struct RaceList: View {
               onDelete(race)
             } label: {
               Label("Delete", systemImage: "trash")
-            }
+            }  // Button
           }
-        }
+        }  // List
         .scrollContentBackground(.hidden)
       }
     }  // Group

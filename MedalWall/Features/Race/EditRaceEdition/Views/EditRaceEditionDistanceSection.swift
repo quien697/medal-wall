@@ -9,8 +9,8 @@ import SwiftUI
 
 struct EditRaceEditionDistanceSection: View {
   let distances: [RaceDistance]
-  var onRemove: (RaceDistance) -> Void
-  var onAdd: () -> Void
+  let onRemove: (RaceDistance) -> Void
+  let onAdd: () -> Void
 
   var body: some View {
     Section {
@@ -25,11 +25,11 @@ struct EditRaceEditionDistanceSection: View {
               Image(systemName: "xmark")
                 .font(.TypeScale.overline)
                 .foregroundStyle(Color.Text.tertiary)
-            }
+            }  // Button
             .buttonStyle(.plain)
-          }
+          }  // HStack
           .chipStyle(.neutral)
-        }
+        }  // ForEach
       }  // FlowLayout
     } header: {
       HStack {
@@ -45,21 +45,21 @@ struct EditRaceEditionDistanceSection: View {
 
           Text("Add")
             .textCase(.uppercase)
-        }
+        }  // Button
         .actionStyle(
           .plain,
           font: .TypeScale.callout,
           vPadding: 0,
           hPadding: 0
         )
-      }
+      }  // HStack
     }  // Section
     .listRowBackground(Color.Surface.primary)
   }
 }
 
 #Preview {
-  let distances = RaceEdition.sampleData.first!.distances
+  let distances = RaceEdition.taipei2019.distances
 
   Form {
     EditRaceEditionDistanceSection(

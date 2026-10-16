@@ -15,9 +15,9 @@ struct RaceEntryEditionRow: View {
   var body: some View {
     VStack(alignment: .leading) {
       HStack {
-        Text("\(edition.year)")
+        Text(String(edition.year))
           .font(.TypeScale.Numeric.medium)
-          .foregroundStyle(Color.Record.primary)
+          .foregroundStyle(Color.Text.primary)
 
         Text(edition.dateDisplayLabel)
           .font(.TypeScale.caption)
@@ -33,7 +33,7 @@ struct RaceEntryEditionRow: View {
               distance: distance,
               selection: $selection
             )
-          }
+          }  // ForEach
         }  // FlowLayout
       } else {
         Text("No Distances")

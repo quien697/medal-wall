@@ -13,7 +13,7 @@ struct EditMedalEventPhotosSection: View {
   let onRemove: (String) -> Void
 
   var body: some View {
-    Section("Event Photos") {
+    Section {
       ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 10) {
           ForEach(photos) { photo in
@@ -31,7 +31,7 @@ struct EditMedalEventPhotosSection: View {
                   .symbolRenderingMode(.palette)
                   .foregroundStyle(.white, Color.Status.error)
                   .font(.system(size: 18))
-              }
+              }  // Button
               .buttonStyle(.plain)
               .offset(x: 6, y: -6)
             }  // ZStack
@@ -41,12 +41,15 @@ struct EditMedalEventPhotosSection: View {
             onChooseFromLibrary()
           } label: {
             EmptyPhotoSlot(as: .eventThumbnail)
-          }
+          }  // Button
           .buttonStyle(.plain)
         }  // HStack
         .padding()
       }  // ScrollView
       .listRowInsets(EdgeInsets())
+    } header: {
+      Text("Event Photos")
+        .sectionTitleStyle()
     }  // Section
   }
 }

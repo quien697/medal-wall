@@ -5,31 +5,30 @@
 //  Created by Quien on 2025-11-26.
 //
 
-import PhotosUI
 import SwiftUI
 
 struct EditRaceInfoSection: View {
   @Binding var name: String
   @Binding var url: String
   let place: Place
-  var onEditPlace: () -> Void
+  let onEditPlace: () -> Void
 
   var body: some View {
     Section {
       LabeledContent {
         TextField("e.g. Taipei Marathon", text: $name)
-          .fromStyle(.value)
+          .fieldStyle(.value)
       } label: {
         Text("Name")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }  // LabeledContent
 
       LabeledContent {
         TextField("optional", text: $url)
-          .fromStyle(.value)
+          .fieldStyle(.value)
       } label: {
-        Text("WebSite")
-          .fromStyle(.label)
+        Text("Website")
+          .fieldStyle(.label)
       }  // LabeledContent
 
       LabeledContent {
@@ -40,15 +39,14 @@ struct EditRaceInfoSection: View {
           Image(systemName: "chevron.right")
             .font(.TypeScale.overline)
             .padding(.leading, -6)
-        }
-
+        }  // HStack
         .foregroundStyle(place.formatted.isEmpty ? Color.Text.tertiary : Color.Text.primary)
         .onTapGesture {
           onEditPlace()
         }
       } label: {
         Text("Place")
-          .fromStyle(.label)
+          .fieldStyle(.label)
       }  // LabeledContent
     } header: {
       Text("Info")
@@ -59,7 +57,7 @@ struct EditRaceInfoSection: View {
 }
 
 #Preview {
-  let race = Race.sampleData.first!
+  let race = Race.taipei
 
   Form {
     EditRaceInfoSection(

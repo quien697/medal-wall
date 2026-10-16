@@ -17,14 +17,14 @@ struct ProfileAchievementsSection: View {
         ProfileAchievementRow(trackName: "Full Marathon", progress: fullMarathonProgress)
 
         ProfileAchievementRow(trackName: "Half Marathon", progress: halfMarathonProgress)
-      }
-    }
+      }  // VStack
+    }  // PageSection
   }
 }
 
 #Preview {
   ProfileAchievementsSection(
-    fullMarathonProgress: AchievementProgress.compute(persistedMilestone: 10, liveCount: 10),
-    halfMarathonProgress: AchievementProgress.compute(persistedMilestone: 0, liveCount: 2)
+    fullMarathonProgress: AchievementProgress.compute(liveCount: 10),
+    halfMarathonProgress: AchievementProgress.compute(liveCount: 2)
   )
 }

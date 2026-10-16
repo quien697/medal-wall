@@ -56,6 +56,19 @@ struct StringCatalogTests {
     }
   }
 
+  @Test("The race list's zh-TW strings ship translated")
+  func testRaceListKeysAreTranslated() {
+    let keys = [
+      "No Race Events",
+      "No race events match '%@'",
+      "^[%lld edition](inflect: true)"
+    ]
+
+    for key in keys {
+      #expect(zhTWTable[key] != nil, "missing zh-TW entry for \(key)")
+    }
+  }
+
   @Test("The medal detail's zh-TW strings ship translated")
   func testMedalDetailKeysAreTranslated() {
     let keys = [
@@ -65,7 +78,6 @@ struct StringCatalogTests {
       "Date",
       "Distance",
       "Bib",
-      "Finish",
       "Avg pace",
       "Overall",
       "Gender",
@@ -80,6 +92,25 @@ struct StringCatalogTests {
 
   /// The division label is composed, so the translation must keep its placeholder or the
   /// group silently vanishes from the label.
+  @Test("The launch screen's zh-TW strings ship translated")
+  func testLaunchKeysAreTranslated() {
+    #expect(zhTWTable["Loading your collection"] != nil)
+  }
+
+  @Test("The email sign-in link errors' zh-TW strings ship translated")
+  func testEmailLinkErrorKeysAreTranslated() {
+    let keys = [
+      "We couldn't sign you in with this link.",
+      "This sign-in link wasn't requested on this device.",
+      "Please check your connection, or request a new link.",
+      "Please request a new link on this device."
+    ]
+
+    for key in keys {
+      #expect(zhTWTable[key] != nil, "missing zh-TW entry for \(key)")
+    }
+  }
+
   @Test("The composed division label keeps its placeholder in zh-TW")
   func testDivisionLabelKeepsPlaceholder() {
     #expect(zhTWTable["Division (%@)"]?.contains("%@") == true)

@@ -1,0 +1,40 @@
+//
+//  RaceEntrySubtitle.swift
+//  MedalWall
+//
+//  Created by Quien on 2026-04-16.
+//
+
+import SwiftUI
+
+struct RaceEntrySubtitle: View {
+  let selection: RaceEntry?
+
+  var body: some View {
+    Group {
+      if let selection {
+        Text(selection.selectionLabel)
+          .font(.TypeScale.callout)
+          .foregroundStyle(Color.Text.primary)
+          .frame(maxWidth: .infinity, alignment: .leading)
+      } else {
+        Text("Tap a distance to select the race entry.")
+          .font(.TypeScale.callout)
+          .foregroundStyle(Color.Text.tertiary)
+          .frame(maxWidth: .infinity, alignment: .leading)
+      }
+    }  // Group
+    .animation(.easeInOut(duration: 0.2), value: selection?.selectionLabel)
+    .padding(.horizontal, 16)
+    .padding(.vertical, 12)
+  }
+}
+
+#Preview {
+  let edition = RaceEdition.taipei2019
+  let distance = edition.distances.first!
+
+  RaceEntrySubtitle(selection: nil)
+
+  RaceEntrySubtitle(selection: RaceEntry(race: Race.taipei, edition: edition, distance: distance))
+}

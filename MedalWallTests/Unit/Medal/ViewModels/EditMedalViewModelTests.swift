@@ -7,6 +7,7 @@
 
 import Foundation
 import Testing
+import UIKit
 
 @testable import MedalWall
 
@@ -44,6 +45,16 @@ struct EditMedalViewModelTests {
   func testIsFormValidFalseWhitespaceName() {
     let viewModel = EditMedalViewModel(mode: .add)
     viewModel.name = "   "
+    viewModel.place.countryCode = "TW"
+    viewModel.place.city = "Taipei"
+
+    #expect(viewModel.isFormValid == false)
+  }
+
+  @Test("isFormValid is false when name is only a pasted line break")
+  func testIsFormValidFalseNewlineName() {
+    let viewModel = EditMedalViewModel(mode: .add)
+    viewModel.name = " \n"
     viewModel.place.countryCode = "TW"
     viewModel.place.city = "Taipei"
 
@@ -197,5 +208,85 @@ struct EditMedalViewModelTests {
     #expect(viewModel.finishTime == 12624)
     #expect(viewModel.note == "Great race")
     #expect(viewModel.tags == ["fun"])
+  }
+
+  /// The finish time picker traps on infinity or a value near 1e20, so a stored time the app
+  /// already reads as unrecorded must open the editor empty instead of crashing it.
+  @Test(
+    "init in edit mode leaves an unusable stored finish time empty",
+    arguments: [TimeInterval.infinity, 1e20, 0, -1])
+  func testInitEditModeDropsUnusableFinishTime(finishTime: TimeInterval) {
+    let medal = Medal(
+      name: "Test Race 2025",
+      date: .now,
+      bibNumber: "42",
+      place: Place(countryCode: "JP", city: "Shinjuku"),
+      distance: RaceDistance(category: .full, type: .inPerson),
+      finishTime: finishTime,
+      userID: "user1"
+    )
+    let viewModel = EditMedalViewModel(mode: .edit, medal: medal)
+
+    #expect(viewModel.finishTime == nil)
+  }
+
+  // MARK: - Tags
+  @Test("addTag trims the whitespace and line breaks around a tag")
+  func testAddTagTrims() {
+    let viewModel = EditMedalViewModel(mode: .add)
+
+    viewModel.addTag("  taipei \n")
+
+    #expect(viewModel.tags == ["taipei"])
+  }
+
+  @Test("addTag ignores a tag that is already there")
+  func testAddTagIgnoresDuplicate() {
+    let viewModel = EditMedalViewModel(mode: .add)
+    viewModel.tags = ["taipei"]
+
+    viewModel.addTag("taipei")
+
+    #expect(viewModel.tags == ["taipei"])
+  }
+
+  @Test("addTag ignores a blank tag")
+  func testAddTagIgnoresBlank() {
+    let viewModel = EditMedalViewModel(mode: .add)
+
+    viewModel.addTag(" \n ")
+
+    #expect(viewModel.tags.isEmpty)
+  }
+
+  @Test("removeTag removes only that tag")
+  func testRemoveTag() {
+    let viewModel = EditMedalViewModel(mode: .add)
+    viewModel.tags = ["marathon", "taipei"]
+
+    viewModel.removeTag("marathon")
+
+    #expect(viewModel.tags == ["taipei"])
+  }
+
+  // MARK: - Photo
+  @Test("a photo picked while the existing one loads is kept")
+  func testPickedPhotoSurvivesExistingPhotoLoad() async {
+    let medal = Medal(
+      name: "Taipei Marathon 2019",
+      date: Date(timeIntervalSince1970: 1_577_836_800),
+      bibNumber: "00001",
+      photoUrl: "file:///nonexistent/medal.jpg",
+      place: Place(countryCode: "TW", city: "Taipei"),
+      distance: .default,
+      userID: "uid"
+    )
+    let viewModel = EditMedalViewModel(mode: .edit, medal: medal)
+    let pickedPhoto = UIImage()
+    viewModel.updatePhoto(with: pickedPhoto)
+
+    await viewModel.loadPhoto()
+
+    #expect(viewModel.photo === pickedPhoto)
   }
 }

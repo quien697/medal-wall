@@ -11,10 +11,13 @@ struct EditMedalNoteSection: View {
   @Binding var note: String
 
   var body: some View {
-    Section("Notes") {
+    Section {
       TextEditor(text: $note)
         .font(.TypeScale.body)
         .frame(minHeight: 100)
+    } header: {
+      Text("Notes")
+        .sectionTitleStyle()
     }  // Section
   }
 }

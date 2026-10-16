@@ -23,29 +23,45 @@ that way.
 **When the token list (§04) and an iOS mockup disagree, the token list wins** — the
 mockups drift on exact sizes and hexes.
 
-Code-side tokens:
+Code-side tokens. **Read the cases from the source — they are not listed here**, because
+a list in this file goes stale and then misleads. What is here is the reasoning, which
+the source cannot carry:
 - `Color+Extensions.swift` — `Pigment` (asset names, spelled once) then roles that
-  point at it: `Background`, `Surface`, `Border`, `Text`, `Record`, `Status`,
-  `TierBadge`. Reach for a role first; use a `Pigment` directly only where no role
-  fits (ink on a filled control, ink on champagne). Gold is never tappable — `Record`
-  only ever describes something earned.
+  point at it: `Background`, `Surface`, `Border`, `Text`, `Accent`, `Record`, `Status`,
+  `TierBadge`, `Progress`. Views and modifiers never use a `Pigment` — only roles
+  reference one; when no role fits, add a role. Gold is never tappable — `Record` only
+  ever describes something earned.
 - `Font+Extensions.swift` — `Font.TypeScale`. Line height, tracking and uppercasing
-  are **not** in it (`Font` cannot carry them); apply `.tracking()` / `.textCase()`
-  at the call site.
-- `CGFloat+Extensions.swift` — `.Radius` (tag, field, button, image, surface, sheet).
-- `ActionStyleViewModifier.swift` — `.actionStyle(.primary/.secondary/.tertiary/
-  .plain/.destructive)`. Pressed and disabled are states, never cases.
-- `ChipViewModifier.swift` — `.chipStyle(.primary/.secondary/.neutral)`, capsule, for
-  things that *name* something: filters, and hashtags like `#taipei` (untappable for
-  now, but still capsules). `TagViewModifier.swift` —
-  `.tagStyle(.record/.neutralInCard/.neutralOnPage/.success/.error)`, 6pt rect, for
-  facts a user cannot change. Shape carries the distinction; never swap them. Gaining a
-  remove affordance moves a label across: a deletable distance is a chip, the same
-  distance read-only is a tag.
-- `ElevationViewModifier.swift` — `.elevation(.soft/.lifted/.ring)`.
+  are **not** in it (`Font` cannot carry them); apply `.tracking(.Tracking.…)` /
+  `.textCase()` at the call site.
+- `CGFloat+Extensions.swift` — `.Radius`, `.Space` and `.Tracking`. There is no `pill`
+  constant; SwiftUI expresses it as `.capsule`, which stays correct at any height.
+- `ActionViewModifier.swift` — `.actionStyle(…)`. Pressed and disabled are states,
+  never cases.
+- `ChipViewModifier.swift` — `.chipStyle(…)`, capsule, for things that *name*
+  something: filters, and hashtags like `#taipei` (untappable for now, but still
+  capsules). `TagViewModifier.swift` — `.tagStyle(…)`, 6pt rect, for facts a user
+  cannot change. Shape carries the distinction; never swap them. Gaining a remove
+  affordance moves a label across: a deletable distance is a chip, the same distance
+  read-only is a tag.
+- `ElevationViewModifier.swift` — `.elevation(…)`.
 
-A fixed colour needs a fixed counterpart: anything sitting on `Record.champagne`
-(no dark slot) must use `Record.ink`, or it inverts out from under its background.
+A fixed colour needs a fixed counterpart: anything sitting on `Record.personalBest`
+(no dark slot) must use `Record.onPersonalBest`, or it inverts out from under its background.
+
+### Keeping code and the design system in step
+- `openspec/design-system/tokens.json` records what the design system says. Its git
+  diff is the changelog for a design system version — nothing else records one, since
+  `documents/` is untracked and each version replaces the last.
+- `openspec/design-system/deviations.md` is the ledger of deliberate differences.
+  **While an entry stands, the iOS value wins**: do not "fix" a token listed there, and
+  read its Why first. An intentional difference that is *not* in the ledger is
+  indistinguishable from a mistake — declare it in the same change that creates it.
+- **Before UI work, check `tokens.json`'s `source.version` against the newest
+  `Medal Wall Design System v*.html` in the design system folder.** If the folder is
+  ahead, say so and offer to run `design-system-check` before continuing. Compare the
+  filename version, not the file's contents — this runs every session and globbing a
+  folder is cheap.
 
 ## Development Workflow
 Features and non-trivial fixes follow the combined OpenSpec + Superpowers loop:
@@ -60,7 +76,7 @@ for trivial changes. Full details: `docs/development-workflow.md`.
 - Repositories are stateless — they return values, never hold state.
 - ViewModels load data with async calls on appear and hold results in memory; filtering/sorting is done in-memory, not via Firestore query predicates.
 - `UserManager` is the single source of truth for auth state and the current `User`; it is injected via `@Environment` — never accessed as a singleton.
-- `AuthService` wraps Firebase Auth. `StorageService` handles all Firebase Storage uploads and returns download URLs.
+- `FirebaseAuthService` (behind the `AuthService` protocol) wraps Firebase Auth. `StorageService` handles all Firebase Storage uploads and returns download URLs.
 - **Draft pattern:** Edit ViewModels stage changes in local draft structs; writes only reach Firestore on explicit save. `EditRaceViewModel` diffs original vs. draft editions on save (delete → create → update in sequential loops — no `WriteBatch`).
 - Photos are uploaded to Firebase Storage via `StorageService`; the download URL is stored as `photoUrl: String?` on the model.
 - Throw `AppError` from repositories and ViewModels; views present errors via `ErrorWrapper` + `ErrorView`.
@@ -98,6 +114,7 @@ Key value types (not persisted directly): `RaceDistance`, `RaceDistanceCategory`
 
 ## Patterns
 - **Guard numeric values against out-of-range inputs.** Never assume persisted (Firestore) or externally-derived numbers sit in the expected range — clamp counts/indices/progress to valid bounds (e.g. `max(0, count)`) so a corrupt or malicious value can't produce negative counts, overflow past a max tier, or index out of bounds. Cover these edge cases with tests.
+- **Trim typed text with `.whitespacesAndNewlines`**, the same way in validation and on save; blank optional text is saved as `nil` (`edit-sheets` spec).
 - `defer { isLoading = false }` for loading state cleanup
 - `[weak self]` in closures that capture reference types
 - No logic or computed properties in views — all derived values belong in the ViewModel
@@ -112,8 +129,8 @@ Key value types (not persisted directly): `RaceDistance`, `RaceDistanceCategory`
 - No SwiftData (`@Model`, `ModelContext`, `@Query`) — persistence is Firestore only
 
 ## Commands
-- **Build:** `xcodebuild -project MedalWall.xcodeproj -scheme MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build`
-- **Test:** `xcodebuild test -project MedalWall.xcodeproj -scheme MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro'`
+- **Build:** `xcodebuild -project MedalWall.xcodeproj -scheme MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.5' build`
+- **Test:** `xcodebuild test -project MedalWall.xcodeproj -scheme MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.5'`
 - **Single test:** append `-only-testing:MedalWallTests/<TestClass>/<testMethod>`
 - **Lint:** SwiftLint runs automatically as an Xcode build phase; swift-format runs via pre-commit hook
 

@@ -7,69 +7,122 @@
 
 import AuthenticationServices
 import CryptoKit
-import FirebaseCore
 import Foundation
-import GoogleSignIn
-import Network
 
 enum ActiveSignIn {
   case apple, google
 }
 
+/// `@MainActor` spelled out: the app target already defaults to it, but this file is also compiled
+/// into the test module, which doesn't, and its Apple and Google flows touch UIKit.
+@MainActor
 @Observable
 final class LoginViewModel {
-  // MARK: - Properties
-  private let authService = AuthService()
+  // MARK: - Data
   var email = ""
+
+  // MARK: - State
   var activeSignIn: ActiveSignIn?
   var isSendingEmail = false
   var isEmailLinkSent = false
   var isPresentingEmailSignIn = false
   var error: AppError?
+  /// An error shown over the email sheet while it is open: from sending the link, or from a
+  /// link opened from Mail meanwhile.
+  var emailSheetError: AppError?
+  /// Counts the email sheet's closings, so a send still running when the sheet closed
+  /// cannot change what the sheet shows the next time it opens.
+  private var emailSheetClosings = 0
+
+  // MARK: - Dependencies
+  /// Signs in with Apple and Google.
+  private let authService = FirebaseAuthService()
+  /// Sends email sign-in links.
+  private let emailAuthService: any AuthService
+  private let networkMonitor: any NetworkMonitor
+  private let defaults: UserDefaults
+
+  // MARK: - Init
+  init(
+    emailAuthService: (any AuthService)? = nil,
+    networkMonitor: (any NetworkMonitor)? = nil,
+    defaults: UserDefaults = .standard
+  ) {
+    self.emailAuthService = emailAuthService ?? FirebaseAuthService()
+    self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
+    self.defaults = defaults
+  }
 
   // MARK: - Computed
   var isEmailValid: Bool {
-    let parts = email.split(separator: "@")
-    return parts.count == 2 && parts[1].contains(".")
+    let parts = trimmedEmail.split(separator: "@", omittingEmptySubsequences: false)
+    return parts.count == 2 && !parts[0].isEmpty && parts[1].contains(".")
   }
+
+  private var trimmedEmail: String { email.trimmingCharacters(in: .whitespacesAndNewlines) }
 
   var isSigningIn: Bool {
     activeSignIn != nil
   }
 
-  // MARK: - Functions
-  func isConnected() async -> Bool {
-    await withCheckedContinuation { continuation in
-      let monitor = NWPathMonitor()
-      monitor.pathUpdateHandler = { path in
-        monitor.cancel()
-        continuation.resume(returning: path.status == .satisfied)
-      }
-      monitor.start(queue: .global())
-    }
+  /// The foreground scene's key window, which the Apple and Google sign-in sheets present over.
+  private var keyWindow: UIWindow? {
+    let windowScene =
+      UIApplication.shared.connectedScenes.first(where: {
+        $0.activationState == .foregroundActive
+      }) as? UIWindowScene
+    return windowScene?.windows.first(where: { $0.isKeyWindow })
   }
 
   // MARK: - Functions -> Sign in with Email link
   /// Shows the email sign-in sheet if the device is online, otherwise surfaces a connection error.
   func signInWithEmailLink() async {
-    if await isConnected() {
+    if await networkMonitor.isConnected() {
       isPresentingEmailSignIn = true
     } else {
       error = .noInternetConnection
     }
   }
 
-  /// Sends a Firebase sign-in link to the given email address.
+  /// Sends a Firebase sign-in link to the entered address, trimmed of surrounding whitespace.
+  /// Fails at once when offline, and reports any failure in `emailSheetError`, so it shows over
+  /// the sheet the user is still on. Once sent, the field holds the address the link went to.
+  /// A send that outlives its sheet still saves that address, so the link works, but leaves
+  /// the next opening alone, its Send button included. A second tap while a send is running
+  /// is ignored, so one tap sends one email.
   func sendEmailLink() async {
+    guard !isSendingEmail else { return }
     isSendingEmail = true
-    defer { isSendingEmail = false }
+    let address = trimmedEmail
+    let closingsAtStart = emailSheetClosings
+    defer { if emailSheetClosings == closingsAtStart { isSendingEmail = false } }
 
+    guard await networkMonitor.isConnected() else {
+      if emailSheetClosings == closingsAtStart { emailSheetError = .noInternetConnection }
+      return
+    }
     do {
-      try await authService.sendSignInLink(to: email)
-      UserDefaults.standard.set(email, forKey: AuthService.pendingEmailSignInKey)
-      isEmailLinkSent = true
+      try await emailAuthService.sendSignInLink(to: address)
+      defaults.set(address, forKey: FirebaseAuthService.pendingEmailSignInKey)
+      if emailSheetClosings == closingsAtStart {
+        email = address
+        isEmailLinkSent = true
+      }
     } catch {
-      self.error = .sendEmailSignInLinkFailed(error.localizedDescription)
+      if emailSheetClosings == closingsAtStart {
+        emailSheetError = .sendEmailSignInLinkFailed(error.localizedDescription)
+      }
+    }
+  }
+
+  /// Shows a sign-in failure from outside the login buttons — an email link opened from Mail.
+  /// It goes over the email sheet while that is open, since the login screen cannot present
+  /// anything until the sheet closes; otherwise it goes on the login screen.
+  func showSignInError(_ signInError: AppError) {
+    if isPresentingEmailSignIn {
+      emailSheetError = signInError
+    } else {
+      error = signInError
     }
   }
 
@@ -77,18 +130,26 @@ final class LoginViewModel {
   func resetEmailFlow() {
     email = ""
     isEmailLinkSent = false
+    emailSheetError = nil
+    isSendingEmail = false
+    emailSheetClosings += 1
   }
 
   // MARK: - Functions -> Sign in with Apple
   /// Presents the Apple Sign-In sheet and signs the user in to Firebase.
   func signInWithApple() async {
+    guard let keyWindow else {
+      self.error = .signInFailed
+      return
+    }
+
     do {
       let nonce = try randomNonceString()
       let request = ASAuthorizationAppleIDProvider().createRequest()
       request.requestedScopes = [.fullName, .email]
       request.nonce = sha256(nonce)
 
-      let delegate = AppleSignInDelegate()
+      let delegate = AppleSignInDelegate(anchor: keyWindow)
       let controller = ASAuthorizationController(authorizationRequests: [request])
       controller.delegate = delegate
       controller.presentationContextProvider = delegate
@@ -169,43 +230,27 @@ final class LoginViewModel {
   // MARK: - Functions -> Sign in with Google
   /// Presents the Google Sign-In sheet and signs the user in to Firebase.
   func signInWithGoogle() async {
-    guard let clientID = FirebaseApp.app()?.options.clientID else {
-      self.error = .signInFailed
-      return
-    }
-
-    GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
-
-    guard
-      let windowScene = UIApplication.shared.connectedScenes.first(where: {
-        $0.activationState == .foregroundActive
-      }) as? UIWindowScene,
-      let rootViewController = windowScene.windows.first(where: { $0.isKeyWindow })?
-        .rootViewController
-    else {
+    guard let rootViewController = keyWindow?.rootViewController else {
       self.error = .signInFailed
       return
     }
 
     do {
-      let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
-      guard let idToken = result.user.idToken?.tokenString else {
-        self.error = .missingIdentityToken
-        return
-      }
+      let tokens = try await authService.requestGoogleTokens(presenting: rootViewController)
 
       activeSignIn = .google
       defer { activeSignIn = nil }
 
-      let accessToken = result.user.accessToken.tokenString
-      try await authService.signInWithGoogle(idToken: idToken, accessToken: accessToken)
+      try await authService.signInWithGoogle(
+        idToken: tokens.idToken,
+        accessToken: tokens.accessToken
+      )
+    } catch is CancellationError {
+      // The user closed Google's sheet; there is nothing to report.
+    } catch let error as AppError {
+      self.error = error
     } catch {
-      switch (error as NSError).code {
-      case GIDSignInError.Code.canceled.rawValue:
-        break
-      default:
-        self.error = .signInFailed
-      }
+      self.error = .signInFailed
     }
   }
 }

@@ -13,15 +13,14 @@ struct EditProfileView: View {
   // MARK: - Environment
   @Environment(\.dismiss) private var dismiss
   @Environment(UserManager.self) private var userManager
+
   // MARK: - State
   @State private var viewModel: EditProfileViewModel
-  @State private var isLoading = false
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingPhotoPicker: Bool = false
   @State private var isPresentingCropImageView: Bool = false
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var rawPickedImage: UIImage?
-  @State private var shouldDismiss: Bool = false
 
   // MARK: - Init
   init(profile: User) {
@@ -59,7 +58,7 @@ struct EditProfileView: View {
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
       .background(Color.Background.primary)
-      .disabled(isLoading)
+      .disabled(viewModel.isLoading)
       .task {
         await viewModel.loadExistingPhoto()
       }
@@ -67,32 +66,29 @@ struct EditProfileView: View {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .close) {
             dismiss()
-          }
-        }
+          }  // Button
+          .disabled(viewModel.isLoading)
+        }  // ToolbarItem
 
         ToolbarItem(placement: .confirmationAction) {
-          Button(role: .confirm) {
-            Task {
-              isLoading = true
-              defer { isLoading = false }
-
-              do {
-                var updatedUser = viewModel.makeUpdatedUser()
-                if viewModel.isPhotoChanged && viewModel.photo == nil {
-                  updatedUser.photoUrl = nil
+          if viewModel.isLoading {
+            ProgressView()
+          } else {
+            Button(role: .confirm) {
+              Task {
+                do {
+                  try await viewModel.save(userManager: userManager)
+                  dismiss()
+                } catch {
+                  errorWrapper = ErrorWrapper(error: error as? AppError ?? .userSaveFailed)
                 }
-                let updatedUserPhoto = viewModel.isPhotoChanged ? viewModel.photo : nil
-                try await userManager.updateUser(updatedUser, photo: updatedUserPhoto)
-                dismiss()
-              } catch {
-                shouldDismiss = true
-                errorWrapper = ErrorWrapper(error: AppError.userSaveFailed)
               }
-            }
+            }  // Button
+            .disabled(!viewModel.isFormValid)
           }
-          .disabled(!viewModel.isFormValid || isLoading)
-        }
+        }  // ToolbarItem
       }  // toolbar
+      .interactiveDismissDisabled()
       .photosPicker(
         isPresented: $isPresentingPhotoPicker,
         selection: $selectedPhoto,
@@ -127,9 +123,6 @@ struct EditProfileView: View {
       )
       .sheet(
         item: $errorWrapper,
-        onDismiss: {
-          if shouldDismiss { dismiss() }
-        },
         content: { wrapper in
           ErrorView(errorWrapper: wrapper)
         }

@@ -11,19 +11,73 @@ identified by name, place, an optional photo, and an optional website URL. A rac
 SHALL follow the shape defined by the `place-entry` capability, which owns the representation
 of a place and how one is chosen.
 
+Every logo upload SHALL go to a new storage location, never over a file a race or edition
+points at. A logo the race no longer holds — a removed or replaced race or edition logo, a
+deleted edition's logo, or every logo of a deleted race — SHALL be deleted from storage, and
+only after the Firestore write or delete succeeds, so a race or edition never points at a
+deleted file. A logo uploaded for a write that fails SHALL be deleted. A logo that fails to
+delete is left in storage rather than failing a write. Medals are untouched: they hold no reference to a race.
+
 #### Scenario: Create a race
 - **WHEN** a user submits a new race with a name and place
 - **THEN** the system creates a `Race` record and it appears in the race list
 
 #### Scenario: Delete a race removes its editions
 - **WHEN** a user deletes a race that has one or more editions
-- **THEN** the system deletes all of that race's editions before deleting the race
-  itself, since Firestore does not cascade-delete subcollections
+- **THEN** the system deletes all of that race's editions and the race itself in a single
+  batched commit, since Firestore does not cascade-delete subcollections
+
+#### Scenario: A race deletion fails partway
+- **WHEN** the commit deleting a race and its editions is rejected
+- **THEN** the race and every one of its editions remain, and the user is shown a delete
+  error rather than a race left without some of its editions
+
+#### Scenario: Delete a race removes its logos
+- **WHEN** a user deletes a race and the delete succeeds
+- **THEN** the system deletes the race's logo and every edition's logo from storage; if the
+  delete fails, every logo remains
+
+#### Scenario: Remove or replace a race or edition logo
+- **WHEN** a user removes or replaces a race's logo or an edition's logo, or deletes an
+  edition, and the race save succeeds
+- **THEN** the system deletes the old logo from storage; if the save fails, the old logo
+  remains and any logo uploaded for the save is deleted
+
+### Requirement: Edition Count Integrity
+`Race.editionCount` SHALL be maintained only by the operations that create and delete
+editions, and each count change SHALL be committed in the same batch as the edition write it
+describes. An update to a race's own fields MUST NOT write `editionCount`, because a client
+editing a name holds only the count it happened to read earlier, and races are a shared,
+globally readable collection whose count another client may have changed since.
+
+A count read back from Firestore SHALL be clamped to zero or more before it is displayed, so
+that a value corrupted by any means cannot present a negative number of editions.
+
+#### Scenario: Adding an edition
+- **WHEN** a user adds an edition to a race
+- **THEN** the edition document and the incremented count commit together, and a failure of
+  either leaves both unchanged
+
+#### Scenario: Deleting an edition
+- **WHEN** a user deletes an edition from a race
+- **THEN** the edition document and the decremented count commit together, and a failure of
+  either leaves both unchanged
+
+#### Scenario: Editing a race while another client adds an edition
+- **WHEN** a user saves an edit to a race's name, place, photo, or website URL
+- **THEN** the write does not include `editionCount`, and a count incremented by another
+  client in the meantime survives the edit
+
+#### Scenario: A stored count is negative
+- **WHEN** a race is read whose stored `editionCount` is below zero
+- **THEN** the race list displays `0 editions`
 
 ### Requirement: Race Edition Management
 The system SHALL allow a signed-in user to create, read, update, and delete a
 `RaceEdition` belonging to a `Race`, recording a year, a start date, an end date, an
-optional photo, and a list of distances offered for that edition.
+optional photo, and a list of distances offered for that edition. The year SHALL be a
+Gregorian year, and the span of dates it allows SHALL be that Gregorian year, whatever
+calendar the device uses, because editions are shared with other users and clients.
 
 #### Scenario: Add an edition to a race
 - **WHEN** a user adds an edition with a year, start date, end date, and at least one
@@ -33,6 +87,11 @@ optional photo, and a list of distances offered for that edition.
 #### Scenario: One-day edition display
 - **WHEN** an edition's start date and end date fall on the same calendar day
 - **THEN** the system displays a single date rather than a date range
+
+#### Scenario: Device set to another calendar
+- **WHEN** a user whose device uses the Republic of China (民國) calendar adds an edition for
+  2026
+- **THEN** the edition is saved with the year 2026 and dates within 2026, not the year 115
 
 ### Requirement: Custom Distance Entry In The Active Unit
 The system SHALL accept a custom race distance in the user's active distance unit, label
@@ -83,3 +142,17 @@ number finds it on the preset row rather than typing it into the custom field.
   Marathon preset
 - **THEN** the distance is stored as `42.1648128` kilometres and remains a custom distance,
   with no prompt and no conversion to the preset
+
+### Requirement: Offline Race Delete Is Refused
+Before deleting a race, from Race Detail or the Races list, the system SHALL check for a
+connection. Without one, the delete SHALL be refused with "No internet connection" before
+anything is deleted, and the race SHALL stay where it is.
+
+#### Scenario: Delete a race from Race Detail while offline
+- **WHEN** a user confirms deleting a race from Race Detail with no connection
+- **THEN** "No internet connection" is shown, nothing is deleted, and Race Detail stays open
+
+#### Scenario: Delete a race from the Races list while offline
+- **WHEN** a user confirms deleting a race from the Races list with no connection
+- **THEN** "No internet connection" is shown, nothing is deleted, and the race stays in the list
+

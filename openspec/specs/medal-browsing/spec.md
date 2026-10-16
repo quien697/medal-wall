@@ -129,10 +129,11 @@ across launches.
   the 2019 medal
 
 ### Requirement: Year Grouping
-The system SHALL group the presented medals by the calendar year of each medal's date,
+The system SHALL group the presented medals by the Gregorian year of each medal's date,
 with the most recent year first. Each group SHALL carry a header showing the year and the
 number of medals in that group. A year with no medals in the presented set SHALL NOT
-produce a group, so the list never shows an empty year.
+produce a group, so the list never shows an empty year. Years are Gregorian whatever calendar
+the device uses, so they match the years editions are stored with.
 
 #### Scenario: Medals are grouped under their year
 - **WHEN** a collection contains one medal from 2025 and two from 2022

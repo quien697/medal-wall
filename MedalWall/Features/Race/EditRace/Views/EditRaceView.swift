@@ -61,17 +61,14 @@ struct EditRaceView: View {
           }
         )
 
-        if viewModel.mode == .edit, let raceId = viewModel.raceId {
+        if viewModel.mode == .edit, viewModel.raceId != nil {
           EditRaceEditionSection(
-            raceId: raceId,
             editions: viewModel.displayedEditions,
             isLoading: viewModel.isEditionsLoading,
             namespace: namespace,
             transitionID: addEdition,
             onTapAddEdition: { isPresentingAddEdition = true },
             onTapEdition: { selectedEdition = $0 },
-            onAdd: { viewModel.stageAddEdition($0) },
-            onUpdate: { viewModel.stageUpdateEdition($0) },
             onDelete: viewModel.stageDeleteEdition
           )
         }
@@ -81,14 +78,14 @@ struct EditRaceView: View {
       .scrollContentBackground(.hidden)
       .background(Color.Background.primary)
       .task {
-        await viewModel.loadExistingPhoto()
-        await viewModel.loadEditions()
+        await viewModel.load()
       }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .cancel) {
             dismiss()
-          }
+          }  // Button
+          .disabled(viewModel.isLoading)
         }  // ToolbarItem
 
         ToolbarItem(placement: .confirmationAction) {
@@ -97,7 +94,7 @@ struct EditRaceView: View {
           } else {
             Button(role: .confirm) {
               guard let userId = userManager.currentUserID else {
-                errorWrapper = ErrorWrapper(error: AppError.userLoadFailed)
+                errorWrapper = ErrorWrapper(error: AppError.notSignedIn)
                 return
               }
               Task {
@@ -106,11 +103,12 @@ struct EditRaceView: View {
                   dismiss()
                 }
               }
-            }
+            }  // Button
             .disabled(!viewModel.isFormValid)
           }
         }  // ToolbarItem
       }  // toolbar
+      .interactiveDismissDisabled()
       .photosPicker(
         isPresented: $isPresentingPhotoPicker,
         selection: $selectedPhoto,
@@ -155,40 +153,23 @@ struct EditRaceView: View {
         PlacePickerView { viewModel.place = $0 }
       }
       .sheet(isPresented: $isPresentingAddEdition) {
-        if let raceId = viewModel.raceId {
-          EditRaceEditionView(
-            mode: .add,
-            raceId: raceId,
-            onCommit: { draft in
-              viewModel.stageAddEdition(draft)
-            }
-          )
-          .navigationTransition(.zoom(sourceID: addEdition, in: namespace))
-        }
+        AddRaceEditionView(
+          onCommit: { draft in
+            viewModel.stageAddEdition(draft)
+          }
+        )
+        .navigationTransition(.zoom(sourceID: addEdition, in: namespace))
       }
       .sheet(item: $selectedEdition) { draft in
-        if let raceId = viewModel.raceId {
-          EditRaceEditionView(
-            mode: .edit,
-            raceId: raceId,
-            edition: RaceEdition(
-              id: draft.id,
-              raceId: raceId,
-              year: draft.year,
-              startDate: draft.startDate,
-              endDate: draft.endDate,
-              photoUrl: draft.existingPhotoUrl,
-              distances: draft.distances,
-              createdBy: draft.createdBy
-            ),
-            onCommit: { updatedDraft in
-              viewModel.stageUpdateEdition(updatedDraft)
-            },
-            onDelete: {
-              viewModel.stageDeleteEdition(id: draft.id)
-            }
-          )
-        }
+        EditRaceEditionView(
+          editing: draft,
+          onCommit: { updatedDraft in
+            viewModel.stageUpdateEdition(updatedDraft)
+          },
+          onDelete: {
+            viewModel.stageDeleteEdition(id: draft.id)
+          }
+        )
       }
       .sheet(
         item: $errorWrapper,
@@ -209,6 +190,6 @@ struct EditRaceView: View {
 }
 
 #Preview("Edit mode") {
-  EditRaceView(mode: .edit, race: Race.sampleData.first!)
+  EditRaceView(mode: .edit, race: Race.taipei)
     .environment(UserManager())
 }

@@ -69,7 +69,7 @@ struct PlacePickerView: View {
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button("Cancel") { dismiss() }
-        }
+        }  // ToolbarItem
       }
       .onChange(of: viewModel.query) {
         viewModel.search()
@@ -147,16 +147,16 @@ struct PlacePickerView: View {
         }
     }
   }
+
+  #Preview("Results") {
+    PlacePickerPreview(.results)
+  }
+
+  #Preview("No results") {
+    PlacePickerPreview(.empty)
+  }
+
+  #Preview("Error") {
+    PlacePickerPreview(.failure)
+  }
 #endif
-
-#Preview("Results") {
-  PlacePickerPreview(.results)
-}
-
-#Preview("No results") {
-  PlacePickerPreview(.empty)
-}
-
-#Preview("Error") {
-  PlacePickerPreview(.failure)
-}

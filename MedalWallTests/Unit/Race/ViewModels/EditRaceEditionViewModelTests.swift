@@ -13,7 +13,7 @@ import UIKit
 struct EditRaceEditionViewModelTests {
 
   private func makeViewModel() -> EditRaceEditionViewModel {
-    EditRaceEditionViewModel(mode: .add, raceId: "test-race", edition: nil)
+    EditRaceEditionViewModel(mode: .add, draft: nil)
   }
 
   // MARK: - isFormValid
@@ -275,5 +275,127 @@ struct EditRaceEditionViewModelTests {
     try viewModel.addDistance(RaceDistance(category: .custom(0.001), type: .inPerson))
 
     #expect(viewModel.distances.count == 1)
+  }
+
+  // MARK: - updateYear
+  @Test("updateYear keeps an end date late on 31 December inside the year")
+  func testUpdateYearKeepsLateDecemberThirtyFirst() throws {
+    let viewModel = makeViewModel()
+    let calendar = Calendar.current
+    let december1 = try #require(calendar.date(from: DateComponents(year: 2025, month: 12, day: 1)))
+    let lateNewYearsEve = try #require(
+      calendar.date(from: DateComponents(year: 2025, month: 12, day: 31, hour: 14))
+    )
+    viewModel.isOneDay = false
+    viewModel.startDate = december1
+    viewModel.endDate = lateNewYearsEve
+
+    viewModel.updateYear(2025)
+
+    #expect(viewModel.endDate == lateNewYearsEve)
+  }
+
+  @Test("updateYear still clamps an end date that falls in the following year")
+  func testUpdateYearClampsDateBeyondTheYear() throws {
+    let viewModel = makeViewModel()
+    let calendar = Calendar.current
+    let december1 = try #require(calendar.date(from: DateComponents(year: 2025, month: 12, day: 1)))
+    let nextNewYearsDay = try #require(
+      calendar.date(from: DateComponents(year: 2026, month: 1, day: 1))
+    )
+    viewModel.isOneDay = false
+    viewModel.startDate = december1
+    viewModel.endDate = nextNewYearsDay
+
+    viewModel.updateYear(2025)
+
+    #expect(viewModel.endDate < nextNewYearsDay)
+  }
+
+  // MARK: - Staged drafts
+  private func makeStagedDraft() throws -> DraftRaceEdition {
+    let raceDay = try #require(
+      Calendar.current.date(from: DateComponents(year: 2026, month: 3, day: 1))
+    )
+    return DraftRaceEdition(
+      year: 2026, isOneDay: true, startDate: raceDay, endDate: raceDay, distances: [],
+      createdBy: "uid")
+  }
+
+  @Test("re-editing a staged new edition keeps it a new edition")
+  func testReEditedNewEditionStaysNew() throws {
+    let staged = try makeStagedDraft()
+    let viewModel = EditRaceEditionViewModel(
+      mode: .edit, draft: staged)
+
+    let rebuilt = viewModel.buildDraft(userId: "uid")
+
+    #expect(rebuilt.id == staged.id)
+    #expect(rebuilt.sourceEditionId == nil)
+  }
+
+  @Test("re-editing a staged edition keeps its newly picked photo")
+  func testReEditedEditionKeepsNewPhoto() throws {
+    var staged = try makeStagedDraft()
+    staged.newPhotoData = Data([0x01, 0x02])
+    let viewModel = EditRaceEditionViewModel(
+      mode: .edit, draft: staged)
+
+    let rebuilt = viewModel.buildDraft(userId: "uid")
+
+    #expect(rebuilt.newPhotoData == staged.newPhotoData)
+  }
+
+  @Test("re-editing a staged edition keeps its photo removal")
+  func testReEditedEditionKeepsPhotoRemoval() {
+    var staged = DraftRaceEdition(from: .taipei2025)
+    staged.isPhotoCleared = true
+    let viewModel = EditRaceEditionViewModel(
+      mode: .edit, draft: staged)
+
+    let rebuilt = viewModel.buildDraft(userId: "uid")
+
+    #expect(rebuilt.isPhotoCleared)
+  }
+
+  @Test("a re-opened staged edition still shows its newly picked photo")
+  func testReopenedEditionShowsNewPhoto() async throws {
+    let image = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
+      UIColor.red.setFill()
+      context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+    }
+    var staged = try makeStagedDraft()
+    staged.newPhotoData = image.pngData()
+    let viewModel = EditRaceEditionViewModel(
+      mode: .edit, draft: staged)
+
+    await viewModel.loadExistingPhoto()
+
+    #expect(viewModel.photo != nil)
+  }
+
+  @Test("a photo picked while the existing one loads is kept")
+  func testPickedPhotoSurvivesExistingPhotoLoad() async {
+    var staged = DraftRaceEdition(from: .taipei2025)
+    staged.existingPhotoUrl = "file:///nonexistent/edition.jpg"
+    let viewModel = EditRaceEditionViewModel(
+      mode: .edit, draft: staged)
+    let pickedPhoto = UIImage()
+    viewModel.updatePhoto(with: pickedPhoto)
+
+    await viewModel.loadExistingPhoto()
+
+    #expect(viewModel.photo === pickedPhoto)
+  }
+
+  @Test("re-editing a staged multi-day edition keeps it multi-day")
+  func testReEditedEditionKeepsMultiDay() throws {
+    var staged = try makeStagedDraft()
+    staged.isOneDay = false
+
+    let viewModel = EditRaceEditionViewModel(
+      mode: .edit, draft: staged)
+
+    #expect(viewModel.isOneDay == false)
   }
 }
