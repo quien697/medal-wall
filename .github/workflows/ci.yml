@@ -57,6 +57,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
 
+      - name: Provide placeholder Firebase config
+        run: |
+          # GoogleService-Info.plist is gitignored, and FirebaseApp.configure() aborts the app at
+          # launch without it, so the test host crashed before any test ran. The tests use stubs,
+          # not Firebase, so well-formed dummy values are enough and keep CI off the real project.
+          cp .github/ci/GoogleService-Info.placeholder.plist MedalWall/GoogleService-Info.plist
+
       - name: Build
         run: |
           # CODE_SIGNING_ALLOWED=NO: CI runners have no signing identity, so code signing must be disabled.
