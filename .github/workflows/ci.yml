@@ -13,10 +13,10 @@ jobs:
 
     env:
       # Pin to a specific Xcode version so the build does not change when the image's default
-      # does. The quien697 packages (TimePicker, CropImage, PhotoViewer, CachedAsyncImage)
-      # declare swift-tools-version 6.3, so Xcode must ship Swift 6.3 or later (Xcode 26.4+):
-      # macos-15 tops out at Xcode 26.3 (Swift 6.2.4) and fails package resolution. Local
-      # development is on Xcode 27, which Actions offers only as a preview image (`xcode-27`).
+      # does. Xcode 26.6 is the newest on a non-preview image, but it ships Swift 6.2.4, older
+      # than the Swift 6.4 of local development on Xcode 27, which Actions offers only as a
+      # preview image (`xcode-27`). A package declaring a swift-tools-version above 6.2 fails
+      # resolution here, so the quien697 packages declare 6.0.
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
 
     steps:
