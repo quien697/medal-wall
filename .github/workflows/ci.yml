@@ -13,10 +13,9 @@ jobs:
 
     env:
       # Pin to a specific Xcode version so the build does not change when the image's default
-      # does. Xcode 26.6 is the newest on a non-preview image, but it ships Swift 6.2.4, older
-      # than the Swift 6.4 of local development on Xcode 27, which Actions offers only as a
-      # preview image (`xcode-27`). A package declaring a swift-tools-version above 6.2 fails
-      # resolution here, so the quien697 packages declare 6.0.
+      # does. Xcode 26.6 is the newest on a non-preview image and ships Swift 6.3, older than
+      # the Swift 6.4 of local development on Xcode 27, which Actions offers only as a preview
+      # image (`xcode-27`). macos-15 tops out at Xcode 26.3 (Swift 6.2.4).
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
 
     steps:
