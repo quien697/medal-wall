@@ -107,7 +107,7 @@ struct EditMedalViewModelTests {
     viewModel.name = "Taipei Marathon 2019"
     viewModel.place.countryCode = "TW"
     viewModel.place.city = "Taipei"
-    viewModel.distance = RaceDistance(
+    viewModel.distance = RaceEvent(
       category: RaceDistanceCategory(value: 0, unit: .kilometers), type: .inPerson)
 
     #expect(viewModel.isFormValid == false)
@@ -119,7 +119,7 @@ struct EditMedalViewModelTests {
     viewModel.name = "Taipei Marathon 2019"
     viewModel.place.countryCode = "TW"
     viewModel.place.city = "Taipei"
-    viewModel.distance = RaceDistance(
+    viewModel.distance = RaceEvent(
       category: RaceDistanceCategory(value: -1, unit: .kilometers), type: .inPerson)
 
     #expect(viewModel.isFormValid == false)
@@ -131,7 +131,7 @@ struct EditMedalViewModelTests {
     viewModel.name = "Taipei Marathon 2019"
     viewModel.place.countryCode = "TW"
     viewModel.place.city = "Taipei"
-    viewModel.distance = RaceDistance(
+    viewModel.distance = RaceEvent(
       category: RaceDistanceCategory(value: 5.0, unit: .kilometers), type: .inPerson)
 
     #expect(viewModel.isFormValid == true)
@@ -177,8 +177,8 @@ struct EditMedalViewModelTests {
     let viewModel = EditMedalViewModel(mode: .add)
     let race = Race.sampleData.first!
     let edition = RaceEdition.sampleData.first!
-    let distance = RaceDistance(category: .full, type: .inPerson)
-    let selection = RaceEntry(race: race, edition: edition, distance: distance)
+    let distance = RaceEvent(category: .full, type: .inPerson)
+    let selection = RaceEntry(race: race, edition: edition, event: distance)
 
     viewModel.autoFill(from: selection)
 
@@ -196,7 +196,7 @@ struct EditMedalViewModelTests {
       date: someDate,
       bibNumber: "42",
       place: Place(countryCode: "JP", city: "Shinjuku", region: "Tokyo"),
-      distance: RaceDistance(category: .full, type: .inPerson),
+      distance: RaceEvent(category: .full, type: .inPerson),
       finishTime: 12624,
       note: "Great race",
       tags: ["fun"],
@@ -224,7 +224,7 @@ struct EditMedalViewModelTests {
       date: .now,
       bibNumber: "42",
       place: Place(countryCode: "JP", city: "Shinjuku"),
-      distance: RaceDistance(category: .full, type: .inPerson),
+      distance: RaceEvent(category: .full, type: .inPerson),
       finishTime: finishTime,
       userID: "user1"
     )

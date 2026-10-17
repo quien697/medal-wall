@@ -10,7 +10,7 @@ import Foundation
 /// The distance narrowing applied to a medal collection.
 ///
 /// Identity follows the distance a category *measures*, never the case that spells it, so
-/// a custom 42.195 and `.full` are one option rather than two. `RaceDistance` defines its
+/// a custom 42.195 and `.full` are one option rather than two. `RaceEvent` defines its
 /// own `==` and `hash` over `category.value` for the same reason — a silently split "Full"
 /// bucket would show one distance as two chips.
 nonisolated enum MedalDistanceFilter: Hashable, Identifiable {

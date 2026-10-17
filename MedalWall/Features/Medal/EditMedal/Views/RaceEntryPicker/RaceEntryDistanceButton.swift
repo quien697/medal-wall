@@ -10,13 +10,13 @@ import SwiftUI
 struct RaceEntryDistanceButton: View {
   let race: Race
   let edition: RaceEdition
-  let distance: RaceDistance
+  let distance: RaceEvent
   @Binding var selection: RaceEntry?
 
   private var isSelected: Bool {
     selection?.race.id == race.id
       && selection?.edition.id == edition.id
-      && selection?.distance == distance
+      && selection?.event == distance
   }
 
   var body: some View {
@@ -24,7 +24,7 @@ struct RaceEntryDistanceButton: View {
       if isSelected {
         selection = nil
       } else {
-        selection = RaceEntry(race: race, edition: edition, distance: distance)
+        selection = RaceEntry(race: race, edition: edition, event: distance)
       }
     } label: {
       if isSelected {
@@ -56,6 +56,6 @@ struct RaceEntryDistanceButton: View {
     race: race,
     edition: edition,
     distance: distance,
-    selection: .constant(RaceEntry(race: race, edition: edition, distance: distance))
+    selection: .constant(RaceEntry(race: race, edition: edition, event: distance))
   )
 }

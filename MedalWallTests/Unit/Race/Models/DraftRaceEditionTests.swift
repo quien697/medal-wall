@@ -50,8 +50,8 @@ struct DraftRaceEditionTests {
   func testInitFromEditionCopiesDistances() {
     var edition = makeEdition()
     edition.distances = [
-      RaceDistance(category: .full, type: .inPerson),
-      RaceDistance(category: .half, type: .virtual)
+      RaceEvent(category: .full, type: .inPerson),
+      RaceEvent(category: .half, type: .virtual)
     ]
     let draft = DraftRaceEdition(from: edition)
 

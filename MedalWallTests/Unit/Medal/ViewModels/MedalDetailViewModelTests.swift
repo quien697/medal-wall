@@ -27,7 +27,7 @@ struct MedalDetailViewModelTests {
 
   private func makeMedal(
     id: String = UUID().uuidString,
-    distance: RaceDistance = RaceDistance(category: .full, type: .inPerson),
+    distance: RaceEvent = RaceEvent(category: .full, type: .inPerson),
     finishTime: TimeInterval? = nil,
     overallPlacement: Int? = nil,
     totalParticipants: Int? = nil,

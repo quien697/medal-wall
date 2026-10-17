@@ -60,7 +60,7 @@ struct EditMedalViewModelSaveTests {
     viewModel.date = raceDay
     viewModel.bibNumber = "F1234"
     viewModel.place = Place(countryCode: "JP", city: "Tokyo")
-    viewModel.distance = RaceDistance(category: .half, type: .virtual)
+    viewModel.distance = RaceEvent(category: .half, type: .virtual)
     viewModel.finishTime = 12_345
     viewModel.overallPlacement = 120
     viewModel.totalParticipants = 3_000
@@ -86,7 +86,7 @@ struct EditMedalViewModelSaveTests {
     #expect(medal.date == raceDay)
     #expect(medal.bibNumber == "F1234")
     #expect(medal.place == Place(countryCode: "JP", city: "Tokyo"))
-    #expect(medal.distance == RaceDistance(category: .half, type: .virtual))
+    #expect(medal.distance == RaceEvent(category: .half, type: .virtual))
     #expect(medal.finishTime == 12_345)
     #expect(medal.overallPlacement == 120)
     #expect(medal.totalParticipants == 3_000)

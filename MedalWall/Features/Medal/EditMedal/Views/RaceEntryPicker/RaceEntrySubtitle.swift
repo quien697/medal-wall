@@ -36,5 +36,5 @@ struct RaceEntrySubtitle: View {
 
   RaceEntrySubtitle(selection: nil)
 
-  RaceEntrySubtitle(selection: RaceEntry(race: Race.taipei, edition: edition, distance: distance))
+  RaceEntrySubtitle(selection: RaceEntry(race: Race.taipei, edition: edition, event: distance))
 }

@@ -14,7 +14,7 @@ struct RaceEdition: Codable, Identifiable {
   var startDate: Date
   var endDate: Date
   var photoUrl: String?
-  var distances: [RaceDistance]
+  var distances: [RaceEvent]
   var createdBy: String
   var createdAt: Date
   var updatedAt: Date
@@ -26,7 +26,7 @@ struct RaceEdition: Codable, Identifiable {
     startDate: Date,
     endDate: Date,
     photoUrl: String? = nil,
-    distances: [RaceDistance] = [],
+    distances: [RaceEvent] = [],
     createdBy: String,
     createdAt: Date = .now,
     updatedAt: Date = .now

@@ -13,7 +13,7 @@ final class EditMedalViewModel {
   var bibNumber: String = ""
   var photo: UIImage?
   var place = Place(countryCode: "", city: "")
-  var distance: RaceDistance = .default
+  var distance: RaceEvent = .default
   var finishTime: TimeInterval?
   var overallPlacement: Int?
   var totalParticipants: Int?
@@ -145,7 +145,7 @@ final class EditMedalViewModel {
   func autoFill(from selection: RaceEntry) {
     name = "\(selection.race.name) \(selection.edition.year)"
     date = selection.edition.startDate
-    distance = selection.distance
+    distance = selection.event
     place = selection.race.place
   }
 

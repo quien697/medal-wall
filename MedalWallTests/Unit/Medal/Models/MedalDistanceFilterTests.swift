@@ -45,7 +45,7 @@ struct MedalDistanceFilterTests {
   }
 
   /// A custom distance that happens to measure a preset must not split into a second
-  /// bucket — `RaceDistance` already defines identity by `category.value` for this reason.
+  /// bucket — `RaceEvent` already defines identity by `category.value` for this reason.
   @Test("A custom distance equals the preset it measures")
   func testCustomDistanceEqualsMatchingPreset() {
     #expect(

@@ -33,7 +33,7 @@ struct MedalsViewModelTests {
       date: date,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      distance: RaceDistance(category: category, type: .inPerson),
+      distance: RaceEvent(category: category, type: .inPerson),
       finishTime: finishTime,
       userID: "user1"
     )

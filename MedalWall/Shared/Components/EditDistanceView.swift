@@ -12,13 +12,13 @@ struct EditDistanceView: View {
   @Environment(\.dismiss) private var dismiss
 
   // MARK: - State
-  @State private var draftDistance: RaceDistance
+  @State private var draftDistance: RaceEvent
   @State private var customValue: Double
   @State private var errorWrapper: ErrorWrapper?
 
   // MARK: - Properties
   let mode: ItemEditMode
-  let onAction: (RaceDistance) throws -> Void
+  let onAction: (RaceEvent) throws -> Void
   /// The active unit. `customValue` is expressed in it; `draftDistance.category` is always
   /// kilometre-canonical, and the two are bridged only through `DistanceUnit`.
   private let unit: DistanceUnit
@@ -28,8 +28,8 @@ struct EditDistanceView: View {
   // MARK: - Init
   init(
     mode: ItemEditMode,
-    distance: RaceDistance,
-    onAction: @escaping (RaceDistance) throws -> Void
+    distance: RaceEvent,
+    onAction: @escaping (RaceEvent) throws -> Void
   ) {
     let unit = DistanceUnit.resolved()
     let originalCustomKilometers: Double? =
@@ -141,7 +141,7 @@ struct EditDistanceView: View {
 #Preview {
   EditDistanceView(
     mode: .add,
-    distance: RaceDistance(category: .half, type: .inPerson),
+    distance: RaceEvent(category: .half, type: .inPerson),
     onAction: { _ in }
   )
 }

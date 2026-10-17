@@ -134,7 +134,7 @@ private func previewMedal(stripped: Bool = false) -> Medal {
       date: .now,
       bibNumber: "1",
       place: Place(countryCode: "TW", city: "Taipei"),
-      distance: RaceDistance(category: .full, type: .inPerson),
+      distance: RaceEvent(category: .full, type: .inPerson),
       userID: "preview"
     )
   }

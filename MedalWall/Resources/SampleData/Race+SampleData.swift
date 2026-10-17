@@ -71,8 +71,8 @@ extension RaceEdition {
     startDate: DateComponents(calendar: .current, year: 2019, month: 12, day: 15).date!,
     endDate: DateComponents(calendar: .current, year: 2019, month: 12, day: 15).date!,
     distances: [
-      RaceDistance(category: .full, type: .inPerson),
-      RaceDistance(category: .half, type: .inPerson)
+      RaceEvent(category: .full, type: .inPerson),
+      RaceEvent(category: .half, type: .inPerson)
     ],
     createdBy: "preview"
   )
@@ -84,9 +84,9 @@ extension RaceEdition {
     startDate: DateComponents(calendar: .current, year: 2025, month: 12, day: 20).date!,
     endDate: DateComponents(calendar: .current, year: 2025, month: 12, day: 21).date!,
     distances: [
-      RaceDistance(category: .full, type: .inPerson),
-      RaceDistance(category: .half, type: .inPerson),
-      RaceDistance(category: .half, type: .virtual)
+      RaceEvent(category: .full, type: .inPerson),
+      RaceEvent(category: .half, type: .inPerson),
+      RaceEvent(category: .half, type: .virtual)
     ],
     createdBy: "preview"
   )
@@ -98,11 +98,11 @@ extension RaceEdition {
     startDate: DateComponents(calendar: .current, year: 2022, month: 5, day: 1).date!,
     endDate: DateComponents(calendar: .current, year: 2022, month: 5, day: 1).date!,
     distances: [
-      RaceDistance(category: .full, type: .inPerson),
-      RaceDistance(category: .half, type: .inPerson),
-      RaceDistance(category: RaceDistanceCategory(value: 8.0, unit: .kilometers), type: .inPerson),
-      RaceDistance(category: .full, type: .virtual),
-      RaceDistance(category: .half, type: .virtual)
+      RaceEvent(category: .full, type: .inPerson),
+      RaceEvent(category: .half, type: .inPerson),
+      RaceEvent(category: RaceDistanceCategory(value: 8.0, unit: .kilometers), type: .inPerson),
+      RaceEvent(category: .full, type: .virtual),
+      RaceEvent(category: .half, type: .virtual)
     ],
     createdBy: "preview"
   )
@@ -114,9 +114,9 @@ extension RaceEdition {
     startDate: DateComponents(calendar: .current, year: 2026, month: 5, day: 3).date!,
     endDate: DateComponents(calendar: .current, year: 2026, month: 5, day: 3).date!,
     distances: [
-      RaceDistance(category: .full, type: .inPerson),
-      RaceDistance(category: .half, type: .inPerson),
-      RaceDistance(category: RaceDistanceCategory(value: 8.0, unit: .kilometers), type: .inPerson)
+      RaceEvent(category: .full, type: .inPerson),
+      RaceEvent(category: .half, type: .inPerson),
+      RaceEvent(category: RaceDistanceCategory(value: 8.0, unit: .kilometers), type: .inPerson)
     ],
     createdBy: "preview"
   )
@@ -128,7 +128,7 @@ extension RaceEdition {
     startDate: DateComponents(calendar: .current, year: 2023, month: 3, day: 5).date!,
     endDate: DateComponents(calendar: .current, year: 2023, month: 3, day: 5).date!,
     distances: [
-      RaceDistance(category: .full, type: .inPerson)
+      RaceEvent(category: .full, type: .inPerson)
     ],
     createdBy: "preview"
   )
@@ -140,7 +140,7 @@ extension RaceEdition {
     startDate: DateComponents(calendar: .current, year: 2024, month: 4, day: 15).date!,
     endDate: DateComponents(calendar: .current, year: 2024, month: 4, day: 15).date!,
     distances: [
-      RaceDistance(category: .full, type: .inPerson)
+      RaceEvent(category: .full, type: .inPerson)
     ],
     createdBy: "preview"
   )

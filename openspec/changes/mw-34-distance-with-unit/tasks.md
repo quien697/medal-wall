@@ -13,17 +13,17 @@
 
 ## 2. RaceEvent and RaceResult
 
-- [ ] 2.1 Rename `RaceDistanceTests` to `RaceEventTests` and make it fail first: encoding
+- [x] 2.1 Rename `RaceDistanceTests` to `RaceEventTests` and make it fail first: encoding
       writes `{ kind: "distance", value, unit, type }`; a missing or other `kind`, and a
       missing or unknown `unit`, fail to decode; `==` and `hash` use category and type but
       not `id`; `<` orders by type, then real length longest first, then kilometres before
       miles at equal length
-- [ ] 2.2 Add failing `RaceResultTests`: `.seconds(13500)` encodes
+- [x] 2.2 Add failing `RaceResultTests`: `.seconds(13500)` encodes
       `{ value: 13500, unit: "seconds" }`, and an unknown unit fails to decode
-- [ ] 2.3 Rename `RaceDistance` to `RaceEvent` (`git mv` to `RaceEvent.swift`) across the app
+- [x] 2.3 Rename `RaceDistance` to `RaceEvent` (`git mv` to `RaceEvent.swift`) across the app
       and tests, and rename `RaceEntry.distance` to `event`
-- [ ] 2.4 Add `RaceResult` and `ResultUnit` in `RaceResult.swift`
-- [ ] 2.5 Update the test target's `membershipExceptions` in `project.pbxproj` for
+- [x] 2.4 Add `RaceResult` and `ResultUnit` in `RaceResult.swift`
+- [x] 2.5 Update the test target's `membershipExceptions` in `project.pbxproj` for
       `RaceEvent.swift` and `RaceResult.swift`
 
 ## 3. Stored fields

@@ -22,7 +22,7 @@ struct MedalFirestoreRepositoryTests {
       bibNumber: "1024",
       photoUrl: isFull ? "https://example.com/medal.jpg" : nil,
       place: Place(countryCode: "TW", city: "Taipei City"),
-      distance: RaceDistance(category: .full, type: .inPerson),
+      distance: RaceEvent(category: .full, type: .inPerson),
       finishTime: isFull ? 12_600 : nil,
       overallPlacement: isFull ? 120 : nil,
       totalParticipants: isFull ? 2_000 : nil,

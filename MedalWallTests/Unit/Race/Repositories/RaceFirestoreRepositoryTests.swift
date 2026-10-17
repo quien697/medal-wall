@@ -67,7 +67,7 @@ struct RaceFirestoreRepositoryTests {
   private func makeEdition(photoUrl: String?) -> RaceEdition {
     RaceEdition(
       id: "edition-2025", raceId: "race-taipei", year: 2025, startDate: .now, endDate: .now,
-      photoUrl: photoUrl, distances: [RaceDistance(category: .full, type: .inPerson)],
+      photoUrl: photoUrl, distances: [RaceEvent(category: .full, type: .inPerson)],
       createdBy: "uid")
   }
 
