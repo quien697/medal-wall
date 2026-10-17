@@ -45,9 +45,9 @@ struct MedalPersonalRecordTests {
   @Test("a medal whose distance is not a number holds no record")
   func testNaNDistanceHoldsNoRecord() {
     let medals = [
-      makeMedal(category: .custom(.nan), finishTime: 3600),
-      makeMedal(category: .custom(.nan), finishTime: 4000),
-      makeMedal(category: .custom(.nan), finishTime: 5000)
+      makeMedal(category: RaceDistanceCategory(value: .nan, unit: .kilometers), finishTime: 3600),
+      makeMedal(category: RaceDistanceCategory(value: .nan, unit: .kilometers), finishTime: 4000),
+      makeMedal(category: RaceDistanceCategory(value: .nan, unit: .kilometers), finishTime: 5000)
     ]
 
     #expect(medals.personalRecordIDs.isEmpty)
@@ -55,7 +55,10 @@ struct MedalPersonalRecordTests {
 
   @Test(
     "a medal whose distance is zero or negative holds no record",
-    arguments: [RaceDistanceCategory.custom(0), .custom(-5)])
+    arguments: [
+      RaceDistanceCategory(value: 0, unit: .kilometers),
+      RaceDistanceCategory(value: -5, unit: .kilometers)
+    ])
   func testNonPositiveDistanceHoldsNoRecord(category: RaceDistanceCategory) {
     let medals = [makeMedal(category: category, finishTime: 3600)]
 
@@ -116,7 +119,9 @@ struct MedalPersonalRecordTests {
   func testCustomDistanceCollapsesOntoPreset() {
     let medals = [
       makeMedal(id: "preset", category: .full, finishTime: 14000),
-      makeMedal(id: "custom", category: .custom(42.195), finishTime: 12624)
+      makeMedal(
+        id: "custom", category: RaceDistanceCategory(value: 42.195, unit: .kilometers),
+        finishTime: 12624)
     ]
 
     let records = medals.personalRecords
@@ -353,7 +358,9 @@ struct MedalPersonalRecordTests {
   func testPersonalBestsCollapsesCustomOntoPreset() {
     let medals = [
       makeMedal(id: "preset", category: .full, finishTime: 14000),
-      makeMedal(id: "custom", category: .custom(42.195), finishTime: 12624)
+      makeMedal(
+        id: "custom", category: RaceDistanceCategory(value: 42.195, unit: .kilometers),
+        finishTime: 12624)
     ]
 
     #expect(medals.personalBests.count == 1)

@@ -92,7 +92,7 @@ struct MedalDistanceFilteringTests {
   func testCategoriesOwnedIncludesCustom() {
     let medals = [
       makeMedal(category: .full),
-      makeMedal(category: .custom(30)),
+      makeMedal(category: RaceDistanceCategory(value: 30, unit: .kilometers)),
       makeMedal(category: .half)
     ]
 
@@ -105,7 +105,7 @@ struct MedalDistanceFilteringTests {
   func testCategoriesOwnedCollapsesCustomOntoPreset() {
     let medals = [
       makeMedal(category: .full),
-      makeMedal(category: .custom(42.195))
+      makeMedal(category: RaceDistanceCategory(value: 42.195, unit: .kilometers))
     ]
 
     #expect(medals.distanceCategoriesOwned.count == 1)
@@ -122,7 +122,7 @@ struct MedalDistanceFilteringTests {
   func testCategoriesOwnedCollapsesNearToleranceCustomOntoPreset() {
     let medals = [
       makeMedal(category: .full),
-      makeMedal(category: .custom(42.16481))
+      makeMedal(category: RaceDistanceCategory(value: 42.16481, unit: .kilometers))
     ]
 
     #expect(medals.distanceCategoriesOwned.count == 1)
@@ -137,8 +137,8 @@ struct MedalDistanceFilteringTests {
   func testCategoriesOwnedDropsNonFiniteValues() {
     let medals = [
       makeMedal(category: .full),
-      makeMedal(category: .custom(Double.nan)),
-      makeMedal(category: .custom(Double.infinity))
+      makeMedal(category: RaceDistanceCategory(value: Double.nan, unit: .kilometers)),
+      makeMedal(category: RaceDistanceCategory(value: Double.infinity, unit: .kilometers))
     ]
 
     let owned = medals.distanceCategoriesOwned.map(\.value)
@@ -218,7 +218,7 @@ struct MedalDistanceFilteringTests {
   @Test("filtered by a custom distance matches the preset it measures")
   func testFilteredByCustomMatchesPreset() {
     let medals = [
-      makeMedal(category: .custom(42.195)),
+      makeMedal(category: RaceDistanceCategory(value: 42.195, unit: .kilometers)),
       makeMedal(category: .half)
     ]
 
@@ -233,7 +233,7 @@ struct MedalDistanceFilteringTests {
   @Test("filtered by a preset matches a custom distance within the preset's tolerance")
   func testFilteredByPresetMatchesCustomWithinTolerance() {
     let medals = [
-      makeMedal(category: .custom(42.16481)),
+      makeMedal(category: RaceDistanceCategory(value: 42.16481, unit: .kilometers)),
       makeMedal(category: .half)
     ]
 
@@ -247,7 +247,7 @@ struct MedalDistanceFilteringTests {
     let medals = [
       makeMedal(category: .full),
       makeMedal(category: .half),
-      makeMedal(category: .custom(30)),
+      makeMedal(category: RaceDistanceCategory(value: 30, unit: .kilometers)),
       makeMedal(category: .fiveKM)
     ]
 

@@ -131,6 +131,19 @@ nonisolated enum DistanceUnit: String, CaseIterable {
     return "\(number) \(abbreviation(defaults: defaults))"
   }
 
+  /// A value already in this unit rendered with up to four decimals, e.g. `"42.2 km"`.
+  ///
+  /// Nothing is converted: the number is shown as it was stored.
+  func formatted(value: Double, defaults: UserDefaults = .standard) -> String {
+    let number = value.formatted(
+      .number
+        .precision(.fractionLength(0...4))
+        .locale(AppLanguage.resolvedLocale(from: defaults))
+    )
+
+    return "\(number) \(abbreviation(defaults: defaults))"
+  }
+
   /// The localized unit abbreviation — `"km"` or `"mi"`.
   func abbreviation(defaults: UserDefaults = .standard) -> String {
     self == .miles

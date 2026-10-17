@@ -1,13 +1,13 @@
 ## 1. Distance value and unit
 
-- [ ] 1.1 Rewrite `RaceDistanceCategoryTests` to fail first: the four constants carry their
+- [x] 1.1 Rewrite `RaceDistanceCategoryTests` to fail first: the four constants carry their
       kilometre values; equality uses value and unit (`10 km` equals `.tenKM`, `10 mi` does
       not); `kilometers` converts `10 mi` to `16.09344`; `label` gives `Full` / `Half` /
       `10K` / `5K` whatever the unit setting, and `42.2 km`, `10 mi`, `12.3456 km` and
       `16 km` for custom values, in English and `zh-TW`
-- [ ] 1.2 Add failing tests for custom validation: `10.1234` is valid; `10.12345`, `0`,
+- [x] 1.2 Add failing tests for custom validation: `10.1234` is valid; `10.12345`, `0`,
       `-1`, `NaN` and infinity are not
-- [ ] 1.3 Turn `RaceDistanceCategory` into the `Hashable` struct `{ value, unit }` with
+- [x] 1.3 Turn `RaceDistanceCategory` into the `Hashable` struct `{ value, unit }` with
       static standard constants, `kilometers`, a unit-free `label`, and the validation
       check (design.md, Swift model and Custom entry)
 

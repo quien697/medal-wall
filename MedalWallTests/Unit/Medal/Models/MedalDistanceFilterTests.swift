@@ -48,12 +48,16 @@ struct MedalDistanceFilterTests {
   /// bucket — `RaceDistance` already defines identity by `category.value` for this reason.
   @Test("A custom distance equals the preset it measures")
   func testCustomDistanceEqualsMatchingPreset() {
-    #expect(MedalDistanceFilter.category(.custom(42.195)) == MedalDistanceFilter.category(.full))
+    #expect(
+      MedalDistanceFilter.category(RaceDistanceCategory(value: 42.195, unit: .kilometers))
+        == MedalDistanceFilter.category(.full))
   }
 
   @Test("A custom distance that matches no preset stays distinct")
   func testUnmatchedCustomDistanceStaysDistinct() {
-    #expect(MedalDistanceFilter.category(.custom(30)) != MedalDistanceFilter.category(.full))
+    #expect(
+      MedalDistanceFilter.category(RaceDistanceCategory(value: 30, unit: .kilometers))
+        != MedalDistanceFilter.category(.full))
   }
 
   // MARK: - Hashing
@@ -61,7 +65,7 @@ struct MedalDistanceFilterTests {
   func testCustomDistanceCollapsesInSet() {
     let filters: Set<MedalDistanceFilter> = [
       .category(.full),
-      .category(.custom(42.195))
+      .category(RaceDistanceCategory(value: 42.195, unit: .kilometers))
     ]
 
     #expect(filters.count == 1)
@@ -73,7 +77,7 @@ struct MedalDistanceFilterTests {
       .all,
       .category(.full),
       .category(.half),
-      .category(.custom(30))
+      .category(RaceDistanceCategory(value: 30, unit: .kilometers))
     ]
 
     #expect(filters.count == 4)

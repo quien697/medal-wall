@@ -32,10 +32,8 @@ struct EditDistanceView: View {
     onAction: @escaping (RaceDistance) throws -> Void
   ) {
     let unit = DistanceUnit.resolved()
-    let originalCustomKilometers: Double? = {
-      if case .custom(let value) = distance.category { return value }
-      return nil
-    }()
+    let originalCustomKilometers: Double? =
+      distance.category.isStandard ? nil : distance.category.value
 
     self.mode = mode
     self.draftDistance = distance
@@ -86,16 +84,19 @@ struct EditDistanceView: View {
             presetRow("5K", .fiveKM)
             Text("Custom")
               .font(.TypeScale.Field.label)
-              .tag(RaceDistanceCategory.custom(customKilometers))
+              .tag(RaceDistanceCategory(value: customKilometers, unit: .kilometers))
           }  // Picker
           .pickerStyle(.navigationLink)
 
-          if case .custom = draftDistance.category {
+          if !draftDistance.category.isStandard {
             TextField(unit.customFieldLabel(), value: $customValue, format: .number)
               .font(.TypeScale.Field.value)
               .keyboardType(.decimalPad)
               .onChange(of: customValue) { _, _ in
-                draftDistance.category = .custom(customKilometers)
+                draftDistance.category = RaceDistanceCategory(
+                  value: customKilometers,
+                  unit: .kilometers
+                )
               }
           }
         }  // Section

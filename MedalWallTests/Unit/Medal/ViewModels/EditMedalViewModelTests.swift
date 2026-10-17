@@ -107,7 +107,8 @@ struct EditMedalViewModelTests {
     viewModel.name = "Taipei Marathon 2019"
     viewModel.place.countryCode = "TW"
     viewModel.place.city = "Taipei"
-    viewModel.distance = RaceDistance(category: .custom(0), type: .inPerson)
+    viewModel.distance = RaceDistance(
+      category: RaceDistanceCategory(value: 0, unit: .kilometers), type: .inPerson)
 
     #expect(viewModel.isFormValid == false)
   }
@@ -118,7 +119,8 @@ struct EditMedalViewModelTests {
     viewModel.name = "Taipei Marathon 2019"
     viewModel.place.countryCode = "TW"
     viewModel.place.city = "Taipei"
-    viewModel.distance = RaceDistance(category: .custom(-1), type: .inPerson)
+    viewModel.distance = RaceDistance(
+      category: RaceDistanceCategory(value: -1, unit: .kilometers), type: .inPerson)
 
     #expect(viewModel.isFormValid == false)
   }
@@ -129,7 +131,8 @@ struct EditMedalViewModelTests {
     viewModel.name = "Taipei Marathon 2019"
     viewModel.place.countryCode = "TW"
     viewModel.place.city = "Taipei"
-    viewModel.distance = RaceDistance(category: .custom(5.0), type: .inPerson)
+    viewModel.distance = RaceDistance(
+      category: RaceDistanceCategory(value: 5.0, unit: .kilometers), type: .inPerson)
 
     #expect(viewModel.isFormValid == true)
   }

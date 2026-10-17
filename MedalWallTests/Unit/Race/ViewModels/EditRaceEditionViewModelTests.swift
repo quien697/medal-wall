@@ -210,7 +210,8 @@ struct EditRaceEditionViewModelTests {
     let viewModel = makeViewModel()
 
     #expect(throws: AppError.invalidDistance) {
-      try viewModel.addDistance(RaceDistance(category: .custom(0), type: .inPerson))
+      try viewModel.addDistance(
+        RaceDistance(category: RaceDistanceCategory(value: 0, unit: .kilometers), type: .inPerson))
     }
   }
 
@@ -219,7 +220,8 @@ struct EditRaceEditionViewModelTests {
     let viewModel = makeViewModel()
 
     #expect(throws: AppError.invalidDistance) {
-      try viewModel.addDistance(RaceDistance(category: .custom(-5), type: .inPerson))
+      try viewModel.addDistance(
+        RaceDistance(category: RaceDistanceCategory(value: -5, unit: .kilometers), type: .inPerson))
     }
   }
 
@@ -245,17 +247,20 @@ struct EditRaceEditionViewModelTests {
   @Test("addDistance succeeds for a valid custom distance greater than zero")
   func testAddDistancePositiveCustomSucceeds() throws {
     let viewModel = makeViewModel()
-    try viewModel.addDistance(RaceDistance(category: .custom(8.5), type: .inPerson))
+    try viewModel.addDistance(
+      RaceDistance(category: RaceDistanceCategory(value: 8.5, unit: .kilometers), type: .inPerson))
 
     #expect(viewModel.distances.count == 1)
-    #expect(viewModel.distances.first?.category == .custom(8.5))
+    #expect(
+      viewModel.distances.first?.category == RaceDistanceCategory(value: 8.5, unit: .kilometers))
   }
 
   @Test("addDistance does not add the distance when it throws")
   func testAddDistanceDoesNotMutateOnThrow() {
     let viewModel = makeViewModel()
 
-    try? viewModel.addDistance(RaceDistance(category: .custom(0), type: .inPerson))
+    try? viewModel.addDistance(
+      RaceDistance(category: RaceDistanceCategory(value: 0, unit: .kilometers), type: .inPerson))
 
     #expect(viewModel.distances.isEmpty)
   }
@@ -272,7 +277,9 @@ struct EditRaceEditionViewModelTests {
   @Test("addDistance succeeds for a very small positive custom distance")
   func testAddDistanceTinyPositiveCustomSucceeds() throws {
     let viewModel = makeViewModel()
-    try viewModel.addDistance(RaceDistance(category: .custom(0.001), type: .inPerson))
+    try viewModel.addDistance(
+      RaceDistance(category: RaceDistanceCategory(value: 0.001, unit: .kilometers), type: .inPerson)
+    )
 
     #expect(viewModel.distances.count == 1)
   }

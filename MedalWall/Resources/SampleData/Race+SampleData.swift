@@ -100,7 +100,7 @@ extension RaceEdition {
     distances: [
       RaceDistance(category: .full, type: .inPerson),
       RaceDistance(category: .half, type: .inPerson),
-      RaceDistance(category: .custom(8.0), type: .inPerson),
+      RaceDistance(category: RaceDistanceCategory(value: 8.0, unit: .kilometers), type: .inPerson),
       RaceDistance(category: .full, type: .virtual),
       RaceDistance(category: .half, type: .virtual)
     ],
@@ -116,7 +116,7 @@ extension RaceEdition {
     distances: [
       RaceDistance(category: .full, type: .inPerson),
       RaceDistance(category: .half, type: .inPerson),
-      RaceDistance(category: .custom(8.0), type: .inPerson)
+      RaceDistance(category: RaceDistanceCategory(value: 8.0, unit: .kilometers), type: .inPerson)
     ],
     createdBy: "preview"
   )

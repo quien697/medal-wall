@@ -61,16 +61,20 @@ struct RaceDistanceTests {
 
   @Test("Two custom distances with the same value and type are equal")
   func testEqualityCustomMatch() {
-    let lhs = RaceDistance(category: .custom(33.5), type: .inPerson)
-    let rhs = RaceDistance(category: .custom(33.5), type: .inPerson)
+    let lhs = RaceDistance(
+      category: RaceDistanceCategory(value: 33.5, unit: .kilometers), type: .inPerson)
+    let rhs = RaceDistance(
+      category: RaceDistanceCategory(value: 33.5, unit: .kilometers), type: .inPerson)
 
     #expect(lhs == rhs)
   }
 
   @Test("Two custom distances with different values are not equal")
   func testEqualityCustomDifferentValue() {
-    let lhs = RaceDistance(category: .custom(33.5), type: .inPerson)
-    let rhs = RaceDistance(category: .custom(33.4), type: .inPerson)
+    let lhs = RaceDistance(
+      category: RaceDistanceCategory(value: 33.5, unit: .kilometers), type: .inPerson)
+    let rhs = RaceDistance(
+      category: RaceDistanceCategory(value: 33.4, unit: .kilometers), type: .inPerson)
 
     #expect(lhs != rhs)
   }
@@ -123,7 +127,8 @@ struct RaceDistanceTests {
 
   @Test("Custom distance value is preserved through Codable round-trip")
   func testCodableRoundTripCustom() throws {
-    let original = RaceDistance(category: .custom(33.5), type: .inPerson)
+    let original = RaceDistance(
+      category: RaceDistanceCategory(value: 33.5, unit: .kilometers), type: .inPerson)
     let data = try JSONEncoder().encode(original)
     let decoded = try JSONDecoder().decode(RaceDistance.self, from: data)
 
@@ -149,6 +154,6 @@ struct RaceDistanceTests {
     let data = Data(json.utf8)
     let decoded = try JSONDecoder().decode(RaceDistance.self, from: data)
 
-    #expect(decoded.category == .custom(42.2))
+    #expect(decoded.category == RaceDistanceCategory(value: 42.2, unit: .kilometers))
   }
 }

@@ -57,7 +57,7 @@ extension RaceDistance {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     let value = try container.decode(Double.self, forKey: .value)
     let typeRaw = try container.decode(String.self, forKey: .type)
-    self.category = RaceDistanceCategory(value: value)
+    self.category = RaceDistanceCategory(value: value, unit: .kilometers)
     self.type = RaceDistanceType(rawValue: typeRaw) ?? .inPerson
   }
 

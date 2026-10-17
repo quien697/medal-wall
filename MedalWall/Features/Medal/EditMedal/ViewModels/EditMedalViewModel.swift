@@ -79,7 +79,7 @@ final class EditMedalViewModel {
   // MARK: - Computed
   var isFormValid: Bool {
     let customDistanceValid: Bool = {
-      if case .custom(let value) = distance.category { return value > 0 }
+      if !distance.category.isStandard { return distance.category.value > 0 }
       return true
     }()
 

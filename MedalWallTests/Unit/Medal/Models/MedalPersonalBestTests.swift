@@ -56,8 +56,8 @@ struct MedalPersonalBestTests {
   func testCustomDistanceSharesPresetID() {
     let preset = MedalPersonalBest(category: .full, medal: makeMedal())
     let custom = MedalPersonalBest(
-      category: .custom(42.195),
-      medal: makeMedal(category: .custom(42.195))
+      category: RaceDistanceCategory(value: 42.195, unit: .kilometers),
+      medal: makeMedal(category: RaceDistanceCategory(value: 42.195, unit: .kilometers))
     )
 
     #expect(preset.id == custom.id)

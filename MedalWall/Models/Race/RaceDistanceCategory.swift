@@ -7,72 +7,67 @@
 
 import Foundation
 
-/// Represents standard or custom marathon distance categories.
-enum RaceDistanceCategory: CustomStringConvertible, Hashable {
-  case full
-  case half
-  case tenKM
-  case fiveKM
-  case custom(Double)
+/// A race distance: the number and the unit it was entered in, stored and shown as they are.
+///
+/// The four standard distances are fixed kilometre values, so a custom distance with the same
+/// number and unit is that standard distance by plain equality.
+nonisolated struct RaceDistanceCategory: CustomStringConvertible, Hashable {
+  var value: Double
+  var unit: DistanceUnit
 
-  /// The label shown in the UI, resolved against the stored distance unit preference.
-  nonisolated var description: String {
-    label(in: DistanceUnit.resolved())
+  static let full = RaceDistanceCategory(value: 42.195, unit: .kilometers)
+  static let half = RaceDistanceCategory(value: 21.0975, unit: .kilometers)
+  static let tenKM = RaceDistanceCategory(value: 10, unit: .kilometers)
+  static let fiveKM = RaceDistanceCategory(value: 5, unit: .kilometers)
+
+  /// The preset distances shown in the distance picker, longest first.
+  static var standardCases: [RaceDistanceCategory] {
+    [.full, .half, .tenKM, .fiveKM]
   }
 
-  /// The label for this category in a given unit.
+  /// Whether this is one of the four standard distances.
+  var isStandard: Bool {
+    Self.standardCases.contains(self)
+  }
+
+  /// The real length in kilometres, for sorting and pace. Never shown or stored.
+  var kilometers: Double {
+    unit == .miles ? value * DistanceUnit.kilometersPerMile : value
+  }
+
+  /// Whether this can be saved as a custom distance: greater than zero, a finite number, and
+  /// at most four decimals.
   ///
-  /// Presets are named rather than measured, identically in both units — converting them
-  /// would produce labels no runner uses, since a 10K is never a "6.2mi race". Only a
-  /// custom distance carries a measurement.
-  nonisolated func label(
-    in unit: DistanceUnit,
-    defaults: UserDefaults = .standard
-  ) -> String {
+  /// The decimal check compares against the value rounded to four places with a tolerance,
+  /// because a `Double` such as `10.1234` is not exactly four decimals in binary.
+  var isValidCustom: Bool {
+    guard value.isFinite, value > 0 else { return false }
+    let rounded = (value * 10_000).rounded() / 10_000
+
+    return abs(value - rounded) < 1e-9
+  }
+
+  /// The label shown in the UI.
+  var description: String {
+    label()
+  }
+
+  /// A standard distance's name, or any other distance's stored number and unit.
+  ///
+  /// The distance unit setting plays no part: a distance always reads as it was entered.
+  func label(defaults: UserDefaults = .standard) -> String {
     switch self {
     case .full: .appLocalized("Full", defaults: defaults)
     case .half: .appLocalized("Half", defaults: defaults)
     case .tenKM: .appLocalized("10K", defaults: defaults)
     case .fiveKM: .appLocalized("5K", defaults: defaults)
-    case .custom(let value): unit.formatted(kilometers: value, defaults: defaults)
-    }
-  }
-
-  /// The numeric distance in kilometres used for Codable storage and sorting.
-  nonisolated var value: Double {
-    switch self {
-    case .full: return 42.195
-    case .half: return 21.0975
-    case .tenKM: return 10
-    case .fiveKM: return 5
-    case .custom(let value): return value
+    default: unit.formatted(value: value, defaults: defaults)
     }
   }
 }
 
 extension RaceDistanceCategory {
-  /// Reconstructs a category from its stored numeric value (kilometres) exactly.
-  ///
-  /// This is what `RaceDistance` decode uses. It does not tolerate near-preset values,
-  /// because decode has to preserve whatever was actually saved — collapsing here would
-  /// silently rewrite a genuine custom course into a preset every time a medal or race
-  /// round-trips through Firestore. Collapsing near-preset values for display is
-  /// `nearestPreset(forValue:)`'s job, not this initializer's.
-  init(value: Double) {
-    switch value {
-    case 42.195: self = .full
-    case 21.0975: self = .half
-    case 10: self = .tenKM
-    case 5: self = .fiveKM
-    default: self = .custom(value)
-    }
-  }
-
-  /// The preset this measured value is close enough to be presented as, collapsing unit
-  /// round-trip drift onto the preset it measures — a marathon persisted as 26.2 miles
-  /// arrives as 42.16481 km and would otherwise live as a separate chip from `.full`.
-  /// 0.05 km is tight enough to reject 42.0 (off by 0.195) while still accepting
-  /// 42.16481 (off by 0.030).
+  /// The preset this measured kilometre value is close enough to be presented as.
   ///
   /// Used only where distances are grouped or filtered for display — the medal
   /// collection's chips and its personal-best derivation — never for decode.
@@ -86,12 +81,7 @@ extension RaceDistanceCategory {
     } else if abs(value - RaceDistanceCategory.fiveKM.value) < 0.05 {
       return .fiveKM
     } else {
-      return .custom(value)
+      return RaceDistanceCategory(value: value, unit: .kilometers)
     }
-  }
-
-  /// The preset cases shown in the distance picker (excludes custom).
-  static var standardCases: [RaceDistanceCategory] {
-    [.full, .half, .tenKM, .fiveKM]
   }
 }

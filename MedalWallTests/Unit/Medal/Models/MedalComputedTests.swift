@@ -102,7 +102,8 @@ struct MedalComputedTests {
   @Test("averagePace is nil when custom distance is zero")
   func testAveragePaceNilWhenCustomDistanceZero() {
     let medal = makeMedal(
-      distance: RaceDistance(category: .custom(0), type: .inPerson),
+      distance: RaceDistance(
+        category: RaceDistanceCategory(value: 0, unit: .kilometers), type: .inPerson),
       finishTime: 3600
     )
 
@@ -112,7 +113,8 @@ struct MedalComputedTests {
   @Test("averagePace is nil when custom distance is negative")
   func testAveragePaceNilWhenCustomDistanceNegative() {
     let medal = makeMedal(
-      distance: RaceDistance(category: .custom(-5), type: .inPerson),
+      distance: RaceDistance(
+        category: RaceDistanceCategory(value: -5, unit: .kilometers), type: .inPerson),
       finishTime: 3600
     )
 
@@ -126,7 +128,8 @@ struct MedalComputedTests {
     arguments: [(1e-16, 86_399.0), (0.001, 3_600.0), (0.06, 3_600.0)])
   func testAveragePaceNilWhenTooSlow(kilometers: Double, finishTime: TimeInterval) {
     let medal = makeMedal(
-      distance: RaceDistance(category: .custom(kilometers), type: .inPerson),
+      distance: RaceDistance(
+        category: RaceDistanceCategory(value: kilometers, unit: .kilometers), type: .inPerson),
       finishTime: finishTime
     )
 
@@ -136,7 +139,8 @@ struct MedalComputedTests {
   @Test("averagePace is nil when the distance is infinite")
   func testAveragePaceNilWhenDistanceInfinite() {
     let medal = makeMedal(
-      distance: RaceDistance(category: .custom(.infinity), type: .inPerson),
+      distance: RaceDistance(
+        category: RaceDistanceCategory(value: .infinity, unit: .kilometers), type: .inPerson),
       finishTime: 3600
     )
 
