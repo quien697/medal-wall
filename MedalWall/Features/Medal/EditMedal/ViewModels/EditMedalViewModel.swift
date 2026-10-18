@@ -79,7 +79,7 @@ final class EditMedalViewModel {
   // MARK: - Computed
   var isFormValid: Bool {
     let customDistanceValid: Bool = {
-      if !distance.category.isStandard { return distance.category.value > 0 }
+      if !distance.category.isStandard { return distance.category.isValidCustom }
       return true
     }()
 
@@ -139,6 +139,14 @@ final class EditMedalViewModel {
   /// Removes a tag.
   func removeTag(_ tag: String) {
     tags.removeAll { $0 == tag }
+  }
+
+  /// Sets the medal's distance, throwing if a custom value is not a usable distance.
+  func selectDistance(_ newDistance: RaceEvent) throws {
+    if !newDistance.category.isStandard, !newDistance.category.isValidCustom {
+      throw AppError.invalidDistance
+    }
+    distance = newDistance
   }
 
   /// Auto-fills form fields from a selected race entry.

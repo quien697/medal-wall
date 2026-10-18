@@ -63,19 +63,19 @@
 
 ## 6. Custom entry
 
-- [ ] 6.1 Add failing tests in `EditRaceEditionViewModelTests`: `addDistance` refuses
+- [x] 6.1 Add failing tests in `EditRaceEditionViewModelTests`: `addDistance` refuses
       `10.12345`, `0` and `NaN` with `invalidDistance`, keeps a `10 mi` next to a `10K`, and
       refuses a custom `10 km` beside a `10K` as a duplicate
-- [ ] 6.2 Add failing tests in `EditMedalViewModelTests`: `selectDistance(_:)` refuses an
+- [x] 6.2 Add failing tests in `EditMedalViewModelTests`: `selectDistance(_:)` refuses an
       invalid custom distance with `invalidDistance` and accepts a valid one; `isFormValid`
       uses the same rule
-- [ ] 6.3 Implement the validation in `addDistance` and the new `selectDistance(_:)`, and call
+- [x] 6.3 Implement the validation in `addDistance` and the new `selectDistance(_:)`, and call
       `selectDistance` from `EditMedalView`'s distance picker
-- [ ] 6.4 Rebuild `EditDistanceView` custom entry: a "Custom is chosen" state, the number
+- [x] 6.4 Rebuild `EditDistanceView` custom entry: a "Custom is chosen" state, the number
       field with a unit-free label, the Kilometers / Miles switch starting at the stored or
       the resolved unit, and preset rows showing their stored measurement; add named
       previews for a new custom distance and for a stored custom distance in miles
-- [ ] 6.5 Update the `invalidDistance` message and recovery text to the four-decimal wording
+- [x] 6.5 Update the `invalidDistance` message and recovery text to the four-decimal wording
       in design.md
 
 ## 7. DistanceUnit

@@ -204,7 +204,7 @@ struct EditMedalView: View {
           mode: .edit,
           distance: viewModel.distance,
           onAction: { newDistance in
-            viewModel.distance = newDistance
+            try viewModel.selectDistance(newDistance)
           }
         )
         .presentationDetents([.medium])

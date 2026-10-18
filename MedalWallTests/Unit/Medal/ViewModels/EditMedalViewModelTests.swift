@@ -137,6 +137,56 @@ struct EditMedalViewModelTests {
     #expect(viewModel.isFormValid == true)
   }
 
+  @Test(
+    "isFormValid is false when custom distance has more than four decimals or is not finite",
+    arguments: [10.12345, Double.nan, .infinity])
+  func testIsFormValidFalseCustomDistanceUnusable(value: Double) {
+    let viewModel = EditMedalViewModel(mode: .add)
+    viewModel.name = "Taipei Marathon 2019"
+    viewModel.place.countryCode = "TW"
+    viewModel.place.city = "Taipei"
+    viewModel.distance = RaceEvent(
+      category: RaceDistanceCategory(value: value, unit: .miles), type: .inPerson)
+
+    #expect(viewModel.isFormValid == false)
+  }
+
+  // MARK: - selectDistance
+  @Test(
+    "selectDistance refuses an invalid custom distance and keeps the current one",
+    arguments: [0, -1, 10.12345, Double.nan, .infinity])
+  func testSelectDistanceRefusesInvalidCustom(value: Double) {
+    let viewModel = EditMedalViewModel(mode: .add)
+    let current = viewModel.distance
+
+    #expect(throws: AppError.invalidDistance) {
+      try viewModel.selectDistance(
+        RaceEvent(category: RaceDistanceCategory(value: value, unit: .miles), type: .inPerson))
+    }
+    #expect(viewModel.distance == current)
+  }
+
+  @Test("selectDistance sets a valid custom distance as entered")
+  func testSelectDistanceAcceptsValidCustom() throws {
+    let viewModel = EditMedalViewModel(mode: .add)
+    let distance = RaceEvent(
+      category: RaceDistanceCategory(value: 10.1234, unit: .miles), type: .virtual)
+
+    try viewModel.selectDistance(distance)
+
+    #expect(viewModel.distance == distance)
+  }
+
+  @Test("selectDistance sets a standard distance")
+  func testSelectDistanceAcceptsStandard() throws {
+    let viewModel = EditMedalViewModel(mode: .add)
+    let distance = RaceEvent(category: .half, type: .wheelChair)
+
+    try viewModel.selectDistance(distance)
+
+    #expect(viewModel.distance == distance)
+  }
+
   // MARK: - addEventPhotos / removeEventPhoto
   @Test("addEventPhotos appends one DraftEventPhoto per data item")
   func testAddEventPhotosAppendsAll() {
