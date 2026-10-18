@@ -33,8 +33,8 @@ struct MedalsViewModelTests {
       date: date,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      distance: RaceEvent(category: category, type: .inPerson),
-      finishTime: finishTime,
+      event: RaceEvent(category: category, type: .inPerson),
+      result: finishTime.map(RaceResult.seconds),
       userID: "user1"
     )
   }
@@ -279,7 +279,7 @@ struct MedalsViewModelTests {
     let personalBest = try #require(viewModel.medals.personalBests.first)
 
     #expect(personalBest.medal.name == "Test")
-    #expect(personalBest.medal.finishTime?.formattedHMS == "03:30:24")
+    #expect(personalBest.medal.result?.value.formattedHMS == "03:30:24")
     #expect(personalBest.category.description == RaceDistanceCategory.full.description)
     #expect(
       DistanceUnit.kilometers.paceText(

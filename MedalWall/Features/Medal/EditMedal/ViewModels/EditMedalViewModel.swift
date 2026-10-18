@@ -59,7 +59,7 @@ final class EditMedalViewModel {
       self.date = medal.date
       self.bibNumber = medal.bibNumber
       self.place = medal.place
-      self.distance = medal.distance
+      self.distance = medal.event
       self.finishTime = medal.recordedFinishTime
       self.overallPlacement = medal.overallPlacement
       self.totalParticipants = medal.totalParticipants
@@ -174,8 +174,8 @@ final class EditMedalViewModel {
         updated.bibNumber = trimmedBibNumber
         updated.photoUrl = photoUrl
         updated.place = place
-        updated.distance = distance
-        updated.finishTime = finishTime
+        updated.event = distance
+        updated.result = finishTime.map(RaceResult.seconds)
         updated.overallPlacement = overallPlacement
         updated.totalParticipants = totalParticipants
         updated.division = division?.rawValue
@@ -202,8 +202,8 @@ final class EditMedalViewModel {
           bibNumber: trimmedBibNumber,
           photoUrl: photoUrl,
           place: place,
-          distance: distance,
-          finishTime: finishTime,
+          event: distance,
+          result: finishTime.map(RaceResult.seconds),
           overallPlacement: overallPlacement,
           totalParticipants: totalParticipants,
           division: division,

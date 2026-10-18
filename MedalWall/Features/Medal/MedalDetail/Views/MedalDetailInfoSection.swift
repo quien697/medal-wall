@@ -61,7 +61,7 @@ struct MedalDetailInfoSection: View {
   MedalDetailInfoSection(
     location: "Taipei City, TW",
     date: "Dec 15, 2019",
-    distance: "Full · 42.2 km",
+    distance: "Full",
     raceType: "In-Person",
     bib: "00001"
   )

@@ -33,8 +33,8 @@ struct MedalPersonalRecordTests {
       date: date,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      distance: RaceEvent(category: category, type: .inPerson),
-      finishTime: finishTime,
+      event: RaceEvent(category: category, type: .inPerson),
+      result: finishTime.map(RaceResult.seconds),
       userID: "user1"
     )
   }
@@ -247,7 +247,7 @@ struct MedalPersonalRecordTests {
   @Test("Sample data marks every timed medal and no untimed one")
   func testSampleDataMarksOnlyTimedMedals() {
     let medals = Medal.sampleData
-    let timed = medals.filter { ($0.finishTime ?? 0) > 0 }
+    let timed = medals.filter { ($0.result?.value ?? 0) > 0 }
     let recordIDs = medals.personalRecordIDs
 
     #expect(!timed.isEmpty, "sample data should carry at least one timed medal")
@@ -257,7 +257,7 @@ struct MedalPersonalRecordTests {
       #expect(recordIDs.contains(medal.id), "timed medal \(medal.name) should hold a record")
     }
 
-    for medal in medals where medal.finishTime == nil {
+    for medal in medals where medal.result == nil {
       #expect(!recordIDs.contains(medal.id), "untimed medal \(medal.name) must not be marked")
     }
   }

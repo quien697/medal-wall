@@ -8,17 +8,17 @@
 import Foundation
 
 extension Array where Element == Medal {
-  var fullCount: Int { filter { $0.distance.category == .full }.count }
-  var halfCount: Int { filter { $0.distance.category == .half }.count }
+  var fullCount: Int { filter { $0.event.category == .full }.count }
+  var halfCount: Int { filter { $0.event.category == .half }.count }
 
   var bestFullTime: TimeInterval? {
-    filter { $0.distance.category == .full }
+    filter { $0.event.category == .full }
       .compactMap(\.recordedFinishTime)
       .min()
   }
 
   var bestHalfTime: TimeInterval? {
-    filter { $0.distance.category == .half }
+    filter { $0.event.category == .half }
       .compactMap(\.recordedFinishTime)
       .min()
   }

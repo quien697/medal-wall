@@ -28,18 +28,18 @@
 
 ## 3. Stored fields
 
-- [ ] 3.1 Add failing tests in `MedalFirestoreRepositoryTests`: an encoded medal has `event`
+- [x] 3.1 Add failing tests in `MedalFirestoreRepositoryTests`: an encoded medal has `event`
       and `result` and no `distance` or `finishTime`; a medal without a time has no
       `result`; clearing the time on update deletes `result`; `medalUpdateFields` names
       `event` and `result`
-- [ ] 3.2 Add failing tests in `RaceFirestoreRepositoryTests`: an encoded edition has `events`
+- [x] 3.2 Add failing tests in `RaceFirestoreRepositoryTests`: an encoded edition has `events`
       and no `distances`, and the edition's update field list names `events`
-- [ ] 3.3 Rename `Medal.distance` to `event` and replace `Medal.finishTime` with
+- [x] 3.3 Rename `Medal.distance` to `event` and replace `Medal.finishTime` with
       `result: RaceResult?`; `recordedFinishTime` reads `result?.value` with its guards
       unchanged
-- [ ] 3.4 Rename `RaceEdition.distances` to `events`, and add the `///` comments for
+- [x] 3.4 Rename `RaceEdition.distances` to `events`, and add the `///` comments for
       `Medal.event` and `RaceEdition.events` (design.md, Firestore shape)
-- [ ] 3.5 Update both repositories' field lists, then the sample data and previews,
+- [x] 3.5 Update both repositories' field lists, then the sample data and previews,
       including `MedalDetailInfoSection`'s preview text
 
 ## 4. Pace

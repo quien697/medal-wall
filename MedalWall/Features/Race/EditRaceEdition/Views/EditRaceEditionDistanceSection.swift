@@ -59,7 +59,7 @@ struct EditRaceEditionDistanceSection: View {
 }
 
 #Preview {
-  let distances = RaceEdition.taipei2019.distances
+  let distances = RaceEdition.taipei2019.events
 
   Form {
     EditRaceEditionDistanceSection(

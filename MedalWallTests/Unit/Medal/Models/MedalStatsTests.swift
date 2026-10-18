@@ -21,7 +21,7 @@ struct MedalStatsTests {
       date: .now,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      distance: distance, finishTime: finishTime,
+      event: distance, result: finishTime.map(RaceResult.seconds),
       userID: "user1"
     )
   }

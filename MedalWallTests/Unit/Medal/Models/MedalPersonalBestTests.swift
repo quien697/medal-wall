@@ -22,8 +22,8 @@ struct MedalPersonalBestTests {
       date: .now,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      distance: RaceEvent(category: category, type: .inPerson),
-      finishTime: finishTime,
+      event: RaceEvent(category: category, type: .inPerson),
+      result: finishTime.map(RaceResult.seconds),
       userID: "user1"
     )
   }

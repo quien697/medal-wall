@@ -196,8 +196,8 @@ struct EditMedalViewModelTests {
       date: someDate,
       bibNumber: "42",
       place: Place(countryCode: "JP", city: "Shinjuku", region: "Tokyo"),
-      distance: RaceEvent(category: .full, type: .inPerson),
-      finishTime: 12624,
+      event: RaceEvent(category: .full, type: .inPerson),
+      result: .seconds(12624),
       note: "Great race",
       tags: ["fun"],
       userID: "user1"
@@ -224,8 +224,8 @@ struct EditMedalViewModelTests {
       date: .now,
       bibNumber: "42",
       place: Place(countryCode: "JP", city: "Shinjuku"),
-      distance: RaceEvent(category: .full, type: .inPerson),
-      finishTime: finishTime,
+      event: RaceEvent(category: .full, type: .inPerson),
+      result: .seconds(finishTime),
       userID: "user1"
     )
     let viewModel = EditMedalViewModel(mode: .edit, medal: medal)
@@ -281,7 +281,7 @@ struct EditMedalViewModelTests {
       bibNumber: "00001",
       photoUrl: "file:///nonexistent/medal.jpg",
       place: Place(countryCode: "TW", city: "Taipei"),
-      distance: .default,
+      event: .default,
       userID: "uid"
     )
     let viewModel = EditMedalViewModel(mode: .edit, medal: medal)

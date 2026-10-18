@@ -15,7 +15,9 @@ extension Medal {
   /// infinity or 1,000 hours or more, which another client or a corrupt document could
   /// store: `Duration` traps on such values, so formatting one would crash the app.
   var recordedFinishTime: TimeInterval? {
-    guard let finishTime, finishTime > 0, finishTime < Self.finishTimeLimit else { return nil }
+    guard let finishTime = result?.value, finishTime > 0, finishTime < Self.finishTimeLimit else {
+      return nil
+    }
     return finishTime
   }
 
@@ -27,9 +29,9 @@ extension Medal {
   /// distance stored near zero, and showing it through `Int(_:)` would crash the app. An
   /// infinite distance would give a pace of zero. Both read as no pace.
   var averagePace: Double? {
-    guard let recordedFinishTime, distance.category.value > 0, distance.category.value.isFinite
+    guard let recordedFinishTime, event.category.value > 0, event.category.value.isFinite
     else { return nil }
-    let pace = (recordedFinishTime / 60) / distance.category.value
+    let pace = (recordedFinishTime / 60) / event.category.value
     return pace < Self.paceLimit ? pace : nil
   }
 

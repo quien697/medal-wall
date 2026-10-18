@@ -43,7 +43,7 @@ struct RaceEntryDistanceButton: View {
 #Preview {
   let race = Race.taipei
   let edition = RaceEdition.taipei2019
-  let distance = edition.distances.first!
+  let distance = edition.events.first!
 
   RaceEntryDistanceButton(
     race: race,

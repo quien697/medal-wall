@@ -42,7 +42,7 @@ struct RaceDetailEditionsSection: View {
               PhotoImage(urlString: edition.photoUrl, as: .raceThumbnail)
 
               FlowLayout(spacing: 6) {
-                ForEach(edition.distances.sorted()) { distance in
+                ForEach(edition.events.sorted()) { distance in
                   Text(distance.displayLabel)
                     .tagStyle(.neutralInCard)
                 }  // ForEach

@@ -43,7 +43,7 @@ extension Array where Element == Medal {
   /// ordering and traps.
   var distanceCategoriesOwned: [RaceDistanceCategory] {
     let normalized = Set(
-      map { RaceDistanceCategory.nearestPreset(forValue: $0.distance.category.value) })
+      map { RaceDistanceCategory.nearestPreset(forValue: $0.event.category.value) })
     return
       normalized
       .filter { $0.value.isFinite }
@@ -57,7 +57,7 @@ extension Array where Element == Medal {
       return self
     case .category(let category):
       return filter {
-        RaceDistanceCategory.nearestPreset(forValue: $0.distance.category.value) == category
+        RaceDistanceCategory.nearestPreset(forValue: $0.event.category.value) == category
       }
     }
   }
@@ -88,10 +88,10 @@ extension Array where Element == Medal {
     var records: [RaceDistanceCategory: Medal] = [:]
 
     for medal in sortedForDisplay {
-      let kilometers = medal.distance.category.value
+      let kilometers = medal.event.category.value
       guard let finishTime = medal.recordedFinishTime, kilometers > 0, kilometers.isFinite
       else { continue }
-      let category = RaceDistanceCategory.nearestPreset(forValue: medal.distance.category.value)
+      let category = RaceDistanceCategory.nearestPreset(forValue: medal.event.category.value)
 
       guard let leader = records[category] else {
         records[category] = medal
