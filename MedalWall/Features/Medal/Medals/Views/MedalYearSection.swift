@@ -31,7 +31,7 @@ struct MedalYearSection: View {
             photoUrl: medal.photoUrl,
             date: medal.date.formattedMonthDayYear(),
             name: medal.name,
-            distance: medal.distance.displayLabel,
+            distance: medal.raceEvent.displayLabel,
             finishTime: medal.recordedFinishTime?.formattedHMS,
             isPersonalRecord: personalRecordIDs.contains(medal.id)
           )

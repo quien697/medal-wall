@@ -12,51 +12,39 @@ struct EditDistanceView: View {
   @Environment(\.dismiss) private var dismiss
 
   // MARK: - State
-  @State private var draftDistance: RaceDistance
+  @State private var draftDistance: RaceEvent
+  /// The standard distance chosen, or `nil` while Custom is chosen. Kept apart from the
+  /// custom number so typing `42.195` does not switch the row to Full Marathon mid-entry.
+  @State private var selectedStandard: RaceDistanceCategory?
   @State private var customValue: Double
+  @State private var customUnit: DistanceUnit
   @State private var errorWrapper: ErrorWrapper?
 
   // MARK: - Properties
   let mode: ItemEditMode
-  let onAction: (RaceDistance) throws -> Void
-  /// The active unit. `customValue` is expressed in it; `draftDistance.category` is always
-  /// kilometre-canonical, and the two are bridged only through `DistanceUnit`.
-  private let unit: DistanceUnit
-  /// The kilometres this distance was opened with, so an unedited field saves unchanged.
-  private let originalCustomKilometers: Double?
+  let onAction: (RaceEvent) throws -> Void
 
   // MARK: - Init
+  /// Opens a stored custom distance as its own number and unit. A new custom distance starts
+  /// at the distance unit setting.
   init(
     mode: ItemEditMode,
-    distance: RaceDistance,
-    onAction: @escaping (RaceDistance) throws -> Void
+    distance: RaceEvent,
+    onAction: @escaping (RaceEvent) throws -> Void
   ) {
-    let unit = DistanceUnit.resolved()
-    let originalCustomKilometers: Double? = {
-      if case .custom(let value) = distance.category { return value }
-      return nil
-    }()
+    let isStandard = distance.category.isStandard
 
     self.mode = mode
     self.draftDistance = distance
-    self.unit = unit
-    self.originalCustomKilometers = originalCustomKilometers
-    self.customValue = originalCustomKilometers.map(unit.roundedDisplayValue) ?? 0
+    self.selectedStandard = isStandard ? distance.category : nil
+    self.customValue = isStandard ? 0 : distance.category.value
+    self.customUnit = isStandard ? DistanceUnit.resolved() : distance.category.unit
     self.onAction = onAction
   }
 
   // MARK: - Computed
-  /// The field's value converted back to canonical kilometres, preserving the original
-  /// when the field has not been edited.
-  private var customKilometers: Double {
-    unit.customKilometers(
-      displayValue: customValue,
-      originalKilometers: originalCustomKilometers
-    )
-  }
-
-  /// A preset row showing its measurement in the active unit, so a user looking for a
-  /// number they know finds it here rather than typing it into Custom.
+  /// A preset row showing its stored measurement, the same in both units, so a user looking
+  /// for a number they know finds it here rather than typing it into Custom.
   private func presetRow(
     _ name: LocalizedStringKey,
     _ category: RaceDistanceCategory
@@ -67,11 +55,11 @@ struct EditDistanceView: View {
 
       Spacer()
 
-      Text(unit.formatted(kilometers: category.value))
+      Text(category.unit.formatted(value: category.value))
         .font(.TypeScale.Field.value)
         .foregroundStyle(Color.Text.secondary)
     }  // HStack
-    .tag(category)
+    .tag(Optional(category))
   }
 
   // MARK: - Body
@@ -79,24 +67,28 @@ struct EditDistanceView: View {
     NavigationStack {
       Form {
         Section("Distance") {
-          Picker("Distance", selection: $draftDistance.category) {
+          Picker("Distance", selection: $selectedStandard) {
             presetRow("Full Marathon", .full)
             presetRow("Half Marathon", .half)
             presetRow("10K", .tenKM)
             presetRow("5K", .fiveKM)
             Text("Custom")
               .font(.TypeScale.Field.label)
-              .tag(RaceDistanceCategory.custom(customKilometers))
+              .tag(RaceDistanceCategory?.none)
           }  // Picker
           .pickerStyle(.navigationLink)
 
-          if case .custom = draftDistance.category {
-            TextField(unit.customFieldLabel(), value: $customValue, format: .number)
+          if selectedStandard == nil {
+            TextField("Custom distance", value: $customValue, format: .number)
               .font(.TypeScale.Field.value)
               .keyboardType(.decimalPad)
-              .onChange(of: customValue) { _, _ in
-                draftDistance.category = .custom(customKilometers)
-              }
+
+            Picker("Unit", selection: $customUnit) {
+              ForEach(DistanceUnit.allCases, id: \.self) { unit in
+                Text(unit.label).tag(unit)
+              }  // ForEach
+            }  // Picker
+            .pickerStyle(.segmented)
           }
         }  // Section
 
@@ -119,8 +111,11 @@ struct EditDistanceView: View {
 
         ToolbarItem(placement: .confirmationAction) {
           Button(role: .confirm) {
+            var distance = draftDistance
+            distance.category =
+              selectedStandard ?? RaceDistanceCategory(value: customValue, unit: customUnit)
             do {
-              try onAction(draftDistance)
+              try onAction(distance)
               dismiss()
             } catch let appError as AppError {
               errorWrapper = ErrorWrapper(error: appError)
@@ -137,10 +132,19 @@ struct EditDistanceView: View {
   }
 }
 
-#Preview {
+#Preview("New distance") {
   EditDistanceView(
     mode: .add,
-    distance: RaceDistance(category: .half, type: .inPerson),
+    distance: .default,
+    onAction: { _ in }
+  )
+}
+
+#Preview("Stored custom distance in miles") {
+  EditDistanceView(
+    mode: .edit,
+    distance: RaceEvent(
+      category: RaceDistanceCategory(value: 26.2, unit: .miles), type: .inPerson),
     onAction: { _ in }
   )
 }

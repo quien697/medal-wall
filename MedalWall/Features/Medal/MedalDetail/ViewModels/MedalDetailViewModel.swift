@@ -55,14 +55,14 @@ final class MedalDetailViewModel {
 
   /// The pace without its unit, so the screen can set the two at different sizes.
   var averagePaceValue: String {
-    DistanceUnit.resolved().paceValueText(minutesPerKilometer: medal.averagePace)
-      ?? Self.unfilled
+    let unit = DistanceUnit.resolved()
+    return unit.paceValueText(minutesPerUnit: medal.averagePace(in: unit)) ?? Self.unfilled
   }
 
   /// The unit the pace is expressed in, absent when there is no pace to qualify.
   var averagePaceUnit: String? {
     let unit = DistanceUnit.resolved()
-    guard unit.paceValueText(minutesPerKilometer: medal.averagePace) != nil else { return nil }
+    guard unit.paceValueText(minutesPerUnit: medal.averagePace(in: unit)) != nil else { return nil }
 
     return "/\(unit.abbreviation())"
   }

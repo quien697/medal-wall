@@ -33,8 +33,8 @@ struct MedalsViewModelTests {
       date: date,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      distance: RaceDistance(category: category, type: .inPerson),
-      finishTime: finishTime,
+      raceEvent: RaceEvent(category: category, type: .inPerson),
+      result: finishTime.map(RaceResult.seconds),
       userID: "user1"
     )
   }
@@ -155,6 +155,21 @@ struct MedalsViewModelTests {
 
     #expect(viewModel.selectedFilter == .all)
     #expect(viewModel.yearGroups.first?.medals.count == 1)
+  }
+
+  @Test("A selection falls back to all when only the same number in another unit remains")
+  func testStaleSelectionIgnoresSameNumberInAnotherUnit() {
+    let tenMiles = RaceDistanceCategory(value: 10, unit: .miles)
+    let viewModel = MedalsViewModel()
+    viewModel.medals = [
+      makeMedal(id: "tenK", category: .tenKM),
+      makeMedal(id: "tenMi", category: tenMiles)
+    ]
+    viewModel.selectedFilter = .category(tenMiles)
+    viewModel.medals = [makeMedal(id: "tenK", category: .tenKM)]
+
+    #expect(viewModel.selectedFilter == .all)
+    #expect(viewModel.yearGroups.first?.medals.map(\.id) == ["tenK"])
   }
 
   @Test("A selection whose category survives is kept")
@@ -279,11 +294,11 @@ struct MedalsViewModelTests {
     let personalBest = try #require(viewModel.medals.personalBests.first)
 
     #expect(personalBest.medal.name == "Test")
-    #expect(personalBest.medal.finishTime?.formattedHMS == "03:30:24")
+    #expect(personalBest.medal.result?.value.formattedHMS == "03:30:24")
     #expect(personalBest.category.description == RaceDistanceCategory.full.description)
     #expect(
       DistanceUnit.kilometers.paceText(
-        minutesPerKilometer: personalBest.medal.averagePace
+        minutesPerUnit: personalBest.medal.averagePace(in: .kilometers)
       ).contains("4'59\"")
     )
   }

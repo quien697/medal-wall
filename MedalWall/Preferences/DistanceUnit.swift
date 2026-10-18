@@ -7,7 +7,8 @@
 
 import Foundation
 
-/// The unit distances are displayed in.
+/// A unit of distance. A stored distance carries the unit it was entered in; as a preference,
+/// the unit sets the pace unit and the starting unit for a new custom distance.
 ///
 /// Deliberately has no `system` case, unlike `AppTheme` and `AppLanguage`. A measurement
 /// system is not a live OS setting users toggle, and `"system"` would be an ambiguous value
@@ -20,8 +21,8 @@ nonisolated enum DistanceUnit: String, CaseIterable {
   /// The `@AppStorage` / `UserDefaults` key backing the distance unit preference.
   static let storageKey = "distanceUnit"
 
-  /// Kilometres in one mile, by the international definition. Distances are stored in
-  /// kilometres, so this is the only conversion constant the app needs.
+  /// Kilometres in one mile, by the international definition. Used in memory only, to compare
+  /// real lengths and to work out pace across units; no distance is stored or shown converted.
   static let kilometersPerMile = 1.609344
 
   var label: String {
@@ -48,7 +49,7 @@ nonisolated enum DistanceUnit: String, CaseIterable {
     return DistanceUnit(rawValue: rawValue)
   }
 
-  /// The unit the app displays in — the user's choice when they have made one, otherwise
+  /// The unit set as the preference — the user's choice when they have made one, otherwise
   /// whatever the device region implies.
   static func resolved(from defaults: UserDefaults = .standard) -> DistanceUnit {
     stored(in: defaults) ?? deviceDefault
@@ -71,60 +72,17 @@ nonisolated enum DistanceUnit: String, CaseIterable {
     }
   }
 
-  // MARK: - Conversion
-  /// Converts a canonical kilometre value into this unit, for display.
-  func displayValue(fromKilometers kilometers: Double) -> Double {
-    self == .miles ? kilometers / Self.kilometersPerMile : kilometers
-  }
-
-  /// Converts a value entered in this unit back to canonical kilometres, unrounded — full
-  /// precision is what lets a mile-entered distance round-trip exactly.
-  func kilometers(fromDisplayValue value: Double) -> Double {
-    self == .miles ? value * Self.kilometersPerMile : value
-  }
-
-  /// The value the custom-distance field is seeded with — the same one-decimal figure the
-  /// app displays everywhere else, so the field agrees with the labels around it.
-  func roundedDisplayValue(fromKilometers kilometers: Double) -> Double {
-    (displayValue(fromKilometers: kilometers) * 10).rounded() / 10
-  }
-
-  /// The kilometre value to persist for a custom distance edited in this unit.
-  ///
-  /// When the field still holds the rounded value it was seeded with, the original
-  /// kilometres are returned untouched. Race editions are shared, globally readable
-  /// records, so opening one in a different unit and saving without editing must not
-  /// rewrite the stored number through the rounding used for display.
-  func customKilometers(displayValue: Double, originalKilometers: Double?) -> Double {
-    if let originalKilometers,
-      displayValue == roundedDisplayValue(fromKilometers: originalKilometers)
-    {
-      return originalKilometers
-    }
-
-    return kilometers(fromDisplayValue: displayValue)
-  }
-
-  /// Converts a pace in minutes per kilometre into minutes per this unit.
-  ///
-  /// Pace converts the opposite way from a distance: covering a mile takes longer than
-  /// covering a kilometre, so the per-mile figure is the larger one.
-  func pace(fromMinutesPerKilometer minutes: Double) -> Double {
-    self == .miles ? minutes * Self.kilometersPerMile : minutes
-  }
-
   // MARK: - Formatting
-  /// A canonical kilometre value rendered in this unit, e.g. `"26.2 mi"`.
+  /// A value already in this unit rendered with up to four decimals, e.g. `"42.2 km"`.
   ///
-  /// Formats the number under the locale resolved from the app's *language* preference,
-  /// and pairs it with a String Catalog abbreviation, rather than using
-  /// `Measurement`/`UnitLength` — which would format against the device locale and choose
-  /// its own translation of the unit name.
-  func formatted(kilometers: Double, defaults: UserDefaults = .standard) -> String {
-    let value = displayValue(fromKilometers: kilometers)
+  /// Nothing is converted: the number is shown as it was stored. Formats the number under
+  /// the locale resolved from the app's *language* preference, and pairs it with a String
+  /// Catalog abbreviation, rather than using `Measurement`/`UnitLength` — which would format
+  /// against the device locale and choose its own translation of the unit name.
+  func formatted(value: Double, defaults: UserDefaults = .standard) -> String {
     let number = value.formatted(
       .number
-        .precision(.fractionLength(0...1))
+        .precision(.fractionLength(0...4))
         .locale(AppLanguage.resolvedLocale(from: defaults))
     )
 
@@ -138,7 +96,7 @@ nonisolated enum DistanceUnit: String, CaseIterable {
       : .appLocalized("km", defaults: defaults)
   }
 
-  /// A pace in minutes per kilometre rendered in this unit, without its unit — `5'41"`.
+  /// A pace in minutes per this unit, rendered without its unit — `5'41"`.
   ///
   /// Seconds are truncated, which is the app's long-standing behaviour. Returns `nil`
   /// rather than a placeholder when there is no pace: how an unrecorded value reads is a
@@ -150,39 +108,25 @@ nonisolated enum DistanceUnit: String, CaseIterable {
   /// A pace that is not a number, is negative, or is too large for `Int(_:)` returns `nil`:
   /// `Int(_:)` traps on such a value, and a crash is worse than an unfilled pace.
   func paceValueText(
-    minutesPerKilometer pace: Double?,
+    minutesPerUnit pace: Double?,
     defaults: UserDefaults = .standard
   ) -> String? {
-    guard let pace else { return nil }
-    let converted = self.pace(fromMinutesPerKilometer: pace)
-    guard converted.isFinite, converted >= 0, converted < Double(Int.max) else { return nil }
-    let minutes = Int(converted)
-    let seconds = Int((converted - Double(minutes)) * 60)
+    guard let pace, pace.isFinite, pace >= 0, pace < Double(Int.max) else { return nil }
+    let minutes = Int(pace)
+    let seconds = Int((pace - Double(minutes)) * 60)
 
     return String(format: "%d'%02d\"", minutes, seconds)
   }
 
-  /// A pace in minutes per kilometre rendered in this unit — `5'41" /km` or `9'08" /mi`.
+  /// A pace in minutes per this unit, rendered with its unit — `5'41" /km` or `9'08" /mi`.
   ///
   /// A nil pace returns `"--'-- \""` so a missing time still keeps the right shape.
   /// Composed from `paceValueText` so the pace format itself is written once.
-  func paceText(minutesPerKilometer pace: Double?, defaults: UserDefaults = .standard) -> String {
-    guard let value = paceValueText(minutesPerKilometer: pace, defaults: defaults) else {
+  func paceText(minutesPerUnit pace: Double?, defaults: UserDefaults = .standard) -> String {
+    guard let value = paceValueText(minutesPerUnit: pace, defaults: defaults) else {
       return "--'-- \""
     }
 
     return "\(value) /\(abbreviation(defaults: defaults))"
-  }
-
-  /// The custom-distance field's label — `"Custom distance (mi)"`.
-  ///
-  /// Composes two catalog lookups, so both must resolve against the *same* preferences;
-  /// threading one `defaults` through prevents the format string and its argument being
-  /// read from different localization tables.
-  func customFieldLabel(defaults: UserDefaults = .standard) -> String {
-    .appLocalized(
-      "Custom distance (\(abbreviation(defaults: defaults)))",
-      defaults: defaults
-    )
   }
 }

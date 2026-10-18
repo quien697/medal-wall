@@ -28,7 +28,7 @@ struct MedalOrderingTests {
       date: date,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      distance: RaceDistance(category: .full, type: .inPerson),
+      raceEvent: RaceEvent(category: .full, type: .inPerson),
       userID: "user1"
     )
   }

@@ -14,8 +14,8 @@ extension Medal {
       date: RaceEdition.taipei2019.startDate,
       bibNumber: "00001",
       place: Race.taipei.place,
-      distance: RaceEdition.taipei2019.distances[0],
-      finishTime: 3 * 3600 + 30 * 60 + 24,
+      raceEvent: RaceEdition.taipei2019.raceEvents[0],
+      result: .seconds(3 * 3600 + 30 * 60 + 24),
       overallPlacement: 1058,
       totalParticipants: 7373,
       division: Division(gender: .male, ageGroup: .from30to34),
@@ -33,7 +33,7 @@ extension Medal {
       date: RaceEdition.vancouver2022.startDate,
       bibNumber: "2814",
       place: Race.vancouver.place,
-      distance: RaceEdition.vancouver2022.distances.first ?? .default,
+      raceEvent: RaceEdition.vancouver2022.raceEvents.first ?? .default,
       userID: "preview"
     )
 
@@ -42,8 +42,8 @@ extension Medal {
       date: RaceEdition.taipei2019.startDate,
       bibNumber: "00002",
       place: Race.taipei.place,
-      distance: RaceEdition.taipei2019.distances[1],
-      finishTime: 1 * 3600 + 45 * 60 + 30,
+      raceEvent: RaceEdition.taipei2019.raceEvents[1],
+      result: .seconds(1 * 3600 + 45 * 60 + 30),
       overallPlacement: 142,
       totalParticipants: 12450,
       division: Division(gender: .male, ageGroup: .from30to34),

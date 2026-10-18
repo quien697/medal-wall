@@ -27,7 +27,7 @@ struct MedalDetailViewModelTests {
 
   private func makeMedal(
     id: String = UUID().uuidString,
-    distance: RaceDistance = RaceDistance(category: .full, type: .inPerson),
+    distance: RaceEvent = RaceEvent(category: .full, type: .inPerson),
     finishTime: TimeInterval? = nil,
     overallPlacement: Int? = nil,
     totalParticipants: Int? = nil,
@@ -45,8 +45,8 @@ struct MedalDetailViewModelTests {
       date: .now,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      distance: distance,
-      finishTime: finishTime,
+      raceEvent: distance,
+      result: finishTime.map(RaceResult.seconds),
       overallPlacement: overallPlacement,
       totalParticipants: totalParticipants,
       division: division,
@@ -182,43 +182,73 @@ struct MedalDetailViewModelTests {
   @Test("A recorded pace splits into its value and its unit")
   func testAveragePaceSplit() {
     // 12624s over 42.195km → pace ≈ 4.9864 min/km → "4'59\"" and "/km"
-    let viewModel = MedalDetailViewModel(medal: makeMedal(finishTime: 12624))
+    let medal = makeMedal(finishTime: 12624)
+    let viewModel = MedalDetailViewModel(medal: medal)
     let unit = DistanceUnit.resolved()
-    let expected = unit.paceValueText(minutesPerKilometer: 12624 / 60 / 42.195)
+    let expected = unit.paceValueText(minutesPerUnit: medal.averagePace(in: unit))
 
     #expect(viewModel.averagePaceValue == expected)
     #expect(viewModel.averagePaceUnit == "/\(unit.abbreviation())")
   }
 
-  @Test("Pace is expressed per kilometre in kilometres mode")
+  @Test("A kilometre distance's pace is expressed per kilometre in kilometres mode")
   func testPaceTextKilometers() {
-    let pace = 5 + 41.0 / 60
+    // 10 km in 56:50 is 5'41" per kilometre.
+    let medal = makeMedal(distance: RaceEvent(category: .tenKM, type: .inPerson), finishTime: 3410)
 
     #expect(
       DistanceUnit.kilometers.paceText(
-        minutesPerKilometer: pace,
+        minutesPerUnit: medal.averagePace(in: .kilometers),
         defaults: Self.makeDefaults()
       ) == "5'41\" /km"
     )
   }
 
-  @Test("Pace is expressed per mile in miles mode")
+  @Test("A kilometre distance's pace is expressed per mile in miles mode")
   func testPaceTextMiles() {
-    let pace = 5 + 41.0 / 60
+    let medal = makeMedal(distance: RaceEvent(category: .tenKM, type: .inPerson), finishTime: 3410)
 
     #expect(
       DistanceUnit.miles.paceText(
-        minutesPerKilometer: pace,
+        minutesPerUnit: medal.averagePace(in: .miles),
         defaults: Self.makeDefaults()
       ) == "9'08\" /mi"
     )
   }
 
+  /// Going through kilometres and back gives 6.9999… minutes here, which truncates to 6'59".
+  @Test("A mile distance's pace is expressed per mile with no second lost")
+  func testPaceTextMileDistanceInMiles() {
+    let medal = makeMedal(distance: Self.tenMiles, finishTime: 4200)
+
+    #expect(
+      DistanceUnit.miles.paceText(
+        minutesPerUnit: medal.averagePace(in: .miles),
+        defaults: Self.makeDefaults()
+      ) == "7'00\" /mi"
+    )
+  }
+
+  @Test("A mile distance's pace is expressed per kilometre in kilometres mode")
+  func testPaceTextMileDistanceInKilometers() {
+    let medal = makeMedal(distance: Self.tenMiles, finishTime: 4200)
+
+    #expect(
+      DistanceUnit.kilometers.paceText(
+        minutesPerUnit: medal.averagePace(in: .kilometers),
+        defaults: Self.makeDefaults()
+      ) == "4'20\" /km"
+    )
+  }
+
+  private static let tenMiles = RaceEvent(
+    category: RaceDistanceCategory(value: 10, unit: .miles), type: .inPerson)
+
   @Test("Pace is the placeholder when there is no pace to show")
   func testPaceTextNil() {
     #expect(
       DistanceUnit.miles.paceText(
-        minutesPerKilometer: nil,
+        minutesPerUnit: nil,
         defaults: Self.makeDefaults()
       ) == "--'-- \""
     )

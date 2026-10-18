@@ -109,7 +109,7 @@ struct RacesViewModelRepositoryTests {
     let raceDay = Date(timeIntervalSince1970: 1_577_836_800)
     let withLogo = RaceEdition(
       id: "edition-logo", raceId: race.id, year: 2019, startDate: raceDay, endDate: raceDay,
-      photoUrl: "https://example.com/edition.jpg", distances: [], createdBy: "uid")
+      photoUrl: "https://example.com/edition.jpg", raceEvents: [], createdBy: "uid")
     let withoutLogo = RaceEdition(
       id: "edition-plain", raceId: race.id, year: 2018, startDate: raceDay, endDate: raceDay,
       createdBy: "uid")

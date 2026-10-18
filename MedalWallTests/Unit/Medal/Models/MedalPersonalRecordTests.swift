@@ -33,8 +33,8 @@ struct MedalPersonalRecordTests {
       date: date,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      distance: RaceDistance(category: category, type: .inPerson),
-      finishTime: finishTime,
+      raceEvent: RaceEvent(category: category, type: .inPerson),
+      result: finishTime.map(RaceResult.seconds),
       userID: "user1"
     )
   }
@@ -45,9 +45,9 @@ struct MedalPersonalRecordTests {
   @Test("a medal whose distance is not a number holds no record")
   func testNaNDistanceHoldsNoRecord() {
     let medals = [
-      makeMedal(category: .custom(.nan), finishTime: 3600),
-      makeMedal(category: .custom(.nan), finishTime: 4000),
-      makeMedal(category: .custom(.nan), finishTime: 5000)
+      makeMedal(category: RaceDistanceCategory(value: .nan, unit: .kilometers), finishTime: 3600),
+      makeMedal(category: RaceDistanceCategory(value: .nan, unit: .kilometers), finishTime: 4000),
+      makeMedal(category: RaceDistanceCategory(value: .nan, unit: .kilometers), finishTime: 5000)
     ]
 
     #expect(medals.personalRecordIDs.isEmpty)
@@ -55,7 +55,10 @@ struct MedalPersonalRecordTests {
 
   @Test(
     "a medal whose distance is zero or negative holds no record",
-    arguments: [RaceDistanceCategory.custom(0), .custom(-5)])
+    arguments: [
+      RaceDistanceCategory(value: 0, unit: .kilometers),
+      RaceDistanceCategory(value: -5, unit: .kilometers)
+    ])
   func testNonPositiveDistanceHoldsNoRecord(category: RaceDistanceCategory) {
     let medals = [makeMedal(category: category, finishTime: 3600)]
 
@@ -112,11 +115,43 @@ struct MedalPersonalRecordTests {
     #expect(medals.personalRecords[.tenKM] == nil)
   }
 
-  @Test("A custom distance collapses onto the preset it measures")
+  @Test("10K and 10 mi each hold their own record")
+  func testSameNumberInDifferentUnitsHoldsSeparateRecords() {
+    let medals = [
+      makeMedal(id: "10K", category: .tenKM, finishTime: 2700),
+      makeMedal(id: "10 mi", category: Self.tenMiles, finishTime: 4200)
+    ]
+
+    let records = medals.personalRecords
+
+    #expect(records.count == 2)
+    #expect(records[.tenKM]?.id == "10K")
+    #expect(records[Self.tenMiles]?.id == "10 mi")
+  }
+
+  @Test("A near-standard distance holds its own record, apart from the standard")
+  func testNearStandardDistanceHoldsSeparateRecord() {
+    let fortyTwoPointTwo = RaceDistanceCategory(value: 42.2, unit: .kilometers)
+    let medals = [
+      makeMedal(id: "full", category: .full, finishTime: 14000),
+      makeMedal(id: "42.2", category: fortyTwoPointTwo, finishTime: 12624)
+    ]
+
+    let records = medals.personalRecords
+
+    #expect(records[.full]?.id == "full")
+    #expect(records[fortyTwoPointTwo]?.id == "42.2")
+  }
+
+  private static let tenMiles = RaceDistanceCategory(value: 10, unit: .miles)
+
+  @Test("A custom distance of exactly a standard competes for that standard's record")
   func testCustomDistanceCollapsesOntoPreset() {
     let medals = [
       makeMedal(id: "preset", category: .full, finishTime: 14000),
-      makeMedal(id: "custom", category: .custom(42.195), finishTime: 12624)
+      makeMedal(
+        id: "custom", category: RaceDistanceCategory(value: 42.195, unit: .kilometers),
+        finishTime: 12624)
     ]
 
     let records = medals.personalRecords
@@ -242,7 +277,7 @@ struct MedalPersonalRecordTests {
   @Test("Sample data marks every timed medal and no untimed one")
   func testSampleDataMarksOnlyTimedMedals() {
     let medals = Medal.sampleData
-    let timed = medals.filter { ($0.finishTime ?? 0) > 0 }
+    let timed = medals.filter { ($0.result?.value ?? 0) > 0 }
     let recordIDs = medals.personalRecordIDs
 
     #expect(!timed.isEmpty, "sample data should carry at least one timed medal")
@@ -252,7 +287,7 @@ struct MedalPersonalRecordTests {
       #expect(recordIDs.contains(medal.id), "timed medal \(medal.name) should hold a record")
     }
 
-    for medal in medals where medal.finishTime == nil {
+    for medal in medals where medal.result == nil {
       #expect(!recordIDs.contains(medal.id), "untimed medal \(medal.name) must not be marked")
     }
   }
@@ -273,8 +308,10 @@ struct MedalPersonalRecordTests {
     #expect(wholeCollection == filtered)
     #expect(filtered == "fastHalf")
   }
+}
 
-  // MARK: - personalBests
+// MARK: - personalBests
+extension MedalPersonalRecordTests {
   @Test("personalBests is empty for an empty collection")
   func testPersonalBestsEmptyCollection() {
     let medals: [Medal] = []
@@ -349,11 +386,24 @@ struct MedalPersonalRecordTests {
     #expect(medals.distanceCategoriesOwned.contains(.half))
   }
 
-  @Test("A custom distance equal to a preset yields one entry, not two")
+  @Test("10K and 10 mi yield separate entries, 10 mi first")
+  func testPersonalBestsKeepsUnitsApart() {
+    let medals = [
+      makeMedal(id: "10K", category: .tenKM, finishTime: 2700),
+      makeMedal(id: "10 mi", category: Self.tenMiles, finishTime: 4200)
+    ]
+
+    #expect(medals.personalBests.map(\.category) == [Self.tenMiles, .tenKM])
+    #expect(medals.personalBests.map(\.medal.id) == ["10 mi", "10K"])
+  }
+
+  @Test("A custom distance of exactly a standard yields one entry, not two")
   func testPersonalBestsCollapsesCustomOntoPreset() {
     let medals = [
       makeMedal(id: "preset", category: .full, finishTime: 14000),
-      makeMedal(id: "custom", category: .custom(42.195), finishTime: 12624)
+      makeMedal(
+        id: "custom", category: RaceDistanceCategory(value: 42.195, unit: .kilometers),
+        finishTime: 12624)
     ]
 
     #expect(medals.personalBests.count == 1)

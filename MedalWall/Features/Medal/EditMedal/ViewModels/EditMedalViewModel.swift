@@ -13,7 +13,7 @@ final class EditMedalViewModel {
   var bibNumber: String = ""
   var photo: UIImage?
   var place = Place(countryCode: "", city: "")
-  var distance: RaceDistance = .default
+  var distance: RaceEvent = .default
   var finishTime: TimeInterval?
   var overallPlacement: Int?
   var totalParticipants: Int?
@@ -59,7 +59,7 @@ final class EditMedalViewModel {
       self.date = medal.date
       self.bibNumber = medal.bibNumber
       self.place = medal.place
-      self.distance = medal.distance
+      self.distance = medal.raceEvent
       self.finishTime = medal.recordedFinishTime
       self.overallPlacement = medal.overallPlacement
       self.totalParticipants = medal.totalParticipants
@@ -79,7 +79,7 @@ final class EditMedalViewModel {
   // MARK: - Computed
   var isFormValid: Bool {
     let customDistanceValid: Bool = {
-      if case .custom(let value) = distance.category { return value > 0 }
+      if !distance.category.isStandard { return distance.category.isValidCustom }
       return true
     }()
 
@@ -141,11 +141,19 @@ final class EditMedalViewModel {
     tags.removeAll { $0 == tag }
   }
 
+  /// Sets the medal's distance, throwing if a custom value is not a usable distance.
+  func selectDistance(_ newDistance: RaceEvent) throws {
+    if !newDistance.category.isStandard, !newDistance.category.isValidCustom {
+      throw AppError.invalidDistance
+    }
+    distance = newDistance
+  }
+
   /// Auto-fills form fields from a selected race entry.
   func autoFill(from selection: RaceEntry) {
     name = "\(selection.race.name) \(selection.edition.year)"
     date = selection.edition.startDate
-    distance = selection.distance
+    distance = selection.raceEvent
     place = selection.race.place
   }
 
@@ -174,8 +182,8 @@ final class EditMedalViewModel {
         updated.bibNumber = trimmedBibNumber
         updated.photoUrl = photoUrl
         updated.place = place
-        updated.distance = distance
-        updated.finishTime = finishTime
+        updated.raceEvent = distance
+        updated.result = finishTime.map(RaceResult.seconds)
         updated.overallPlacement = overallPlacement
         updated.totalParticipants = totalParticipants
         updated.division = division?.rawValue
@@ -202,8 +210,8 @@ final class EditMedalViewModel {
           bibNumber: trimmedBibNumber,
           photoUrl: photoUrl,
           place: place,
-          distance: distance,
-          finishTime: finishTime,
+          raceEvent: distance,
+          result: finishTime.map(RaceResult.seconds),
           overallPlacement: overallPlacement,
           totalParticipants: totalParticipants,
           division: division,

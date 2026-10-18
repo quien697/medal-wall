@@ -21,7 +21,7 @@ struct DraftRaceEdition: Identifiable {
   var isOneDay: Bool
   var startDate: Date
   var endDate: Date
-  var distances: [RaceDistance]
+  var distances: [RaceEvent]
   let createdBy: String
 
   // MARK: - Photo
@@ -45,7 +45,7 @@ struct DraftRaceEdition: Identifiable {
     self.isOneDay = edition.isOneDay
     self.startDate = edition.startDate
     self.endDate = edition.endDate
-    self.distances = edition.distances
+    self.distances = edition.raceEvents
     self.createdBy = edition.createdBy
     self.existingPhotoUrl = edition.photoUrl
     self.newPhotoData = nil
@@ -59,7 +59,7 @@ struct DraftRaceEdition: Identifiable {
     isOneDay: Bool,
     startDate: Date,
     endDate: Date,
-    distances: [RaceDistance],
+    distances: [RaceEvent],
     createdBy: String
   ) {
     self.id = UUID().uuidString

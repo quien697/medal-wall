@@ -134,7 +134,8 @@ nonisolated enum AppError: LocalizedError, Equatable {
     case .duplicateDistance:
       .appLocalized("This distance already exists.")
     case .invalidDistance:
-      .appLocalized("Distance must be greater than zero.")
+      .appLocalized(
+        "Distance must be greater than zero and less than 10,000, with at most 4 decimal places.")
     case .photoDataInvalid:
       .appLocalized("We couldn't process the selected image.")
     case .placeSearchFailed(let description):
@@ -178,7 +179,8 @@ nonisolated enum AppError: LocalizedError, Equatable {
     case .duplicateDistance:
       .appLocalized("Please try selecting a different distance or type.")
     case .invalidDistance:
-      .appLocalized("Please enter a distance greater than 0.")
+      .appLocalized(
+        "Please enter a distance greater than 0 and less than 10,000, with up to 4 decimal places.")
     case .photoDataInvalid:
       .appLocalized("Please try choosing a different image.")
     case .sendEmailSignInLinkFailed:

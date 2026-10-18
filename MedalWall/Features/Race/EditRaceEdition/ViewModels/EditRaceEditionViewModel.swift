@@ -17,7 +17,7 @@ final class EditRaceEditionViewModel {
   var startDate: Date
   var endDate: Date
   var photo: UIImage?
-  var distances: [RaceDistance] = []
+  var distances: [RaceEvent] = []
 
   // MARK: - State
   var isPhotoChanged = false
@@ -125,9 +125,9 @@ final class EditRaceEditionViewModel {
     }
   }
 
-  /// Appends a distance to the list, throwing if the custom value is zero/negative or if it is already present.
-  func addDistance(_ distance: RaceDistance) throws {
-    if case .custom(let value) = distance.category, value <= 0 {
+  /// Appends a distance to the list, throwing if a custom value is not a usable distance or if it is already present.
+  func addDistance(_ distance: RaceEvent) throws {
+    if !distance.category.isStandard, !distance.category.isValidCustom {
       throw AppError.invalidDistance
     }
     guard !distances.contains(distance) else { throw AppError.duplicateDistance }
@@ -135,7 +135,7 @@ final class EditRaceEditionViewModel {
   }
 
   /// Removes a distance from the list.
-  func removeDistance(_ distance: RaceDistance) {
+  func removeDistance(_ distance: RaceEvent) {
     distances.removeAll { $0 == distance }
   }
 

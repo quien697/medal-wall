@@ -102,8 +102,8 @@ struct LocalizedDisplayStringTests {
 
   @Test("Race distance label composes a type with a numeric distance")
   func testRaceDistanceDisplayLabel() {
-    #expect(RaceDistance(category: .half, type: .virtual).displayLabel == "Virtual Half")
-    #expect(RaceDistance(category: .full, type: .inPerson).displayLabel == "Full")
+    #expect(RaceEvent(category: .half, type: .virtual).displayLabel == "Virtual Half")
+    #expect(RaceEvent(category: .full, type: .inPerson).displayLabel == "Full")
   }
 
   // MARK: - AchievementTier
@@ -189,6 +189,31 @@ struct LocalizedDisplayStringTests {
     #expect(translated("Not Signed In") == "尚未登入")
     #expect(translated("You're not signed in.") == "你目前尚未登入。")
     #expect(translated("Please sign in and try again.") == "請登入後再試一次。")
+  }
+
+  @Test("An invalid distance names its range and the four-decimal limit")
+  func testInvalidDistanceStrings() {
+    let error = AppError.invalidDistance
+
+    #expect(error.title == "Invalid Distance")
+    #expect(
+      error.message
+        == "Distance must be greater than zero and less than 10,000, with at most 4 decimal places."
+    )
+    #expect(
+      error.guidance == """
+        Please enter a distance greater than 0 and less than 10,000, with up to 4 decimal \
+        places.
+        """)
+    #expect(translated("Invalid Distance") == "距離無效")
+    #expect(
+      translated(
+        "Distance must be greater than zero and less than 10,000, with at most 4 decimal places.")
+        == "距離必須大於零且小於 10,000，最多 4 位小數。")
+    #expect(
+      translated(
+        "Please enter a distance greater than 0 and less than 10,000, with up to 4 decimal places.")
+        == "請輸入大於 0 且小於 10,000、最多 4 位小數的距離。")
   }
 
   @Test("An error bridged through `any Error` still reads its own message and guidance")

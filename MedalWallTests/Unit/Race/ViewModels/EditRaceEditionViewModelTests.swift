@@ -158,8 +158,8 @@ struct EditRaceEditionViewModelTests {
   @Test("removeDistance removes the matching distance")
   func testRemoveDistance() throws {
     let viewModel = makeViewModel()
-    let full = RaceDistance(category: .full, type: .inPerson)
-    let half = RaceDistance(category: .half, type: .inPerson)
+    let full = RaceEvent(category: .full, type: .inPerson)
+    let half = RaceEvent(category: .half, type: .inPerson)
     try viewModel.addDistance(full)
     try viewModel.addDistance(half)
 
@@ -172,9 +172,9 @@ struct EditRaceEditionViewModelTests {
   @Test("removeDistance on a distance not in the list has no effect")
   func testRemoveDistanceNotPresent() throws {
     let viewModel = makeViewModel()
-    try viewModel.addDistance(RaceDistance(category: .full, type: .inPerson))
+    try viewModel.addDistance(RaceEvent(category: .full, type: .inPerson))
 
-    viewModel.removeDistance(RaceDistance(category: .half, type: .inPerson))
+    viewModel.removeDistance(RaceEvent(category: .half, type: .inPerson))
 
     #expect(viewModel.distances.count == 1)
   }
@@ -183,7 +183,7 @@ struct EditRaceEditionViewModelTests {
   func testRemoveDistanceFromEmptyList() {
     let viewModel = makeViewModel()
 
-    viewModel.removeDistance(RaceDistance(category: .full, type: .inPerson))
+    viewModel.removeDistance(RaceEvent(category: .full, type: .inPerson))
 
     #expect(viewModel.distances.isEmpty)
   }
@@ -203,14 +203,17 @@ struct EditRaceEditionViewModelTests {
 
     #expect(viewModel.photoHint.contains("update the"))
   }
+}
 
-  // MARK: - addDistance validation
+// MARK: - addDistance validation
+extension EditRaceEditionViewModelTests {
   @Test("addDistance throws invalidDistance for a custom distance of zero")
   func testAddDistanceZeroThrows() {
     let viewModel = makeViewModel()
 
     #expect(throws: AppError.invalidDistance) {
-      try viewModel.addDistance(RaceDistance(category: .custom(0), type: .inPerson))
+      try viewModel.addDistance(
+        RaceEvent(category: RaceDistanceCategory(value: 0, unit: .kilometers), type: .inPerson))
     }
   }
 
@@ -219,14 +222,61 @@ struct EditRaceEditionViewModelTests {
     let viewModel = makeViewModel()
 
     #expect(throws: AppError.invalidDistance) {
-      try viewModel.addDistance(RaceDistance(category: .custom(-5), type: .inPerson))
+      try viewModel.addDistance(
+        RaceEvent(category: RaceDistanceCategory(value: -5, unit: .kilometers), type: .inPerson))
+    }
+  }
+
+  @Test(
+    "addDistance refuses more than four decimals, non-finite values, and 10,000 or more",
+    arguments: [10.12345, Double.nan, .infinity, 10_000])
+  func testAddDistanceUnusableValueThrows(value: Double) {
+    let viewModel = makeViewModel()
+
+    #expect(throws: AppError.invalidDistance) {
+      try viewModel.addDistance(
+        RaceEvent(category: RaceDistanceCategory(value: value, unit: .miles), type: .inPerson))
+    }
+    #expect(viewModel.distances.isEmpty)
+  }
+
+  @Test("addDistance accepts a custom distance with four decimals")
+  func testAddDistanceFourDecimalsSucceeds() throws {
+    let viewModel = makeViewModel()
+    let distance = RaceEvent(
+      category: RaceDistanceCategory(value: 10.1234, unit: .miles), type: .inPerson)
+
+    try viewModel.addDistance(distance)
+
+    #expect(viewModel.distances == [distance])
+  }
+
+  @Test("addDistance keeps a custom 10 mi next to a 10K of the same type")
+  func testAddDistanceKeepsSameNumberInAnotherUnit() throws {
+    let viewModel = makeViewModel()
+    try viewModel.addDistance(RaceEvent(category: .tenKM, type: .inPerson))
+
+    try viewModel.addDistance(
+      RaceEvent(category: RaceDistanceCategory(value: 10, unit: .miles), type: .inPerson))
+
+    #expect(viewModel.distances.count == 2)
+  }
+
+  @Test("addDistance refuses a custom 10 km beside a 10K of the same type as a duplicate")
+  func testAddDistanceRefusesCustomValueOfAStandard() throws {
+    let viewModel = makeViewModel()
+    try viewModel.addDistance(RaceEvent(category: .tenKM, type: .inPerson))
+
+    #expect(throws: AppError.duplicateDistance) {
+      try viewModel.addDistance(
+        RaceEvent(category: RaceDistanceCategory(value: 10, unit: .kilometers), type: .inPerson))
     }
   }
 
   @Test("addDistance throws duplicateDistance when the same distance is added twice")
   func testAddDistanceDuplicateThrows() throws {
     let viewModel = makeViewModel()
-    let distance = RaceDistance(category: .full, type: .inPerson)
+    let distance = RaceEvent(category: .full, type: .inPerson)
     try viewModel.addDistance(distance)
 
     #expect(throws: AppError.duplicateDistance) {
@@ -237,7 +287,7 @@ struct EditRaceEditionViewModelTests {
   @Test("addDistance succeeds for a valid standard distance")
   func testAddDistanceStandardSucceeds() throws {
     let viewModel = makeViewModel()
-    try viewModel.addDistance(RaceDistance(category: .full, type: .inPerson))
+    try viewModel.addDistance(RaceEvent(category: .full, type: .inPerson))
 
     #expect(viewModel.distances.count == 1)
   }
@@ -245,17 +295,20 @@ struct EditRaceEditionViewModelTests {
   @Test("addDistance succeeds for a valid custom distance greater than zero")
   func testAddDistancePositiveCustomSucceeds() throws {
     let viewModel = makeViewModel()
-    try viewModel.addDistance(RaceDistance(category: .custom(8.5), type: .inPerson))
+    try viewModel.addDistance(
+      RaceEvent(category: RaceDistanceCategory(value: 8.5, unit: .kilometers), type: .inPerson))
 
     #expect(viewModel.distances.count == 1)
-    #expect(viewModel.distances.first?.category == .custom(8.5))
+    #expect(
+      viewModel.distances.first?.category == RaceDistanceCategory(value: 8.5, unit: .kilometers))
   }
 
   @Test("addDistance does not add the distance when it throws")
   func testAddDistanceDoesNotMutateOnThrow() {
     let viewModel = makeViewModel()
 
-    try? viewModel.addDistance(RaceDistance(category: .custom(0), type: .inPerson))
+    try? viewModel.addDistance(
+      RaceEvent(category: RaceDistanceCategory(value: 0, unit: .kilometers), type: .inPerson))
 
     #expect(viewModel.distances.isEmpty)
   }
@@ -263,8 +316,8 @@ struct EditRaceEditionViewModelTests {
   @Test("addDistance allows same category with different type — not a duplicate")
   func testAddDistanceSameCategoryDifferentTypeSucceeds() throws {
     let viewModel = makeViewModel()
-    try viewModel.addDistance(RaceDistance(category: .full, type: .inPerson))
-    try viewModel.addDistance(RaceDistance(category: .full, type: .virtual))
+    try viewModel.addDistance(RaceEvent(category: .full, type: .inPerson))
+    try viewModel.addDistance(RaceEvent(category: .full, type: .virtual))
 
     #expect(viewModel.distances.count == 2)
   }
@@ -272,7 +325,9 @@ struct EditRaceEditionViewModelTests {
   @Test("addDistance succeeds for a very small positive custom distance")
   func testAddDistanceTinyPositiveCustomSucceeds() throws {
     let viewModel = makeViewModel()
-    try viewModel.addDistance(RaceDistance(category: .custom(0.001), type: .inPerson))
+    try viewModel.addDistance(
+      RaceEvent(category: RaceDistanceCategory(value: 0.001, unit: .kilometers), type: .inPerson)
+    )
 
     #expect(viewModel.distances.count == 1)
   }

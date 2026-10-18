@@ -15,21 +15,33 @@ extension Medal {
   /// infinity or 1,000 hours or more, which another client or a corrupt document could
   /// store: `Duration` traps on such values, so formatting one would crash the app.
   var recordedFinishTime: TimeInterval? {
-    guard let finishTime, finishTime > 0, finishTime < Self.finishTimeLimit else { return nil }
+    guard let finishTime = result?.value, finishTime > 0, finishTime < Self.finishTimeLimit else {
+      return nil
+    }
     return finishTime
   }
 
   private static let finishTimeLimit: TimeInterval = 1_000 * 60 * 60
 
-  /// Average pace in minutes per kilometre, or `nil` when there is no usable one.
+  /// Average pace in minutes per `unit`, or `nil` when there is no usable one.
   ///
-  /// A pace of 1,000 minutes per kilometre or slower is not one anyone ran; it comes from a
+  /// The distance is used as stored when it is already in `unit`, and converted only when it
+  /// is not. Working out a mile distance's pace per kilometre and converting it back can land
+  /// just under the true figure, and because pace truncates its seconds, 7'00" would read as
+  /// 6'59".
+  ///
+  /// A pace of 1,000 minutes per unit or slower is not one anyone ran; it comes from a
   /// distance stored near zero, and showing it through `Int(_:)` would crash the app. An
   /// infinite distance would give a pace of zero. Both read as no pace.
-  var averagePace: Double? {
-    guard let recordedFinishTime, distance.category.value > 0, distance.category.value.isFinite
-    else { return nil }
-    let pace = (recordedFinishTime / 60) / distance.category.value
+  func averagePace(in unit: DistanceUnit) -> Double? {
+    var distance = raceEvent.category.value
+    if raceEvent.category.unit != unit {
+      distance =
+        unit == .miles
+        ? distance / DistanceUnit.kilometersPerMile : distance * DistanceUnit.kilometersPerMile
+    }
+    guard let recordedFinishTime, distance > 0, distance.isFinite else { return nil }
+    let pace = (recordedFinishTime / 60) / distance
     return pace < Self.paceLimit ? pace : nil
   }
 

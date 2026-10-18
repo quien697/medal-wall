@@ -107,7 +107,8 @@ struct EditMedalViewModelTests {
     viewModel.name = "Taipei Marathon 2019"
     viewModel.place.countryCode = "TW"
     viewModel.place.city = "Taipei"
-    viewModel.distance = RaceDistance(category: .custom(0), type: .inPerson)
+    viewModel.distance = RaceEvent(
+      category: RaceDistanceCategory(value: 0, unit: .kilometers), type: .inPerson)
 
     #expect(viewModel.isFormValid == false)
   }
@@ -118,7 +119,8 @@ struct EditMedalViewModelTests {
     viewModel.name = "Taipei Marathon 2019"
     viewModel.place.countryCode = "TW"
     viewModel.place.city = "Taipei"
-    viewModel.distance = RaceDistance(category: .custom(-1), type: .inPerson)
+    viewModel.distance = RaceEvent(
+      category: RaceDistanceCategory(value: -1, unit: .kilometers), type: .inPerson)
 
     #expect(viewModel.isFormValid == false)
   }
@@ -129,9 +131,60 @@ struct EditMedalViewModelTests {
     viewModel.name = "Taipei Marathon 2019"
     viewModel.place.countryCode = "TW"
     viewModel.place.city = "Taipei"
-    viewModel.distance = RaceDistance(category: .custom(5.0), type: .inPerson)
+    viewModel.distance = RaceEvent(
+      category: RaceDistanceCategory(value: 5.0, unit: .kilometers), type: .inPerson)
 
     #expect(viewModel.isFormValid == true)
+  }
+
+  @Test(
+    "isFormValid is false for more than four decimals, non-finite values, or 10,000 or more",
+    arguments: [10.12345, Double.nan, .infinity, 10_000])
+  func testIsFormValidFalseCustomDistanceUnusable(value: Double) {
+    let viewModel = EditMedalViewModel(mode: .add)
+    viewModel.name = "Taipei Marathon 2019"
+    viewModel.place.countryCode = "TW"
+    viewModel.place.city = "Taipei"
+    viewModel.distance = RaceEvent(
+      category: RaceDistanceCategory(value: value, unit: .miles), type: .inPerson)
+
+    #expect(viewModel.isFormValid == false)
+  }
+
+  // MARK: - selectDistance
+  @Test(
+    "selectDistance refuses an invalid custom distance and keeps the current one",
+    arguments: [0, -1, 10.12345, Double.nan, .infinity, 10_000])
+  func testSelectDistanceRefusesInvalidCustom(value: Double) {
+    let viewModel = EditMedalViewModel(mode: .add)
+    let current = viewModel.distance
+
+    #expect(throws: AppError.invalidDistance) {
+      try viewModel.selectDistance(
+        RaceEvent(category: RaceDistanceCategory(value: value, unit: .miles), type: .inPerson))
+    }
+    #expect(viewModel.distance == current)
+  }
+
+  @Test("selectDistance sets a valid custom distance as entered")
+  func testSelectDistanceAcceptsValidCustom() throws {
+    let viewModel = EditMedalViewModel(mode: .add)
+    let distance = RaceEvent(
+      category: RaceDistanceCategory(value: 10.1234, unit: .miles), type: .virtual)
+
+    try viewModel.selectDistance(distance)
+
+    #expect(viewModel.distance == distance)
+  }
+
+  @Test("selectDistance sets a standard distance")
+  func testSelectDistanceAcceptsStandard() throws {
+    let viewModel = EditMedalViewModel(mode: .add)
+    let distance = RaceEvent(category: .half, type: .wheelChair)
+
+    try viewModel.selectDistance(distance)
+
+    #expect(viewModel.distance == distance)
   }
 
   // MARK: - addEventPhotos / removeEventPhoto
@@ -174,8 +227,8 @@ struct EditMedalViewModelTests {
     let viewModel = EditMedalViewModel(mode: .add)
     let race = Race.sampleData.first!
     let edition = RaceEdition.sampleData.first!
-    let distance = RaceDistance(category: .full, type: .inPerson)
-    let selection = RaceEntry(race: race, edition: edition, distance: distance)
+    let distance = RaceEvent(category: .full, type: .inPerson)
+    let selection = RaceEntry(race: race, edition: edition, raceEvent: distance)
 
     viewModel.autoFill(from: selection)
 
@@ -193,8 +246,8 @@ struct EditMedalViewModelTests {
       date: someDate,
       bibNumber: "42",
       place: Place(countryCode: "JP", city: "Shinjuku", region: "Tokyo"),
-      distance: RaceDistance(category: .full, type: .inPerson),
-      finishTime: 12624,
+      raceEvent: RaceEvent(category: .full, type: .inPerson),
+      result: .seconds(12624),
       note: "Great race",
       tags: ["fun"],
       userID: "user1"
@@ -221,8 +274,8 @@ struct EditMedalViewModelTests {
       date: .now,
       bibNumber: "42",
       place: Place(countryCode: "JP", city: "Shinjuku"),
-      distance: RaceDistance(category: .full, type: .inPerson),
-      finishTime: finishTime,
+      raceEvent: RaceEvent(category: .full, type: .inPerson),
+      result: .seconds(finishTime),
       userID: "user1"
     )
     let viewModel = EditMedalViewModel(mode: .edit, medal: medal)
@@ -278,7 +331,7 @@ struct EditMedalViewModelTests {
       bibNumber: "00001",
       photoUrl: "file:///nonexistent/medal.jpg",
       place: Place(countryCode: "TW", city: "Taipei"),
-      distance: .default,
+      raceEvent: .default,
       userID: "uid"
     )
     let viewModel = EditMedalViewModel(mode: .edit, medal: medal)

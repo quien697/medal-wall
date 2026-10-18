@@ -111,6 +111,18 @@ struct StringCatalogTests {
     }
   }
 
+  /// The footer names the units as zh-TW shows them, 公里 and 英里, not km and mi.
+  @Test("The distance entry and Settings zh-TW strings ship translated")
+  func testDistanceEntryAndSettingsKeysAreTranslated() {
+    #expect(zhTWTable["Custom distance"] == "自訂距離")
+    #expect(zhTWTable["Unit"] == "單位")
+    #expect(
+      zhTWTable[
+        "Distance sets the pace unit (/km or /mi) and the starting unit for a custom distance. "
+          + "Distances always show as they were entered."
+      ] == "「距離」設定配速單位（/公里 或 /英里）及自訂距離的預設單位。距離一律依輸入時的單位顯示。")
+  }
+
   @Test("The composed division label keeps its placeholder in zh-TW")
   func testDivisionLabelKeepsPlaceholder() {
     #expect(zhTWTable["Division (%@)"]?.contains("%@") == true)
@@ -119,6 +131,16 @@ struct StringCatalogTests {
   @Test("The retired medal list title is gone from the catalog")
   func testRetiredTitleRemoved() {
     #expect(zhTWTable["Your Rewards"] == nil)
+  }
+
+  @Test("The retired distance strings are gone from the catalog")
+  func testRetiredDistanceStringsRemoved() {
+    #expect(zhTWTable["Custom distance (%@)"] == nil)
+    #expect(zhTWTable["Distance must be greater than zero."] == nil)
+    #expect(zhTWTable["Please enter a distance greater than 0."] == nil)
+    #expect(zhTWTable["Distance must be greater than zero, with at most 4 decimal places."] == nil)
+    #expect(
+      zhTWTable["Please enter a distance greater than 0, with up to 4 decimal places."] == nil)
   }
 
   @Test("Every zh-TW entry keeps the format specifiers of its key")

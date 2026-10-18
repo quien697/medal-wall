@@ -136,49 +136,36 @@ struct DistanceUnitTests {
     #expect(DistanceUnit.deviceDefault == deviceUnit)
   }
 
-  // MARK: - conversion
-  @Test("Miles convert to kilometres by the exact international factor")
-  func testMilesToKilometers() {
-    #expect(DistanceUnit.miles.kilometers(fromDisplayValue: 10) == 16.09344)
-    #expect(DistanceUnit.miles.kilometers(fromDisplayValue: 12) == 19.312128)
-  }
-
-  @Test("Kilometres pass through unconverted")
-  func testKilometersPassThrough() {
-    #expect(DistanceUnit.kilometers.kilometers(fromDisplayValue: 16.09) == 16.09)
-    #expect(DistanceUnit.kilometers.displayValue(fromKilometers: 16.09) == 16.09)
-  }
-
-  @Test("A mile-entered distance round-trips exactly")
-  func testMilesRoundTrip() {
-    let stored = DistanceUnit.miles.kilometers(fromDisplayValue: 10)
-
-    #expect(DistanceUnit.miles.displayValue(fromKilometers: stored) == 10)
-  }
-
   // MARK: - formatted
-  @Test("Full marathon formats in both units")
-  func testFormattedFull() {
-    #expect(Self.text(42.195, in: .kilometers) == "42.2 km")
-    #expect(Self.text(42.195, in: .miles) == "26.2 mi")
+  @Test("A standard distance formats its stored measurement")
+  func testFormattedStandard() {
+    #expect(Self.text(42.195, in: .kilometers) == "42.195 km")
+    #expect(Self.text(21.0975, in: .kilometers) == "21.0975 km")
   }
 
-  @Test("Half marathon formats in both units")
-  func testFormattedHalf() {
-    #expect(Self.text(21.0975, in: .kilometers) == "21.1 km")
-    #expect(Self.text(21.0975, in: .miles) == "13.1 mi")
+  @Test("A mile distance formats as the miles that were stored")
+  func testFormattedMiles() {
+    #expect(Self.text(26.2, in: .miles) == "26.2 mi")
+    #expect(Self.text(10, in: .miles) == "10 mi")
   }
 
   @Test("Trailing zero is dropped")
   func testFormattedDropsTrailingZero() {
     #expect(Self.text(10, in: .kilometers) == "10 km")
-    #expect(Self.text(10, in: .miles) == "6.2 mi")
+    #expect(Self.text(16.0, in: .kilometers) == "16 km")
   }
 
-  @Test("A mile-entered custom distance formats as the number that was typed")
-  func testFormattedCustom() {
-    #expect(Self.text(16.09344, in: .kilometers) == "16.1 km")
-    #expect(Self.text(16.09344, in: .miles) == "10 mi")
+  @Test("A value with more than four decimals shows four")
+  func testFormattedCapsAtFourDecimals() {
+    #expect(Self.text(42.16481, in: .kilometers) == "42.1648 km")
+  }
+
+  /// The setting only sets the pace unit and where a new custom distance starts.
+  @Test("The distance unit setting does not change how a distance formats")
+  func testFormattedIgnoresSetting() {
+    let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.miles.rawValue)
+
+    #expect(DistanceUnit.kilometers.formatted(value: 10, defaults: defaults) == "10 km")
   }
 
   @Test("Zero formats without a malformed value")
@@ -190,94 +177,7 @@ struct DistanceUnitTests {
   @Test("A negative distance formats without crashing")
   func testFormattedNegative() {
     #expect(Self.text(-5, in: .kilometers) == "-5 km")
-    #expect(Self.text(-5, in: .miles) == "-3.1 mi")
-  }
-
-  // MARK: - customFieldLabel
-  @Test("The custom field label names the active unit in English")
-  func testCustomFieldLabelEnglish() {
-    let defaults = Self.makeDefaults(distanceUnit: nil)
-
-    #expect(DistanceUnit.miles.customFieldLabel(defaults: defaults) == "Custom distance (mi)")
-    #expect(
-      DistanceUnit.kilometers.customFieldLabel(defaults: defaults) == "Custom distance (km)"
-    )
-  }
-
-  @Test("The custom field label composes both lookups from the same localization table")
-  func testCustomFieldLabelTraditionalChinese() {
-    // The format string and its interpolated unit are two separate catalog lookups; if
-    // they resolved against different tables the result would mix scripts.
-    let defaults = Self.makeDefaults(
-      distanceUnit: nil,
-      appLanguage: AppLanguage.zhTW.rawValue
-    )
-
-    #expect(DistanceUnit.kilometers.customFieldLabel(defaults: defaults) == "自訂距離（公里）")
-    #expect(DistanceUnit.miles.customFieldLabel(defaults: defaults) == "自訂距離（英里）")
-  }
-
-  // MARK: - custom distance entry
-  @Test("The custom field is seeded with the value the app displays")
-  func testSeededDisplayValue() {
-    #expect(DistanceUnit.miles.roundedDisplayValue(fromKilometers: 16.09) == 10)
-    #expect(DistanceUnit.kilometers.roundedDisplayValue(fromKilometers: 16.09) == 16.1)
-    #expect(DistanceUnit.miles.roundedDisplayValue(fromKilometers: 42.195) == 26.2)
-  }
-
-  @Test("An unedited custom distance keeps its original kilometres")
-  func testUneditedCustomDistanceIsPreserved() {
-    // 16.09 km seeds the miles field with a rounded 10; saving without editing must not
-    // rewrite the stored value to 16.09344 — race editions are shared records.
-    let saved = DistanceUnit.miles.customKilometers(
-      displayValue: 10,
-      originalKilometers: 16.09
-    )
-
-    #expect(saved == 16.09)
-  }
-
-  @Test("An unedited custom distance keeps its original kilometres in kilometres mode")
-  func testUneditedCustomDistanceIsPreservedInKilometers() {
-    let saved = DistanceUnit.kilometers.customKilometers(
-      displayValue: 16.1,
-      originalKilometers: 16.09
-    )
-
-    #expect(saved == 16.09)
-  }
-
-  @Test("An edited custom distance converts from the entered unit")
-  func testEditedCustomDistanceConverts() {
-    let saved = DistanceUnit.miles.customKilometers(
-      displayValue: 12,
-      originalKilometers: 16.09
-    )
-
-    #expect(saved == 19.312128)
-  }
-
-  @Test("A brand-new custom distance converts from the entered unit")
-  func testNewCustomDistanceConverts() {
-    #expect(
-      DistanceUnit.miles.customKilometers(displayValue: 10, originalKilometers: nil)
-        == 16.09344
-    )
-    #expect(
-      DistanceUnit.kilometers.customKilometers(displayValue: 10, originalKilometers: nil)
-        == 10
-    )
-  }
-
-  @Test("A mile-entered near-preset distance snaps onto the preset it measures")
-  func testNearPresetIsSnapped() {
-    let saved = DistanceUnit.miles.customKilometers(
-      displayValue: 26.2,
-      originalKilometers: nil
-    )
-
-    #expect(saved == 42.1648128)
-    #expect(RaceDistanceCategory.nearestPreset(forValue: saved) == .full)
+    #expect(Self.text(-5, in: .miles) == "-5 mi")
   }
 
   // MARK: - paceValueText
@@ -287,7 +187,7 @@ struct DistanceUnitTests {
     let pace = 5 + 41.0 / 60
 
     let value = DistanceUnit.kilometers.paceValueText(
-      minutesPerKilometer: pace,
+      minutesPerUnit: pace,
       defaults: defaults
     )
 
@@ -300,24 +200,25 @@ struct DistanceUnitTests {
     let pace = 4 + 59.9 / 60
 
     let value = DistanceUnit.kilometers.paceValueText(
-      minutesPerKilometer: pace,
+      minutesPerUnit: pace,
       defaults: defaults
     )
 
     #expect(value == "4'59\"")
   }
 
-  @Test("paceValueText converts to minutes per mile in miles mode")
+  /// The pace is already calculated in miles, so converting it here would count it twice.
+  @Test("paceValueText shows minutes per mile as given in miles mode")
   func testPaceValueTextMiles() {
     let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.miles.rawValue)
     let pace = 5.0
 
     let value = DistanceUnit.miles.paceValueText(
-      minutesPerKilometer: pace,
+      minutesPerUnit: pace,
       defaults: defaults
     )
 
-    #expect(value == "8'02\"")
+    #expect(value == "5'00\"")
   }
 
   /// The unfilled wording belongs to the screen, not to a unit.
@@ -326,7 +227,7 @@ struct DistanceUnitTests {
     let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.kilometers.rawValue)
 
     #expect(
-      DistanceUnit.kilometers.paceValueText(minutesPerKilometer: nil, defaults: defaults) == nil
+      DistanceUnit.kilometers.paceValueText(minutesPerUnit: nil, defaults: defaults) == nil
     )
   }
 
@@ -339,7 +240,7 @@ struct DistanceUnitTests {
     let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.kilometers.rawValue)
 
     #expect(
-      DistanceUnit.kilometers.paceValueText(minutesPerKilometer: pace, defaults: defaults) == nil
+      DistanceUnit.kilometers.paceValueText(minutesPerUnit: pace, defaults: defaults) == nil
     )
   }
 
@@ -350,11 +251,11 @@ struct DistanceUnitTests {
     let pace = 5 + 41.0 / 60
 
     let value = DistanceUnit.kilometers.paceValueText(
-      minutesPerKilometer: pace,
+      minutesPerUnit: pace,
       defaults: defaults
     )
     let joined = DistanceUnit.kilometers.paceText(
-      minutesPerKilometer: pace,
+      minutesPerUnit: pace,
       defaults: defaults
     )
 
@@ -368,20 +269,20 @@ struct DistanceUnitTests {
     let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.kilometers.rawValue)
 
     #expect(
-      DistanceUnit.kilometers.paceText(minutesPerKilometer: nil, defaults: defaults)
+      DistanceUnit.kilometers.paceText(minutesPerUnit: nil, defaults: defaults)
         == "--'-- \""
     )
   }
 
-  /// Formats a canonical kilometre value under a pinned English locale, so number
-  /// formatting does not vary with the simulator's region.
+  /// Formats a value already in `unit` under a pinned English locale, so number formatting
+  /// does not vary with the simulator's region.
   private static func text(
-    _ kilometers: Double,
+    _ value: Double,
     in unit: DistanceUnit,
     function: String = #function
   ) -> String {
     let defaults = makeDefaults(distanceUnit: unit.rawValue, function: function)
 
-    return unit.formatted(kilometers: kilometers, defaults: defaults)
+    return unit.formatted(value: value, defaults: defaults)
   }
 }

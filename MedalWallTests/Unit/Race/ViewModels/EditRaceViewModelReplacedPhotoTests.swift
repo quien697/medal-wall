@@ -34,7 +34,7 @@ struct EditRaceViewModelReplacedPhotoTests {
     )
     return RaceEdition(
       id: "edition-2025", raceId: "race-taipei", year: 2025, startDate: raceDay,
-      endDate: raceDay, photoUrl: editionPhotoUrl, distances: [], createdBy: "uid")
+      endDate: raceDay, photoUrl: editionPhotoUrl, raceEvents: [], createdBy: "uid")
   }
 
   private func makePhotoData() throws -> Data {

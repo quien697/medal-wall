@@ -13,7 +13,7 @@ import Testing
 struct MedalComputedTests {
 
   private func makeMedal(
-    distance: RaceDistance = RaceDistance(category: .full, type: .inPerson),
+    distance: RaceEvent = RaceEvent(category: .full, type: .inPerson),
     finishTime: TimeInterval? = nil,
     division: Division? = nil
   ) -> Medal {
@@ -22,7 +22,7 @@ struct MedalComputedTests {
       date: .now,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      distance: distance, finishTime: finishTime,
+      raceEvent: distance, result: finishTime.map(RaceResult.seconds),
       division: division, userID: "user1"
     )
   }
@@ -82,41 +82,43 @@ struct MedalComputedTests {
   func testAveragePaceNilWhenNoFinishTime() {
     let medal = makeMedal()
 
-    #expect(medal.averagePace == nil)
+    #expect(medal.averagePace(in: .kilometers) == nil)
   }
 
   @Test("averagePace is nil when finishTime is zero")
   func testAveragePaceNilWhenFinishTimeZero() {
     let medal = makeMedal(finishTime: 0)
 
-    #expect(medal.averagePace == nil)
+    #expect(medal.averagePace(in: .kilometers) == nil)
   }
 
   @Test("averagePace is nil when finishTime is negative")
   func testAveragePaceNilWhenFinishTimeNegative() {
     let medal = makeMedal(finishTime: -1)
 
-    #expect(medal.averagePace == nil)
+    #expect(medal.averagePace(in: .kilometers) == nil)
   }
 
   @Test("averagePace is nil when custom distance is zero")
   func testAveragePaceNilWhenCustomDistanceZero() {
     let medal = makeMedal(
-      distance: RaceDistance(category: .custom(0), type: .inPerson),
+      distance: RaceEvent(
+        category: RaceDistanceCategory(value: 0, unit: .kilometers), type: .inPerson),
       finishTime: 3600
     )
 
-    #expect(medal.averagePace == nil)
+    #expect(medal.averagePace(in: .kilometers) == nil)
   }
 
   @Test("averagePace is nil when custom distance is negative")
   func testAveragePaceNilWhenCustomDistanceNegative() {
     let medal = makeMedal(
-      distance: RaceDistance(category: .custom(-5), type: .inPerson),
+      distance: RaceEvent(
+        category: RaceDistanceCategory(value: -5, unit: .kilometers), type: .inPerson),
       finishTime: 3600
     )
 
-    #expect(medal.averagePace == nil)
+    #expect(medal.averagePace(in: .kilometers) == nil)
   }
 
   /// The pace is shown through `Int(_:)`, which traps above `Int.max`; a stored distance near
@@ -126,21 +128,37 @@ struct MedalComputedTests {
     arguments: [(1e-16, 86_399.0), (0.001, 3_600.0), (0.06, 3_600.0)])
   func testAveragePaceNilWhenTooSlow(kilometers: Double, finishTime: TimeInterval) {
     let medal = makeMedal(
-      distance: RaceDistance(category: .custom(kilometers), type: .inPerson),
+      distance: RaceEvent(
+        category: RaceDistanceCategory(value: kilometers, unit: .kilometers), type: .inPerson),
       finishTime: finishTime
     )
 
-    #expect(medal.averagePace == nil)
+    #expect(medal.averagePace(in: .kilometers) == nil)
   }
 
   @Test("averagePace is nil when the distance is infinite")
   func testAveragePaceNilWhenDistanceInfinite() {
     let medal = makeMedal(
-      distance: RaceDistance(category: .custom(.infinity), type: .inPerson),
+      distance: RaceEvent(
+        category: RaceDistanceCategory(value: .infinity, unit: .kilometers), type: .inPerson),
       finishTime: 3600
     )
 
-    #expect(medal.averagePace == nil)
+    #expect(medal.averagePace(in: .kilometers) == nil)
+  }
+
+  /// A mile distance is checked after it is converted as well as when it is used as stored.
+  @Test(
+    "averagePace is nil for a zero, infinite or NaN mile distance in either unit",
+    arguments: [0, Double.infinity, .nan], DistanceUnit.allCases)
+  func testAveragePaceNilWhenMileDistanceUnusable(miles: Double, unit: DistanceUnit) {
+    let medal = makeMedal(
+      distance: RaceEvent(
+        category: RaceDistanceCategory(value: miles, unit: .miles), type: .inPerson),
+      finishTime: 3600
+    )
+
+    #expect(medal.averagePace(in: unit) == nil)
   }
 
   @Test("averagePace calculates minutes per km for a full marathon")
@@ -149,7 +167,7 @@ struct MedalComputedTests {
     let medal = makeMedal(finishTime: finishTime)
 
     let expected = (finishTime / 60) / RaceDistanceCategory.full.value
-    #expect(medal.averagePace == expected)
+    #expect(medal.averagePace(in: .kilometers) == expected)
   }
 
   // MARK: - parsedDivision

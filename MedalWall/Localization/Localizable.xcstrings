@@ -348,12 +348,12 @@
         }
       }
     },
-    "Custom distance (%@)" : {
+    "Custom distance" : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "自訂距離（%@）"
+            "value" : "自訂距離"
           }
         }
       }
@@ -458,12 +458,22 @@
         }
       }
     },
-    "Distance must be greater than zero." : {
+    "Distance must be greater than zero and less than 10,000, with at most 4 decimal places." : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "距離必須大於零。"
+            "value" : "距離必須大於零且小於 10,000，最多 4 位小數。"
+          }
+        }
+      }
+    },
+    "Distance sets the pace unit (/km or /mi) and the starting unit for a custom distance. Distances always show as they were entered." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「距離」設定配速單位（/公里 或 /英里）及自訂距離的預設單位。距離一律依輸入時的單位顯示。"
           }
         }
       }
@@ -1395,12 +1405,12 @@
         }
       }
     },
-    "Please enter a distance greater than 0." : {
+    "Please enter a distance greater than 0 and less than 10,000, with up to 4 decimal places." : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請輸入大於 0 的距離。"
+            "value" : "請輸入大於 0 且小於 10,000、最多 4 位小數的距離。"
           }
         }
       }
@@ -1874,6 +1884,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "非預期的錯誤"
+          }
+        }
+      }
+    },
+    "Unit" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "單位"
           }
         }
       }

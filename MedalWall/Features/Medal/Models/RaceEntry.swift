@@ -10,9 +10,9 @@ import Foundation
 struct RaceEntry {
   let race: Race
   let edition: RaceEdition
-  let distance: RaceDistance
+  let raceEvent: RaceEvent
 
   var selectionLabel: String {
-    .appLocalized("\(race.name) \(String(edition.year)) (\(distance.displayLabel)) selected")
+    .appLocalized("\(race.name) \(String(edition.year)) (\(raceEvent.displayLabel)) selected")
   }
 }

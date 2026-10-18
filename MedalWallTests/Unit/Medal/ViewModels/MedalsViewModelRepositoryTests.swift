@@ -20,7 +20,7 @@ struct MedalsViewModelRepositoryTests {
       date: Date(timeIntervalSince1970: 1_577_836_800),
       bibNumber: "00001",
       place: Place(countryCode: "TW", city: "Taipei City"),
-      distance: .default,
+      raceEvent: .default,
       userID: userID
     )
   }

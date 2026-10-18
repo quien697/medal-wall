@@ -23,6 +23,14 @@ struct MedalDistanceFilterTests {
     #expect(MedalDistanceFilter.category(.full).id != MedalDistanceFilter.category(.half).id)
   }
 
+  @Test("10K and 10 mi carry distinct ids")
+  func testSameNumberInDifferentUnitsHasDistinctIDs() {
+    #expect(
+      MedalDistanceFilter.category(.tenKM).id != MedalDistanceFilter.category(Self.tenMiles).id)
+  }
+
+  private static let tenMiles = RaceDistanceCategory(value: 10, unit: .miles)
+
   // MARK: - Equality
   @Test("Two all cases are equal")
   func testAllEqualsAll() {
@@ -44,24 +52,38 @@ struct MedalDistanceFilterTests {
     #expect(MedalDistanceFilter.category(.full) != MedalDistanceFilter.category(.tenKM))
   }
 
-  /// A custom distance that happens to measure a preset must not split into a second
-  /// bucket — `RaceDistance` already defines identity by `category.value` for this reason.
-  @Test("A custom distance equals the preset it measures")
+  @Test("A custom distance of exactly a standard equals that standard")
   func testCustomDistanceEqualsMatchingPreset() {
-    #expect(MedalDistanceFilter.category(.custom(42.195)) == MedalDistanceFilter.category(.full))
+    #expect(
+      MedalDistanceFilter.category(RaceDistanceCategory(value: 42.195, unit: .kilometers))
+        == MedalDistanceFilter.category(.full))
   }
 
   @Test("A custom distance that matches no preset stays distinct")
   func testUnmatchedCustomDistanceStaysDistinct() {
-    #expect(MedalDistanceFilter.category(.custom(30)) != MedalDistanceFilter.category(.full))
+    #expect(
+      MedalDistanceFilter.category(RaceDistanceCategory(value: 30, unit: .kilometers))
+        != MedalDistanceFilter.category(.full))
+  }
+
+  @Test("A near-standard distance does not equal the standard")
+  func testNearStandardDistanceIsNotTheStandard() {
+    #expect(
+      MedalDistanceFilter.category(RaceDistanceCategory(value: 42.2, unit: .kilometers))
+        != MedalDistanceFilter.category(.full))
+  }
+
+  @Test("10K and 10 mi are not equal")
+  func testSameNumberInDifferentUnitsIsNotEqual() {
+    #expect(MedalDistanceFilter.category(.tenKM) != MedalDistanceFilter.category(Self.tenMiles))
   }
 
   // MARK: - Hashing
-  @Test("A custom distance collapses onto the preset it measures in a set")
+  @Test("A custom distance of exactly a standard is one entry with it in a set")
   func testCustomDistanceCollapsesInSet() {
     let filters: Set<MedalDistanceFilter> = [
       .category(.full),
-      .category(.custom(42.195))
+      .category(RaceDistanceCategory(value: 42.195, unit: .kilometers))
     ]
 
     #expect(filters.count == 1)
@@ -73,9 +95,11 @@ struct MedalDistanceFilterTests {
       .all,
       .category(.full),
       .category(.half),
-      .category(.custom(30))
+      .category(RaceDistanceCategory(value: 30, unit: .kilometers)),
+      .category(.tenKM),
+      .category(Self.tenMiles)
     ]
 
-    #expect(filters.count == 4)
+    #expect(filters.count == 6)
   }
 }

@@ -66,7 +66,7 @@ final class MedalsViewModel {
   /// owns it. Called whenever `medals` or `selectedFilter` changes.
   private func reconcileFilter() {
     guard case .category(let category) = selectedFilter else { return }
-    if !medals.distanceCategoriesOwned.contains(where: { $0.value == category.value }) {
+    if !medals.distanceCategoriesOwned.contains(category) {
       selectedFilter = .all
     }
   }

@@ -14,8 +14,10 @@ struct Medal: Codable, Identifiable {
   var bibNumber: String
   var photoUrl: String?
   var place: Place
-  var distance: RaceDistance
-  var finishTime: TimeInterval?
+  /// The event this medal was earned in: its distance, a standard such as Full or a custom
+  /// one such as 10 mi, and how it was run (in person, virtual or wheelchair).
+  var raceEvent: RaceEvent
+  var result: RaceResult?
   var overallPlacement: Int?
   var totalParticipants: Int?
   var division: String?
@@ -37,8 +39,8 @@ struct Medal: Codable, Identifiable {
     bibNumber: String,
     photoUrl: String? = nil,
     place: Place,
-    distance: RaceDistance,
-    finishTime: TimeInterval? = nil,
+    raceEvent: RaceEvent,
+    result: RaceResult? = nil,
     overallPlacement: Int? = nil,
     totalParticipants: Int? = nil,
     division: Division? = nil,
@@ -59,8 +61,8 @@ struct Medal: Codable, Identifiable {
     self.bibNumber = bibNumber
     self.photoUrl = photoUrl
     self.place = place
-    self.distance = distance
-    self.finishTime = finishTime
+    self.raceEvent = raceEvent
+    self.result = result
     self.overallPlacement = overallPlacement
     self.totalParticipants = totalParticipants
     self.division = division?.rawValue

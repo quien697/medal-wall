@@ -46,7 +46,7 @@ struct MedalPersonalBestCarousel: View {
                 finishTime: personalBest.medal.recordedFinishTime?.formattedHMS ?? "—",
                 raceName: personalBest.medal.name,
                 pace: DistanceUnit.resolved().paceText(
-                  minutesPerKilometer: personalBest.medal.averagePace
+                  minutesPerUnit: personalBest.medal.averagePace(in: .resolved())
                 ),
                 pageCount: personalBests.count,
                 currentPage: personalBests.pageIndex(for: scrolledID)

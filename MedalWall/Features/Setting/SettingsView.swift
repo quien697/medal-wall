@@ -24,6 +24,15 @@ struct SettingsView: View {
       } header: {
         Text("Preferences")
           .sectionTitleStyle()
+      } footer: {
+        Text(
+          """
+          Distance sets the pace unit (/km or /mi) and the starting unit for a custom \
+          distance. Distances always show as they were entered.
+          """
+        )
+        .font(.TypeScale.caption)
+        .foregroundStyle(Color.Text.secondary)
       }  // Section
       .listRowBackground(Color.Surface.primary)
 

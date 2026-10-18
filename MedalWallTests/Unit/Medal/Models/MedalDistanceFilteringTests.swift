@@ -23,7 +23,7 @@ struct MedalDistanceFilteringTests {
       date: .now,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      distance: RaceDistance(category: category, type: type),
+      raceEvent: RaceEvent(category: category, type: type),
       userID: "user1"
     )
   }
@@ -92,7 +92,7 @@ struct MedalDistanceFilteringTests {
   func testCategoriesOwnedIncludesCustom() {
     let medals = [
       makeMedal(category: .full),
-      makeMedal(category: .custom(30)),
+      makeMedal(category: RaceDistanceCategory(value: 30, unit: .kilometers)),
       makeMedal(category: .half)
     ]
 
@@ -101,33 +101,51 @@ struct MedalDistanceFilteringTests {
     #expect(owned == [42.195, 30, 21.0975])
   }
 
-  @Test("distanceCategoriesOwned collapses a custom distance onto the preset it measures")
-  func testCategoriesOwnedCollapsesCustomOntoPreset() {
+  @Test("distanceCategoriesOwned counts a custom distance of exactly a standard as that standard")
+  func testCategoriesOwnedTreatsExactStandardValueAsStandard() {
     let medals = [
       makeMedal(category: .full),
-      makeMedal(category: .custom(42.195))
+      makeMedal(category: RaceDistanceCategory(value: 42.195, unit: .kilometers))
     ]
 
-    #expect(medals.distanceCategoriesOwned.count == 1)
+    #expect(medals.distanceCategoriesOwned == [.full])
   }
 
-  /// A marathon entered as 26.2 miles arrives as 42.16481 km — close to but not exactly
-  /// 42.195, so it lands as `.custom(42.16481)` rather than `.custom(42.195)`. The
-  /// tolerance that collapses it onto `.full` must run *before* the Set dedup, otherwise
-  /// the chip surfaces two `.full` entries side by side and `personalBests` emits two
-  /// records that share an `id`, breaking the carousel's `ForEach`.
-  @Test(
-    "distanceCategoriesOwned collapses a near-tolerance custom distance onto the preset it measures"
-  )
-  func testCategoriesOwnedCollapsesNearToleranceCustomOntoPreset() {
+  @Test("distanceCategoriesOwned keeps a near-standard distance as its own category, longer first")
+  func testCategoriesOwnedKeepsNearStandardDistanceSeparate() {
     let medals = [
       makeMedal(category: .full),
-      makeMedal(category: .custom(42.16481))
+      makeMedal(category: Self.fortyTwoPointTwoKilometers)
     ]
 
-    #expect(medals.distanceCategoriesOwned.count == 1)
-    #expect(medals.distanceCategoriesOwned.first == .full)
+    #expect(medals.distanceCategoriesOwned == [Self.fortyTwoPointTwoKilometers, .full])
   }
+
+  @Test("distanceCategoriesOwned keeps 10K and 10 mi apart, 10 mi first")
+  func testCategoriesOwnedKeepsUnitsApart() {
+    let medals = [
+      makeMedal(category: .tenKM),
+      makeMedal(category: Self.tenMiles)
+    ]
+
+    #expect(medals.distanceCategoriesOwned == [Self.tenMiles, .tenKM])
+  }
+
+  @Test("distanceCategoriesOwned lists kilometres first when two units measure the same length")
+  func testCategoriesOwnedOrdersKilometersFirstAtEqualLength() {
+    let sameLengthInKilometers = RaceDistanceCategory(
+      value: 10 * DistanceUnit.kilometersPerMile, unit: .kilometers)
+    let medals = [
+      makeMedal(category: Self.tenMiles),
+      makeMedal(category: sameLengthInKilometers)
+    ]
+
+    #expect(medals.distanceCategoriesOwned == [sameLengthInKilometers, Self.tenMiles])
+  }
+
+  private static let tenMiles = RaceDistanceCategory(value: 10, unit: .miles)
+  private static let fortyTwoPointTwoKilometers = RaceDistanceCategory(
+    value: 42.2, unit: .kilometers)
 
   /// CLAUDE.md `## Patterns`: "Guard numeric values against out-of-range inputs."
   /// A corrupt Firestore write can deliver a non-finite distance; sorting a
@@ -137,8 +155,8 @@ struct MedalDistanceFilteringTests {
   func testCategoriesOwnedDropsNonFiniteValues() {
     let medals = [
       makeMedal(category: .full),
-      makeMedal(category: .custom(Double.nan)),
-      makeMedal(category: .custom(Double.infinity))
+      makeMedal(category: RaceDistanceCategory(value: Double.nan, unit: .kilometers)),
+      makeMedal(category: RaceDistanceCategory(value: Double.infinity, unit: .kilometers))
     ]
 
     let owned = medals.distanceCategoriesOwned.map(\.value)
@@ -215,29 +233,36 @@ struct MedalDistanceFilteringTests {
     #expect(medals.filtered(by: .category(.full)).count == 2)
   }
 
-  @Test("filtered by a custom distance matches the preset it measures")
-  func testFilteredByCustomMatchesPreset() {
+  @Test("filtered by a standard matches a custom distance of exactly that standard")
+  func testFilteredByStandardMatchesExactCustomValue() {
     let medals = [
-      makeMedal(category: .custom(42.195)),
+      makeMedal(category: RaceDistanceCategory(value: 42.195, unit: .kilometers)),
       makeMedal(category: .half)
     ]
 
     #expect(medals.filtered(by: .category(.full)).count == 1)
   }
 
-  /// A marathon entered as 26.2 miles rounds to 42.16481 km, just inside the 0.05 km
-  /// window `RaceDistanceCategory.nearestPreset(forValue:)` collapses onto `.full`.
-  /// `filtered(by:)` must agree with that normalization — otherwise the chip surfaces
-  /// `.full` but selecting it excludes the medal that the personal-bests card lists
-  /// under `.full`.
-  @Test("filtered by a preset matches a custom distance within the preset's tolerance")
-  func testFilteredByPresetMatchesCustomWithinTolerance() {
+  @Test("filtered by a standard leaves out a near-standard distance, and the reverse")
+  func testFilteredByStandardExcludesNearStandardDistance() {
     let medals = [
-      makeMedal(category: .custom(42.16481)),
-      makeMedal(category: .half)
+      makeMedal(id: "full", category: .full),
+      makeMedal(id: "42.2", category: Self.fortyTwoPointTwoKilometers)
     ]
 
-    #expect(medals.filtered(by: .category(.full)).count == 1)
+    #expect(medals.filtered(by: .category(.full)).map(\.id) == ["full"])
+    #expect(medals.filtered(by: .category(Self.fortyTwoPointTwoKilometers)).map(\.id) == ["42.2"])
+  }
+
+  @Test("filtered by 10 mi leaves out a 10K, and the reverse")
+  func testFilteredByUnitKeepsUnitsApart() {
+    let medals = [
+      makeMedal(id: "10K", category: .tenKM),
+      makeMedal(id: "10 mi", category: Self.tenMiles)
+    ]
+
+    #expect(medals.filtered(by: .category(Self.tenMiles)).map(\.id) == ["10 mi"])
+    #expect(medals.filtered(by: .category(.tenKM)).map(\.id) == ["10K"])
   }
 
   /// The screen's central invariant: options are derived from the collection, so
@@ -247,8 +272,10 @@ struct MedalDistanceFilteringTests {
     let medals = [
       makeMedal(category: .full),
       makeMedal(category: .half),
-      makeMedal(category: .custom(30)),
-      makeMedal(category: .fiveKM)
+      makeMedal(category: RaceDistanceCategory(value: 30, unit: .kilometers)),
+      makeMedal(category: .fiveKM),
+      makeMedal(category: Self.tenMiles),
+      makeMedal(category: Self.fortyTwoPointTwoKilometers)
     ]
 
     for category in medals.distanceCategoriesOwned {
