@@ -153,9 +153,13 @@ the device uses, so they match the years editions are stored with.
 The system SHALL offer a distance filter whose options are derived from the distance
 categories present in the user's collection, never from a fixed list. The options SHALL be
 an `All` option first, followed by one option per distance category the user owns, ordered
-by distance from longest to shortest. Each option SHALL carry the number of medals it
+by real length from longest to shortest. Each option SHALL carry the number of medals it
 selects. Selecting an option SHALL narrow the presented medals to that distance category;
 selecting `All` SHALL present every medal.
+
+A distance category SHALL be identified by its exact stored value and unit. No distance is
+folded into a nearby one, so `10K` and `10 mi` are separate options, and a medal at `42.2`
+kilometres has its own option rather than joining `Full`.
 
 #### Scenario: Options reflect what the user owns
 - **WHEN** a collection contains only half marathons and 10K races
@@ -169,7 +173,17 @@ selecting `All` SHALL present every medal.
 #### Scenario: Custom distances appear as options
 - **WHEN** a collection contains a medal at a custom distance
 - **THEN** that custom distance is offered as its own filter option, placed among the
-  others by its distance
+  others by its real length
+
+#### Scenario: The same number in different units are separate options
+- **WHEN** a collection contains a 10K medal and a `10 mi` medal
+- **THEN** the filter offers `10 mi` and `10K` as separate options, `10 mi` first because it
+  is longer
+
+#### Scenario: A near-standard distance is its own option
+- **WHEN** a collection contains a full marathon medal and a medal at `42.2` kilometres
+- **THEN** the filter offers `42.2 km` and `Full` as separate options, each counting one
+  medal
 
 #### Scenario: Each option reports its own count
 - **WHEN** a collection contains nine medals, five full marathons and four half marathons
@@ -233,6 +247,10 @@ currently filtered subset, so a filter selection never changes which medal holds
 #### Scenario: Each category holds its own record
 - **WHEN** a collection contains both full and half marathons with finish times
 - **THEN** one full marathon medal and one half marathon medal are each marked
+
+#### Scenario: The same number in different units holds separate records
+- **WHEN** a collection contains a 10K medal and a `10 mi` medal, both with finish times
+- **THEN** each is marked as the personal record for its own distance
 
 #### Scenario: Medals without a finish time are excluded
 - **WHEN** the only medal in a category has no finish time

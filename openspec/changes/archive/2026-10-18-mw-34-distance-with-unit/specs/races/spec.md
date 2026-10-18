@@ -49,13 +49,13 @@ and unit twice cannot. The distance picker SHALL instead show each preset's stor
 measurement, identical in both units, so a user looking for a known number finds it on the
 preset row rather than typing it into the custom field.
 
-#### Scenario: Preset rows show their stored measurement
+#### Scenario: Preset rows show their measurement
 - **WHEN** a user opens the distance picker, with the distance unit set to either
   Kilometers or Miles
 - **THEN** the preset rows read `Full Marathon · 42.195 km`, `Half Marathon · 21.0975 km`,
   `10K · 10 km`, and `5K · 5 km`
 
-#### Scenario: A near-standard custom distance is not snapped
+#### Scenario: A near-preset custom distance is not snapped
 - **WHEN** a user enters a custom distance of `26.2` miles rather than selecting the Full
   Marathon preset
 - **THEN** the distance is stored as `26.2` miles and remains a custom distance, with no

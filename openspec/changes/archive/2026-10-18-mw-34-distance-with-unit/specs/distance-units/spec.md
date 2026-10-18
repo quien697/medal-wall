@@ -40,6 +40,32 @@ other distance, including every distance in miles, is a custom distance.
 - **WHEN** an event is read as `42.2` kilometres or as `26.2` miles
 - **THEN** it is a custom distance, not the Full Marathon
 
+### Requirement: Stored Measurement Display
+The system SHALL display a distance's stored measurement — its stored number with its
+stored unit — on the preset rows of the distance picker and for every custom distance
+wherever it appears. The measurement SHALL read the same whatever the distance unit
+setting, because no distance is converted for display.
+
+Measured values SHALL be formatted with up to four fraction digits and trailing zeros
+dropped, using the locale resolved from the app's language preference, and paired with a
+String Catalog abbreviation (`km` / `mi`) rather than a Foundation-supplied unit name.
+
+#### Scenario: A distance in miles reads in miles under the kilometre setting
+- **WHEN** the distance unit is Kilometers and a medal's distance is stored as `10` miles
+- **THEN** it reads `10 mi`
+
+#### Scenario: A distance in kilometres reads in kilometres under the mile setting
+- **WHEN** the distance unit is Miles and a medal's distance is stored as `42.2` kilometres
+- **THEN** it reads `42.2 km`
+
+#### Scenario: Four decimals are shown
+- **WHEN** a custom distance stored as `12.3456` kilometres is displayed
+- **THEN** it reads `12.3456 km`
+
+#### Scenario: Trailing zeros are dropped
+- **WHEN** a custom distance of exactly `16` kilometres is displayed
+- **THEN** it reads `16 km`, not `16.0 km`
+
 ## MODIFIED Requirements
 
 ### Requirement: Distance Unit Resolution
@@ -107,32 +133,6 @@ comes close to a standard one is shown as its measurement.
 - **WHEN** a user views a medal card for a medal at `42.2` kilometres
 - **THEN** the badge reads `42.2 km`, not `Full`
 
-### Requirement: Measured Distance Display
-The system SHALL display a distance's stored measurement — its stored number with its
-stored unit — on the preset rows of the distance picker and for every custom distance
-wherever it appears. The measurement SHALL read the same whatever the distance unit
-setting, because no distance is converted for display.
-
-Measured values SHALL be formatted with up to four fraction digits and trailing zeros
-dropped, using the locale resolved from the app's language preference, and paired with a
-String Catalog abbreviation (`km` / `mi`) rather than a Foundation-supplied unit name.
-
-#### Scenario: A distance in miles reads in miles under the kilometre setting
-- **WHEN** the distance unit is Kilometers and a medal's distance is stored as `10` miles
-- **THEN** it reads `10 mi`
-
-#### Scenario: A distance in kilometres reads in kilometres under the mile setting
-- **WHEN** the distance unit is Miles and a medal's distance is stored as `42.2` kilometres
-- **THEN** it reads `42.2 km`
-
-#### Scenario: Four decimals are shown
-- **WHEN** a custom distance stored as `12.3456` kilometres is displayed
-- **THEN** it reads `12.3456 km`
-
-#### Scenario: Trailing zeros are dropped
-- **WHEN** a custom distance of exactly `16` kilometres is displayed
-- **THEN** it reads `16 km`, not `16.0 km`
-
 ### Requirement: Pace Expressed In The Active Unit
 The system SHALL calculate average pace from the recorded finish time and the real length of
 the distance, whichever unit the distance is stored in, and SHALL express it per unit of the
@@ -160,3 +160,8 @@ rather than rounded, which is the app's existing behaviour.
 converted to kilometres for storage. Replaced by "Distance Stored With Its Unit".
 **Migration**: None in code. Development documents are rewritten by hand to the `event` /
 `result` / `events` shape.
+
+### Requirement: Measured Distance Display
+**Reason**: The medal detail hero no longer shows a distance, and no distance is converted
+for display. Replaced by "Stored Measurement Display".
+**Migration**: None.
