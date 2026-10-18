@@ -112,7 +112,7 @@
 
 ## 11. Docs
 
-- [ ] 11.1 Update `CLAUDE.md`'s data model notes: `RaceEvent` instead of `RaceDistance`, and
+- [x] 11.1 Update `CLAUDE.md`'s data model notes: `RaceEvent` instead of `RaceDistance`, and
       `RaceEntry` bundling a `RaceEvent`
 - [ ] 11.2 When archiving, rewrite the `distance-units` spec's Purpose, which still describes
       kilometre storage and display conversion

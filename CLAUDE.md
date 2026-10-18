@@ -90,7 +90,7 @@ Medal                   (subcollection: users/{uid}/medals)
   └── EventPhoto        (embedded array on Medal)
 ```
 
-Key value types (not persisted directly): `RaceDistance`, `RaceDistanceCategory`, `RaceDistanceType`, `Division` (space-separated string in Firestore: `"male from30to34"`; parsed by splitting on last space), `GeoLocation`, `RaceEntry` (ephemeral, not `Codable`; bundles `Race` + `RaceEdition` + `RaceDistance` for the race-picker during medal creation).
+Key value types (not persisted directly): `RaceEvent`, `RaceResult`, `RaceDistanceCategory`, `RaceDistanceType`, `Division` (space-separated string in Firestore: `"male from30to34"`; parsed by splitting on last space), `GeoLocation`, `RaceEntry` (ephemeral, not `Codable`; bundles `Race` + `RaceEdition` + `RaceEvent` for the race-picker during medal creation).
 
 ## Naming
 - `isPresenting` prefix for state that shows/dismisses a sheet or modal
@@ -119,7 +119,7 @@ Key value types (not persisted directly): `RaceDistance`, `RaceDistanceCategory`
 - `[weak self]` in closures that capture reference types
 - No logic or computed properties in views — all derived values belong in the ViewModel
 - **Edit ViewModels** take `mode: ItemEditMode` (`.add` / `.edit`) and a nullable model; both add and edit share one ViewModel branching on `mode` in `init` and `save()`.
-- **No Race–Medal link:** `Medal` stores `RaceDistance` as a value type, not a foreign key to `Race`. Medals survive race deletion intentionally — do not add `raceId` or cascade-delete medals.
+- **No Race–Medal link:** `Medal` stores its `RaceEvent` as a value type, not a foreign key to `Race`. Medals survive race deletion intentionally — do not add `raceId` or cascade-delete medals.
 - **Firestore cascade:** Firestore does not cascade-delete subcollections. `deleteRace()` manually fetches and deletes all editions before deleting the race document; any new deletion path must do the same.
 
 ## Don'ts
