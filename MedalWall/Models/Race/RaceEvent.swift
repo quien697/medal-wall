@@ -26,10 +26,13 @@ struct RaceEvent: Identifiable, Hashable, Comparable, Codable {
     return "\(type.displayName) \(category.description)"
   }
 
+  /// Two events are equal when their distance (value and unit) and type match. `id` is left
+  /// out, so a decoded copy equals the original and `10K` never equals `10 mi`.
   static func == (lhs: RaceEvent, rhs: RaceEvent) -> Bool {
     lhs.category == rhs.category && lhs.type == rhs.type
   }
 
+  /// Hashes the same distance and type that `==` compares, leaving out `id`.
   func hash(into hasher: inout Hasher) {
     hasher.combine(category)
     hasher.combine(type)
