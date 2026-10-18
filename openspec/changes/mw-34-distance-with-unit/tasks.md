@@ -88,7 +88,7 @@
 
 ## 8. Settings
 
-- [ ] 8.1 Add the Preferences footer to `SettingsView` in `Font.TypeScale.caption` and
+- [x] 8.1 Add the Preferences footer to `SettingsView` in `Font.TypeScale.caption` and
       `Color.Text.secondary`, with the text from design.md
 
 ## 9. Strings
