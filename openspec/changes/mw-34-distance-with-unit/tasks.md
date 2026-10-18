@@ -100,14 +100,14 @@
 
 ## 10. Verify
 
-- [ ] 10.1 Search the code for leftovers: `nearestPreset`, `customKilometers`,
+- [x] 10.1 Search the code for leftovers: `nearestPreset`, `customKilometers`,
       `roundedDisplayValue`, `.custom(`, a stored `finishTime`, and `RaceDistance` other
       than `RaceDistanceCategory` / `RaceDistanceType`
-- [ ] 10.2 Build with SwiftLint clean, then run the full test suite
-- [ ] 10.3 Check the medal rows, filter chips, personal best cards, distance picker and
+- [x] 10.2 Build with SwiftLint clean, then run the full test suite
+- [x] 10.3 Check the medal rows, filter chips, personal best cards, distance picker and
       Settings in previews, in English and 繁體中文, with each unit setting, including a
       four-decimal custom label
-- [ ] 10.4 After the development documents are rewritten to the new shape, launch the app
+- [x] 10.4 After the development documents are rewritten to the new shape, launch the app
       against them
 
 ## 11. Docs

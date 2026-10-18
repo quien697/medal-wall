@@ -30,7 +30,7 @@ nonisolated struct RaceDistanceCategory: CustomStringConvertible, Hashable {
     Self.standardCases.contains(self)
   }
 
-  /// The real length in kilometres, for sorting and pace. Never shown or stored.
+  /// The real length in kilometres, for sorting. Never shown or stored.
   var kilometers: Double {
     unit == .miles ? value * DistanceUnit.kilometersPerMile : value
   }
