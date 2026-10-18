@@ -93,10 +93,10 @@
 
 ## 9. Strings
 
-- [ ] 9.1 Script the new String Catalog keys with `zh-TW`: the Settings footer, the unit-free
+- [x] 9.1 Script the new String Catalog keys with `zh-TW`: the Settings footer, the unit-free
       custom label, and the updated invalid-distance texts; remove
       `"Custom distance (%@)"`
-- [ ] 9.2 Update `LocalizedDisplayStringTests` for the changed and removed keys
+- [x] 9.2 Update `LocalizedDisplayStringTests` for the changed and removed keys
 
 ## 10. Verify
 
