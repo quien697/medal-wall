@@ -80,9 +80,9 @@
 
 ## 7. DistanceUnit
 
-- [ ] 7.1 Rewrite `DistanceUnitTests`: drop the tests for the removed conversions, and test
+- [x] 7.1 Rewrite `DistanceUnitTests`: drop the tests for the removed conversions, and test
       that `formatted` shows the stored value in its own unit with up to four decimals
-- [ ] 7.2 Remove `displayValue(fromKilometers:)`, `kilometers(fromDisplayValue:)`,
+- [x] 7.2 Remove `displayValue(fromKilometers:)`, `kilometers(fromDisplayValue:)`,
       `roundedDisplayValue`, `customKilometers` and `customFieldLabel`, and make
       `formatted` stop converting
 
