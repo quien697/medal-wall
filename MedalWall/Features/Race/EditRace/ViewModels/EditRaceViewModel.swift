@@ -251,7 +251,7 @@ final class EditRaceViewModel {
         year: draft.year,
         startDate: draft.startDate,
         endDate: draft.endDate,
-        events: draft.distances,
+        raceEvents: draft.distances,
         createdBy: draft.createdBy
       )
 
@@ -277,7 +277,7 @@ final class EditRaceViewModel {
       edition.year = draft.year
       edition.startDate = draft.startDate
       edition.endDate = draft.endDate
-      edition.events = draft.distances
+      edition.raceEvents = draft.distances
 
       var uploadedPhotoUrl: String?
       do {

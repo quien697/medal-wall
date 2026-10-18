@@ -67,17 +67,18 @@ struct RaceFirestoreRepositoryTests {
   private func makeEdition(photoUrl: String?) -> RaceEdition {
     RaceEdition(
       id: "edition-2025", raceId: "race-taipei", year: 2025, startDate: .now, endDate: .now,
-      photoUrl: photoUrl, events: [RaceEvent(category: .full, type: .inPerson)],
+      photoUrl: photoUrl, raceEvents: [RaceEvent(category: .full, type: .inPerson)],
       createdBy: "uid")
   }
 
-  @Test("an edition stores its events under that name, not the old one")
-  func testEventsFieldName() throws {
+  @Test("an edition stores its race events under that name, not the old ones")
+  func testRaceEventsFieldName() throws {
     let fields = try RaceFirestoreRepository.updateFields(for: makeEdition(photoUrl: nil))
-    let events = fields["events"] as? [[String: Any]]
+    let raceEvents = fields["raceEvents"] as? [[String: Any]]
 
-    #expect(events?.first?["kind"] as? String == "distance")
+    #expect(raceEvents?.first?["kind"] as? String == "distance")
     // An old name left in `editionUpdateFields` would show up here as a delete.
+    #expect(fields["events"] == nil)
     #expect(fields["distances"] == nil)
   }
 

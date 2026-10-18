@@ -33,7 +33,7 @@ struct MedalPersonalRecordTests {
       date: date,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      event: RaceEvent(category: category, type: .inPerson),
+      raceEvent: RaceEvent(category: category, type: .inPerson),
       result: finishTime.map(RaceResult.seconds),
       userID: "user1"
     )

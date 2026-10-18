@@ -34,8 +34,8 @@ extension Medal {
   /// distance stored near zero, and showing it through `Int(_:)` would crash the app. An
   /// infinite distance would give a pace of zero. Both read as no pace.
   func averagePace(in unit: DistanceUnit) -> Double? {
-    var distance = event.category.value
-    if event.category.unit != unit {
+    var distance = raceEvent.category.value
+    if raceEvent.category.unit != unit {
       distance =
         unit == .miles
         ? distance / DistanceUnit.kilometersPerMile : distance * DistanceUnit.kilometersPerMile

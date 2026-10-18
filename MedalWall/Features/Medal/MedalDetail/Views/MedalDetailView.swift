@@ -35,8 +35,8 @@ struct MedalDetailView: View {
       MedalDetailInfoSection(
         location: viewModel.medal.place.formatted,
         date: viewModel.medal.date.formattedMonthDayYear(),
-        distance: viewModel.medal.event.category.description,
-        raceType: viewModel.medal.event.type.displayName,
+        distance: viewModel.medal.raceEvent.category.description,
+        raceType: viewModel.medal.raceEvent.type.displayName,
         bib: viewModel.medal.bibNumber
       )
 
@@ -134,7 +134,7 @@ private func previewMedal(stripped: Bool = false) -> Medal {
       date: .now,
       bibNumber: "1",
       place: Place(countryCode: "TW", city: "Taipei"),
-      event: RaceEvent(category: .full, type: .inPerson),
+      raceEvent: RaceEvent(category: .full, type: .inPerson),
       userID: "preview"
     )
   }

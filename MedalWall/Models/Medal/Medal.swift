@@ -16,7 +16,7 @@ struct Medal: Codable, Identifiable {
   var place: Place
   /// The event this medal was earned in: its distance, a standard such as Full or a custom
   /// one such as 10 mi, and how it was run (in person, virtual or wheelchair).
-  var event: RaceEvent
+  var raceEvent: RaceEvent
   var result: RaceResult?
   var overallPlacement: Int?
   var totalParticipants: Int?
@@ -39,7 +39,7 @@ struct Medal: Codable, Identifiable {
     bibNumber: String,
     photoUrl: String? = nil,
     place: Place,
-    event: RaceEvent,
+    raceEvent: RaceEvent,
     result: RaceResult? = nil,
     overallPlacement: Int? = nil,
     totalParticipants: Int? = nil,
@@ -61,7 +61,7 @@ struct Medal: Codable, Identifiable {
     self.bibNumber = bibNumber
     self.photoUrl = photoUrl
     self.place = place
-    self.event = event
+    self.raceEvent = raceEvent
     self.result = result
     self.overallPlacement = overallPlacement
     self.totalParticipants = totalParticipants

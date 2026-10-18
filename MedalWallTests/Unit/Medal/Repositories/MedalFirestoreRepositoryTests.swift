@@ -22,7 +22,7 @@ struct MedalFirestoreRepositoryTests {
       bibNumber: "1024",
       photoUrl: isFull ? "https://example.com/medal.jpg" : nil,
       place: Place(countryCode: "TW", city: "Taipei City"),
-      event: RaceEvent(category: .full, type: .inPerson),
+      raceEvent: RaceEvent(category: .full, type: .inPerson),
       result: isFull ? .seconds(12_600) : nil,
       overallPlacement: isFull ? 120 : nil,
       totalParticipants: isFull ? 2_000 : nil,
@@ -50,16 +50,17 @@ struct MedalFirestoreRepositoryTests {
     #expect(fields["result"] as? [String: Any] == nil)
   }
 
-  @Test("a medal stores its event and result under those names, not the old ones")
-  func testEventAndResultFieldNames() throws {
+  @Test("a medal stores its race event and result under those names, not the old ones")
+  func testRaceEventAndResultFieldNames() throws {
     let fields = try MedalFirestoreRepository.updateFields(for: makeMedal(isFull: true))
-    let event = fields["event"] as? [String: Any]
+    let raceEvent = fields["raceEvent"] as? [String: Any]
     let result = fields["result"] as? [String: Any]
 
-    #expect(event?["unit"] as? String == "kilometers")
+    #expect(raceEvent?["unit"] as? String == "kilometers")
     #expect(result?["value"] as? Double == 12_600)
     #expect(result?["unit"] as? String == "seconds")
     // An old name left in `medalUpdateFields` would show up here as a delete.
+    #expect(fields["event"] == nil)
     #expect(fields["distance"] == nil)
     #expect(fields["finishTime"] == nil)
   }

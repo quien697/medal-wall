@@ -34,7 +34,7 @@ struct EditRaceViewModelStorageTests {
     )
     return RaceEdition(
       id: "edition-2025", raceId: "race-taipei", year: 2025, startDate: raceDay,
-      endDate: raceDay, photoUrl: editionPhotoUrl, events: [], createdBy: "uid")
+      endDate: raceDay, photoUrl: editionPhotoUrl, raceEvents: [], createdBy: "uid")
   }
 
   private func makePhotoData() throws -> Data {
@@ -269,7 +269,7 @@ struct EditRaceViewModelStorageTests {
     let race = makeRace()
     let failing = RaceEdition(
       id: "edition-2024", raceId: race.id, year: 2024, startDate: edition.startDate,
-      endDate: edition.endDate, events: [], createdBy: "uid")
+      endDate: edition.endDate, raceEvents: [], createdBy: "uid")
     let repository = StubRaceRepository(
       races: [race], editions: [race.id: [edition, failing]],
       failingEditionUpdateIDs: [failing.id])

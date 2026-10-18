@@ -83,7 +83,7 @@ final class RaceFirestoreRepository: RaceRepository {
     "startDate",
     "endDate",
     "photoUrl",
-    "events",
+    "raceEvents",
     "createdBy",
     "createdAt",
     "updatedAt"

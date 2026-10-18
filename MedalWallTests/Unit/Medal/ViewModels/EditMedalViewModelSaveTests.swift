@@ -28,7 +28,7 @@ struct EditMedalViewModelSaveTests {
       bibNumber: "00001",
       photoUrl: "https://example.com/cover.jpg",
       place: Place(countryCode: "TW", city: "Taipei City"),
-      event: .default,
+      raceEvent: .default,
       note: "Old note",
       userID: "uid",
       createdAt: Date(timeIntervalSince1970: 1_577_923_200)
@@ -86,7 +86,7 @@ struct EditMedalViewModelSaveTests {
     #expect(medal.date == raceDay)
     #expect(medal.bibNumber == "F1234")
     #expect(medal.place == Place(countryCode: "JP", city: "Tokyo"))
-    #expect(medal.event == RaceEvent(category: .half, type: .virtual))
+    #expect(medal.raceEvent == RaceEvent(category: .half, type: .virtual))
     #expect(medal.result == .seconds(12_345))
     #expect(medal.overallPlacement == 120)
     #expect(medal.totalParticipants == 3_000)

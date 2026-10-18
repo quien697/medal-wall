@@ -24,7 +24,7 @@ struct EditMedalViewModelStorageTests {
       bibNumber: "00001",
       photoUrl: photoUrl,
       place: Place(countryCode: "TW", city: "Taipei City"),
-      event: .default,
+      raceEvent: .default,
       userID: "uid"
     )
   }

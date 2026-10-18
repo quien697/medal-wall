@@ -32,9 +32,9 @@ struct RaceEntrySubtitle: View {
 
 #Preview {
   let edition = RaceEdition.taipei2019
-  let distance = edition.events.first!
+  let distance = edition.raceEvents.first!
 
   RaceEntrySubtitle(selection: nil)
 
-  RaceEntrySubtitle(selection: RaceEntry(race: Race.taipei, edition: edition, event: distance))
+  RaceEntrySubtitle(selection: RaceEntry(race: Race.taipei, edition: edition, raceEvent: distance))
 }

@@ -228,7 +228,7 @@ struct EditMedalViewModelTests {
     let race = Race.sampleData.first!
     let edition = RaceEdition.sampleData.first!
     let distance = RaceEvent(category: .full, type: .inPerson)
-    let selection = RaceEntry(race: race, edition: edition, event: distance)
+    let selection = RaceEntry(race: race, edition: edition, raceEvent: distance)
 
     viewModel.autoFill(from: selection)
 
@@ -246,7 +246,7 @@ struct EditMedalViewModelTests {
       date: someDate,
       bibNumber: "42",
       place: Place(countryCode: "JP", city: "Shinjuku", region: "Tokyo"),
-      event: RaceEvent(category: .full, type: .inPerson),
+      raceEvent: RaceEvent(category: .full, type: .inPerson),
       result: .seconds(12624),
       note: "Great race",
       tags: ["fun"],
@@ -274,7 +274,7 @@ struct EditMedalViewModelTests {
       date: .now,
       bibNumber: "42",
       place: Place(countryCode: "JP", city: "Shinjuku"),
-      event: RaceEvent(category: .full, type: .inPerson),
+      raceEvent: RaceEvent(category: .full, type: .inPerson),
       result: .seconds(finishTime),
       userID: "user1"
     )
@@ -331,7 +331,7 @@ struct EditMedalViewModelTests {
       bibNumber: "00001",
       photoUrl: "file:///nonexistent/medal.jpg",
       place: Place(countryCode: "TW", city: "Taipei"),
-      event: .default,
+      raceEvent: .default,
       userID: "uid"
     )
     let viewModel = EditMedalViewModel(mode: .edit, medal: medal)

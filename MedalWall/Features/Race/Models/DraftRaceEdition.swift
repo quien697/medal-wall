@@ -45,7 +45,7 @@ struct DraftRaceEdition: Identifiable {
     self.isOneDay = edition.isOneDay
     self.startDate = edition.startDate
     self.endDate = edition.endDate
-    self.distances = edition.events
+    self.distances = edition.raceEvents
     self.createdBy = edition.createdBy
     self.existingPhotoUrl = edition.photoUrl
     self.newPhotoData = nil

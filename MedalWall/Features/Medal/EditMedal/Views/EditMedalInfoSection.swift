@@ -84,7 +84,7 @@ struct EditMedalInfoSection: View {
       date: .constant(medal.date),
       bib: .constant(medal.bibNumber),
       place: medal.place,
-      distance: medal.event.displayLabel,
+      distance: medal.raceEvent.displayLabel,
       onEditPlace: {},
       onEditDistance: {}
     )

@@ -44,7 +44,7 @@ final class MedalFirestoreRepository: MedalRepository {
     "bibNumber",
     "photoUrl",
     "place",
-    "event",
+    "raceEvent",
     "result",
     "overallPlacement",
     "totalParticipants",

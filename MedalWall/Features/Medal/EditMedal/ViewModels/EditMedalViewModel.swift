@@ -59,7 +59,7 @@ final class EditMedalViewModel {
       self.date = medal.date
       self.bibNumber = medal.bibNumber
       self.place = medal.place
-      self.distance = medal.event
+      self.distance = medal.raceEvent
       self.finishTime = medal.recordedFinishTime
       self.overallPlacement = medal.overallPlacement
       self.totalParticipants = medal.totalParticipants
@@ -153,7 +153,7 @@ final class EditMedalViewModel {
   func autoFill(from selection: RaceEntry) {
     name = "\(selection.race.name) \(selection.edition.year)"
     date = selection.edition.startDate
-    distance = selection.event
+    distance = selection.raceEvent
     place = selection.race.place
   }
 
@@ -182,7 +182,7 @@ final class EditMedalViewModel {
         updated.bibNumber = trimmedBibNumber
         updated.photoUrl = photoUrl
         updated.place = place
-        updated.event = distance
+        updated.raceEvent = distance
         updated.result = finishTime.map(RaceResult.seconds)
         updated.overallPlacement = overallPlacement
         updated.totalParticipants = totalParticipants
@@ -210,7 +210,7 @@ final class EditMedalViewModel {
           bibNumber: trimmedBibNumber,
           photoUrl: photoUrl,
           place: place,
-          event: distance,
+          raceEvent: distance,
           result: finishTime.map(RaceResult.seconds),
           overallPlacement: overallPlacement,
           totalParticipants: totalParticipants,

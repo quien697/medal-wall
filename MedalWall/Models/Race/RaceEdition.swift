@@ -16,8 +16,8 @@ struct RaceEdition: Codable, Identifiable {
   var photoUrl: String?
   /// The events this edition offers, such as Full, Half and 10K. Each one pairs a distance
   /// with a way of taking part. Picking one when adding a medal copies it into the medal's
-  /// `event`, so the medal keeps its own copy.
-  var events: [RaceEvent]
+  /// `raceEvent`, so the medal keeps its own copy.
+  var raceEvents: [RaceEvent]
   var createdBy: String
   var createdAt: Date
   var updatedAt: Date
@@ -29,7 +29,7 @@ struct RaceEdition: Codable, Identifiable {
     startDate: Date,
     endDate: Date,
     photoUrl: String? = nil,
-    events: [RaceEvent] = [],
+    raceEvents: [RaceEvent] = [],
     createdBy: String,
     createdAt: Date = .now,
     updatedAt: Date = .now
@@ -40,7 +40,7 @@ struct RaceEdition: Codable, Identifiable {
     self.startDate = startDate
     self.endDate = endDate
     self.photoUrl = photoUrl
-    self.events = events
+    self.raceEvents = raceEvents
     self.createdBy = createdBy
     self.createdAt = createdAt
     self.updatedAt = updatedAt

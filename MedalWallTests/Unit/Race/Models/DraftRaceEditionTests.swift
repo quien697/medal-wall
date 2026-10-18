@@ -49,13 +49,13 @@ struct DraftRaceEditionTests {
   @Test("init(from:) copies distances from the source edition")
   func testInitFromEditionCopiesDistances() {
     var edition = makeEdition()
-    edition.events = [
+    edition.raceEvents = [
       RaceEvent(category: .full, type: .inPerson),
       RaceEvent(category: .half, type: .virtual)
     ]
     let draft = DraftRaceEdition(from: edition)
 
-    #expect(draft.distances == edition.events)
+    #expect(draft.distances == edition.raceEvents)
   }
 
   @Test("init(from:) sets existingPhotoUrl to nil when source edition has no photo")

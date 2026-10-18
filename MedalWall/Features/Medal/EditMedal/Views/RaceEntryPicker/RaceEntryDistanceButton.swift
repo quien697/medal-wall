@@ -16,7 +16,7 @@ struct RaceEntryDistanceButton: View {
   private var isSelected: Bool {
     selection?.race.id == race.id
       && selection?.edition.id == edition.id
-      && selection?.event == distance
+      && selection?.raceEvent == distance
   }
 
   var body: some View {
@@ -24,7 +24,7 @@ struct RaceEntryDistanceButton: View {
       if isSelected {
         selection = nil
       } else {
-        selection = RaceEntry(race: race, edition: edition, event: distance)
+        selection = RaceEntry(race: race, edition: edition, raceEvent: distance)
       }
     } label: {
       if isSelected {
@@ -43,7 +43,7 @@ struct RaceEntryDistanceButton: View {
 #Preview {
   let race = Race.taipei
   let edition = RaceEdition.taipei2019
-  let distance = edition.events.first!
+  let distance = edition.raceEvents.first!
 
   RaceEntryDistanceButton(
     race: race,
@@ -56,6 +56,6 @@ struct RaceEntryDistanceButton: View {
     race: race,
     edition: edition,
     distance: distance,
-    selection: .constant(RaceEntry(race: race, edition: edition, event: distance))
+    selection: .constant(RaceEntry(race: race, edition: edition, raceEvent: distance))
   )
 }

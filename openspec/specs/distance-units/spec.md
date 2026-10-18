@@ -92,8 +92,8 @@ rather than rounded, which is the app's existing behaviour.
   it is kilometres
 
 ### Requirement: Distance Stored With Its Unit
-The system SHALL store the event a medal was earned in as `event: { kind, value, unit, type }`,
-the events a race edition offers as `events: [{ kind, value, unit, type }]`, and a medal's
+The system SHALL store the event a medal was earned in as `raceEvent: { kind, value, unit, type }`,
+the events a race edition offers as `raceEvents: [{ kind, value, unit, type }]`, and a medal's
 result, when one is recorded, as `result: { value, unit }`. `kind` SHALL be `"distance"`. An
 event's `unit` SHALL be `"kilometers"` or `"miles"`, its `type` SHALL be `"inPerson"`,
 `"virtual"` or `"wheelChair"`, and a result's `unit` SHALL be `"seconds"`. This is a

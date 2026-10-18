@@ -45,7 +45,7 @@ struct MedalDetailViewModelTests {
       date: .now,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      event: distance,
+      raceEvent: distance,
       result: finishTime.map(RaceResult.seconds),
       overallPlacement: overallPlacement,
       totalParticipants: totalParticipants,

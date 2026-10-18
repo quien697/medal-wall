@@ -40,7 +40,7 @@ extension Array where Element == Medal {
   /// `±Inf`) are dropped after the Set — sorting one violates strict weak ordering and
   /// traps.
   var distanceCategoriesOwned: [RaceDistanceCategory] {
-    Set(map(\.event.category))
+    Set(map(\.raceEvent.category))
       .filter { $0.value.isFinite }
       .sorted { lhs, rhs in
         lhs.kilometers != rhs.kilometers
@@ -55,7 +55,7 @@ extension Array where Element == Medal {
     case .all:
       return self
     case .category(let category):
-      return filter { $0.event.category == category }
+      return filter { $0.raceEvent.category == category }
     }
   }
 
@@ -85,7 +85,7 @@ extension Array where Element == Medal {
     var records: [RaceDistanceCategory: Medal] = [:]
 
     for medal in sortedForDisplay {
-      let category = medal.event.category
+      let category = medal.raceEvent.category
       guard let finishTime = medal.recordedFinishTime, category.value > 0, category.value.isFinite
       else { continue }
 

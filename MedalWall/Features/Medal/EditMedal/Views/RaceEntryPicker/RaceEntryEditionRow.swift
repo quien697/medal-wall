@@ -24,9 +24,9 @@ struct RaceEntryEditionRow: View {
           .foregroundStyle(Color.Text.tertiary)
       }  // HStack
 
-      if !edition.events.isEmpty {
+      if !edition.raceEvents.isEmpty {
         FlowLayout(spacing: 8) {
-          ForEach(edition.events.sorted(), id: \.self) { distance in
+          ForEach(edition.raceEvents.sorted(), id: \.self) { distance in
             RaceEntryDistanceButton(
               race: race,
               edition: edition,

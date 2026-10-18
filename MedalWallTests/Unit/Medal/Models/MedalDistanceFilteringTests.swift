@@ -23,7 +23,7 @@ struct MedalDistanceFilteringTests {
       date: .now,
       bibNumber: "1",
       place: Place(countryCode: "CA", city: "Vancouver"),
-      event: RaceEvent(category: category, type: type),
+      raceEvent: RaceEvent(category: category, type: type),
       userID: "user1"
     )
   }
