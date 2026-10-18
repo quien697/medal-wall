@@ -65,23 +65,3 @@ nonisolated struct RaceDistanceCategory: CustomStringConvertible, Hashable {
     }
   }
 }
-
-extension RaceDistanceCategory {
-  /// The preset this measured kilometre value is close enough to be presented as.
-  ///
-  /// Used only where distances are grouped or filtered for display — the medal
-  /// collection's chips and its personal-best derivation — never for decode.
-  static func nearestPreset(forValue value: Double) -> RaceDistanceCategory {
-    if abs(value - RaceDistanceCategory.full.value) < 0.05 {
-      return .full
-    } else if abs(value - RaceDistanceCategory.half.value) < 0.05 {
-      return .half
-    } else if abs(value - RaceDistanceCategory.tenKM.value) < 0.05 {
-      return .tenKM
-    } else if abs(value - RaceDistanceCategory.fiveKM.value) < 0.05 {
-      return .fiveKM
-    } else {
-      return RaceDistanceCategory(value: value, unit: .kilometers)
-    }
-  }
-}

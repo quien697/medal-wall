@@ -9,10 +9,9 @@ import Foundation
 
 /// The distance narrowing applied to a medal collection.
 ///
-/// Identity follows the distance a category *measures*, never the case that spells it, so
-/// a custom 42.195 and `.full` are one option rather than two. `RaceEvent` defines its
-/// own `==` and `hash` over `category.value` for the same reason — a silently split "Full"
-/// bucket would show one distance as two chips.
+/// Identity is the category's exact value and unit, which the synthesized `Hashable` takes
+/// from `RaceDistanceCategory`. `10K` and `10 mi` are two options, and a custom distance of
+/// exactly a standard value is that standard.
 nonisolated enum MedalDistanceFilter: Hashable, Identifiable {
   case all
   case category(RaceDistanceCategory)
@@ -21,39 +20,18 @@ nonisolated enum MedalDistanceFilter: Hashable, Identifiable {
   var id: String {
     switch self {
     case .all: "all"
-    case .category(let category): "\(category.value)"
+    case .category(let category): "\(category.value)-\(category.unit.rawValue)"
     }
   }
 
   /// The chip label: `All`, or the distance's own name.
   ///
-  /// A category names itself through `description`, which already resolves against the
-  /// stored distance unit, so a custom distance reads in the user's unit for free.
+  /// A category names itself through `description`: a standard by its name, any other by
+  /// its stored measurement.
   var label: String {
     switch self {
     case .all: .appLocalized("All")
     case .category(let category): category.description
-    }
-  }
-
-  // MARK: - Hashable
-  /// Compares by measured distance, so equal distances are one option.
-  static func == (lhs: MedalDistanceFilter, rhs: MedalDistanceFilter) -> Bool {
-    switch (lhs, rhs) {
-    case (.all, .all):
-      true
-    case (.category(let lhsCategory), .category(let rhsCategory)):
-      lhsCategory.value == rhsCategory.value
-    case (.all, .category), (.category, .all):
-      false
-    }
-  }
-
-  /// Hashes the measured distance so it agrees with `==`.
-  func hash(into hasher: inout Hasher) {
-    switch self {
-    case .all: hasher.combine("all")
-    case .category(let category): hasher.combine(category.value)
     }
   }
 }

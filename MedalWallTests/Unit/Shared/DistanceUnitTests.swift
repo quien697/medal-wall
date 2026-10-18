@@ -269,17 +269,6 @@ struct DistanceUnitTests {
     )
   }
 
-  @Test("A mile-entered near-preset distance snaps onto the preset it measures")
-  func testNearPresetIsSnapped() {
-    let saved = DistanceUnit.miles.customKilometers(
-      displayValue: 26.2,
-      originalKilometers: nil
-    )
-
-    #expect(saved == 42.1648128)
-    #expect(RaceDistanceCategory.nearestPreset(forValue: saved) == .full)
-  }
-
   // MARK: - paceValueText
   @Test("paceValueText returns the value alone, with no unit")
   func testPaceValueTextHasNoUnit() {

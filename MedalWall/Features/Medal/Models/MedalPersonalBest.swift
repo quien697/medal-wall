@@ -14,7 +14,7 @@ import Foundation
 /// the card down and re-insert it, which the carousel would show as a jump to another page
 /// while the user is reading it.
 nonisolated struct MedalPersonalBest: Identifiable {
-  var id: Double { category.value }
+  var id: RaceDistanceCategory { category }
   let category: RaceDistanceCategory
   let medal: Medal
 }

@@ -32,22 +32,21 @@ extension Array where Element == Medal {
 
 // MARK: - Distance Filtering
 extension Array where Element == Medal {
-  /// The distance categories present in the collection, longest first.
+  /// The distance categories present in the collection, longest real length first.
   ///
-  /// Categories are compared by measured distance, so a custom 42.195 collapses onto
-  /// `.full` rather than offering the same distance as a second option. The Set dedup
-  /// runs on the normalized categories, not the raw `Double`s — otherwise a `.full`
-  /// (42.195) plus a `.custom(42.16481)` (the "26.2 mi" round-trip that lands inside
-  /// the 0.05 km tolerance) would surface two `.full` chips. Non-finite values
-  /// (`NaN`, `±Inf`) are dropped after the Set — sorting one violates strict weak
-  /// ordering and traps.
+  /// A category is its exact value and unit, so `10K` and `10 mi` are two options and a
+  /// `42.2 km` medal does not join `Full`. Where two categories are the same real length,
+  /// kilometres come first, as in `RaceEvent`'s ordering. Non-finite values (`NaN`,
+  /// `±Inf`) are dropped after the Set — sorting one violates strict weak ordering and
+  /// traps.
   var distanceCategoriesOwned: [RaceDistanceCategory] {
-    let normalized = Set(
-      map { RaceDistanceCategory.nearestPreset(forValue: $0.event.category.value) })
-    return
-      normalized
+    Set(map(\.event.category))
       .filter { $0.value.isFinite }
-      .sorted { $0.value > $1.value }
+      .sorted { lhs, rhs in
+        lhs.kilometers != rhs.kilometers
+          ? lhs.kilometers > rhs.kilometers
+          : lhs.unit == .kilometers && rhs.unit == .miles
+      }
   }
 
   /// The medals `distanceFilter` selects, across every race type at that distance.
@@ -56,9 +55,7 @@ extension Array where Element == Medal {
     case .all:
       return self
     case .category(let category):
-      return filter {
-        RaceDistanceCategory.nearestPreset(forValue: $0.event.category.value) == category
-      }
+      return filter { $0.event.category == category }
     }
   }
 
@@ -70,7 +67,7 @@ extension Array where Element == Medal {
 
 // MARK: - Personal Records
 extension Array where Element == Medal {
-  /// The fastest medal at each distance, keyed by its measured category.
+  /// The fastest medal at each distance, keyed by its category.
   ///
   /// A record belongs to the collection rather than to a medal, so it is derived here and
   /// never persisted — adding, editing, or deleting a medal moves it with no stored value
@@ -88,10 +85,9 @@ extension Array where Element == Medal {
     var records: [RaceDistanceCategory: Medal] = [:]
 
     for medal in sortedForDisplay {
-      let kilometers = medal.event.category.value
-      guard let finishTime = medal.recordedFinishTime, kilometers > 0, kilometers.isFinite
+      let category = medal.event.category
+      guard let finishTime = medal.recordedFinishTime, category.value > 0, category.value.isFinite
       else { continue }
-      let category = RaceDistanceCategory.nearestPreset(forValue: medal.event.category.value)
 
       guard let leader = records[category] else {
         records[category] = medal
@@ -119,9 +115,8 @@ extension Array where Element == Medal {
   ///
   /// Walks `distanceCategoriesOwned` rather than sorting `personalRecords` by key, so the
   /// carousel and the filter chips share one ordering rule instead of keeping two in
-  /// agreement by hand. Both sides key on a category normalized through
-  /// `RaceDistanceCategory.nearestPreset(forValue:)`, so a custom distance finds the
-  /// preset it measures.
+  /// agreement by hand. Both sides key on the medal's own category, so each record finds
+  /// its chip.
   ///
   /// A distance whose medals are all untimed holds no record and drops out here, which is
   /// what leaves it out of the carousel while the filter still offers it.

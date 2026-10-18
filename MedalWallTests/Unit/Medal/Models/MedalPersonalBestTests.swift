@@ -29,11 +29,20 @@ struct MedalPersonalBestTests {
   }
 
   // MARK: - Identifiable
-  @Test("id is the category's distance")
-  func testIDIsTheCategoryValue() {
+  @Test("id is the category")
+  func testIDIsTheCategory() {
     let best = MedalPersonalBest(category: .full, medal: makeMedal())
 
-    #expect(best.id == RaceDistanceCategory.full.value)
+    #expect(best.id == .full)
+  }
+
+  @Test("10K and 10 mi entries carry distinct ids")
+  func testSameNumberInDifferentUnitsHasDistinctIDs() {
+    let tenMiles = RaceDistanceCategory(value: 10, unit: .miles)
+    let tenK = MedalPersonalBest(category: .tenKM, medal: makeMedal(category: .tenKM))
+    let tenMi = MedalPersonalBest(category: tenMiles, medal: makeMedal(category: tenMiles))
+
+    #expect(tenK.id != tenMi.id)
   }
 
   @Test("Two entries at the same distance share an id whichever medal holds the record")
@@ -52,7 +61,7 @@ struct MedalPersonalBestTests {
     #expect(full.id != half.id)
   }
 
-  @Test("A custom distance equal to a preset shares that preset's id")
+  @Test("A custom distance of exactly a standard shares that standard's id")
   func testCustomDistanceSharesPresetID() {
     let preset = MedalPersonalBest(category: .full, medal: makeMedal())
     let custom = MedalPersonalBest(
