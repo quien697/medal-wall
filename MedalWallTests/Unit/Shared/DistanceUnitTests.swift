@@ -287,7 +287,7 @@ struct DistanceUnitTests {
     let pace = 5 + 41.0 / 60
 
     let value = DistanceUnit.kilometers.paceValueText(
-      minutesPerKilometer: pace,
+      minutesPerUnit: pace,
       defaults: defaults
     )
 
@@ -300,24 +300,25 @@ struct DistanceUnitTests {
     let pace = 4 + 59.9 / 60
 
     let value = DistanceUnit.kilometers.paceValueText(
-      minutesPerKilometer: pace,
+      minutesPerUnit: pace,
       defaults: defaults
     )
 
     #expect(value == "4'59\"")
   }
 
-  @Test("paceValueText converts to minutes per mile in miles mode")
+  /// The pace is already calculated in miles, so converting it here would count it twice.
+  @Test("paceValueText shows minutes per mile as given in miles mode")
   func testPaceValueTextMiles() {
     let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.miles.rawValue)
     let pace = 5.0
 
     let value = DistanceUnit.miles.paceValueText(
-      minutesPerKilometer: pace,
+      minutesPerUnit: pace,
       defaults: defaults
     )
 
-    #expect(value == "8'02\"")
+    #expect(value == "5'00\"")
   }
 
   /// The unfilled wording belongs to the screen, not to a unit.
@@ -326,7 +327,7 @@ struct DistanceUnitTests {
     let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.kilometers.rawValue)
 
     #expect(
-      DistanceUnit.kilometers.paceValueText(minutesPerKilometer: nil, defaults: defaults) == nil
+      DistanceUnit.kilometers.paceValueText(minutesPerUnit: nil, defaults: defaults) == nil
     )
   }
 
@@ -339,7 +340,7 @@ struct DistanceUnitTests {
     let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.kilometers.rawValue)
 
     #expect(
-      DistanceUnit.kilometers.paceValueText(minutesPerKilometer: pace, defaults: defaults) == nil
+      DistanceUnit.kilometers.paceValueText(minutesPerUnit: pace, defaults: defaults) == nil
     )
   }
 
@@ -350,11 +351,11 @@ struct DistanceUnitTests {
     let pace = 5 + 41.0 / 60
 
     let value = DistanceUnit.kilometers.paceValueText(
-      minutesPerKilometer: pace,
+      minutesPerUnit: pace,
       defaults: defaults
     )
     let joined = DistanceUnit.kilometers.paceText(
-      minutesPerKilometer: pace,
+      minutesPerUnit: pace,
       defaults: defaults
     )
 
@@ -368,7 +369,7 @@ struct DistanceUnitTests {
     let defaults = Self.makeDefaults(distanceUnit: DistanceUnit.kilometers.rawValue)
 
     #expect(
-      DistanceUnit.kilometers.paceText(minutesPerKilometer: nil, defaults: defaults)
+      DistanceUnit.kilometers.paceText(minutesPerUnit: nil, defaults: defaults)
         == "--'-- \""
     )
   }

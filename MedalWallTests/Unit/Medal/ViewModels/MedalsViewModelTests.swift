@@ -283,7 +283,7 @@ struct MedalsViewModelTests {
     #expect(personalBest.category.description == RaceDistanceCategory.full.description)
     #expect(
       DistanceUnit.kilometers.paceText(
-        minutesPerKilometer: personalBest.medal.averagePace
+        minutesPerUnit: personalBest.medal.averagePace(in: .kilometers)
       ).contains("4'59\"")
     )
   }

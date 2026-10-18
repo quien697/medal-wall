@@ -149,8 +149,8 @@ rather than rounded, which is the app's existing behaviour.
 - **THEN** the detail screen shows `5'41" /km`
 
 #### Scenario: Pace for a distance stored in miles
-- **WHEN** a medal's distance is stored as `10` miles with a finish time of 1:20:00
-- **THEN** the pace reads `8'00" /mi` when the active unit is miles, and `4'58" /km` when
+- **WHEN** a medal's distance is stored as `10` miles with a finish time of 1:10:00
+- **THEN** the pace reads `7'00" /mi` when the active unit is miles, and `4'20" /km` when
   it is kilometres
 
 ## REMOVED Requirements

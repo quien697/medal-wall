@@ -44,10 +44,10 @@
 
 ## 4. Pace
 
-- [ ] 4.1 Add failing tests: a `10 mi` medal at 1:20:00 reads `8'00" /mi` in miles and
-      `4'58" /km` in kilometres; `5'41" /km` still reads `9'08" /mi`; a zero, infinite or
+- [x] 4.1 Add failing tests: a `10 mi` medal at 1:10:00 reads `7'00" /mi` in miles and
+      `4'20" /km` in kilometres; `5'41" /km` still reads `9'08" /mi`; a zero, infinite or
       `NaN` distance still gives no pace
-- [ ] 4.2 Make `averagePace` take the active unit and calculate in it, and make
+- [x] 4.2 Make `averagePace` take the active unit and calculate in it, and make
       `paceValueText` / `paceText` take minutes per that unit (design.md, Pace); update
       `MedalDetailViewModel` and `MedalPersonalBestCarousel`
 

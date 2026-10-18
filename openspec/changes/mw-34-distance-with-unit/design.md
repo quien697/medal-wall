@@ -88,9 +88,9 @@ events: [ { kind: "distance", value: 10, unit: "miles", type: "virtual" } ]
 ### Pace
 
 Pace is calculated in the unit it is shown in. When the event's unit matches the active unit,
-the stored value is used as it is; only a mismatch converts. A `10 mi` event at 1:20:00 then
-reads exactly `8'00" /mi`. Converting to kilometres and back can land on 7.9999… minutes,
-and because pace truncates seconds that would show as `7'59"`. `averagePace` therefore takes
+the stored value is used as it is; only a mismatch converts. A `10 mi` event at 1:10:00 then
+reads exactly `7'00" /mi`. Converting to kilometres and back lands on 6.9999… minutes, and
+because pace truncates seconds that would show as `6'59"`. `averagePace` therefore takes
 the active unit, and `paceValueText` / `paceText` take minutes per that unit, keeping their
 existing guards against values that would trap `Int(_:)`.
 

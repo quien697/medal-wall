@@ -105,14 +105,6 @@ nonisolated enum DistanceUnit: String, CaseIterable {
     return kilometers(fromDisplayValue: displayValue)
   }
 
-  /// Converts a pace in minutes per kilometre into minutes per this unit.
-  ///
-  /// Pace converts the opposite way from a distance: covering a mile takes longer than
-  /// covering a kilometre, so the per-mile figure is the larger one.
-  func pace(fromMinutesPerKilometer minutes: Double) -> Double {
-    self == .miles ? minutes * Self.kilometersPerMile : minutes
-  }
-
   // MARK: - Formatting
   /// A canonical kilometre value rendered in this unit, e.g. `"26.2 mi"`.
   ///
@@ -151,7 +143,7 @@ nonisolated enum DistanceUnit: String, CaseIterable {
       : .appLocalized("km", defaults: defaults)
   }
 
-  /// A pace in minutes per kilometre rendered in this unit, without its unit — `5'41"`.
+  /// A pace in minutes per this unit, rendered without its unit — `5'41"`.
   ///
   /// Seconds are truncated, which is the app's long-standing behaviour. Returns `nil`
   /// rather than a placeholder when there is no pace: how an unrecorded value reads is a
@@ -163,24 +155,22 @@ nonisolated enum DistanceUnit: String, CaseIterable {
   /// A pace that is not a number, is negative, or is too large for `Int(_:)` returns `nil`:
   /// `Int(_:)` traps on such a value, and a crash is worse than an unfilled pace.
   func paceValueText(
-    minutesPerKilometer pace: Double?,
+    minutesPerUnit pace: Double?,
     defaults: UserDefaults = .standard
   ) -> String? {
-    guard let pace else { return nil }
-    let converted = self.pace(fromMinutesPerKilometer: pace)
-    guard converted.isFinite, converted >= 0, converted < Double(Int.max) else { return nil }
-    let minutes = Int(converted)
-    let seconds = Int((converted - Double(minutes)) * 60)
+    guard let pace, pace.isFinite, pace >= 0, pace < Double(Int.max) else { return nil }
+    let minutes = Int(pace)
+    let seconds = Int((pace - Double(minutes)) * 60)
 
     return String(format: "%d'%02d\"", minutes, seconds)
   }
 
-  /// A pace in minutes per kilometre rendered in this unit — `5'41" /km` or `9'08" /mi`.
+  /// A pace in minutes per this unit, rendered with its unit — `5'41" /km` or `9'08" /mi`.
   ///
   /// A nil pace returns `"--'-- \""` so a missing time still keeps the right shape.
   /// Composed from `paceValueText` so the pace format itself is written once.
-  func paceText(minutesPerKilometer pace: Double?, defaults: UserDefaults = .standard) -> String {
-    guard let value = paceValueText(minutesPerKilometer: pace, defaults: defaults) else {
+  func paceText(minutesPerUnit pace: Double?, defaults: UserDefaults = .standard) -> String {
+    guard let value = paceValueText(minutesPerUnit: pace, defaults: defaults) else {
       return "--'-- \""
     }
 
