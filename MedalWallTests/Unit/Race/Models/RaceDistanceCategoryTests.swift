@@ -142,6 +142,18 @@ struct RaceDistanceCategoryTests {
     #expect(!RaceDistanceCategory(value: .infinity, unit: .kilometers).isValidCustom)
   }
 
+  @Test("A value of 10,000 or more is not a valid custom distance, in either unit")
+  func testTooLarge() {
+    #expect(!RaceDistanceCategory(value: 10_000, unit: .kilometers).isValidCustom)
+    #expect(!RaceDistanceCategory(value: 10_000, unit: .miles).isValidCustom)
+    #expect(!RaceDistanceCategory(value: 1e300, unit: .kilometers).isValidCustom)
+  }
+
+  @Test("A value just under 10,000 is a valid custom distance")
+  func testJustUnderLimit() {
+    #expect(RaceDistanceCategory(value: 9_999.9999, unit: .kilometers).isValidCustom)
+  }
+
   // MARK: - standardCases
   @Test("standardCases lists the picker's presets longest first")
   func testStandardCases() {

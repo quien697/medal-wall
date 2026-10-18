@@ -83,10 +83,10 @@ struct EditDistanceView: View {
               .font(.TypeScale.Field.value)
               .keyboardType(.decimalPad)
 
-            Picker("Distance", selection: $customUnit) {
+            Picker("Unit", selection: $customUnit) {
               ForEach(DistanceUnit.allCases, id: \.self) { unit in
                 Text(unit.label).tag(unit)
-              }
+              }  // ForEach
             }  // Picker
             .pickerStyle(.segmented)
           }

@@ -138,8 +138,8 @@ struct EditMedalViewModelTests {
   }
 
   @Test(
-    "isFormValid is false when custom distance has more than four decimals or is not finite",
-    arguments: [10.12345, Double.nan, .infinity])
+    "isFormValid is false for more than four decimals, non-finite values, or 10,000 or more",
+    arguments: [10.12345, Double.nan, .infinity, 10_000])
   func testIsFormValidFalseCustomDistanceUnusable(value: Double) {
     let viewModel = EditMedalViewModel(mode: .add)
     viewModel.name = "Taipei Marathon 2019"
@@ -154,7 +154,7 @@ struct EditMedalViewModelTests {
   // MARK: - selectDistance
   @Test(
     "selectDistance refuses an invalid custom distance and keeps the current one",
-    arguments: [0, -1, 10.12345, Double.nan, .infinity])
+    arguments: [0, -1, 10.12345, Double.nan, .infinity, 10_000])
   func testSelectDistanceRefusesInvalidCustom(value: Double) {
     let viewModel = EditMedalViewModel(mode: .add)
     let current = viewModel.distance

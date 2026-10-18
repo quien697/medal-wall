@@ -145,9 +145,9 @@ at the distance unit setting; for a stored custom distance it SHALL start at the
 unit. The distance SHALL be stored with the number and unit as entered, with no conversion,
 so opening and saving a distance without editing it never changes it.
 
-A custom distance SHALL be greater than zero, a finite number, and have at most four
-decimal places; any other value SHALL be refused with the invalid distance error. A number
-and unit equal to a standard distance SHALL be saved as that standard distance.
+A custom distance SHALL be greater than zero, less than 10,000 in its own unit, and have at
+most four decimal places; any other value SHALL be refused with the invalid distance error. A
+number and unit equal to a standard distance SHALL be saved as that standard distance.
 
 #### Scenario: Entering a custom distance in miles
 - **WHEN** a user sets the switch to Miles and enters a custom distance of `10`
@@ -169,6 +169,10 @@ and unit equal to a standard distance SHALL be saved as that standard distance.
 
 #### Scenario: Zero is refused
 - **WHEN** a user enters a custom distance of `0`
+- **THEN** it is refused with the invalid distance error and nothing is saved
+
+#### Scenario: 10,000 or more is refused
+- **WHEN** a user enters a custom distance of `10000` in either unit
 - **THEN** it is refused with the invalid distance error and nothing is saved
 
 #### Scenario: A standard value saves the standard distance

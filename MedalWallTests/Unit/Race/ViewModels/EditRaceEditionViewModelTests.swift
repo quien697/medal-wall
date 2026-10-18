@@ -228,8 +228,8 @@ extension EditRaceEditionViewModelTests {
   }
 
   @Test(
-    "addDistance throws invalidDistance for more than four decimals or a value that is not finite",
-    arguments: [10.12345, Double.nan, .infinity])
+    "addDistance refuses more than four decimals, non-finite values, and 10,000 or more",
+    arguments: [10.12345, Double.nan, .infinity, 10_000])
   func testAddDistanceUnusableValueThrows(value: Double) {
     let viewModel = makeViewModel()
 

@@ -458,12 +458,12 @@
         }
       }
     },
-    "Distance must be greater than zero, with at most 4 decimal places." : {
+    "Distance must be greater than zero and less than 10,000, with at most 4 decimal places." : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "距離必須大於零，且最多 4 位小數。"
+            "value" : "距離必須大於零且小於 10,000，最多 4 位小數。"
           }
         }
       }
@@ -1405,12 +1405,12 @@
         }
       }
     },
-    "Please enter a distance greater than 0, with up to 4 decimal places." : {
+    "Please enter a distance greater than 0 and less than 10,000, with up to 4 decimal places." : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請輸入大於 0 且最多 4 位小數的距離。"
+            "value" : "請輸入大於 0 且小於 10,000、最多 4 位小數的距離。"
           }
         }
       }
@@ -1884,6 +1884,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "非預期的錯誤"
+          }
+        }
+      }
+    },
+    "Unit" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "單位"
           }
         }
       }

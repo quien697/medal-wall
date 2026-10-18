@@ -35,17 +35,21 @@ nonisolated struct RaceDistanceCategory: CustomStringConvertible, Hashable {
     unit == .miles ? value * DistanceUnit.kilometersPerMile : value
   }
 
-  /// Whether this can be saved as a custom distance: greater than zero, a finite number, and
-  /// at most four decimals.
+  /// Whether this can be saved as a custom distance: greater than zero and less than
+  /// `customLimit`, which also rules out NaN and infinity, with at most four decimals.
   ///
   /// The decimal check compares against the value rounded to four places with a tolerance,
   /// because a `Double` such as `10.1234` is not exactly four decimals in binary.
   var isValidCustom: Bool {
-    guard value.isFinite, value > 0 else { return false }
+    guard value > 0, value < Self.customLimit else { return false }
     let rounded = (value * 10_000).rounded() / 10_000
 
     return abs(value - rounded) < 1e-9
   }
+
+  /// A custom distance is below this in its own unit. The longest multi-day races are about
+  /// 5,000 km, so nothing real is refused, while a mistyped run of digits is.
+  static let customLimit = 10_000.0
 
   /// The label shown in the UI.
   var description: String {

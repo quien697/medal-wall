@@ -157,6 +157,21 @@ struct MedalsViewModelTests {
     #expect(viewModel.yearGroups.first?.medals.count == 1)
   }
 
+  @Test("A selection falls back to all when only the same number in another unit remains")
+  func testStaleSelectionIgnoresSameNumberInAnotherUnit() {
+    let tenMiles = RaceDistanceCategory(value: 10, unit: .miles)
+    let viewModel = MedalsViewModel()
+    viewModel.medals = [
+      makeMedal(id: "tenK", category: .tenKM),
+      makeMedal(id: "tenMi", category: tenMiles)
+    ]
+    viewModel.selectedFilter = .category(tenMiles)
+    viewModel.medals = [makeMedal(id: "tenK", category: .tenKM)]
+
+    #expect(viewModel.selectedFilter == .all)
+    #expect(viewModel.yearGroups.first?.medals.map(\.id) == ["tenK"])
+  }
+
   @Test("A selection whose category survives is kept")
   func testSurvivingSelectionIsKept() {
     let viewModel = MedalsViewModel()
