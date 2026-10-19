@@ -55,11 +55,11 @@ struct ProgressBar: View {
 
         if let value {
           RoundedRectangle(cornerRadius: .Radius.progressTrack)
-            .fill(Color.Progress.fill)
+            .fill(Color.Progress.indicator)
             .frame(width: proxy.size.width * Self.filledFraction(value))
         } else {
           RoundedRectangle(cornerRadius: .Radius.progressTrack)
-            .fill(Color.Progress.fill)
+            .fill(Color.Progress.indicator)
             .frame(width: proxy.size.width * Self.segmentFraction)
             .offset(x: proxy.size.width * (isReduceMotionOn ? 0 : slidePosition))
         }

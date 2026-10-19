@@ -94,7 +94,7 @@ extension Color {
   /// never gilt — a bar is not something earned.
   struct Progress {
     static let track = Pigment.stone
-    static let fill = Pigment.inkNavy
+    static let indicator = Pigment.inkNavy
   }
 
   struct Status {
