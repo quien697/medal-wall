@@ -14,7 +14,8 @@ until its first load succeeds, so a load retried after a failed first load SHALL
 again. When a screen that already shows its content loads again — on returning to its tab, or
 after an add, edit or delete — the system SHALL keep that content on screen and replace it with
 the new data when it arrives, showing neither bones nor a spinner. These screens SHALL NOT show
-a spinner while their data loads.
+a spinner while their data loads. While Races reloads, its races SHALL NOT be swiped to delete,
+since the reload's older data would bring back a race deleted meanwhile.
 
 #### Scenario: First load
 - **WHEN** a user opens the Medals tab for the first time since the app started and the medals
@@ -26,6 +27,10 @@ a spinner while their data loads.
 - **WHEN** a user returns to the Medals tab after their medals have loaded
 - **THEN** the collection stays on screen while it reloads, with no bones and no spinner, and
   updates when the new medals arrive
+
+#### Scenario: Deleting a race during a reload
+- **WHEN** a user swipes a race while the Races list reloads
+- **THEN** no delete action is offered until the reload completes
 
 #### Scenario: Retry after a failed first load
 - **WHEN** a screen's first load failed and the screen loads again

@@ -88,23 +88,16 @@ nonisolated struct BarBone: Shape {
 /// off, where a repeating animation would keep running. VoiceOver reads the whole skeleton as
 /// one "Loading" element, so it never reads out placeholder data.
 struct SkeletonViewModifier: ViewModifier {
-  // MARK: - Environment
   @Environment(\.accessibilityReduceMotion) private var isReduceMotionOn
-
-  // MARK: - State
   /// When the bones appeared, 300 ms after the skeleton turned on; `nil` until then.
   @State private var revealDate: Date?
-
-  // MARK: - Properties
   let isActive: Bool
 
-  // MARK: - Computed
   /// The pulse runs only while revealed bones show and Reduce Motion is off.
   private var isPulsing: Bool {
     isActive && revealDate != nil && !isReduceMotionOn
   }
 
-  // MARK: - Body
   func body(content: Content) -> some View {
     TimelineView(.animation(paused: !isPulsing)) { timeline in
       content
@@ -138,7 +131,6 @@ struct SkeletonViewModifier: ViewModifier {
     }
   }
 
-  // MARK: - Functions
   /// The skeleton's opacity: full while inactive; hidden until its bones are revealed; then a
   /// pulse from 0.6 up to 1 over 1.2 s and back, easing in and out, or full and still under
   /// Reduce Motion. Internal so a test can read it.
@@ -161,24 +153,22 @@ struct SkeletonViewModifier: ViewModifier {
 ///
 /// Inside `.skeleton(_:)` the content keeps its frame but is hidden, and the bone sits in that
 /// frame in the colour for what it sits on — covering text, gold and navy alike, which
-/// redaction alone would only fade. Anywhere else the content shows unchanged.
+/// redaction alone would only fade. Anywhere else the content shows unchanged. The content is
+/// the same view either way, so it keeps its state when the skeleton ends.
 struct SkeletonBoneViewModifier<BoneShape: Shape>: ViewModifier {
-  // MARK: - Environment
   @Environment(\.redactionReasons) private var redactionReasons
   @Environment(\.skeletonSurface) private var skeletonSurface
-
-  // MARK: - Properties
   let shape: BoneShape
 
-  // MARK: - Body
   func body(content: Content) -> some View {
-    if redactionReasons.contains(.placeholder) {
-      content
-        .hidden()
-        .overlay(shape.fill(skeletonSurface.boneColor))
-    } else {
-      content
-    }
+    let isBone = redactionReasons.contains(.placeholder)
+    content
+      .opacity(isBone ? 0 : 1)
+      .overlay {
+        if isBone {
+          shape.fill(skeletonSurface.boneColor)
+        }
+      }
   }
 }
 

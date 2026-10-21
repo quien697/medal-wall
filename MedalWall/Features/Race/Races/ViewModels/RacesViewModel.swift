@@ -69,6 +69,12 @@ final class RacesViewModel {
     isShowingSkeleton ? Race.placeholders : filteredRaces
   }
 
+  /// Whether a race may be swiped away: not while a load runs, since its older data would bring
+  /// back a race deleted meanwhile.
+  var canDeleteRaces: Bool {
+    !isLoading
+  }
+
   // MARK: - Functions
   /// Loads all races from Firestore.
   func loadRaces() async {

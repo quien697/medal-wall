@@ -20,7 +20,7 @@ struct ProfileView: View {
   var body: some View {
     NavigationStack {
       Group {
-        if userManager.currentUser == nil, userManager.profileLoadError != nil {
+        if userManager.isProfileUnavailable {
           EmptyState(
             title: "Profile Unavailable",
             description:
@@ -28,9 +28,10 @@ struct ProfileView: View {
           )
         } else {
           ScrollView {
-            let user = userManager.currentUser ?? .placeholder
-            ProfileHeaderSection(photoUrl: user.photoUrl, userName: user.name, bio: user.bio)
-              .skeleton(userManager.isProfileLoading)
+            if let user = userManager.displayedUser {
+              ProfileHeaderSection(photoUrl: user.photoUrl, userName: user.name, bio: user.bio)
+                .skeleton(userManager.isProfileLoading)
+            }
 
             ProfileSummarySection(
               totalMedals: viewModel.totalMedals,

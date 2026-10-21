@@ -291,4 +291,31 @@ struct RacesViewModelRepositoryTests {
 
     #expect(viewModel.displayedRaces.isEmpty)
   }
+
+  // MARK: - Delete during reload
+  @Test(
+    "a race cannot be deleted while the list reloads, whose older data would bring it back",
+    .timeLimit(.minutes(1)))
+  func testNoDeleteDuringReload() async {
+    let repository = StubRaceRepository(races: [makeRace(id: "a")])
+    let viewModel = RacesViewModel(repository: repository)
+    await viewModel.loadRaces()
+    await repository.fetchHold.holdNext()
+
+    let reload = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(!viewModel.canDeleteRaces)
+    await repository.fetchHold.release()
+    await reload.value
+  }
+
+  @Test("once the races have loaded they can be deleted")
+  func testDeleteAfterLoad() async {
+    let viewModel = RacesViewModel(repository: StubRaceRepository(races: [makeRace(id: "a")]))
+
+    await viewModel.loadRaces()
+
+    #expect(viewModel.canDeleteRaces)
+  }
 }

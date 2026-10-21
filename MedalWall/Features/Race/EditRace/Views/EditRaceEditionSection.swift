@@ -39,6 +39,8 @@ struct EditRaceEditionSection: View {
           // A form row is a card, though not drawn by `surfaceStyle()`.
           .environment(\.skeletonSurface, .card)
           .skeleton(isShowingSkeleton)
+          // VoiceOver reads one "Loading" for the section, not one per placeholder row.
+          .accessibilityHidden(isShowingSkeleton && edition.id != editions.first?.id)
           .deleteDisabled(isShowingSkeleton)
         }  // ForEach
         .onDelete { offsets in

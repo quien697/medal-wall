@@ -40,6 +40,17 @@ final class UserManager {
     currentUserID != nil && currentUser == nil && profileLoadError == nil
   }
 
+  /// Whether the profile could not load, so the You tab shows its empty state instead.
+  var isProfileUnavailable: Bool {
+    currentUser == nil && profileLoadError != nil
+  }
+
+  /// The user the You tab's header shows: the placeholder while bones stand in for the profile,
+  /// the loaded profile otherwise.
+  var displayedUser: User? {
+    isProfileLoading ? .placeholder : currentUser
+  }
+
   /// Which root screen the app shows. A signed-in user reaches the app as soon as the session
   /// is known; their profile loads inside it.
   var sessionState: SessionState {
@@ -204,8 +215,7 @@ final class UserManager {
   /// Loads the profile again if the last attempt failed, or replaces the phone's copy with
   /// the server's.
   private func reloadProfileIfNeeded() async {
-    let didFail = currentUser == nil && profileLoadError != nil
-    guard didFail || isProfileFromCache else { return }
+    guard isProfileUnavailable || isProfileFromCache else { return }
 
     await loadProfile()
   }

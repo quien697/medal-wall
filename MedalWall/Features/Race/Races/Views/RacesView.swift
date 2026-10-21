@@ -25,6 +25,7 @@ struct RacesView: View {
       RaceList(
         races: viewModel.displayedRaces,
         searchText: viewModel.searchText,
+        canDelete: viewModel.canDeleteRaces,
         onDelete: { race in
           selectedRace = race
           isPresentingDeleteConfirm = true

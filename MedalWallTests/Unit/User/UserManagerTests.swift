@@ -387,4 +387,54 @@ extension UserManagerTests {
 
     #expect(!manager.isProfileLoading)
   }
+
+  // MARK: - Displayed profile
+  @Test(
+    "while the profile loads the header shows the placeholder user, as bones",
+    .timeLimit(.minutes(1)))
+  func testDisplayedUserIsPlaceholderWhileLoading() async {
+    let repository = StubUserRepository(user: makeProfile())
+    await repository.fetchHold.holdNext()
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
+
+    let signIn = Task { await authService.report((uid: uid, email: email)) }
+    await repository.fetchHold.waitForStart()
+
+    #expect(manager.displayedUser?.uid == User.placeholder.uid)
+    #expect(!manager.isProfileUnavailable)
+    await repository.fetchHold.release()
+    await signIn.value
+    #expect(manager.displayedUser?.firstName == "Mei")
+  }
+
+  @Test("a profile that can't load is unavailable, and no user is shown")
+  func testFailedProfileIsUnavailable() async {
+    let repository = StubUserRepository(
+      user: makeProfile(), fetchOutcome: .failure(.noInternetConnection))
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
+
+    await authService.report((uid: uid, email: email))
+
+    #expect(manager.isProfileUnavailable)
+    #expect(manager.displayedUser == nil)
+  }
+
+  @Test("nobody signed in shows no user, not the placeholder")
+  func testSignedOutShowsNoUser() async {
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: StubUserRepository(), authService: authService,
+      networkMonitor: StubNetworkMonitor(), defaults: defaults)
+
+    await authService.report(nil)
+
+    #expect(manager.displayedUser == nil)
+    #expect(!manager.isProfileUnavailable)
+  }
 }
