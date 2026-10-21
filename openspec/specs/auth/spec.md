@@ -213,7 +213,8 @@ discarded.
 
 #### Scenario: Profile cannot load
 - **WHEN** fetching the profile fails
-- **THEN** no profile is used in its place, and the tabs show with the You tab blank
+- **THEN** no profile is used in its place, and the tabs show with the You tab's empty state
+  (see the profile spec)
 
 #### Scenario: Sign-out while the profile loads
 - **WHEN** the user signs out before their profile finishes loading

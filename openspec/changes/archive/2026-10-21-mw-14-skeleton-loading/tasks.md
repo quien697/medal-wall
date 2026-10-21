@@ -122,5 +122,5 @@
       on; then a fast load showing no bones
 - [x] 9.3 Check that the save buttons' spinners and a downloading photo's spinner are unchanged
 - [x] 9.4 Run `design-system-check`
-- [ ] 9.5 At archive, update the `profile` spec's Purpose, which still says the You tab is blank
+- [x] 9.5 At archive, update the `profile` spec's Purpose, which still says the You tab is blank
       until the profile loads

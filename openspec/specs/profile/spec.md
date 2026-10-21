@@ -3,8 +3,8 @@
 ## Purpose
 Let a signed-in user view and edit their personal profile, and surface race statistics
 computed on the fly from their medal list rather than stored on the `User` record. A profile
-read from the device's local copy is shown but never written. Until the profile loads, the
-You tab is blank.
+read from the device's local copy is shown but never written. While the profile loads, the
+You tab's header shows as bones; a profile that cannot load shows an empty state.
 ## Requirements
 ### Requirement: Editable Profile
 The system SHALL allow a signed-in user to view and edit their profile: first name,
@@ -42,13 +42,25 @@ that fails SHALL be deleted. When two devices edit the profile, the last save wi
 ### Requirement: Computed Race Statistics
 The system SHALL compute and display, from the user's medal list, the total number of
 medals, the count of full and half marathon medals, and the best (lowest) finish time
-recorded for full and half marathon distances. They SHALL be shown once the profile has
-loaded (see Profile Not Yet Loaded).
+recorded for full and half marathon distances. The statistics and achievement progress SHALL
+show as bones until the medals load, then as values, whether or not the profile has loaded
+yet. A profile that cannot load replaces them with the You tab's empty state (see Profile Not
+Yet Loaded).
 
 #### Scenario: Stats update as medals change
 - **WHEN** a user adds or deletes a medal with a full or half marathon distance
 - **THEN** the displayed total medal count, distance counts, and best times reflect
   the change without being separately stored on the `User` record
+
+#### Scenario: Medals load before the profile
+- **WHEN** the user's medals load while the profile is still loading
+- **THEN** the statistics and achievement progress show their values while the header still
+  shows bones
+
+#### Scenario: Medals cannot load
+- **WHEN** the user's medals cannot load and the profile has loaded
+- **THEN** the statistics show zero counts and no best times, the achievements show no
+  progress, and the error sheet is presented
 
 ### Requirement: Cached Profile Is Read-Only
 A profile read from the device's local copy rather than the server can be older than the
@@ -66,23 +78,32 @@ when the connection returns or the app comes back to the foreground.
 - **THEN** the system loads the server's profile and Edit Profile becomes available
 
 ### Requirement: Profile Not Yet Loaded
-Until the signed-in user's profile has loaded — while it loads, while offline with no copy on
-the device, or after it fails — the system SHALL leave the You tab's content blank: no
-header, no medal statistics, and no achievement progress. The title and toolbar SHALL stay, so
-Settings remains reachable. Edit Profile SHALL be disabled. No error SHALL be shown.
+While the signed-in user's profile loads, the You tab's header SHALL show as bones. When the
+profile cannot load — while offline with no copy on the device, or after it fails — the
+system SHALL show the You tab's empty state in place of all its content, with no header,
+statistics or achievement progress even if the medals have loaded, and SHALL present the
+error sheet for each failed load. The title and toolbar SHALL stay, so Settings remains
+reachable. Edit Profile SHALL be disabled until the profile has loaded.
 
 #### Scenario: Profile has not loaded
 - **WHEN** a signed-in user opens the You tab before their profile has loaded
-- **THEN** the tab shows its title and toolbar over blank content, and Edit Profile is
+- **THEN** the tab shows its title and toolbar over bones for the header, and Edit Profile is
   disabled
 
 #### Scenario: Profile cannot load
 - **WHEN** the profile cannot load for any reason
-- **THEN** the You tab stays blank with no error, and Settings stays reachable
-  so the user can sign out
+- **THEN** the You tab shows its empty state in place of the header, statistics and
+  achievements, the error sheet is presented, and Settings stays reachable so the user can
+  sign out
+
+#### Scenario: Profile loads after failing
+- **WHEN** the profile is loaded again after failing, because the connection returned or the
+  app came back to the foreground
+- **THEN** the header shows bones while it loads, then the header, statistics and progress
+  replace the empty state
 
 #### Scenario: Profile loads later
 - **WHEN** the profile loads after the You tab is showing
-- **THEN** the tab shows the header, statistics and progress, and Edit Profile becomes
-  available once the profile has come from the server
+- **THEN** the header replaces its bones, and Edit Profile becomes available once the profile
+  has come from the server
 
