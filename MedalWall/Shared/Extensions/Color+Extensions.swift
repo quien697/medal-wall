@@ -97,6 +97,13 @@ extension Color {
     static let indicator = Pigment.inkNavy
   }
 
+  /// A skeleton's bones, which cover the content they stand in for. A bone inside a card
+  /// takes `inCard`, so it still shows against the card's fill.
+  struct Skeleton {
+    static let onPage = Pigment.stone
+    static let inCard = Pigment.granite
+  }
+
   struct Status {
     static let success = Pigment.laurel
     static let error = Pigment.cinnabar

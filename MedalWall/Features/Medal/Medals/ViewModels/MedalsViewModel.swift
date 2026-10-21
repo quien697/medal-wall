@@ -15,7 +15,11 @@ final class MedalsViewModel {
   }
 
   // MARK: - State
-  var isLoading = false
+  /// Starts `true`: the screen loads as soon as it appears, and until then an empty
+  /// collection is not yet known to be empty.
+  var isLoading = true
+  /// Whether a load has succeeded, so a reload keeps the collection on screen.
+  private(set) var hasLoaded = false
   var error: AppError?
 
   // MARK: - Filter
@@ -61,6 +65,11 @@ final class MedalsViewModel {
     medals.isEmpty
   }
 
+  /// Bones stand in for the collection while it loads, until a load first succeeds.
+  var isShowingSkeleton: Bool {
+    isLoading && !hasLoaded
+  }
+
   // MARK: - Functions
   /// Falls a stored category selection back to `.all` if the collection no longer
   /// owns it. Called whenever `medals` or `selectedFilter` changes.
@@ -78,6 +87,7 @@ final class MedalsViewModel {
 
     do {
       medals = try await repository.fetchMedals(userId: userId)
+      hasLoaded = true
     } catch {
       self.error = .medalFetchFailed(error.localizedDescription)
     }

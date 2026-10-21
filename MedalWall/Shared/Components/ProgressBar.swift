@@ -10,7 +10,8 @@ import SwiftUI
 /// The design system's `ProgressBar`: one height, a stone track and an ink fill. Given a value
 /// it fills that fraction of whatever width it is offered; without one there is no progress to
 /// report, so a segment slides across the track on a loop — held still at the start when
-/// Reduce Motion is on. Decorative: callers state the progress in text beside it.
+/// Reduce Motion is on. Decorative: callers state the progress in text beside it. Inside a
+/// skeleton the whole track is one bone, with no ink.
 struct ProgressBar: View {
   // MARK: - Environment
   @Environment(\.accessibilityReduceMotion) private var isReduceMotionOn
@@ -67,6 +68,7 @@ struct ProgressBar: View {
       .clipShape(.rect(cornerRadius: .Radius.progressTrack))
     }  // GeometryReader
     .frame(height: Self.height)
+    .skeletonBone(.rect(cornerRadius: .Radius.progressTrack))
     .accessibilityHidden(true)
     .onAppear {
       guard value == nil, !isReduceMotionOn else { return }
@@ -91,4 +93,13 @@ struct ProgressBar: View {
   ProgressBar()
     .frame(width: 72)
     .padding()
+}
+
+#Preview("Skeleton") {
+  ProgressBar(value: 0.4)
+    .padding()
+    .surfaceStyle()
+    .padding()
+    .background(Color.Background.primary)
+    .redacted(reason: .placeholder)
 }

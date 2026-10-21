@@ -33,17 +33,13 @@ struct RaceDetailView: View {
       )
 
       ScrollView {
-        RaceDetailEditionsSection(editions: viewModel.editions)
+        RaceDetailEditionsSection(
+          editions: viewModel.displayedEditions,
+          isShowingSkeleton: viewModel.isShowingSkeleton
+        )
       }  // ScrollView
     }  // VStack
     .background(Color.Background.primary)
-    .overlay {
-      if viewModel.isLoading {
-        ProgressView()
-          .frame(maxWidth: .infinity, maxHeight: .infinity)
-          .background(Color.black.opacity(0.1))
-      }
-    }
     .task {
       await viewModel.loadEditions()
     }

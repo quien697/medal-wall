@@ -42,6 +42,7 @@ struct MedalPersonalBestCard: View {
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
+          .skeletonBone(.overline)
       }  // HStack
       .padding(.bottom, .Space.inline)
 
@@ -50,11 +51,13 @@ struct MedalPersonalBestCard: View {
         .fontWeight(.bold)
         .foregroundStyle(Color.Text.primary)
         .lineLimit(1)
+        .skeletonBone(.callout)
 
       Text(finishTime)
         .font(.TypeScale.Numeric.large)
         .fontWeight(.heavy)
         .foregroundStyle(Color.Text.primary)
+        .skeletonBone(.numericLarge)
 
       HStack {
         Text(pace)
@@ -62,6 +65,7 @@ struct MedalPersonalBestCard: View {
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
+          .skeletonBone(.overline)
 
         Spacer()
 
@@ -86,6 +90,7 @@ struct MedalPersonalBestCard: View {
           .fill(Color.Text.secondary)
           .opacity(page == currentPage ? 1 : dimmedDot)
           .frame(width: dotSize, height: dotSize)
+          .skeletonBone(.circle)
       }  // ForEach
     }  // HStack
   }

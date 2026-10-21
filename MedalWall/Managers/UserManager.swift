@@ -17,7 +17,7 @@ final class UserManager {
   private let defaults: UserDefaults
   private var currentUserEmail: String?
   /// Why the profile could not load; nil while it is loading or once it has.
-  private var profileLoadError: AppError?
+  private(set) var profileLoadError: AppError?
   /// Whether `currentUser` was read from the phone's copy rather than the server. Such a
   /// profile may be older than the server's, so it is shown but never written.
   private var isProfileFromCache = false
@@ -33,6 +33,12 @@ final class UserManager {
   // MARK: - Computed
   /// Whether the profile may be edited: only once it has come from the server.
   var canEditProfile: Bool { currentUser != nil && !isProfileFromCache }
+
+  /// Whether a signed-in user's profile is on its way: neither loaded nor failed. A retry
+  /// clears `profileLoadError` as it starts, so the profile counts as loading again.
+  var isProfileLoading: Bool {
+    currentUserID != nil && currentUser == nil && profileLoadError == nil
+  }
 
   /// Which root screen the app shows. A signed-in user reaches the app as soon as the session
   /// is known; their profile loads inside it.

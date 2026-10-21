@@ -20,7 +20,7 @@ actor StubRaceRepository: RaceRepository {
   private(set) var races: [Race]
   /// Editions keyed by race id.
   private(set) var editions: [String: [RaceEdition]]
-  private let fetchOutcome: Result<Void, AppError>
+  private var fetchOutcome: Result<Void, AppError>
   /// Races whose editions fail to fetch while every other fetch follows `fetchOutcome`.
   private let failingEditionRaceIDs: Set<String>
   private let writeOutcome: Result<Void, AppError>
@@ -31,6 +31,8 @@ actor StubRaceRepository: RaceRepository {
   private let deleteOutcome: Result<Void, AppError>
   /// How long each edition fetch takes to answer.
   private let editionFetchLatency: Duration
+  /// Holds a race or edition list fetch in flight while a test looks at the load.
+  let fetchHold = FetchHold()
 
   // MARK: - Recorded calls
   private(set) var fetchCallCount = 0
@@ -67,9 +69,16 @@ actor StubRaceRepository: RaceRepository {
     self.editionFetchLatency = editionFetchLatency
   }
 
+  // MARK: - Script control
+  /// Changes what later fetches do, as when the connection drops or comes back.
+  func setFetchOutcome(_ outcome: Result<Void, AppError>) {
+    fetchOutcome = outcome
+  }
+
   // MARK: - RaceRepository
   func fetchRaces() async throws -> [Race] {
     fetchCallCount += 1
+    await fetchHold.enter()
     try fetchOutcome.get()
     return races
   }
@@ -110,6 +119,7 @@ actor StubRaceRepository: RaceRepository {
     editionFetchesInFlight += 1
     maxConcurrentEditionFetches = max(maxConcurrentEditionFetches, editionFetchesInFlight)
     defer { editionFetchesInFlight -= 1 }
+    await fetchHold.enter()
     if editionFetchLatency > .zero {
       try await Task.sleep(for: editionFetchLatency)
     }

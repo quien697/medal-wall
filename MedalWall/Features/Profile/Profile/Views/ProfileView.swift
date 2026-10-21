@@ -19,30 +19,38 @@ struct ProfileView: View {
   // MARK: - Body
   var body: some View {
     NavigationStack {
-      ScrollView {
-        if let user = userManager.currentUser {
-          ProfileHeaderSection(
-            photoUrl: user.photoUrl,
-            userName: user.name,
-            bio: user.bio
+      Group {
+        if userManager.currentUser == nil, userManager.profileLoadError != nil {
+          EmptyState(
+            title: "Profile Unavailable",
+            description:
+              "We couldn't load your profile. Please check your connection and try again."
           )
+        } else {
+          ScrollView {
+            let user = userManager.currentUser ?? .placeholder
+            ProfileHeaderSection(photoUrl: user.photoUrl, userName: user.name, bio: user.bio)
+              .skeleton(userManager.isProfileLoading)
 
-          ProfileSummarySection(
-            totalMedals: viewModel.totalMedals,
-            fullCount: viewModel.fullCount,
-            halfCount: viewModel.halfCount,
-            bestFullTime: viewModel.bestFullTime,
-            bestHalfTime: viewModel.bestHalfTime
-          )
+            ProfileSummarySection(
+              totalMedals: viewModel.totalMedals,
+              fullCount: viewModel.fullCount,
+              halfCount: viewModel.halfCount,
+              bestFullTime: viewModel.bestFullTime,
+              bestHalfTime: viewModel.bestHalfTime,
+              isShowingSkeleton: viewModel.isShowingSkeleton
+            )
 
-          ProfileAchievementsSection(
-            fullMarathonProgress: viewModel.fullMarathonProgress,
-            halfMarathonProgress: viewModel.halfMarathonProgress
-          )
-          .padding(.bottom, 10)
+            ProfileAchievementsSection(
+              fullMarathonProgress: viewModel.fullMarathonProgress,
+              halfMarathonProgress: viewModel.halfMarathonProgress,
+              isShowingSkeleton: viewModel.isShowingSkeleton
+            )
+            .padding(.bottom, 10)
+          }  // ScrollView
+          .scrollIndicators(.hidden)
         }
-      }  // ScrollView
-      .scrollIndicators(.hidden)
+      }  // Group
       .navigationTitle("Profile")
       .background(Color.Background.primary)
       .toolbarTitleDisplayMode(.inlineLarge)
@@ -94,11 +102,18 @@ struct ProfileView: View {
           errorWrapper = ErrorWrapper(error: error)
         }
       }
+      // Never cleared on dismiss: the error keeps the empty state up and is what the retry
+      // on reconnect or return to the app looks for.
+      .onChange(of: userManager.profileLoadError, initial: true) { _, error in
+        if let error {
+          errorWrapper = ErrorWrapper(error: error)
+        }
+      }
     }  // NavigationStack
   }
 }
 
-#Preview("No profile") {
+#Preview {
   ProfileView()
     .environment(UserManager())
 }

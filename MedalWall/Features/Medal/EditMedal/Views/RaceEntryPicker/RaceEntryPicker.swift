@@ -33,14 +33,15 @@ struct RaceEntryPicker: View {
 
         Divider()
 
-        if viewModel.isLoading {
-          ProgressView()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if viewModel.races.isEmpty {
+        if viewModel.displayedRaces.isEmpty {
           EmptyState(title: "No Race Events", description: "Add race events to use auto-fill")
         } else {
           RaceEntryList(
-            races: viewModel.races, editions: viewModel.editions, selection: $selection)
+            races: viewModel.displayedRaces,
+            editions: viewModel.displayedEditions,
+            selection: $selection
+          )
+          .skeleton(viewModel.isShowingSkeleton)
         }
       }  // VStack
       .navigationTitle("Pick Race Entry")

@@ -16,7 +16,8 @@ choosing.
 
 | Token | Code | Design system | Why | Status | Since | Ticket |
 |---|---|---|---|---|---|---|
+| skeleton bone sizes | `BoneSize` in `SkeletonViewModifier.swift`: bars overline 10, caption 10, body 12, callout 14, headline 16, Numeric.medium 18, title2 24, Numeric.large 30, tag 20, chip 20 (capsule); corners `radius.tag` (6) | not named; iOS mockup v4.5.5 draws bars of these heights with 5–6 corners | Every bar of one text style must match across screens, and the token list gives no size, so the values come from the mockup | unreported | 2026-10-21 | MW-14 |
 
-No open deviations. `color.navy950` (MW-29, since 2026-08-26) was resolved in v4.5.3, which
+`color.navy950` (MW-29, since 2026-08-26) was resolved in v4.5.3, which
 named the same fixed ink as `color.obsidian` — the code was renamed `Navy950` → `Obsidian` to
 match.

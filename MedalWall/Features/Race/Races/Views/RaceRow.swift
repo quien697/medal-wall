@@ -24,14 +24,17 @@ struct RaceRow: View {
         Text(name)
           .font(.TypeScale.headline)
           .foregroundStyle(Color.Text.primary)
+          .skeletonBone(.headline)
 
         Text(place)
           .font(.TypeScale.caption)
           .foregroundStyle(Color.Text.secondary)
+          .skeletonBone(.caption)
 
         Text("^[\(editionCount) edition](inflect: true)")
           .font(.TypeScale.caption)
           .foregroundStyle(Color.Text.tertiary)
+          .skeletonBone(.caption)
       }  // VStack
     }  // HStack
   }

@@ -18,6 +18,8 @@ final class EditRaceViewModel {
   // MARK: - State
   var isLoading = false
   var isEditionsLoading = false
+  /// Whether the race's editions have loaded, so a reload keeps them on screen.
+  private(set) var hasLoadedEditions = false
   var error: AppError?
   private(set) var isPhotoChanged = false
 
@@ -60,10 +62,21 @@ final class EditRaceViewModel {
   }
 
   // MARK: - Computed
+  /// Bones stand in for an existing race's editions while they load, until a load first
+  /// succeeds.
+  var isShowingEditionsSkeleton: Bool {
+    isEditionsLoading && !hasLoadedEditions
+  }
+
   var raceId: String? { race?.id }
 
+  /// The editions the section shows: placeholders while bones stand in for an existing race's
+  /// editions, the staged editions, newest first, otherwise.
   var displayedEditions: [DraftRaceEdition] {
-    draftEditions
+    guard !isShowingEditionsSkeleton else { return DraftRaceEdition.placeholders }
+
+    return
+      draftEditions
       .filter { !editionIdsToDelete.contains($0.id) }
       .sorted { $0.startDate > $1.startDate }
   }
@@ -102,6 +115,7 @@ final class EditRaceViewModel {
       draftEditions =
         loaded.map { DraftRaceEdition(from: $0) }
         + draftEditions.filter { $0.sourceEditionId == nil }
+      hasLoadedEditions = true
     } catch {
       self.error = .raceFetchFailed(error.localizedDescription)
     }

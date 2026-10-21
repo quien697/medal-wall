@@ -304,7 +304,7 @@ struct EditRaceViewModelRepositoryTests {
 
     let loading = Task { await viewModel.load() }
     let deadline = ContinuousClock.now + .seconds(2)
-    while viewModel.displayedEditions.isEmpty, ContinuousClock.now < deadline {
+    while viewModel.isShowingEditionsSkeleton, ContinuousClock.now < deadline {
       try await Task.sleep(for: .milliseconds(10))
     }
     let editionIDs = viewModel.displayedEditions.map(\.id)
@@ -312,5 +312,114 @@ struct EditRaceViewModelRepositoryTests {
     await loading.value
 
     #expect(editionIDs == [existing.id])
+  }
+}
+
+// MARK: - Editions skeleton
+extension EditRaceViewModelRepositoryTests {
+  @Test("an existing race's editions show bones before the first load")
+  func testEditionsSkeletonBeforeFirstLoad() {
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: makeRace(), repository: StubRaceRepository(),
+      networkMonitor: StubNetworkMonitor())
+
+    #expect(viewModel.isShowingEditionsSkeleton)
+  }
+
+  @Test("an existing race's editions show bones while they load", .timeLimit(.minutes(1)))
+  func testEditionsSkeletonDuringLoad() async {
+    let repository = StubRaceRepository(
+      races: [makeRace(editionCount: 1)], editions: ["race-taipei": [makeExistingEdition()]])
+    await repository.fetchHold.holdNext()
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: makeRace(editionCount: 1), repository: repository,
+      networkMonitor: StubNetworkMonitor())
+
+    let load = Task { await viewModel.loadEditions() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(viewModel.isShowingEditionsSkeleton)
+    await repository.fetchHold.release()
+    await load.value
+    #expect(!viewModel.isShowingEditionsSkeleton)
+  }
+
+  @Test("editions that fail to load give way to the empty editions, not bones")
+  func testNoEditionsSkeletonAfterFailedLoad() async {
+    let repository = StubRaceRepository(fetchOutcome: .failure(.raceFetchFailed("offline")))
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: makeRace(), repository: repository, networkMonitor: StubNetworkMonitor())
+
+    await viewModel.loadEditions()
+
+    #expect(!viewModel.isShowingEditionsSkeleton)
+  }
+
+  @Test("a reload keeps the editions on screen, with no bones", .timeLimit(.minutes(1)))
+  func testNoEditionsSkeletonDuringReload() async {
+    let repository = StubRaceRepository(
+      races: [makeRace(editionCount: 1)], editions: ["race-taipei": [makeExistingEdition()]])
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: makeRace(editionCount: 1), repository: repository,
+      networkMonitor: StubNetworkMonitor())
+    await viewModel.loadEditions()
+    await repository.fetchHold.holdNext()
+
+    let reload = Task { await viewModel.loadEditions() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(!viewModel.isShowingEditionsSkeleton)
+    await repository.fetchHold.release()
+    await reload.value
+  }
+
+  @Test("a new race has no editions to load, so it never shows bones")
+  func testNoEditionsSkeletonInAddMode() {
+    let viewModel = EditRaceViewModel(
+      mode: .add, race: nil, repository: StubRaceRepository(), networkMonitor: StubNetworkMonitor())
+
+    #expect(!viewModel.isShowingEditionsSkeleton)
+  }
+
+  @Test("an existing race shows placeholder editions, as bones, before the first load")
+  func testDisplayedEditionsArePlaceholdersBeforeLoad() {
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: makeRace(), repository: StubRaceRepository(),
+      networkMonitor: StubNetworkMonitor())
+
+    #expect(
+      viewModel.displayedEditions.map(\.id) == DraftRaceEdition.placeholders.map(\.id))
+  }
+
+  @Test("once loaded an existing race shows its editions")
+  func testDisplayedEditionsAfterLoad() async {
+    let repository = StubRaceRepository(
+      races: [makeRace(editionCount: 1)], editions: ["race-taipei": [makeExistingEdition()]])
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: makeRace(editionCount: 1), repository: repository,
+      networkMonitor: StubNetworkMonitor())
+
+    await viewModel.loadEditions()
+
+    #expect(viewModel.displayedEditions.map(\.sourceEditionId) == [makeExistingEdition().id])
+  }
+
+  @Test("editions that fail to load show none, so the empty editions show")
+  func testNoDisplayedEditionsAfterFailedLoad() async {
+    let repository = StubRaceRepository(fetchOutcome: .failure(.raceFetchFailed("offline")))
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: makeRace(), repository: repository, networkMonitor: StubNetworkMonitor())
+
+    await viewModel.loadEditions()
+
+    #expect(viewModel.displayedEditions.isEmpty)
+  }
+
+  @Test("a new race shows no placeholder editions")
+  func testNoPlaceholderEditionsInAddMode() {
+    let viewModel = EditRaceViewModel(
+      mode: .add, race: nil, repository: StubRaceRepository(), networkMonitor: StubNetworkMonitor())
+
+    #expect(viewModel.displayedEditions.isEmpty)
   }
 }

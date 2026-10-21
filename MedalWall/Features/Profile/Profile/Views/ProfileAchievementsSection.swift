@@ -10,6 +10,8 @@ import SwiftUI
 struct ProfileAchievementsSection: View {
   let fullMarathonProgress: AchievementProgress
   let halfMarathonProgress: AchievementProgress
+  /// Shows the rows as bones, under the real title, while the medals load.
+  let isShowingSkeleton: Bool
 
   var body: some View {
     PageSection(title: "Achievements") {
@@ -18,6 +20,7 @@ struct ProfileAchievementsSection: View {
 
         ProfileAchievementRow(trackName: "Half Marathon", progress: halfMarathonProgress)
       }  // VStack
+      .skeleton(isShowingSkeleton)
     }  // PageSection
   }
 }
@@ -25,6 +28,16 @@ struct ProfileAchievementsSection: View {
 #Preview {
   ProfileAchievementsSection(
     fullMarathonProgress: AchievementProgress.compute(liveCount: 10),
-    halfMarathonProgress: AchievementProgress.compute(liveCount: 2)
+    halfMarathonProgress: AchievementProgress.compute(liveCount: 2),
+    isShowingSkeleton: false
   )
+}
+
+#Preview("Loading") {
+  ProfileAchievementsSection(
+    fullMarathonProgress: AchievementProgress.compute(liveCount: 4),
+    halfMarathonProgress: AchievementProgress.compute(liveCount: 4),
+    isShowingSkeleton: true
+  )
+  .background(Color.Background.primary)
 }

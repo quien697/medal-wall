@@ -94,6 +94,7 @@ struct TagViewModifier: ViewModifier {
       .padding(.horizontal, hPadding)
       .background(style.background)
       .clipShape(.rect(cornerRadius: .Radius.tag))
+      .skeletonBone(.tag)
   }
 }
 
@@ -148,4 +149,16 @@ extension View {
   }  // VStack
   .padding()
   .background(Color.Background.primary)
+}
+
+#Preview("Skeleton") {
+  VStack(spacing: 8) {
+    Text("PR").tagStyle(.record)
+    Text("42.195 km").tagStyle(.neutralInCard)
+  }  // VStack
+  .padding()
+  .surfaceStyle()
+  .padding()
+  .background(Color.Background.primary)
+  .redacted(reason: .placeholder)
 }

@@ -33,11 +33,11 @@ struct RaceDetailViewModelTests {
     #expect(viewModel.editions.isEmpty)
   }
 
-  @Test("isLoading starts false")
-  func testIsLoadingStartsFalse() {
+  @Test("isLoading starts true: the editions load as soon as the screen appears")
+  func testIsLoadingStartsTrue() {
     let viewModel = RaceDetailViewModel(race: makeRace())
 
-    #expect(viewModel.isLoading == false)
+    #expect(viewModel.isLoading)
   }
 
   @Test("error starts nil")

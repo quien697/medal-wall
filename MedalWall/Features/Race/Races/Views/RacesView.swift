@@ -23,13 +23,14 @@ struct RacesView: View {
   var body: some View {
     NavigationStack {
       RaceList(
-        races: viewModel.filteredRaces,
+        races: viewModel.displayedRaces,
         searchText: viewModel.searchText,
         onDelete: { race in
           selectedRace = race
           isPresentingDeleteConfirm = true
         }
       )
+      .skeleton(viewModel.isShowingSkeleton)
       .scrollIndicators(.hidden)
       .navigationTitle("Races")
       .background(Color.Background.primary)
@@ -37,13 +38,6 @@ struct RacesView: View {
       .toolbarRole(.editor)
       .searchable(text: $viewModel.searchText, prompt: "Search race events...")
       .autocorrectionDisabled()
-      .overlay {
-        if viewModel.isLoading {
-          ProgressView()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.black.opacity(0.1))
-        }
-      }
       .task {
         await viewModel.loadRaces()
       }

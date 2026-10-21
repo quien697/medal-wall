@@ -59,4 +59,108 @@ struct ProfileViewModelRepositoryTests {
 
     #expect(viewModel.totalMedals == 1)
   }
+
+  // MARK: - First load vs reload
+  @Test("before the first load the statistics are not yet known, so bones show")
+  func testSkeletonBeforeFirstLoad() {
+    let viewModel = ProfileViewModel(repository: StubMedalRepository())
+
+    #expect(viewModel.isShowingSkeleton)
+  }
+
+  @Test("bones show while the first load runs", .timeLimit(.minutes(1)))
+  func testSkeletonDuringFirstLoad() async {
+    let repository = StubMedalRepository(medals: [makeMedal(id: "a")])
+    await repository.fetchHold.holdNext()
+    let viewModel = ProfileViewModel(repository: repository)
+
+    let load = Task { await viewModel.loadMedals(userId: "uid") }
+    await repository.fetchHold.waitForStart()
+
+    #expect(viewModel.isShowingSkeleton)
+    await repository.fetchHold.release()
+    await load.value
+  }
+
+  @Test("the statistics replace the bones once the medals load")
+  func testNoSkeletonAfterLoad() async {
+    let viewModel = ProfileViewModel(repository: StubMedalRepository(medals: [makeMedal(id: "a")]))
+
+    await viewModel.loadMedals(userId: "uid")
+
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(!viewModel.isLoading)
+  }
+
+  @Test("a failed first load shows zero statistics, not bones")
+  func testNoSkeletonAfterFailedFirstLoad() async {
+    let repository = StubMedalRepository(fetchOutcome: .failure(.medalFetchFailed("offline")))
+    let viewModel = ProfileViewModel(repository: repository)
+
+    await viewModel.loadMedals(userId: "uid")
+
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(viewModel.totalMedals == 0)
+  }
+
+  @Test("a reload keeps the statistics on screen, with no bones", .timeLimit(.minutes(1)))
+  func testNoSkeletonDuringReload() async {
+    let repository = StubMedalRepository(medals: [makeMedal(id: "a")])
+    let viewModel = ProfileViewModel(repository: repository)
+    await viewModel.loadMedals(userId: "uid")
+    await repository.fetchHold.holdNext()
+
+    let reload = Task { await viewModel.loadMedals(userId: "uid") }
+    await repository.fetchHold.waitForStart()
+
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(viewModel.totalMedals == 1)
+    await repository.fetchHold.release()
+    await reload.value
+  }
+
+  @Test("a retry after a failed first load shows bones again", .timeLimit(.minutes(1)))
+  func testSkeletonDuringRetryAfterFailure() async {
+    let repository = StubMedalRepository(
+      medals: [makeMedal(id: "a")], fetchOutcome: .failure(.medalFetchFailed("offline")))
+    let viewModel = ProfileViewModel(repository: repository)
+    await viewModel.loadMedals(userId: "uid")
+    await repository.setFetchOutcome(.success(()))
+    await repository.fetchHold.holdNext()
+
+    let retry = Task { await viewModel.loadMedals(userId: "uid") }
+    await repository.fetchHold.waitForStart()
+
+    #expect(viewModel.isShowingSkeleton)
+    await repository.fetchHold.release()
+    await retry.value
+    #expect(!viewModel.isShowingSkeleton)
+  }
+
+  @Test("a failed reload keeps the statistics on screen, with no bones")
+  func testNoSkeletonAfterFailedReload() async {
+    let repository = StubMedalRepository(medals: [makeMedal(id: "a"), makeMedal(id: "b")])
+    let viewModel = ProfileViewModel(repository: repository)
+    await viewModel.loadMedals(userId: "uid")
+    await repository.setFetchOutcome(.failure(.medalFetchFailed("offline")))
+
+    await viewModel.loadMedals(userId: "uid")
+
+    #expect(viewModel.totalMedals == 2)
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(viewModel.error != nil)
+  }
+
+  // MARK: - Displayed statistics
+  @Test("before the first load the statistics come from placeholder medals, as bones")
+  func testStatisticsFromPlaceholdersBeforeLoad() {
+    let viewModel = ProfileViewModel(repository: StubMedalRepository())
+
+    #expect(viewModel.totalMedals == Medal.placeholders.count)
+    #expect(viewModel.fullCount == Medal.placeholders.fullCount)
+    #expect(viewModel.halfCount == Medal.placeholders.halfCount)
+    #expect(viewModel.bestFullTime == Medal.placeholders.bestFullTime?.formattedHMS)
+    #expect(viewModel.bestHalfTime == Medal.placeholders.bestHalfTime?.formattedHMS)
+    #expect(viewModel.fullMarathonProgress == .compute(liveCount: Medal.placeholders.fullCount))
+  }
 }

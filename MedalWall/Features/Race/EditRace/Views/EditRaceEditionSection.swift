@@ -9,8 +9,10 @@ import SwiftUI
 
 struct EditRaceEditionSection: View {
   // MARK: - Properties
+  /// The editions to show: placeholders while they load.
   let editions: [DraftRaceEdition]
-  let isLoading: Bool
+  /// Shows the editions as bones, under the real header, while they load.
+  let isShowingSkeleton: Bool
   let namespace: Namespace.ID
   let transitionID: String
   let onTapAddEdition: () -> Void
@@ -20,10 +22,7 @@ struct EditRaceEditionSection: View {
   // MARK: - Body
   var body: some View {
     Section {
-      if isLoading && editions.isEmpty {
-        ProgressView()
-          .frame(maxWidth: .infinity, alignment: .center)
-      } else if editions.isEmpty {
+      if editions.isEmpty {
         ContentUnavailableView {
           Text("No editions yet.")
             .font(.TypeScale.body)
@@ -34,39 +33,13 @@ struct EditRaceEditionSection: View {
           Button {
             onTapEdition(edition)
           } label: {
-            HStack(spacing: 10) {
-              if let photo = edition.displayPhoto {
-                PhotoImage(photo: photo, as: .raceThumbnail)
-              } else {
-                PhotoImage(urlString: edition.displayPhotoUrl, as: .raceThumbnail)
-              }
-
-              VStack(alignment: .leading, spacing: 5) {
-                HStack(spacing: 10) {
-                  Text(String(edition.year))
-                    .font(.TypeScale.Numeric.medium)
-                    .foregroundStyle(Color.Text.primary)
-
-                  Text(edition.dateDisplayLabel)
-                    .font(.TypeScale.caption)
-                    .foregroundStyle(Color.Text.tertiary)
-                }  // HStack
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                  HStack {
-                    ForEach(edition.distances.sorted()) { distance in
-                      Text(distance.displayLabel)
-                        .tagStyle(.neutralInCard)
-                    }  // ForEach
-                  }  // HStack
-                }  // ScrollView
-              }  // VStack
-
-              Image(systemName: "chevron.right")
-                .foregroundStyle(Color.Text.tertiary)
-            }  // HStack
+            editionRow(edition)
           }  // Button
           .buttonStyle(.plain)
+          // A form row is a card, though not drawn by `surfaceStyle()`.
+          .environment(\.skeletonSurface, .card)
+          .skeleton(isShowingSkeleton)
+          .deleteDisabled(isShowingSkeleton)
         }  // ForEach
         .onDelete { offsets in
           for index in offsets {
@@ -100,6 +73,44 @@ struct EditRaceEditionSection: View {
     }  // Section
     .listRowBackground(Color.Surface.primary)
   }
+
+  // MARK: - Functions
+  /// One edition: its logo, year, dates and distances, leading to its editor.
+  private func editionRow(_ edition: DraftRaceEdition) -> some View {
+    HStack(spacing: 10) {
+      if let photo = edition.displayPhoto {
+        PhotoImage(photo: photo, as: .raceThumbnail)
+      } else {
+        PhotoImage(urlString: edition.displayPhotoUrl, as: .raceThumbnail)
+      }
+
+      VStack(alignment: .leading, spacing: 5) {
+        HStack(spacing: 10) {
+          Text(String(edition.year))
+            .font(.TypeScale.Numeric.medium)
+            .foregroundStyle(Color.Text.primary)
+            .skeletonBone(.numericMedium)
+
+          Text(edition.dateDisplayLabel)
+            .font(.TypeScale.caption)
+            .foregroundStyle(Color.Text.tertiary)
+            .skeletonBone(.caption)
+        }  // HStack
+
+        ScrollView(.horizontal, showsIndicators: false) {
+          HStack {
+            ForEach(edition.distances.sorted()) { distance in
+              Text(distance.displayLabel)
+                .tagStyle(.neutralInCard)
+            }  // ForEach
+          }  // HStack
+        }  // ScrollView
+      }  // VStack
+
+      Image(systemName: "chevron.right")
+        .foregroundStyle(Color.Text.tertiary)
+    }  // HStack
+  }
 }
 
 #Preview("Empty") {
@@ -108,7 +119,7 @@ struct EditRaceEditionSection: View {
   Form {
     EditRaceEditionSection(
       editions: [],
-      isLoading: false,
+      isShowingSkeleton: false,
       namespace: namespace,
       transitionID: "transitionID",
       onTapAddEdition: {},
@@ -127,7 +138,23 @@ struct EditRaceEditionSection: View {
         DraftRaceEdition(from: .taipei2025),
         DraftRaceEdition(from: .taipei2019)
       ],
-      isLoading: false,
+      isShowingSkeleton: false,
+      namespace: namespace,
+      transitionID: "transitionID",
+      onTapAddEdition: {},
+      onTapEdition: { _ in },
+      onDelete: { _ in }
+    )
+  }
+}
+
+#Preview("Loading") {
+  @Previewable @Namespace var namespace
+
+  Form {
+    EditRaceEditionSection(
+      editions: DraftRaceEdition.placeholders,
+      isShowingSkeleton: true,
       namespace: namespace,
       transitionID: "transitionID",
       onTapAddEdition: {},

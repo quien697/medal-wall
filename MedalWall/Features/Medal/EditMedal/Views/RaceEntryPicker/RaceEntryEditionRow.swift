@@ -18,10 +18,12 @@ struct RaceEntryEditionRow: View {
         Text(String(edition.year))
           .font(.TypeScale.Numeric.medium)
           .foregroundStyle(Color.Text.primary)
+          .skeletonBone(.numericMedium)
 
         Text(edition.dateDisplayLabel)
           .font(.TypeScale.caption)
           .foregroundStyle(Color.Text.tertiary)
+          .skeletonBone(.caption)
       }  // HStack
 
       if !edition.raceEvents.isEmpty {
@@ -39,6 +41,7 @@ struct RaceEntryEditionRow: View {
         Text("No Distances")
           .font(.TypeScale.callout)
           .foregroundStyle(Color.Text.secondary)
+          .skeletonBone(.callout)
           .padding(.vertical, 6)
       }
     }  // VStack

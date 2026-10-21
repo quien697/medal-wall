@@ -53,6 +53,11 @@ struct RaceList: View {
   RaceList(races: [], searchText: "", onDelete: { _ in })
 }
 
+#Preview("Loading") {
+  RaceList(races: Race.placeholders, searchText: "", onDelete: { _ in })
+    .skeleton(true)
+}
+
 #Preview("No Search Results") {
   RaceList(races: [], searchText: "XYZ Marathon", onDelete: { _ in })
 }

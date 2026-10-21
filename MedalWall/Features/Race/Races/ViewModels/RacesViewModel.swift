@@ -13,7 +13,11 @@ final class RacesViewModel {
   var races: [Race] = []
 
   // MARK: - State
-  var isLoading = false
+  /// Starts `true`: the screen loads as soon as it appears, and until then an empty list is
+  /// not yet known to be empty.
+  var isLoading = true
+  /// Whether a load has succeeded, so a reload keeps the races on screen.
+  private(set) var hasLoaded = false
   var error: AppError?
 
   // MARK: - Filter
@@ -54,6 +58,17 @@ final class RacesViewModel {
       }
   }
 
+  /// Bones stand in for the races while they load, until a load first succeeds.
+  var isShowingSkeleton: Bool {
+    isLoading && !hasLoaded
+  }
+
+  /// The races the list shows: placeholders while bones stand in for them, the searched races
+  /// otherwise.
+  var displayedRaces: [Race] {
+    isShowingSkeleton ? Race.placeholders : filteredRaces
+  }
+
   // MARK: - Functions
   /// Loads all races from Firestore.
   func loadRaces() async {
@@ -62,6 +77,7 @@ final class RacesViewModel {
 
     do {
       races = try await repository.fetchRaces()
+      hasLoaded = true
     } catch {
       self.error = .raceFetchFailed(error.localizedDescription)
     }

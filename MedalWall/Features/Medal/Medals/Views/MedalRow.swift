@@ -35,23 +35,27 @@ struct MedalRow: View {
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
+          .skeletonBone(.overline)
 
         Text(name)
           .font(.TypeScale.headline)
           .foregroundStyle(Color.Text.primary)
           .lineLimit(2)
+          .skeletonBone(.headline)
 
         Text(distance)
           .font(.TypeScale.overline)
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
+          .skeletonBone(.overline)
 
         if let finishTime {
           HStack(spacing: .Space.stack) {
             Text(finishTime)
               .font(.TypeScale.Numeric.medium)
               .foregroundStyle(Color.Text.secondary)
+              .skeletonBone(.numericMedium)
 
             if isPersonalRecord {
               Text("PR")
@@ -65,6 +69,7 @@ struct MedalRow: View {
             .tracking(metadataTracking)
             .textCase(.uppercase)
             .foregroundStyle(Color.Text.secondary)
+            .skeletonBone(.overline)
             .padding(.top, .Space.inline)
         }
       }  // VStack

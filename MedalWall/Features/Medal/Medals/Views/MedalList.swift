@@ -21,7 +21,7 @@ struct MedalList: View {
   // MARK: - Body
   var body: some View {
     Group {
-      if viewModel.isEmpty && !viewModel.isLoading {
+      if viewModel.isEmpty {
         EmptyState(title: "No Medals", description: "Tap the + button to add your first medal!")
       } else {
         ScrollView {

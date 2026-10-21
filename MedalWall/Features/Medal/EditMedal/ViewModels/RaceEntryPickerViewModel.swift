@@ -16,12 +16,31 @@ final class RaceEntryPickerViewModel {
   /// Starts `true`: the picker loads as soon as it appears, and until then an empty list is
   /// not yet known to be empty.
   private(set) var isLoading = true
+  /// Whether the races have loaded, so a reload keeps them on screen.
+  private(set) var hasLoaded = false
   var error: AppError?
   private let repository: any RaceRepository
 
   // MARK: - Init
   init(repository: (any RaceRepository)? = nil) {
     self.repository = repository ?? RaceFirestoreRepository()
+  }
+
+  // MARK: - Computed
+  /// Bones stand in for the races while they load, until a load first succeeds.
+  var isShowingSkeleton: Bool {
+    isLoading && !hasLoaded
+  }
+
+  /// The races the picker shows: placeholders while bones stand in for them, the loaded races
+  /// otherwise.
+  var displayedRaces: [Race] {
+    isShowingSkeleton ? Race.placeholders : races
+  }
+
+  /// The editions of `displayedRaces`, keyed by race id.
+  var displayedEditions: [String: [RaceEdition]] {
+    isShowingSkeleton ? RaceEdition.placeholdersByRace : editions
   }
 
   // MARK: - Functions
@@ -61,6 +80,7 @@ final class RaceEntryPickerViewModel {
     }
     races = fetched
     editions = loaded
+    hasLoaded = true
   }
 
   /// Fetches one race's editions, newest first.

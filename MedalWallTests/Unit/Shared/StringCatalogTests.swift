@@ -123,6 +123,19 @@ struct StringCatalogTests {
       ] == "「距離」設定配速單位（/公里 或 /英里）及自訂距離的預設單位。距離一律依輸入時的單位顯示。")
   }
 
+  @Test("The label VoiceOver reads for a skeleton ships translated")
+  func testSkeletonLabelIsTranslated() {
+    #expect(zhTWTable["Loading"] == "載入中")
+  }
+
+  @Test("The You tab's empty state ships translated")
+  func testProfileUnavailableIsTranslated() {
+    #expect(zhTWTable["Profile Unavailable"] == "個人資料無法使用")
+    #expect(
+      zhTWTable["We couldn't load your profile. Please check your connection and try again."]
+        == "我們無法載入你的個人資料。請檢查網路連線後再試一次。")
+  }
+
   @Test("The composed division label keeps its placeholder in zh-TW")
   func testDivisionLabelKeepsPlaceholder() {
     #expect(zhTWTable["Division (%@)"]?.contains("%@") == true)

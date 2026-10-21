@@ -26,6 +26,7 @@ struct MedalYearHeader: View {
           .fontWeight(.heavy)
           .monospacedDigit()
           .foregroundStyle(Color.Text.primary)
+          .skeletonBone(.callout)
 
         Spacer()
 
@@ -34,6 +35,7 @@ struct MedalYearHeader: View {
           .tracking(.Tracking.label)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
+          .skeletonBone(.overline)
       }  // HStack
 
       Rectangle()

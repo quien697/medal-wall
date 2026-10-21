@@ -14,6 +14,7 @@ import SwiftUI
 /// is a real state: it says the result is missing.
 ///
 /// The ring is a circle drawn behind the content, so the content must be circular too.
+/// Inside a skeleton, ring and content are one circular bone with no shadow.
 struct MedalRingViewModifier: ViewModifier {
   private let ringWidth: CGFloat = 3
 
@@ -22,6 +23,7 @@ struct MedalRingViewModifier: ViewModifier {
       .padding(ringWidth)
       .background(Circle().fill(Color.Record.earned))
       .elevation(.ring)
+      .skeletonBone(.circle)
   }
 }
 
@@ -33,7 +35,7 @@ extension View {
   }
 }
 
-#Preview {
+#Preview("Medal Ring") {
   VStack(spacing: 40) {
     PhotoImage(photo: UIImage(named: "bmo-vancouver-marathon"), as: .medal)
       .medalRing()
@@ -43,4 +45,12 @@ extension View {
   }  // VStack
   .padding(40)
   .background(Color.Background.primary)
+}
+
+#Preview("Skeleton") {
+  PhotoImage(photo: UIImage(named: "bmo-vancouver-marathon"), as: .medal)
+    .medalRing()
+    .padding(40)
+    .background(Color.Background.primary)
+    .redacted(reason: .placeholder)
 }
