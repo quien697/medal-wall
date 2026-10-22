@@ -29,9 +29,9 @@ extension EnvironmentValues {
 /// The height of a bar bone, named by the type step of the text it stands in for, or by the
 /// tag or chip it covers.
 ///
-/// The heights are the iOS mockup's bars, which follow the font rather than the line, so every
-/// bar of one text style matches across the app; a tag and a chip share a height, so a row of
-/// them lines up. The design system names no bone sizes, so `deviations.md` records these.
+/// The heights are the design system's skeleton bars, which follow the font rather than the line,
+/// so every bar of one text style matches across the app; a tag and a chip share a height, so a
+/// row of them lines up.
 enum BoneSize {
   case title2
   case headline

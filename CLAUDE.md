@@ -28,7 +28,7 @@ a list in this file goes stale and then misleads. What is here is the reasoning,
 the source cannot carry:
 - `Color+Extensions.swift` — `Pigment` (asset names, spelled once) then roles that
   point at it: `Background`, `Surface`, `Border`, `Text`, `Accent`, `Record`, `Status`,
-  `TierBadge`, `Progress`. Views and modifiers never use a `Pigment` — only roles
+  `TierBadge`, `Progress`, `Skeleton`. Views and modifiers never use a `Pigment` — only roles
   reference one; when no role fits, add a role. Gold is never tappable — `Record` only
   ever describes something earned.
 - `Font+Extensions.swift` — `Font.TypeScale`. Line height, tracking and uppercasing
