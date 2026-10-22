@@ -950,6 +950,16 @@
         }
       }
     },
+    "Loading" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "載入中"
+          }
+        }
+      }
+    },
     "Loading your collection" : {
       "localizations" : {
         "zh-TW" : {
@@ -1515,6 +1525,16 @@
         }
       }
     },
+    "Profile Unavailable" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "個人資料無法使用"
+          }
+        }
+      }
+    },
     "Quarter Century" : {
       "localizations" : {
         "zh-TW" : {
@@ -1954,6 +1974,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "我們無法載入你的獎牌。%@"
+          }
+        }
+      }
+    },
+    "We couldn't load your profile. Please check your connection and try again." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我們無法載入你的個人資料。請檢查網路連線後再試一次。"
           }
         }
       }

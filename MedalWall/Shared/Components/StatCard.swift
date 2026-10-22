@@ -10,6 +10,8 @@ import SwiftUI
 struct StatCard: View {
   let title: String
   let titleFont: Font
+  /// The bar that stands in for the title in a skeleton: the `BoneSize` of `titleFont`.
+  let titleBone: BoneSize
   let subtitle: LocalizedStringKey
   let titleColor: Color
   let vPadding: CGFloat
@@ -18,6 +20,7 @@ struct StatCard: View {
   init(
     title: String,
     titleFont: Font? = nil,
+    titleBone: BoneSize? = nil,
     subtitle: LocalizedStringKey,
     titleColor: Color? = nil,
     vPadding: CGFloat? = nil,
@@ -25,6 +28,7 @@ struct StatCard: View {
   ) {
     self.title = title
     self.titleFont = titleFont ?? .TypeScale.Numeric.large
+    self.titleBone = titleBone ?? .numericLarge
     self.subtitle = subtitle
     self.titleColor = titleColor ?? Color.Text.primary
     self.vPadding = vPadding ?? 16
@@ -38,6 +42,7 @@ struct StatCard: View {
         .foregroundStyle(titleColor)
         .lineLimit(1)
         .minimumScaleFactor(0.5)
+        .skeletonBone(titleBone)
 
       Text(subtitle)
         .font(.TypeScale.overline)
@@ -46,6 +51,7 @@ struct StatCard: View {
         .foregroundStyle(Color.Text.tertiary)
         .lineLimit(1)
         .minimumScaleFactor(0.5)
+        .skeletonBone(.overline)
     }  // VStack
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .surfaceStyle(
@@ -88,13 +94,27 @@ struct StatCard: View {
     StatCard(
       title: "03:30:10",
       titleFont: .TypeScale.Numeric.medium,
+      titleBone: .numericMedium,
       subtitle: "Best Full"
     )
 
     StatCard(
       title: "--:--:--",
       titleFont: .TypeScale.Numeric.medium,
+      titleBone: .numericMedium,
       subtitle: "Best Half"
     )
   }
+}
+
+#Preview("Skeleton") {
+  HStack(spacing: 8) {
+    StatCard(title: "32", subtitle: "Medals")
+
+    StatCard(title: "12", subtitle: "Full")
+  }  // HStack
+  .fixedSize(horizontal: false, vertical: true)
+  .padding()
+  .background(Color.Background.primary)
+  .redacted(reason: .placeholder)
 }

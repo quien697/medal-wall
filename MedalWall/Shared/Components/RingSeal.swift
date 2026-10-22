@@ -68,7 +68,8 @@ enum RingSealSize {
 ///
 /// The rings carry the mark and the caller styles its own content, because the
 /// centre colour does not follow from the ring style — the wordmark and the tier
-/// numeral diverge in dark appearance.
+/// numeral diverge in dark appearance. Inside a skeleton the seal is one circular bone,
+/// so no gold shows before anything is earned.
 struct RingSeal<Content: View>: View {
   let style: RingSealStyle
   let size: RingSealSize
@@ -92,6 +93,7 @@ struct RingSeal<Content: View>: View {
       content
     }  // ZStack
     .frame(width: size.diameter, height: size.diameter)
+    .skeletonBone(.circle)
   }
 }
 
@@ -123,4 +125,18 @@ struct RingSeal<Content: View>: View {
   }  // HStack
   .padding()
   .background(Color.Background.primary)
+}
+
+#Preview("Skeleton") {
+  RingSeal(.record, size: .tier) {
+    Text(verbatim: "10")
+      .font(.system(size: 17, weight: .black))
+      .monospacedDigit()
+      .foregroundStyle(Color.TierBadge.earnedNumeral)
+  }  // RingSeal
+  .padding()
+  .surfaceStyle()
+  .padding()
+  .background(Color.Background.primary)
+  .redacted(reason: .placeholder)
 }

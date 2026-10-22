@@ -103,4 +103,103 @@ struct RaceEntryPickerViewModelTests {
     #expect(await repository.maxConcurrentEditionFetches == races.count)
     #expect(viewModel.editions.count == races.count)
   }
+
+  // MARK: - First load vs reload
+  @Test("before the first load the list is not yet known to be empty, so bones show")
+  func testSkeletonBeforeFirstLoad() {
+    let viewModel = RaceEntryPickerViewModel(repository: StubRaceRepository())
+
+    #expect(viewModel.isShowingSkeleton)
+  }
+
+  @Test("bones show while the first load runs", .timeLimit(.minutes(1)))
+  func testSkeletonDuringFirstLoad() async {
+    let repository = StubRaceRepository(races: [race])
+    await repository.fetchHold.holdNext()
+    let viewModel = RaceEntryPickerViewModel(repository: repository)
+
+    let load = Task { await viewModel.load() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(viewModel.isShowingSkeleton)
+    await repository.fetchHold.release()
+    await load.value
+    #expect(!viewModel.isShowingSkeleton)
+  }
+
+  @Test("a failed first load gives way to the empty state, not bones")
+  func testNoSkeletonAfterFailedFirstLoad() async {
+    let repository = StubRaceRepository(fetchOutcome: .failure(.raceFetchFailed("offline")))
+    let viewModel = RaceEntryPickerViewModel(repository: repository)
+
+    await viewModel.load()
+
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(viewModel.races.isEmpty)
+  }
+
+  @Test("a reload keeps the races on screen, with no bones", .timeLimit(.minutes(1)))
+  func testNoSkeletonDuringReload() async {
+    let repository = StubRaceRepository(races: [race])
+    let viewModel = RaceEntryPickerViewModel(repository: repository)
+    await viewModel.load()
+    await repository.fetchHold.holdNext()
+
+    let reload = Task { await viewModel.load() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(!viewModel.isShowingSkeleton)
+    await repository.fetchHold.release()
+    await reload.value
+  }
+
+  @Test("a retry after a failed first load shows bones again", .timeLimit(.minutes(1)))
+  func testSkeletonDuringRetryAfterFailure() async {
+    let repository = StubRaceRepository(
+      races: [race], fetchOutcome: .failure(.raceFetchFailed("offline")))
+    let viewModel = RaceEntryPickerViewModel(repository: repository)
+    await viewModel.load()
+    await repository.setFetchOutcome(.success(()))
+    await repository.fetchHold.holdNext()
+
+    let retry = Task { await viewModel.load() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(viewModel.isShowingSkeleton)
+    await repository.fetchHold.release()
+    await retry.value
+  }
+
+  // MARK: - Displayed races
+  @Test("before the first load the picker shows placeholder races and editions, as bones")
+  func testDisplayedRacesArePlaceholdersBeforeLoad() {
+    let viewModel = RaceEntryPickerViewModel(repository: StubRaceRepository())
+
+    #expect(viewModel.displayedRaces.map(\.id) == Race.placeholders.map(\.id))
+    #expect(
+      viewModel.displayedEditions.keys.sorted() == RaceEdition.placeholdersByRace.keys.sorted())
+  }
+
+  @Test("once loaded the picker shows the races and their editions")
+  func testDisplayedRacesAfterLoad() async {
+    let repository = StubRaceRepository(
+      races: [race], editions: [race.id: [makeEdition(year: 2025)]])
+    let viewModel = RaceEntryPickerViewModel(repository: repository)
+
+    await viewModel.load()
+
+    #expect(viewModel.displayedRaces.map(\.id) == [race.id])
+    #expect(viewModel.displayedEditions[race.id]?.map(\.year) == [2025])
+  }
+
+  @Test("a failed first load shows no races, so the empty state shows")
+  func testNoDisplayedRacesAfterFailedFirstLoad() async {
+    let repository = StubRaceRepository(fetchOutcome: .failure(.raceFetchFailed("offline")))
+    let viewModel = RaceEntryPickerViewModel(repository: repository)
+
+    await viewModel.load()
+
+    #expect(viewModel.displayedRaces.isEmpty)
+    #expect(viewModel.displayedEditions.isEmpty)
+  }
 }

@@ -30,6 +30,8 @@ actor StubUserRepository: UserRepository {
   private var isCreateReleased = false
   private var createStartWaiter: CheckedContinuation<Void, Never>?
   private var heldCreate: CheckedContinuation<Void, Never>?
+  /// Holds a fetch in flight while a test looks at the load.
+  let fetchHold = FetchHold()
 
   // MARK: - Recorded calls
   private(set) var fetchCallCount = 0
@@ -81,6 +83,7 @@ actor StubUserRepository: UserRepository {
   // MARK: - UserRepository
   func fetchUser(uid: String) async throws -> (user: User, isFromCache: Bool)? {
     fetchCallCount += 1
+    await fetchHold.enter()
     try fetchOutcome.get()
     guard let user, user.uid == uid else { return nil }
     return (user, fetchesFromCache)

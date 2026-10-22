@@ -12,7 +12,7 @@ import SwiftUI
 ///
 /// The surface is separated from the page by `elevation.hairline` — a 1pt
 /// `Border.primary` stroke and no shadow. The stroke is drawn inside the shape, so the
-/// border never adds to the card's size.
+/// border never adds to the card's size. Skeleton bones inside it take `Skeleton.inCard`.
 struct SurfaceViewModifier: ViewModifier {
   let bgColor: Color
   let borderColor: Color
@@ -21,6 +21,7 @@ struct SurfaceViewModifier: ViewModifier {
 
   func body(content: Content) -> some View {
     content
+      .environment(\.skeletonSurface, .card)
       .padding(.vertical, vPadding)
       .padding(.horizontal, hPadding)
       .background(bgColor)

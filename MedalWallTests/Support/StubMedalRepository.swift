@@ -19,7 +19,9 @@ actor StubMedalRepository: MedalRepository {
   // MARK: - Script
   /// The medals a fetch returns, and the store writes land in.
   private(set) var medals: [Medal]
-  private let fetchOutcome: Result<Void, AppError>
+  private var fetchOutcome: Result<Void, AppError>
+  /// Holds a fetch in flight while a test looks at the load.
+  let fetchHold = FetchHold()
   private let writeOutcome: Result<Void, AppError>
   private let deleteOutcome: Result<Void, AppError>
 
@@ -42,9 +44,16 @@ actor StubMedalRepository: MedalRepository {
     self.deleteOutcome = deleteOutcome
   }
 
+  // MARK: - Script control
+  /// Changes what later fetches do, as when the connection drops or comes back.
+  func setFetchOutcome(_ outcome: Result<Void, AppError>) {
+    fetchOutcome = outcome
+  }
+
   // MARK: - MedalRepository
   func fetchMedals(userId: String) async throws -> [Medal] {
     fetchCallCount += 1
+    await fetchHold.enter()
     try fetchOutcome.get()
     return medals.filter { $0.userID == userId }
   }

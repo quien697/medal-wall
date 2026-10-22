@@ -14,7 +14,8 @@ import SwiftUI
 /// Use `init(photo:as:)` for a locally held `UIImage` (e.g. an edit draft), or
 /// `init(urlString:as:)` for a remote URL loaded via `CachedAsyncImage`. The gold ring
 /// is not part of the image — a caller that knows the medal was earned adds it with
-/// `.medalRing()`.
+/// `.medalRing()`. Inside a skeleton the photo is one bone in its shape, with no
+/// placeholder glyph or spinner.
 struct PhotoImage: View {
   private let photo: UIImage?
   private let urlString: String?
@@ -36,23 +37,26 @@ struct PhotoImage: View {
   }
 
   var body: some View {
-    if let photo {
-      styled(Image(uiImage: photo))
-    } else if let urlString, let url = URL(string: urlString) {
-      CachedAsyncImage(url: url, targetSize: imageType.size) { phase in
-        switch phase {
-        case .success(let image):
-          styled(image)
-        default:
-          PlaceholderImage(as: imageType)
-            .overlay {
-              if case .empty = phase { ProgressView() }
-            }
+    Group {
+      if let photo {
+        styled(Image(uiImage: photo))
+      } else if let urlString, let url = URL(string: urlString) {
+        CachedAsyncImage(url: url, targetSize: imageType.size) { phase in
+          switch phase {
+          case .success(let image):
+            styled(image)
+          default:
+            PlaceholderImage(as: imageType)
+              .overlay {
+                if case .empty = phase { ProgressView() }
+              }
+          }
         }
+      } else {
+        PlaceholderImage(as: imageType)
       }
-    } else {
-      PlaceholderImage(as: imageType)
-    }
+    }  // Group
+    .skeletonBone(imageType.shape)
   }
 
   /// Renders a real image at this asset's size and shape.
@@ -65,7 +69,7 @@ struct PhotoImage: View {
   }
 }
 
-#Preview {
+#Preview("Image Photo") {
   VStack(spacing: 20) {
     PhotoImage(photo: UIImage(named: "bmo-vancouver-marathon"), as: .medal)
       .medalRing()
@@ -76,4 +80,17 @@ struct PhotoImage: View {
   }  // VStack
   .padding(40)
   .background(Color.Background.primary)
+}
+
+#Preview("Skeleton") {
+  VStack(spacing: 20) {
+    PhotoImage(photo: nil, as: .avatar)
+
+    PhotoImage(photo: nil, as: .raceThumbnail)
+
+    PhotoImage(photo: nil, as: .medalThumbnail)
+  }  // VStack
+  .padding(40)
+  .background(Color.Background.primary)
+  .redacted(reason: .placeholder)
 }

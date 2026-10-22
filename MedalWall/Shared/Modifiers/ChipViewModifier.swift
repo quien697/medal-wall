@@ -85,6 +85,7 @@ struct ChipViewModifier: ViewModifier {
         Capsule()
           .strokeBorder(isEnabled ? style.border : .clear, lineWidth: 1)
       )
+      .skeletonBone(.chip)
   }
 }
 
@@ -129,4 +130,14 @@ extension View {
   }  // HStack
   .padding()
   .background(Color.Surface.primary)
+}
+
+#Preview("Skeleton") {
+  HStack(spacing: 8) {
+    Text("All").chipStyle(.primary)
+    Text("全馬").chipStyle(.secondary)
+  }  // HStack
+  .padding()
+  .background(Color.Background.primary)
+  .redacted(reason: .placeholder)
 }

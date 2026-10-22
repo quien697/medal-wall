@@ -108,6 +108,7 @@
 				Repositories/UserFirestoreRepository.swift,
 				"Resources/SampleData/Medal+SampleData.swift",
 				"Resources/SampleData/Race+SampleData.swift",
+				"Resources/SampleData/User+SampleData.swift",
 				Services/AppleSignInDelegate.swift,
 				Services/FirebaseAuthService.swift,
 				Services/MapKitPlaceSearchService.swift,

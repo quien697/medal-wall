@@ -314,3 +314,127 @@ struct UserManagerTests {
     #expect(manager.currentUser == nil)
   }
 }
+
+// MARK: - Profile load state
+extension UserManagerTests {
+  @Test("a signed-in profile counts as loading until it arrives", .timeLimit(.minutes(1)))
+  func testProfileLoadingUntilItArrives() async {
+    let repository = StubUserRepository(user: makeProfile())
+    await repository.fetchHold.holdNext()
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
+
+    let signIn = Task { await authService.report((uid: uid, email: email)) }
+    await repository.fetchHold.waitForStart()
+
+    #expect(manager.isProfileLoading)
+    await repository.fetchHold.release()
+    await signIn.value
+    #expect(!manager.isProfileLoading)
+    #expect(manager.currentUser != nil)
+  }
+
+  @Test("a profile that can't load stops counting as loading and says why")
+  func testFailedLoadSaysWhy() async {
+    let repository = StubUserRepository(
+      user: makeProfile(), fetchOutcome: .failure(.noInternetConnection))
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
+
+    await authService.report((uid: uid, email: email))
+
+    #expect(!manager.isProfileLoading)
+    #expect(manager.profileLoadError == .noInternetConnection)
+  }
+
+  @Test(
+    "retrying a profile that couldn't load counts as loading again", .timeLimit(.minutes(1)))
+  func testRetryCountsAsLoading() async {
+    let repository = StubUserRepository(
+      user: makeProfile(), fetchOutcome: .failure(.noInternetConnection))
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
+    await authService.report((uid: uid, email: email))
+    await repository.setFetchOutcome(.success(()))
+    await repository.fetchHold.holdNext()
+
+    let retry = Task { await manager.validateSession() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(manager.isProfileLoading)
+    #expect(manager.profileLoadError == nil)
+    await repository.fetchHold.release()
+    await retry.value
+    #expect(!manager.isProfileLoading)
+    #expect(manager.profileLoadError == nil)
+    #expect(manager.currentUser?.firstName == "Mei")
+  }
+
+  @Test("nobody signed in means no profile to load")
+  func testSignedOutIsNotLoading() async {
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: StubUserRepository(), authService: authService,
+      networkMonitor: StubNetworkMonitor(), defaults: defaults)
+
+    await authService.report(nil)
+
+    #expect(!manager.isProfileLoading)
+  }
+
+  // MARK: - Displayed profile
+  @Test(
+    "while the profile loads the header shows the placeholder user, as bones",
+    .timeLimit(.minutes(1)))
+  func testDisplayedUserIsPlaceholderWhileLoading() async {
+    let repository = StubUserRepository(user: makeProfile())
+    await repository.fetchHold.holdNext()
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
+
+    let signIn = Task { await authService.report((uid: uid, email: email)) }
+    await repository.fetchHold.waitForStart()
+
+    #expect(manager.displayedUser?.uid == User.placeholder.uid)
+    #expect(!manager.isProfileUnavailable)
+    await repository.fetchHold.release()
+    await signIn.value
+    #expect(manager.displayedUser?.firstName == "Mei")
+  }
+
+  @Test("a profile that can't load is unavailable, and no user is shown")
+  func testFailedProfileIsUnavailable() async {
+    let repository = StubUserRepository(
+      user: makeProfile(), fetchOutcome: .failure(.noInternetConnection))
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: repository, authService: authService, networkMonitor: StubNetworkMonitor(),
+      defaults: defaults)
+
+    await authService.report((uid: uid, email: email))
+
+    #expect(manager.isProfileUnavailable)
+    #expect(manager.displayedUser == nil)
+  }
+
+  @Test("nobody signed in shows no user, not the placeholder")
+  func testSignedOutShowsNoUser() async {
+    let authService = StubAuthService()
+    let manager = UserManager(
+      repository: StubUserRepository(), authService: authService,
+      networkMonitor: StubNetworkMonitor(), defaults: defaults)
+
+    await authService.report(nil)
+
+    #expect(manager.displayedUser == nil)
+    #expect(!manager.isProfileUnavailable)
+  }
+}

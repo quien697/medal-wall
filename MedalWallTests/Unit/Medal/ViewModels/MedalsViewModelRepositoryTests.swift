@@ -65,4 +65,94 @@ struct MedalsViewModelRepositoryTests {
       Issue.record("expected medalFetchFailed, got \(String(describing: viewModel.error))")
     }
   }
+
+  // MARK: - First load vs reload
+  @Test("before the first load the collection is not yet known to be empty, so bones show")
+  func testSkeletonBeforeFirstLoad() {
+    let viewModel = MedalsViewModel(repository: StubMedalRepository())
+
+    #expect(viewModel.isShowingSkeleton)
+  }
+
+  @Test("bones show while the first load runs", .timeLimit(.minutes(1)))
+  func testSkeletonDuringFirstLoad() async {
+    let repository = StubMedalRepository(medals: [makeMedal(id: "a")])
+    await repository.fetchHold.holdNext()
+    let viewModel = MedalsViewModel(repository: repository)
+
+    let load = Task { await viewModel.loadMedals(userId: "uid") }
+    await repository.fetchHold.waitForStart()
+
+    #expect(viewModel.isShowingSkeleton)
+    await repository.fetchHold.release()
+    await load.value
+  }
+
+  @Test("the collection replaces the bones once it loads")
+  func testNoSkeletonAfterLoad() async {
+    let viewModel = MedalsViewModel(repository: StubMedalRepository(medals: [makeMedal(id: "a")]))
+
+    await viewModel.loadMedals(userId: "uid")
+
+    #expect(!viewModel.isShowingSkeleton)
+  }
+
+  @Test("a failed first load gives way to the empty state, not bones")
+  func testNoSkeletonAfterFailedFirstLoad() async {
+    let repository = StubMedalRepository(fetchOutcome: .failure(.medalFetchFailed("offline")))
+    let viewModel = MedalsViewModel(repository: repository)
+
+    await viewModel.loadMedals(userId: "uid")
+
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(viewModel.isEmpty)
+  }
+
+  @Test("a reload keeps the collection on screen, with no bones", .timeLimit(.minutes(1)))
+  func testNoSkeletonDuringReload() async {
+    let repository = StubMedalRepository(medals: [makeMedal(id: "a")])
+    let viewModel = MedalsViewModel(repository: repository)
+    await viewModel.loadMedals(userId: "uid")
+    await repository.fetchHold.holdNext()
+
+    let reload = Task { await viewModel.loadMedals(userId: "uid") }
+    await repository.fetchHold.waitForStart()
+
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(viewModel.medals.count == 1)
+    await repository.fetchHold.release()
+    await reload.value
+  }
+
+  @Test("a retry after a failed first load shows bones again", .timeLimit(.minutes(1)))
+  func testSkeletonDuringRetryAfterFailure() async {
+    let repository = StubMedalRepository(
+      medals: [makeMedal(id: "a")], fetchOutcome: .failure(.medalFetchFailed("offline")))
+    let viewModel = MedalsViewModel(repository: repository)
+    await viewModel.loadMedals(userId: "uid")
+    await repository.setFetchOutcome(.success(()))
+    await repository.fetchHold.holdNext()
+
+    let retry = Task { await viewModel.loadMedals(userId: "uid") }
+    await repository.fetchHold.waitForStart()
+
+    #expect(viewModel.isShowingSkeleton)
+    await repository.fetchHold.release()
+    await retry.value
+    #expect(!viewModel.isShowingSkeleton)
+  }
+
+  @Test("a failed reload keeps the collection on screen")
+  func testFailedReloadKeepsMedals() async {
+    let repository = StubMedalRepository(medals: [makeMedal(id: "a"), makeMedal(id: "b")])
+    let viewModel = MedalsViewModel(repository: repository)
+    await viewModel.loadMedals(userId: "uid")
+    await repository.setFetchOutcome(.failure(.medalFetchFailed("offline")))
+
+    await viewModel.loadMedals(userId: "uid")
+
+    #expect(viewModel.medals.count == 2)
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(viewModel.error != nil)
+  }
 }

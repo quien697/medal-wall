@@ -13,6 +13,11 @@ final class ProfileViewModel {
   var medals: [Medal] = []
 
   // MARK: - State
+  /// Starts `true`: the medals load as soon as the screen appears, and until then the
+  /// statistics are not yet known.
+  private(set) var isLoading = true
+  /// Whether a load has succeeded, so a reload keeps the statistics on screen.
+  private(set) var hasLoaded = false
   var error: AppError?
 
   // MARK: - Dependencies
@@ -24,11 +29,17 @@ final class ProfileViewModel {
   }
 
   // MARK: - Computed
-  var totalMedals: Int { medals.count }
-  var fullCount: Int { medals.fullCount }
-  var halfCount: Int { medals.halfCount }
-  var bestFullTime: String { medals.bestFullTime?.formattedHMS ?? "-" }
-  var bestHalfTime: String { medals.bestHalfTime?.formattedHMS ?? "-" }
+  /// The medals the statistics come from: placeholders while bones stand in for them, the
+  /// loaded medals otherwise.
+  private var displayedMedals: [Medal] {
+    isShowingSkeleton ? Medal.placeholders : medals
+  }
+
+  var totalMedals: Int { displayedMedals.count }
+  var fullCount: Int { displayedMedals.fullCount }
+  var halfCount: Int { displayedMedals.halfCount }
+  var bestFullTime: String { displayedMedals.bestFullTime?.formattedHMS ?? "-" }
+  var bestHalfTime: String { displayedMedals.bestHalfTime?.formattedHMS ?? "-" }
 
   /// Full Marathon achievement progress, from the loaded medals.
   var fullMarathonProgress: AchievementProgress { .compute(liveCount: fullCount) }
@@ -36,11 +47,21 @@ final class ProfileViewModel {
   /// Half Marathon achievement progress, from the loaded medals.
   var halfMarathonProgress: AchievementProgress { .compute(liveCount: halfCount) }
 
+  /// Bones stand in for the statistics and achievements while the medals load, until a load
+  /// first succeeds.
+  var isShowingSkeleton: Bool {
+    isLoading && !hasLoaded
+  }
+
   // MARK: - Functions
   /// Loads all medals for the given user from Firestore, keeping the current ones if the fetch fails.
   func loadMedals(userId: String) async {
+    defer { isLoading = false }
+    isLoading = true
+
     do {
       medals = try await repository.fetchMedals(userId: userId)
+      hasLoaded = true
     } catch {
       self.error = .medalFetchFailed(error.localizedDescription)
     }

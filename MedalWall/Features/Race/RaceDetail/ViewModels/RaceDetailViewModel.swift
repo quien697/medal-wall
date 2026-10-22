@@ -14,7 +14,11 @@ final class RaceDetailViewModel {
   var editions: [RaceEdition] = []
 
   // MARK: - State
-  var isLoading = false
+  /// Starts `true`: the editions load as soon as the screen appears, and until then an empty
+  /// list is not yet known to be empty.
+  var isLoading = true
+  /// Whether a load of the editions has succeeded, so a reload keeps them on screen.
+  private(set) var hasLoaded = false
   var error: AppError?
 
   // MARK: - Dependencies
@@ -33,6 +37,18 @@ final class RaceDetailViewModel {
     self.repository = repository ?? RaceFirestoreRepository()
     self.storageService = storageService ?? StorageService()
     self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
+  }
+
+  // MARK: - Computed
+  /// Bones stand in for the editions while they load, until a load first succeeds.
+  var isShowingSkeleton: Bool {
+    isLoading && !hasLoaded
+  }
+
+  /// The editions the section shows: placeholders while bones stand in for them, the loaded
+  /// editions otherwise.
+  var displayedEditions: [RaceEdition] {
+    isShowingSkeleton ? RaceEdition.placeholders : editions
   }
 
   // MARK: - Functions
@@ -55,6 +71,7 @@ final class RaceDetailViewModel {
     do {
       editions = try await repository.fetchEditions(raceId: race.id)
         .sorted { $0.startDate > $1.startDate }
+      hasLoaded = true
     } catch {
       self.error = .raceFetchFailed(error.localizedDescription)
     }

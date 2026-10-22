@@ -59,3 +59,22 @@ extension Medal {
     return [taipeiMedal2019, taipeiHalfMedal, vancouverMedal]
   }()
 }
+
+extension Medal {
+  /// Stands in for the collection while it first loads, behind a skeleton. Eight timed medals
+  /// over two years and two distances, so the skeleton shows a personal best card per
+  /// distance, three filter chips, and more rows than the tallest iPhone fits.
+  static let placeholders: [Medal] = (0..<8).map { index in
+    let isFull = index.isMultiple(of: 2)
+    return Medal(
+      id: "placeholder-medal-\(index)",
+      name: "Taipei Marathon",
+      date: Date(timeIntervalSince1970: index < 4 ? 1_749_945_600 : 1_718_409_600),
+      bibNumber: "00000",
+      place: Race.taipei.place,
+      raceEvent: RaceEvent(category: isFull ? .full : .half, type: .inPerson),
+      result: .seconds(Double((isFull ? 12_600 : 6_300) + index * 60)),
+      userID: "placeholder"
+    )
+  }
+}

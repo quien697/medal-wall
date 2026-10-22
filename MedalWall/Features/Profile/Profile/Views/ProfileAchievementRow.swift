@@ -19,10 +19,12 @@ struct ProfileAchievementRow: View {
         Text(trackName)
           .font(.TypeScale.headline)
           .foregroundStyle(Color.Text.primary)
+          .skeletonBone(.headline)
 
         Text(progress.unlockedTier?.name ?? .appLocalized("Not started"))
           .font(.TypeScale.caption)
           .foregroundStyle(Color.Text.secondary)
+          .skeletonBone(.caption)
 
         if let nextTier = progress.nextTier {
           ProgressBar(value: progress.progressFraction)
@@ -30,12 +32,14 @@ struct ProfileAchievementRow: View {
           Text("\(progress.currentCount) of \(nextTier.threshold) \u{2192} \(nextTier.name)")
             .font(.TypeScale.caption)
             .foregroundStyle(Color.Text.secondary)
+            .skeletonBone(.caption)
         } else if let unlockedTier = progress.unlockedTier {
           ProgressBar(value: progress.progressFraction)
 
           Text("\(progress.currentCount) of \(unlockedTier.threshold)")
             .font(.TypeScale.caption)
             .foregroundStyle(Color.Text.secondary)
+            .skeletonBone(.caption)
         }
       }  // VStack
 

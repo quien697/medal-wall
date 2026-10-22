@@ -145,3 +145,49 @@ extension RaceEdition {
     createdBy: "preview"
   )
 }
+
+extension Race {
+  /// Stands in for the race list while it first loads, behind a skeleton — more rows than the
+  /// tallest iPhone fits.
+  static let placeholders: [Race] = (0..<14).map { index in
+    Race(
+      id: "placeholder-race-\(index)",
+      name: "Taipei Marathon",
+      place: Race.taipei.place,
+      editionCount: 2,
+      createdBy: "placeholder"
+    )
+  }
+}
+
+extension RaceEdition {
+  /// Stands in for a race's editions while they first load, behind a skeleton — more cards
+  /// than the tallest iPhone fits.
+  static let placeholders: [RaceEdition] = (0..<6).map { index in
+    let date = Date(timeIntervalSince1970: 1_765_929_600 - Double(index) * 31_536_000)
+    return RaceEdition(
+      id: "placeholder-edition-\(index)",
+      raceId: "placeholder-race-0",
+      year: 2025 - index,
+      startDate: date,
+      endDate: date,
+      raceEvents: [
+        RaceEvent(category: .full, type: .inPerson),
+        RaceEvent(category: .half, type: .inPerson)
+      ],
+      createdBy: "placeholder"
+    )
+  }
+
+  /// Each placeholder race's editions, for the race picker's skeleton: one edition per race.
+  static let placeholdersByRace: [String: [RaceEdition]] = Dictionary(
+    uniqueKeysWithValues: Race.placeholders.map { race in (race.id, [placeholders[0]]) }
+  )
+}
+
+extension DraftRaceEdition {
+  /// Stands in for Edit Race's editions while they first load, behind a skeleton.
+  static let placeholders: [DraftRaceEdition] = RaceEdition.placeholders.map { edition in
+    DraftRaceEdition(from: edition)
+  }
+}

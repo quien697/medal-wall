@@ -23,11 +23,13 @@ struct ProfileHeaderSection: View {
             .foregroundStyle(Color.Text.primary)
             .lineLimit(1)
             .minimumScaleFactor(0.5)
+            .skeletonBone(.title2)
 
           if let bio, !bio.isEmpty {
             Text(bio)
               .font(.TypeScale.body)
               .foregroundStyle(Color.Text.secondary)
+              .skeletonBone(.body)
           }
         }  // VStack
 
@@ -42,5 +44,13 @@ struct ProfileHeaderSection: View {
     ProfileHeaderSection(
       photoUrl: nil, userName: "Tsung-Hsun Liu", bio: "I am here to cross the finish line.")
   }
+  .background(Color.Background.primary)
+}
+
+#Preview("Loading") {
+  ProfileHeaderSection(
+    photoUrl: nil, userName: User.placeholder.name, bio: User.placeholder.bio
+  )
+  .skeleton(true)
   .background(Color.Background.primary)
 }

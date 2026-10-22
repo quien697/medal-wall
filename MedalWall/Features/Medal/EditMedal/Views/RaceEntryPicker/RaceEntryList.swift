@@ -26,14 +26,17 @@ struct RaceEntryList: View {
             Text(race.name)
               .font(.TypeScale.headline)
               .foregroundStyle(Color.Text.primary)
+              .skeletonBone(.headline)
 
             Text(race.place.formatted)
               .font(.TypeScale.caption)
               .foregroundStyle(Color.Text.secondary)
+              .skeletonBone(.caption)
 
             Text("^[\(raceEditions.count) edition](inflect: true)")
               .font(.TypeScale.caption)
               .foregroundStyle(Color.Text.tertiary)
+              .skeletonBone(.caption)
           }  // VStack
         }  // HStack
 
@@ -62,4 +65,11 @@ struct RaceEntryList: View {
     Race.taipei.id: [RaceEdition.taipei2019, RaceEdition.taipei2025]
   ]
   RaceEntryList(races: Race.sampleData, editions: editions, selection: .constant(nil))
+}
+
+#Preview("Loading") {
+  RaceEntryList(
+    races: Race.placeholders, editions: RaceEdition.placeholdersByRace, selection: .constant(nil)
+  )
+  .skeleton(true)
 }

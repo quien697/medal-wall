@@ -13,6 +13,13 @@ struct MedalsView: View {
 
   // MARK: - State
   @State private var viewModel = MedalsViewModel()
+  /// Lays the skeleton out from placeholder medals, through the same view model the
+  /// collection uses.
+  @State private var placeholderViewModel: MedalsViewModel = {
+    let viewModel = MedalsViewModel()
+    viewModel.medals = Medal.placeholders
+    return viewModel
+  }()
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingAddMedal = false
 
@@ -23,18 +30,12 @@ struct MedalsView: View {
   // MARK: - Body
   var body: some View {
     NavigationStack {
-      MedalList(viewModel: viewModel)
+      MedalList(viewModel: viewModel.isShowingSkeleton ? placeholderViewModel : viewModel)
+        .skeleton(viewModel.isShowingSkeleton)
         .navigationTitle("Your Collection")
         .background(Color.Background.primary)
         .toolbarTitleDisplayMode(.inlineLarge)
         .toolbarRole(.editor)
-        .overlay {
-          if viewModel.isLoading {
-            ProgressView()
-              .frame(maxWidth: .infinity, maxHeight: .infinity)
-              .background(Color.black.opacity(0.1))
-          }
-        }
         .toolbar {
           ToolbarItem(placement: .title) {
             ExpandedNavigationTitle(title: "Your Collection")
@@ -81,7 +82,7 @@ struct MedalsView: View {
   }
 }
 
-#Preview {
+#Preview("Loading") {
   MedalsView()
     .environment(UserManager())
 }

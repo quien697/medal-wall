@@ -64,7 +64,7 @@ struct EditRaceView: View {
         if viewModel.mode == .edit, viewModel.raceId != nil {
           EditRaceEditionSection(
             editions: viewModel.displayedEditions,
-            isLoading: viewModel.isEditionsLoading,
+            isShowingSkeleton: viewModel.isShowingEditionsSkeleton,
             namespace: namespace,
             transitionID: addEdition,
             onTapAddEdition: { isPresentingAddEdition = true },

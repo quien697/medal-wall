@@ -23,27 +23,34 @@ struct ProfileSummarySection: View {
   let halfCount: Int
   let bestFullTime: String
   let bestHalfTime: String
+  /// Shows the statistics as bones while the medals load.
+  let isShowingSkeleton: Bool
 
   var body: some View {
     PageSection {
-      LazyVGrid(columns: threeColumns, spacing: 8) {
-        StatCard(title: "\(totalMedals)", subtitle: "Medals")
-        StatCard(title: "\(fullCount)", subtitle: "Full")
-        StatCard(title: "\(halfCount)", subtitle: "Half")
-      }  // LazyVGrid
+      VStack(spacing: .Space.gutter) {
+        LazyVGrid(columns: threeColumns, spacing: 8) {
+          StatCard(title: "\(totalMedals)", subtitle: "Medals")
+          StatCard(title: "\(fullCount)", subtitle: "Full")
+          StatCard(title: "\(halfCount)", subtitle: "Half")
+        }  // LazyVGrid
 
-      LazyVGrid(columns: twoColumns, spacing: 8) {
-        StatCard(
-          title: bestFullTime,
-          titleFont: .TypeScale.Numeric.medium,
-          subtitle: "Best Full"
-        )
-        StatCard(
-          title: bestHalfTime,
-          titleFont: .TypeScale.Numeric.medium,
-          subtitle: "Best Half"
-        )
-      }  // LazyVGrid
+        LazyVGrid(columns: twoColumns, spacing: 8) {
+          StatCard(
+            title: bestFullTime,
+            titleFont: .TypeScale.Numeric.medium,
+            titleBone: .numericMedium,
+            subtitle: "Best Full"
+          )
+          StatCard(
+            title: bestHalfTime,
+            titleFont: .TypeScale.Numeric.medium,
+            titleBone: .numericMedium,
+            subtitle: "Best Half"
+          )
+        }  // LazyVGrid
+      }  // VStack
+      .skeleton(isShowingSkeleton)
     }  // PageSection
   }
 }
@@ -54,6 +61,19 @@ struct ProfileSummarySection: View {
     fullCount: 5,
     halfCount: 4,
     bestFullTime: "05:12:20",
-    bestHalfTime: "-"
+    bestHalfTime: "-",
+    isShowingSkeleton: false
   )
+}
+
+#Preview("Loading") {
+  ProfileSummarySection(
+    totalMedals: 8,
+    fullCount: 4,
+    halfCount: 4,
+    bestFullTime: "03:30:00",
+    bestHalfTime: "01:46:00",
+    isShowingSkeleton: true
+  )
+  .background(Color.Background.primary)
 }

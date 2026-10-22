@@ -160,4 +160,129 @@ struct RaceDetailViewModelRepositoryTests {
     #expect(await repository.deletedRaceIDs.isEmpty)
     #expect(await storage.deletedURLs.isEmpty)
   }
+
+  // MARK: - First load vs reload
+  @Test("before the first load the editions are not yet known to be empty, so bones show")
+  func testSkeletonBeforeFirstLoad() {
+    let viewModel = RaceDetailViewModel(race: makeRace(), repository: StubRaceRepository())
+
+    #expect(viewModel.isShowingSkeleton)
+  }
+
+  @Test("bones show while the first load runs", .timeLimit(.minutes(1)))
+  func testSkeletonDuringFirstLoad() async {
+    let repository = StubRaceRepository(
+      races: [makeRace()], editions: [raceId: [makeEdition(id: "a")]])
+    await repository.fetchHold.holdNext()
+    let viewModel = RaceDetailViewModel(race: makeRace(), repository: repository)
+
+    let load = Task { await viewModel.loadEditions() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(viewModel.isShowingSkeleton)
+    await repository.fetchHold.release()
+    await load.value
+  }
+
+  @Test("the editions replace the bones once they load")
+  func testNoSkeletonAfterLoad() async {
+    let repository = StubRaceRepository(
+      races: [makeRace()], editions: [raceId: [makeEdition(id: "a")]])
+    let viewModel = RaceDetailViewModel(race: makeRace(), repository: repository)
+
+    await viewModel.loadEditions()
+
+    #expect(!viewModel.isShowingSkeleton)
+  }
+
+  @Test("a failed first load gives way to the empty editions, not bones")
+  func testNoSkeletonAfterFailedFirstLoad() async {
+    let repository = StubRaceRepository(fetchOutcome: .failure(.raceFetchFailed("offline")))
+    let viewModel = RaceDetailViewModel(race: makeRace(), repository: repository)
+
+    await viewModel.loadEditions()
+
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(viewModel.editions.isEmpty)
+  }
+
+  @Test("a reload keeps the editions on screen, with no bones", .timeLimit(.minutes(1)))
+  func testNoSkeletonDuringReload() async {
+    let repository = StubRaceRepository(
+      races: [makeRace()], editions: [raceId: [makeEdition(id: "a")]])
+    let viewModel = RaceDetailViewModel(race: makeRace(), repository: repository)
+    await viewModel.loadEditions()
+    await repository.fetchHold.holdNext()
+
+    let reload = Task { await viewModel.loadEditions() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(viewModel.editions.count == 1)
+    await repository.fetchHold.release()
+    await reload.value
+  }
+
+  @Test("a retry after a failed first load shows bones again", .timeLimit(.minutes(1)))
+  func testSkeletonDuringRetryAfterFailure() async {
+    let repository = StubRaceRepository(
+      races: [makeRace()], editions: [raceId: [makeEdition(id: "a")]],
+      fetchOutcome: .failure(.raceFetchFailed("offline")))
+    let viewModel = RaceDetailViewModel(race: makeRace(), repository: repository)
+    await viewModel.loadEditions()
+    await repository.setFetchOutcome(.success(()))
+    await repository.fetchHold.holdNext()
+
+    let retry = Task { await viewModel.loadEditions() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(viewModel.isShowingSkeleton)
+    await repository.fetchHold.release()
+    await retry.value
+    #expect(!viewModel.isShowingSkeleton)
+  }
+
+  @Test("a failed reload keeps the editions on screen")
+  func testFailedReloadKeepsEditions() async {
+    let repository = StubRaceRepository(
+      races: [makeRace()], editions: [raceId: [makeEdition(id: "a"), makeEdition(id: "b")]])
+    let viewModel = RaceDetailViewModel(race: makeRace(), repository: repository)
+    await viewModel.loadEditions()
+    await repository.setFetchOutcome(.failure(.raceFetchFailed("offline")))
+
+    await viewModel.loadEditions()
+
+    #expect(viewModel.editions.count == 2)
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(viewModel.error != nil)
+  }
+
+  // MARK: - Displayed editions
+  @Test("before the first load the section shows placeholder editions, as bones")
+  func testDisplayedEditionsArePlaceholdersBeforeLoad() {
+    let viewModel = RaceDetailViewModel(race: makeRace(), repository: StubRaceRepository())
+
+    #expect(viewModel.displayedEditions.map(\.id) == RaceEdition.placeholders.map(\.id))
+  }
+
+  @Test("once loaded the section shows the race's editions")
+  func testDisplayedEditionsAfterLoad() async {
+    let repository = StubRaceRepository(
+      races: [makeRace()], editions: [raceId: [makeEdition(id: "a")]])
+    let viewModel = RaceDetailViewModel(race: makeRace(), repository: repository)
+
+    await viewModel.loadEditions()
+
+    #expect(viewModel.displayedEditions.map(\.id) == ["a"])
+  }
+
+  @Test("a failed first load shows no editions, so the empty state shows")
+  func testNoDisplayedEditionsAfterFailedFirstLoad() async {
+    let repository = StubRaceRepository(fetchOutcome: .failure(.raceFetchFailed("offline")))
+    let viewModel = RaceDetailViewModel(race: makeRace(), repository: repository)
+
+    await viewModel.loadEditions()
+
+    #expect(viewModel.displayedEditions.isEmpty)
+  }
 }

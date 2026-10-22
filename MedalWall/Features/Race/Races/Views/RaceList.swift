@@ -10,6 +10,8 @@ import SwiftUI
 struct RaceList: View {
   let races: [Race]
   let searchText: String
+  /// Whether a row can be swiped away; off while the list reloads.
+  let canDelete: Bool
   let onDelete: (Race) -> Void
 
   var body: some View {
@@ -31,12 +33,17 @@ struct RaceList: View {
               editionCount: race.editionCount
             )
           }  // NavigationLink
+          .listRowBackground(Color.Surface.primary)
+          // A list row is a card, though not drawn by `surfaceStyle()`.
+          .environment(\.skeletonSurface, .card)
           .swipeActions(edge: .trailing) {
-            Button(role: .destructive) {
-              onDelete(race)
-            } label: {
-              Label("Delete", systemImage: "trash")
-            }  // Button
+            if canDelete {
+              Button(role: .destructive) {
+                onDelete(race)
+              } label: {
+                Label("Delete", systemImage: "trash")
+              }  // Button
+            }
           }
         }  // List
         .scrollContentBackground(.hidden)
@@ -46,13 +53,18 @@ struct RaceList: View {
 }
 
 #Preview("Races") {
-  RaceList(races: Race.sampleData, searchText: "", onDelete: { _ in })
+  RaceList(races: Race.sampleData, searchText: "", canDelete: true, onDelete: { _ in })
 }
 
 #Preview("Empty") {
-  RaceList(races: [], searchText: "", onDelete: { _ in })
+  RaceList(races: [], searchText: "", canDelete: true, onDelete: { _ in })
+}
+
+#Preview("Loading") {
+  RaceList(races: Race.placeholders, searchText: "", canDelete: true, onDelete: { _ in })
+    .skeleton(true)
 }
 
 #Preview("No Search Results") {
-  RaceList(races: [], searchText: "XYZ Marathon", onDelete: { _ in })
+  RaceList(races: [], searchText: "XYZ Marathon", canDelete: true, onDelete: { _ in })
 }

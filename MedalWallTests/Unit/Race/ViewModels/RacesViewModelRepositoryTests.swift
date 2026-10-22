@@ -169,4 +169,153 @@ struct RacesViewModelRepositoryTests {
     #expect(await repository.deletedRaceIDs.isEmpty)
     #expect(await storage.deletedURLs.isEmpty)
   }
+
+  // MARK: - First load vs reload
+  @Test("before the first load the list is not yet known to be empty, so bones show")
+  func testSkeletonBeforeFirstLoad() {
+    let viewModel = RacesViewModel(repository: StubRaceRepository())
+
+    #expect(viewModel.isShowingSkeleton)
+  }
+
+  @Test("bones show while the first load runs", .timeLimit(.minutes(1)))
+  func testSkeletonDuringFirstLoad() async {
+    let repository = StubRaceRepository(races: [makeRace(id: "a")])
+    await repository.fetchHold.holdNext()
+    let viewModel = RacesViewModel(repository: repository)
+
+    let load = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(viewModel.isShowingSkeleton)
+    await repository.fetchHold.release()
+    await load.value
+  }
+
+  @Test("the races replace the bones once they load")
+  func testNoSkeletonAfterLoad() async {
+    let viewModel = RacesViewModel(repository: StubRaceRepository(races: [makeRace(id: "a")]))
+
+    await viewModel.loadRaces()
+
+    #expect(!viewModel.isShowingSkeleton)
+  }
+
+  @Test("a failed first load gives way to the empty state, not bones")
+  func testNoSkeletonAfterFailedFirstLoad() async {
+    let repository = StubRaceRepository(fetchOutcome: .failure(.raceFetchFailed("offline")))
+    let viewModel = RacesViewModel(repository: repository)
+
+    await viewModel.loadRaces()
+
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(viewModel.races.isEmpty)
+  }
+
+  @Test("a reload keeps the races on screen, with no bones", .timeLimit(.minutes(1)))
+  func testNoSkeletonDuringReload() async {
+    let repository = StubRaceRepository(races: [makeRace(id: "a")])
+    let viewModel = RacesViewModel(repository: repository)
+    await viewModel.loadRaces()
+    await repository.fetchHold.holdNext()
+
+    let reload = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(viewModel.races.count == 1)
+    await repository.fetchHold.release()
+    await reload.value
+  }
+
+  @Test("a retry after a failed first load shows bones again", .timeLimit(.minutes(1)))
+  func testSkeletonDuringRetryAfterFailure() async {
+    let repository = StubRaceRepository(
+      races: [makeRace(id: "a")], fetchOutcome: .failure(.raceFetchFailed("offline")))
+    let viewModel = RacesViewModel(repository: repository)
+    await viewModel.loadRaces()
+    await repository.setFetchOutcome(.success(()))
+    await repository.fetchHold.holdNext()
+
+    let retry = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(viewModel.isShowingSkeleton)
+    await repository.fetchHold.release()
+    await retry.value
+    #expect(!viewModel.isShowingSkeleton)
+  }
+
+  @Test("a failed reload keeps the races on screen")
+  func testFailedReloadKeepsRaces() async {
+    let repository = StubRaceRepository(races: [makeRace(id: "a"), makeRace(id: "b")])
+    let viewModel = RacesViewModel(repository: repository)
+    await viewModel.loadRaces()
+    await repository.setFetchOutcome(.failure(.raceFetchFailed("offline")))
+
+    await viewModel.loadRaces()
+
+    #expect(viewModel.races.count == 2)
+    #expect(!viewModel.isShowingSkeleton)
+    #expect(viewModel.error != nil)
+  }
+
+  // MARK: - Displayed races
+  @Test("before the first load the list shows placeholder races, as bones")
+  func testDisplayedRacesArePlaceholdersBeforeLoad() {
+    let viewModel = RacesViewModel(repository: StubRaceRepository())
+
+    #expect(viewModel.displayedRaces.map(\.id) == Race.placeholders.map(\.id))
+  }
+
+  @Test("once loaded the list shows the searched races")
+  func testDisplayedRacesAreSearchedAfterLoad() async {
+    let repository = StubRaceRepository(races: [
+      makeRace(id: "boston", name: "Boston Marathon"),
+      makeRace(id: "taipei", name: "Taipei Marathon")
+    ])
+    let viewModel = RacesViewModel(repository: repository)
+    await viewModel.loadRaces()
+
+    viewModel.searchText = "Taipei"
+
+    #expect(viewModel.displayedRaces.map(\.id) == ["taipei"])
+  }
+
+  @Test("a failed first load shows no races, so the empty state shows")
+  func testNoDisplayedRacesAfterFailedFirstLoad() async {
+    let repository = StubRaceRepository(fetchOutcome: .failure(.raceFetchFailed("offline")))
+    let viewModel = RacesViewModel(repository: repository)
+
+    await viewModel.loadRaces()
+
+    #expect(viewModel.displayedRaces.isEmpty)
+  }
+
+  // MARK: - Delete during reload
+  @Test(
+    "a race cannot be deleted while the list reloads, whose older data would bring it back",
+    .timeLimit(.minutes(1)))
+  func testNoDeleteDuringReload() async {
+    let repository = StubRaceRepository(races: [makeRace(id: "a")])
+    let viewModel = RacesViewModel(repository: repository)
+    await viewModel.loadRaces()
+    await repository.fetchHold.holdNext()
+
+    let reload = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+
+    #expect(!viewModel.canDeleteRaces)
+    await repository.fetchHold.release()
+    await reload.value
+  }
+
+  @Test("once the races have loaded they can be deleted")
+  func testDeleteAfterLoad() async {
+    let viewModel = RacesViewModel(repository: StubRaceRepository(races: [makeRace(id: "a")]))
+
+    await viewModel.loadRaces()
+
+    #expect(viewModel.canDeleteRaces)
+  }
 }
