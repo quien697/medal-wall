@@ -1,7 +1,10 @@
 # design-system-sync Specification
 
 ## Purpose
-TBD - created by archiving change design-system-drift-check. Update Purpose after archive.
+Keep the iOS token code in step with the Medal Wall Design System document: record what each
+design system version says in `tokens.json`, compare it with the code and give every token
+one verdict, honour the deliberate differences the deviation ledger records, and, on request,
+write the design system's values into the code.
 ## Requirements
 ### Requirement: Token Capture From The Newest Design System Document
 The check SHALL read the design system's tokens from the highest-versioned
@@ -55,9 +58,11 @@ agreement. Counts make an absence visible instead of leaving it to be inferred.
 
 ### Requirement: Implementation Comparison
 The check SHALL compare the recorded tokens against the iOS implementation — the asset
-catalog colour sets, `CGFloat.Radius`, `CGFloat.Space`, `Font.TypeScale`, `Elevation`, and
-the `ActionStyle`, `ChipStyle`, and `TagStyle` enums — and SHALL assign every token exactly one
-verdict:
+catalog colour sets, `CGFloat.Radius`, `CGFloat.Space`, `CGFloat.Tracking`, `Font.TypeScale`,
+`Elevation`, and, for the `component` family, the `ActionStyle`, `ActionShape`, `ChipStyle`
+and `TagStyle` enums, the pressed and disabled states the action modifier draws, the
+`TierBadge`, `Progress` and `Skeleton` colour roles, `ProgressBar`'s height and radius, and
+the bone sizes in `BoneSize` — and SHALL assign every token exactly one verdict:
 
 | Verdict | Condition | Reported as |
 |---|---|---|
@@ -90,6 +95,11 @@ The check SHALL conclude with an explicit statement of whether any `drift` or
 #### Scenario: A colour's hex differs between the design system and the asset catalog
 - **WHEN** a token's light or dark value differs from its colour set, and no ledger entry
   covers it
+- **THEN** the check reports `drift` for that token, naming both values
+
+#### Scenario: A tracking value differs
+- **WHEN** the design system's `Tracking.label` differs from `CGFloat.Tracking.label`, and no
+  ledger entry covers it
 - **THEN** the check reports `drift` for that token, naming both values
 
 #### Scenario: A colour with no dark slot against a token with equal light and dark values
@@ -186,8 +196,8 @@ between them is a human one.
 
 ### Requirement: Applying Design System Changes To Code
 The check SHALL offer an `apply` mode that writes design system values into the code:
-the asset catalog colour sets, `Color.Pigment`, `CGFloat.Radius`, `CGFloat.Space`, and
-`Font.TypeScale` values.
+the asset catalog colour sets, `Color.Pigment`, `CGFloat.Radius`, `CGFloat.Space`,
+`CGFloat.Tracking`, and `Font.TypeScale` values.
 
 `apply` SHALL NOT write a token covered by a standing ledger entry, in any status. It SHALL
 NOT write the colour role structs, the modifier enums, or any doc comment — those encode
@@ -198,6 +208,10 @@ design reasoning rather than transcribed values.
 #### Scenario: A design system release changes a value the code has not claimed
 - **WHEN** a token's value changed in the design system and no ledger entry covers it
 - **THEN** `apply` writes the new value into the corresponding code token
+
+#### Scenario: A design system release changes a tracking value
+- **WHEN** a tracking value changed in the design system and no ledger entry covers it
+- **THEN** `apply` writes the new value into `CGFloat.Tracking`
 
 #### Scenario: A design system release changes a value the ledger protects
 - **WHEN** a token's value changed in the design system and a ledger entry covers it

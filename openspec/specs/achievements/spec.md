@@ -71,12 +71,10 @@ layers as the tier rises. Gold/silver/bronze is deliberately not used here — t
 language belongs to real race placement (`overallPlacement`, `divisionPlacement`), and reusing
 it for milestone counts would blur two different ideas.
 
-**Tiers come from the live count; nothing is stored.** Until 2026-10-09 an earned tier was
-sticky: a milestone stored on the `User` record kept it against later medal deletion. That cost
-a second write path to the user document after every medal save, and a device holding an older
-profile could overwrite the stored value downward. Badges now reflect the medals the user
-holds. Old `highestFullMilestone` / `highestHalfMilestone` values remain in some user documents
-and are ignored.
+**Tiers come from the live count; nothing is stored.** A stored tier would need a second write
+to the user document after every medal save, and a device holding an older profile could
+overwrite it downward. Badges reflect the medals the user holds. Some user documents still hold
+`highestFullMilestone` / `highestHalfMilestone` fields; they are ignored.
 
 **Self-reported data is out of scope, not overlooked.** Fabricated medals are not guarded
 against because the whole `Medal` model is self-reported — bib number, finish time, and

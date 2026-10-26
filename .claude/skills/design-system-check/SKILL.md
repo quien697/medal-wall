@@ -23,7 +23,7 @@ what they contain, not by their position, because the order changes between vers
 | `radius` | lines starting `radius.tag` | name → number, or `capsule` |
 | `elevation` | lines starting `elevation.` — **the same block as `radius`**; read both prefixes out of it, not `radius.` alone | name → CSS shadow spec, or a plain border |
 | `space` | a Swift `extension CGFloat` with `struct Space` | name → number |
-| `component` | lines starting `ActionStyle` | enum → case names |
+| `component` | lines starting `ActionStyle`, plus the `Skeleton {` and `Tracking {` blocks | enum → case names; `ProgressBar`, `Progress`, `Skeleton` and `Tracking` → their values |
 
 The document also states `type` and `space` for Kotlin and CSS. Read those too — they feed the
 internal-consistency report below.
@@ -38,7 +38,8 @@ internal-consistency report below.
 | `type` | `Font.TypeScale` in `MedalWall/Shared/Extensions/Font+Extensions.swift` |
 | `radius`, `space` | `CGFloat.Radius` / `CGFloat.Space` in `CGFloat+Extensions.swift` |
 | `elevation` | `Elevation` in `MedalWall/Shared/Modifiers/ElevationViewModifier.swift` |
-| `component` | `ActionStyle`, `ChipStyle`, `TagStyle` in `MedalWall/Shared/Modifiers/` |
+| `component` | `ActionStyle` (and the pressed and disabled states it draws), `ActionShape`, `ChipStyle`, `TagStyle` in `MedalWall/Shared/Modifiers/`; the `TierBadge`, `Progress` and `Skeleton` colour roles in `Color+Extensions.swift`; `ProgressBar`'s height and `CGFloat.Radius.progressTrack`; `BoneSize` in `SkeletonViewModifier.swift` |
+| `component.Tracking` | `CGFloat.Tracking` in `CGFloat+Extensions.swift` |
 
 Colour components are `"red"`/`"green"`/`"blue"` strings that are **either** floats (`"0.788"`)
 **or** hex (`"0x0F"`) — handle both. Converting 17 colour sets by hand is error-prone; write a
@@ -159,13 +160,13 @@ file, because it is the design system's changelog. Nothing else records what a v
 Only with `apply` in `$ARGUMENTS`.
 
 **Write** design system values into: the `.colorset` `Contents.json` files, `Color.Pigment`,
-`CGFloat.Radius`, `CGFloat.Space`, and the values in `Font.TypeScale`.
+`CGFloat.Radius`, `CGFloat.Space`, `CGFloat.Tracking`, and the values in `Font.TypeScale`.
 
 **Never write:**
 
 - any token a ledger entry covers, in any status — the iOS value wins
 - the colour role structs — `Background`, `Surface`, `Border`, `Text`, `Accent`, `Record`,
-  `TierBadge`, `Status`
+  `TierBadge`, `Progress`, `Skeleton`, `Status`
 - the modifier enums
 - any doc comment
 

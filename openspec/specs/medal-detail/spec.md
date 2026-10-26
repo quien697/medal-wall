@@ -1,7 +1,9 @@
 # medal-detail Specification
 
 ## Purpose
-TBD - created by archiving change mw-30-medal-detail-redesign. Update Purpose after archive.
+Present one medal in full: the medal and its race name first, then its fixed facts, its whole
+result with unrecorded fields shown as still to fill in, the record marker supplied by the
+screen that opened it, the day's photos and note, and its tags.
 ## Requirements
 ### Requirement: Medal Identity Presentation
 The system SHALL open a medal's detail with the medal itself: its photo, wearing the
