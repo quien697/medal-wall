@@ -37,17 +37,11 @@ final class RacesViewModel {
   }
 
   // MARK: - Computed
-  /// The races to show, sorted by name, each with `editionCount` clamped to zero or more: the
-  /// count is maintained server-side, so a corrupt value must not reach a row and render as
-  /// "-1 editions".
+  /// The races to show, sorted by name, each with `editionCount` clamped to zero or more.
   var sortedRaces: [Race] {
     races
       .sorted { $0.name.localizedCompare($1.name) == .orderedAscending }
-      .map { race in
-        var clamped = race
-        clamped.editionCount = max(0, race.editionCount)
-        return clamped
-      }
+      .withClampedEditionCounts
   }
 
   /// Bones stand in for the races while they load, until a load first succeeds.

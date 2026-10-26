@@ -86,6 +86,84 @@ struct SearchViewModelRepositoryTests {
     #expect(viewModel.matchingRaces.map(\.id) == ["new", "old"])
   }
 
+  // MARK: - Overlapping loads
+  @Test("A load that lands after a newer one leaves the newer races", .timeLimit(.minutes(1)))
+  func testStaleLoadLeavesNewerRaces() async throws {
+    let raceRepository = StubRaceRepository(races: [makeRace(id: "race", name: "Taipei Run")])
+    let viewModel = SearchViewModel(
+      medalRepository: StubMedalRepository(), raceRepository: raceRepository)
+    viewModel.searchText = "Taipei"
+    await raceRepository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.load(userId: "uid") }
+    await raceRepository.fetchHold.waitForStart()
+    _ = try await raceRepository.deleteRace(id: "race")
+
+    await viewModel.load(userId: "uid")
+    await raceRepository.fetchHold.release()
+    await olderLoad.value
+
+    #expect(viewModel.matchingRaces.isEmpty)
+  }
+
+  @Test("A load that lands after a newer one leaves the newer medals", .timeLimit(.minutes(1)))
+  func testStaleLoadLeavesNewerMedals() async throws {
+    let medalRepository = StubMedalRepository(medals: [makeMedal(id: "a", name: "Taipei Run")])
+    let viewModel = SearchViewModel(
+      medalRepository: medalRepository, raceRepository: StubRaceRepository())
+    viewModel.searchText = "Taipei"
+    await medalRepository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.load(userId: "uid") }
+    await medalRepository.fetchHold.waitForStart()
+    try await medalRepository.deleteMedal(id: "a", userId: "uid")
+
+    await viewModel.load(userId: "uid")
+    await medalRepository.fetchHold.release()
+    await olderLoad.value
+
+    #expect(viewModel.matchingMedals.isEmpty)
+  }
+
+  @Test("A load that fails after a newer one succeeded sets no error", .timeLimit(.minutes(1)))
+  func testStaleLoadFailureSetsNoError() async {
+    let raceRepository = StubRaceRepository(races: [makeRace(id: "race", name: "Taipei Run")])
+    let viewModel = SearchViewModel(
+      medalRepository: StubMedalRepository(), raceRepository: raceRepository)
+    await raceRepository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.load(userId: "uid") }
+    await raceRepository.fetchHold.waitForStart()
+
+    await viewModel.load(userId: "uid")
+    await raceRepository.setFetchOutcome(.failure(.raceFetchFailed("offline")))
+    await raceRepository.fetchHold.release()
+    await olderLoad.value
+
+    #expect(viewModel.error == nil)
+  }
+
+  @Test(
+    "A load that lands after a newer one started does not count as finished",
+    .timeLimit(.minutes(1)))
+  func testStaleLoadDoesNotCountAsFinished() async {
+    let medalRepository = StubMedalRepository()
+    let viewModel = SearchViewModel(
+      medalRepository: medalRepository, raceRepository: StubRaceRepository())
+    viewModel.searchText = "Osaka"
+    await medalRepository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.load(userId: "uid") }
+    await medalRepository.fetchHold.waitForStart()
+    await medalRepository.fetchHold.holdNext()
+    let newerLoad = Task { await viewModel.load(userId: "uid") }
+    await medalRepository.fetchHold.waitForStart()
+
+    await medalRepository.fetchHold.release()
+    await olderLoad.value
+
+    #expect(!viewModel.hasFinishedLoadingMedals)
+    await medalRepository.fetchHold.release()
+    await newerLoad.value
+    #expect(viewModel.isShowingNoResults)
+  }
+
   // MARK: - No results
   @Test("No results shows once both loads finish with nothing matching")
   func testNoResultsAfterBothLoads() async {
@@ -212,6 +290,37 @@ struct SearchViewModelRepositoryTests {
     if case .medalFetchFailed = viewModel.error {
     } else {
       Issue.record("expected medalFetchFailed, got \(String(describing: viewModel.error))")
+    }
+  }
+
+  @Test("When both fetches fail one error is set and no results can show")
+  func testBothFetchesFail() async {
+    let viewModel = SearchViewModel(
+      medalRepository: StubMedalRepository(fetchOutcome: .failure(.medalFetchFailed("offline"))),
+      raceRepository: StubRaceRepository(fetchOutcome: .failure(.raceFetchFailed("offline"))))
+
+    await viewModel.load(userId: "uid")
+    viewModel.searchText = "Taipei"
+
+    #expect(viewModel.error != nil)
+    #expect(viewModel.isShowingNoResults)
+  }
+
+  @Test("A failure while an error is still set leaves that error, so one sheet shows")
+  func testLaterFailureKeepsFirstError() async {
+    let medalRepository = StubMedalRepository()
+    let raceRepository = StubRaceRepository(fetchOutcome: .failure(.raceFetchFailed("offline")))
+    let viewModel = SearchViewModel(
+      medalRepository: medalRepository, raceRepository: raceRepository)
+    await viewModel.load(userId: "uid")
+    await raceRepository.setFetchOutcome(.success(()))
+    await medalRepository.setFetchOutcome(.failure(.medalFetchFailed("offline")))
+
+    await viewModel.load(userId: "uid")
+
+    if case .raceFetchFailed = viewModel.error {
+    } else {
+      Issue.record("expected raceFetchFailed, got \(String(describing: viewModel.error))")
     }
   }
 

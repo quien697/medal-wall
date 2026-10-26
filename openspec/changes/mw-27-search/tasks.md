@@ -24,8 +24,11 @@
       false for an empty query
 - [x] 2.3 Write failing tests for failures: a failed race fetch sets `.raceFetchFailed` and the
       medals still match; a failed medal fetch sets `.medalFetchFailed` and the races still
-      match; a failed fetch counts as finished for `isShowingNoResults`; a reload keeps the
-      previous arrays until it completes
+      match; a failure while an error is set keeps the first, so both failing sets one error;
+      a failed fetch counts as finished for `isShowingNoResults`; a reload keeps the previous
+      arrays until it completes; a load that lands after a newer one started changes neither
+      the data, the error nor whether the fetch counts as finished (the stubs answer a held
+      fetch with the data held when it started, and `FetchHold` can hold two fetches at once)
 - [x] 2.4 Create `Features/Search/ViewModels/SearchViewModel.swift` to pass 2.1–2.3 (design.md,
       SearchViewModel and Loading); add it to the test target's `membershipExceptions`
 
@@ -36,10 +39,10 @@
 - [x] 3.2 Write a failing `ImageTypeTests` case for the two search-row image types (the ringed
       medal and the race share one footprint, circle for the medal, rounded rect for the race),
       then add them to `ImageType`
-- [x] 3.3 Create `SearchMedalRow` and `SearchRaceRow` per the mockup and design.md, Rows: both
-      sections share one image footprint; the medal's third line is "distance · time" or the
-      distance alone; the race shows the inflected edition count. Previews: timed and untimed
-      medal, a race with one and with several editions
+- [x] 3.3 Create `SearchMedalRow` and `SearchRaceRow` per design.md, Rows: both sections share
+      one image footprint; the medal shows its date, name, place and distance, each on its own
+      line; the race shows the inflected edition count. Previews: a medal with a standard and
+      with a long custom distance, a race with one and with several editions
 - [x] 3.4 Create `SearchResultList`: one `List`, Your Collection then Races, a section left out
       when empty, rows on `Color.Surface.primary`; medal rows link to
       `MedalDetailView(medal:personalRecordIDs:)`, race rows to `RaceDetailView(race:)`; no
@@ -58,7 +61,8 @@
 - [x] 4.1 Update `RacesViewModelTests` and `RacesViewModelRepositoryTests`: delete the
       search-text tests, rename `filteredRaces` to `sortedRaces` in the rest; watch them fail
 - [x] 4.2 Remove `searchText` from `RacesViewModel` and rename `filteredRaces` to
-      `sortedRaces`, sorting and clamping only
+      `sortedRaces`, sorting and clamping only; the clamp is `withClampedEditionCounts` in
+      `Race+Computed.swift`, tested in `RaceComputedTests` and shared with `SearchViewModel`
 - [x] 4.3 Remove `.searchable` and `.autocorrectionDisabled()` from `RacesView`; remove
       `RaceList`'s `searchText` parameter, its no-search-results branch and preview; delete
       `RaceNoResultState.swift`

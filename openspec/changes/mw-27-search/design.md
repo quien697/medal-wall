@@ -62,6 +62,13 @@ shows up the next time Search is on screen.
 A reload replaces the arrays when it finishes; until then the previous results stay on screen.
 There is no skeleton and no spinner: a section appears when its data arrives.
 
+Loads are never cancelled, so two can overlap: the tab reappears while an earlier load still
+waits on a slow network. Each load takes a number, and a fetch writes its data or its error, or
+counts as finished, only if no newer load has started since. An older snapshot never replaces a
+newer one, so a race deleted from its detail screen cannot come back when the load from before
+the delete lands last, and an older load landing first cannot let "No Results" show while the
+newer load's data is still on its way.
+
 ### Matching
 The query is the field's text trimmed of `.whitespacesAndNewlines`. An empty query shows the
 hint. Otherwise a medal or race matches when `localizedStandardContains(query)` holds for its
@@ -78,13 +85,14 @@ against every race.
 
 ### SearchViewModel
 - **Data:** `medals`, `races`.
-- **State:** `error: AppError?`, and whether each fetch has finished at least once
-  (succeeded or failed). Together these give `isAwaitingFirstLoad`.
+- **State:** `error: AppError?`, whether each fetch has finished at least once (succeeded or
+  failed), which together give `isAwaitingFirstLoad`, and the newest load's number.
 - **Filter:** `searchText`.
 - **Dependencies:** `any MedalRepository`, `any RaceRepository`, defaulting to the Firestore
   implementations, as the other view models take them.
 - **Computed:** `query` (trimmed), `isQueryEmpty`, `matchingMedals`, `matchingRaces` (with
-  `editionCount` clamped to `max(0, …)` as the Races list does), `personalRecordIDs` (from the
+  `editionCount` clamped to zero or more by `withClampedEditionCounts` in `Race+Computed.swift`,
+  which the Races list's `sortedRaces` also uses), `personalRecordIDs` (from the
   **whole** collection, not the matches), and `isShowingNoResults` — a non-empty query, no
   matches in either section, and not `isAwaitingFirstLoad`. A reload does not hide a "No
   Results" already shown.
@@ -109,16 +117,22 @@ sit on `Color.Surface.primary`, as the Races list's rows do. `List` builds rows 
 neither section is capped.
 
 ### Rows
-Both rows follow the mockup: an image, then a bold name and two secondary lines. The image
-takes the same 52 pt footprint in both sections, so the two sections' text columns line up.
+Each row is an image beside a stack of text. The race row follows the mockup; the medal row
+departs from it, as below. The image takes the same 52 pt footprint in both sections, so the
+two sections' text columns line up.
 `PhotoImage` takes its size from `ImageType`, so this is one new `ImageType` case per asset: a
 search-row race image of 52 pt, and a search-row medal photo of 46 pt that `.medalRing()`'s
 3 pt ring brings to 52, as `medalThumbnail` (96 pt) and its ring make the Medal list's 102 pt
 circle. `ImageTypeTests` covers both.
-- **`SearchMedalRow`:** the medal photo in its gold ring (`.medalRing()`), the name, the date
-  (`formattedMonthDayYear()`), and the distance label with the finish time —
-  `"\(raceEvent.displayLabel) · \(finishTime.formattedHMS)"`, or the distance label alone when
-  no time is recorded. No PR tag: the row stays one line shorter than the Medal tab's.
+- **`SearchMedalRow`:** the medal photo in its gold ring (`.medalRing()`), then four lines:
+  the date (`formattedMonthDayYear()`, caption, tertiary), the name, `place.formatted`
+  (caption, secondary) and `raceEvent.displayLabel` (caption, tertiary).
+  - A medal can be found by its place, so the row shows it, beneath the name in the colour the
+    race row gives its place.
+  - The distance has a line of its own because a custom distance can read "Wheel Chair
+    9,999.9999 mi", which would overflow a line shared with the date.
+  - There is no finish time, since a time cannot be searched for and the detail screen shows it.
+    There is no PR tag either.
 - **`SearchRaceRow`:** the race photo, the name, `place.formatted`, and the inflected edition
   count, as `RaceRow` shows it.
 
@@ -132,12 +146,17 @@ view model's whole-collection `personalRecordIDs`. A race row is a `NavigationLi
 ### Errors
 A failed medal fetch sets `.medalFetchFailed`, a failed race fetch `.raceFetchFailed`. The view
 presents them through the project's `ErrorWrapper` bridge and resets `error` on dismiss. The
-section whose data did load stays searchable.
+section whose data did load stays searchable. A failure while `error` is still set leaves it
+alone: `.sheet(item:)` closes and reopens when its item changes, so replacing the error would
+show a second sheet. When both fetches fail, one sheet shows; both failures usually share a
+cause, such as no connection. `SearchViewModel` spells out `@MainActor`, as `LoginViewModel`
+does, because the test module compiles it without the app's default isolation and the two
+fetches both write `error`.
 
 ### The Races list
 - `RacesView` drops `.searchable` and `.autocorrectionDisabled()`.
 - `RacesViewModel` drops `searchText`. `filteredRaces` no longer filters, so it becomes
-  `sortedRaces`: sorted by name, `editionCount` clamped.
+  `sortedRaces`: sorted by name, `editionCount` clamped by `withClampedEditionCounts`.
 - `RaceList` drops its `searchText` parameter and its no-search-results branch, and
   `RaceNoResultState.swift` is deleted.
 - The three catalog keys only the Races search used — "Search race events...",

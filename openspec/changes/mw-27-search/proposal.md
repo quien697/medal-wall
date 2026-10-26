@@ -42,11 +42,14 @@ changes no requirement. The `search` spec records that the Races list has none.
 
 - **Root view:** `ContentView` gains the Search tab.
 - **New feature folder** `MedalWall/Features/Search/`: `SearchView`, `SearchViewModel`, and the
-  compact result rows and section header the mockup draws.
+  result rows and section header.
+- **Models:** `Medal+Search.swift` and `Race+Search.swift` beside their models;
+  `Race+Computed.swift` gains the edition-count clamp that Search and the Races list share.
 - **Races list:** `RacesView` loses `.searchable`; `RacesViewModel` loses `searchText`;
   `RaceList` loses its no-search-results branch; `RaceNoResultState` is deleted. Their tests are
   updated to match.
-- **Tests:** new `SearchViewModel` tests using the existing repository stubs;
+- **Tests:** new `SearchViewModel` tests using the existing repository stubs, whose medal and
+  race fetches now answer with the data held when the fetch started;
   `project.pbxproj`'s test-target membership list gains the new files the tests compile.
 - **Localization:** the tab label, hint, prompt and section titles in English and zh-TW.
 - No Firestore schema, repository, design-token or dependency changes.

@@ -17,10 +17,12 @@ actor FetchHold {
   private var hasStarted = false
   private var isReleased = false
   private var startWaiter: CheckedContinuation<Void, Never>?
-  private var heldFetch: CheckedContinuation<Void, Never>?
+  /// The fetches held so far, oldest first.
+  private var heldFetches: [CheckedContinuation<Void, Never>] = []
 
   // MARK: - Test control
-  /// Holds the next fetch once it starts.
+  /// Holds the next fetch once it starts. Arming again while a fetch is held holds a second
+  /// one too, so two loads can be in flight at once.
   func holdNext() {
     isArmed = true
     hasStarted = false
@@ -33,11 +35,13 @@ actor FetchHold {
     await withCheckedContinuation { startWaiter = $0 }
   }
 
-  /// Lets the held fetch finish.
+  /// Lets the oldest held fetch finish, or the next one through if none has started yet.
   func release() {
-    isReleased = true
-    heldFetch?.resume()
-    heldFetch = nil
+    if heldFetches.isEmpty {
+      isReleased = true
+    } else {
+      heldFetches.removeFirst().resume()
+    }
   }
 
   // MARK: - Stub side
@@ -49,7 +53,7 @@ actor FetchHold {
     startWaiter?.resume()
     startWaiter = nil
     if !isReleased {
-      await withCheckedContinuation { heldFetch = $0 }
+      await withCheckedContinuation { heldFetches.append($0) }
     }
   }
 }

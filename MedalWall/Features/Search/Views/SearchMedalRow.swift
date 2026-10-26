@@ -7,18 +7,18 @@
 
 import SwiftUI
 
-/// One medal as a search result: its photo in the gold ring, its name, its date, and its
-/// distance with the time it was run in.
+/// One medal as a search result: its photo in the gold ring, its date, its name, where it was
+/// run, and its distance.
 ///
-/// More compact than the collection's `MedalRow`, with no PR tag, so a medal takes the same
-/// space as a race in the results.
+/// A medal can be found by its place, so the row shows it, beneath the name as a race row
+/// does. The distance has a line of its own, so a long custom distance never shares one.
 struct SearchMedalRow: View {
   // MARK: - Properties
   let photoUrl: String?
-  let name: String
   let date: String
+  let name: String
+  let place: String
   let distance: String
-  let finishTime: String?
 
   // MARK: - Body
   var body: some View {
@@ -27,49 +27,47 @@ struct SearchMedalRow: View {
         .medalRing()
 
       VStack(alignment: .leading) {
+        Text(date)
+          .font(.TypeScale.caption)
+          .monospacedDigit()
+          .foregroundStyle(Color.Text.tertiary)
+
         Text(name)
           .font(.TypeScale.headline)
           .foregroundStyle(Color.Text.primary)
 
-        Text(date)
+        Text(place)
           .font(.TypeScale.caption)
-          .monospacedDigit()
           .foregroundStyle(Color.Text.secondary)
 
-        Group {
-          if let finishTime {
-            Text(verbatim: "\(distance) · \(finishTime)")
-          } else {
-            Text(distance)
-          }
-        }  // Group
-        .font(.TypeScale.caption)
-        .monospacedDigit()
-        .foregroundStyle(Color.Text.tertiary)
+        Text(distance)
+          .font(.TypeScale.caption)
+          .monospacedDigit()
+          .foregroundStyle(Color.Text.tertiary)
       }  // VStack
     }  // HStack
   }
 }
 
-#Preview("Timed") {
+#Preview("Standard distance") {
   SearchMedalRow(
     photoUrl: nil,
-    name: "Taipei Marathon 2019",
     date: "Dec 15, 2019",
-    distance: "Full",
-    finishTime: "03:30:24"
+    name: "Taipei Marathon 2019",
+    place: "Taipei City, Taiwan",
+    distance: "Full"
   )
   .padding()
   .background(Color.Surface.primary)
 }
 
-#Preview("Untimed") {
+#Preview("Long custom distance") {
   SearchMedalRow(
     photoUrl: nil,
-    name: "BMO Vancouver Marathon 2022",
-    date: "May 1, 2022",
-    distance: "Virtual Full",
-    finishTime: nil
+    date: "Jul 6, 2025",
+    name: "Gold Coast Ultra",
+    place: "Gold Coast, Australia",
+    distance: "Wheel Chair 9,999.9999 mi"
   )
   .padding()
   .background(Color.Surface.primary)

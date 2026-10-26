@@ -12,13 +12,11 @@ import SwiftUI
 /// A section with no matches is left out. `List` builds its rows lazily, so neither section
 /// is capped.
 struct SearchResultList: View {
-  // MARK: - Properties
   let medals: [Medal]
   let races: [Race]
   /// Taken from the whole collection, so a query never promotes a medal into a record.
   let personalRecordIDs: Set<String>
 
-  // MARK: - Body
   var body: some View {
     List {
       if !medals.isEmpty {
@@ -29,10 +27,10 @@ struct SearchResultList: View {
             } label: {
               SearchMedalRow(
                 photoUrl: medal.photoUrl,
-                name: medal.name,
                 date: medal.date.formattedMonthDayYear(),
-                distance: medal.raceEvent.displayLabel,
-                finishTime: medal.recordedFinishTime?.formattedHMS
+                name: medal.name,
+                place: medal.place.formatted,
+                distance: medal.raceEvent.displayLabel
               )
             }  // NavigationLink
             .listRowBackground(Color.Surface.primary)

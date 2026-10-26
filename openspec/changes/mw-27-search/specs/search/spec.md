@@ -107,18 +107,18 @@ A→Z in the user's locale, two races sharing a name ordered by identifier.
   before "T"
 
 ### Requirement: Result Content
-Each medal result SHALL show the medal's photo in its gold ring, its name, its date, and its
-distance followed by its finish time, or its distance alone when no time is recorded. Each race
-result SHALL show the race's photo, its name, its displayed place and its edition count, the
-count clamped to zero or more. Results SHALL NOT offer swipe actions.
+Each medal result SHALL show the medal's photo in its gold ring, its date, its name, its
+displayed place, and its distance on a line of its own. Each race result SHALL show the race's
+photo, its name, its displayed place and its edition count, the count clamped to zero or more.
+Results SHALL NOT offer swipe actions.
 
-#### Scenario: A timed medal
-- **WHEN** a Full marathon medal finished in 03:30:24 is listed
-- **THEN** its row reads "Full · 03:30:24" beneath its name and date
+#### Scenario: A medal found by its place
+- **WHEN** the query "Taiwan" matches a medal run in Taipei City by its place alone
+- **THEN** its row shows "Taipei City, Taiwan" beneath its name
 
-#### Scenario: An untimed medal
-- **WHEN** a medal with no recorded finish time is listed
-- **THEN** its row shows its distance with no time
+#### Scenario: A long custom distance
+- **WHEN** a matching medal's distance reads "Wheel Chair 9,999.9999 mi"
+- **THEN** its row shows the whole distance on its own line, beneath the place
 
 #### Scenario: A corrupt edition count
 - **WHEN** a matching race's stored edition count is negative
@@ -142,8 +142,9 @@ is still running; a reload SHALL NOT hide it.
 ### Requirement: Search Data Loading
 The Search tab SHALL load the races and the signed-in user's medals each time it appears,
 including when the user returns to it from a result's detail screen, and SHALL filter them on
-the phone. Leaving the Search screen while a load runs SHALL NOT cancel the load. While a
-reload runs, the results already shown SHALL stay. The Search tab SHALL NOT show skeleton
+the phone. Leaving the Search screen while a load runs SHALL NOT cancel the load. A load that
+finishes after a newer load has started SHALL NOT change the results or present an error. While
+a reload runs, the results already shown SHALL stay. The Search tab SHALL NOT show skeleton
 bones or a loading indicator; a section appears when its data has loaded.
 
 #### Scenario: A change elsewhere is found
@@ -154,6 +155,11 @@ bones or a loading indicator; a section appears when its data has loaded.
 - **WHEN** the user opens a race from the results, deletes it, and returns to Search
 - **THEN** the deleted race is no longer listed
 
+#### Scenario: An older load finishes last
+- **WHEN** a load that started before a race was deleted finishes after the load started on
+  returning to Search
+- **THEN** the deleted race stays off the list, and the older load presents no error
+
 #### Scenario: A reload keeps results
 - **WHEN** the Search tab reappears with results on screen
 - **THEN** those results stay until the reload replaces them
@@ -161,11 +167,15 @@ bones or a loading indicator; a section appears when its data has loaded.
 ### Requirement: Search Load Failure
 When the medals or the races fail to load, the system SHALL present the error sheet for that
 failure — a medal fetch failure or a race fetch failure — and the data that did load SHALL
-stay searchable.
+stay searchable. When both fail, one error sheet SHALL show.
 
 #### Scenario: Races fail, medals load
 - **WHEN** the race fetch fails and the medal fetch succeeds
 - **THEN** the race fetch error sheet shows, and a query still lists matching medals
+
+#### Scenario: Both fail
+- **WHEN** the medal fetch and the race fetch both fail
+- **THEN** one error sheet shows
 
 ### Requirement: Opening A Result
 Selecting a medal result SHALL open that medal's detail screen, with its personal-record tag

@@ -13,14 +13,10 @@ import SwiftUI
 /// keystroke; until the first loads finish, a query that matches nothing yet shows an empty
 /// page rather than "No Results".
 struct SearchView: View {
-  // MARK: - Environment
   @Environment(UserManager.self) private var userManager
-
-  // MARK: - State
   @State private var viewModel = SearchViewModel()
   @State private var errorWrapper: ErrorWrapper?
 
-  // MARK: - Body
   var body: some View {
     NavigationStack {
       Group {
