@@ -35,8 +35,9 @@ searches are later phases.
   result leads.
 
 ### Modified Capabilities
-_None._ No existing spec states a requirement for the Races list's search field, so removing it
-changes no requirement. The `search` spec records that the Races list has none.
+- `skeleton-loading`: Bone Appearance drops "the search field" from what never becomes a bone;
+  the Races list's was the only search field on a screen that shows bones. The `search` spec
+  records that the Races list has none.
 
 ## Impact
 

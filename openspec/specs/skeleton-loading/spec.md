@@ -42,8 +42,8 @@ since the reload's older data would bring back a race deleted meanwhile.
 - **THEN** the editions section shows bones until the editions arrive
 
 ### Requirement: Bone Appearance
-Only data SHALL become bones. Large titles, navigation and toolbar buttons, the search field,
-section titles, subtitles and the tab bar SHALL show as they do once the data has loaded. Each
+Only data SHALL become bones. Large titles, navigation and toolbar buttons, section titles,
+subtitles and the tab bar SHALL show as they do once the data has loaded. Each
 bone SHALL sit where the content it stands in for sits, laid out as the screen lays out that
 content. A bone for a photo, a medal ring, a seal or a progress bar SHALL take that content's
 size and shape. A bone for a line of text, a tag or a chip SHALL be a bar as wide as it,
