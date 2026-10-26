@@ -35,15 +35,17 @@ buttons are the system's. Nothing in the tab bar or the field is hand-built.
 ### Where the code lives
 `MedalWall/Features/Search/`, following the other feature folders:
 - `Views/SearchView.swift` — the screen: its own `NavigationStack`, `.searchable(text:prompt:)`
-  with the prompt "Search races and medals", the "Search" large title (inline-large with
+  with the prompt "Search races and medals" and `.autocorrectionDisabled()` as the Races list
+  had it, so a race name is never corrected away, the "Search" large title (inline-large with
   `ExpandedNavigationTitle`, as Medals and Races), the error-sheet bridge, and the switch between
   the hint, the results and no results.
 - `Views/SearchResultList.swift` — the `List` with the two sections.
 - `Views/SearchSectionHeader.swift` — a section title (`sectionTitleStyle()`) and its count.
 - `Views/SearchMedalRow.swift`, `Views/SearchRaceRow.swift` — the compact rows the mockup draws.
 - `ViewModels/SearchViewModel.swift`.
-- `Models/Medal+Search.swift`, `Models/Race+Search.swift` — matching and ordering, as array
-  extensions, the way `Medal+Browsing.swift` holds the collection's ordering and filtering.
+
+Matching and ordering live with the models, as array extensions:
+`Models/Medal/Medal+Search.swift` and `Models/Race/Race+Search.swift`.
 
 ### Loading
 `SearchViewModel.load(userId:)` fetches the races and the user's medals concurrently (`async
@@ -95,8 +97,9 @@ against every race.
 | `isShowingNoResults` | `ContentUnavailableView.search(text: query)` |
 | no matches yet, first load still running | an empty background — no hint, no "No Results" |
 
-The hint follows `EmptyState`'s type and colours with the magnifying-glass symbol in place of
-`EmptyState`'s tray.
+The hint is an `EmptyState` with the magnifying-glass symbol: `EmptyState` takes a
+`systemImage`, defaulting to the tray its other screens show, so every empty state keeps one
+type and colour treatment.
 
 ### Results list
 One `List` with up to two `Section`s, Your Collection then Races. A section with no matches is
@@ -106,10 +109,12 @@ sit on `Color.Surface.primary`, as the Races list's rows do. `List` builds rows 
 neither section is capped.
 
 ### Rows
-Both rows follow the mockup: an image, then a bold name and two secondary lines, with the same
-image size in both sections, as the mockup draws it. `PhotoImage` takes its size from
-`ImageType`, so the shared size is one new `ImageType` case per asset — a search-row medal and
-a search-row race image — covered by `ImageTypeTests`.
+Both rows follow the mockup: an image, then a bold name and two secondary lines. The image
+takes the same 52 pt footprint in both sections, so the two sections' text columns line up.
+`PhotoImage` takes its size from `ImageType`, so this is one new `ImageType` case per asset: a
+search-row race image of 52 pt, and a search-row medal photo of 46 pt that `.medalRing()`'s
+3 pt ring brings to 52, as `medalThumbnail` (96 pt) and its ring make the Medal list's 102 pt
+circle. `ImageTypeTests` covers both.
 - **`SearchMedalRow`:** the medal photo in its gold ring (`.medalRing()`), the name, the date
   (`formattedMonthDayYear()`), and the distance label with the finish time —
   `"\(raceEvent.displayLabel) · \(finishTime.formattedHMS)"`, or the distance label alone when
@@ -121,8 +126,8 @@ Neither row carries swipe actions. Deleting stays on the Races list and the deta
 
 ### Opening a result
 A medal row is a `NavigationLink` to `MedalDetailView(medal:personalRecordIDs:)` with the
-view model's whole-collection `personalRecordIDs`, using the zoom transition the Medal tab uses.
-A race row is a `NavigationLink` to `RaceDetailView(race:)`.
+view model's whole-collection `personalRecordIDs`. A race row is a `NavigationLink` to
+`RaceDetailView(race:)`.
 
 ### Errors
 A failed medal fetch sets `.medalFetchFailed`, a failed race fetch `.raceFetchFailed`. The view
@@ -135,8 +140,8 @@ section whose data did load stays searchable.
   `sortedRaces`: sorted by name, `editionCount` clamped.
 - `RaceList` drops its `searchText` parameter and its no-search-results branch, and
   `RaceNoResultState.swift` is deleted.
-- The two catalog keys only the Races search used — "Search race events..." and
-  "No race events match '%@'" — are removed from `Localizable.xcstrings`.
+- The three catalog keys only the Races search used — "Search race events...",
+  "No race events match '%@'" and "No Results" — are removed from `Localizable.xcstrings`.
 
 ### Localization
 New keys in `Localizable.xcstrings`, with zh-TW:

@@ -760,6 +760,16 @@
         }
       }
     },
+    "Find any race by name, city or country." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "依名稱、城市或國家尋找任何賽事。"
+          }
+        }
+      }
+    },
     "Finish Time" : {
       "localizations" : {
         "zh-TW" : {
@@ -1149,26 +1159,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "尚無賽事"
-          }
-        }
-      }
-    },
-    "No race events match '%@'" : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "沒有符合「%@」的賽事"
-          }
-        }
-      }
-    },
-    "No Results" : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "沒有結果"
           }
         }
       }
@@ -1615,6 +1605,16 @@
         }
       }
     },
+    "Search" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "搜尋"
+          }
+        }
+      }
+    },
     "Search for a city or place" : {
       "localizations" : {
         "zh-TW" : {
@@ -1625,12 +1625,22 @@
         }
       }
     },
-    "Search race events..." : {
+    "Search races and medals" : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "搜尋賽事…"
+            "value" : "搜尋賽事與獎牌"
+          }
+        }
+      }
+    },
+    "Search Races and Medals" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "搜尋賽事與獎牌"
           }
         }
       }

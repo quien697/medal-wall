@@ -10,10 +10,11 @@ import SwiftUI
 struct EmptyState: View {
   let title: LocalizedStringKey
   let description: LocalizedStringKey
+  var systemImage = "tray"
 
   var body: some View {
     ContentUnavailableView {
-      Label(title, systemImage: "tray")
+      Label(title, systemImage: systemImage)
         .font(.TypeScale.title2)
         .foregroundStyle(Color.Text.primary)
     } description: {

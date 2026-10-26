@@ -16,16 +16,16 @@ struct RacesViewModelTests {
     Race(name: name, place: place, createdBy: "user-1")
   }
 
-  // MARK: - filteredRaces
-  @Test("filteredRaces is empty when no races are loaded")
-  func testFilteredRacesEmpty() {
+  // MARK: - sortedRaces
+  @Test("sortedRaces is empty when no races are loaded")
+  func testSortedRacesEmpty() {
     let viewModel = RacesViewModel()
 
-    #expect(viewModel.filteredRaces.isEmpty)
+    #expect(viewModel.sortedRaces.isEmpty)
   }
 
-  @Test("filteredRaces returns all races sorted alphabetically when searchText is empty")
-  func testFilteredRacesNoSearchSortedAlphabetically() {
+  @Test("sortedRaces returns every race sorted alphabetically")
+  func testSortedRacesSortedAlphabetically() {
     let viewModel = RacesViewModel()
     viewModel.races = [
       makeRace(name: "Zermatt Marathon"),
@@ -33,83 +33,16 @@ struct RacesViewModelTests {
       makeRace(name: "Boston Marathon")
     ]
 
-    let names = viewModel.filteredRaces.map(\.name)
+    let names = viewModel.sortedRaces.map(\.name)
     #expect(names == ["Apple Run", "Boston Marathon", "Zermatt Marathon"])
   }
 
-  @Test("filteredRaces returns only matching races when searchText is set")
-  func testFilteredRacesWithSearch() {
-    let viewModel = RacesViewModel()
-    viewModel.races = [
-      makeRace(name: "Boston Marathon"),
-      makeRace(name: "Berlin Marathon"),
-      makeRace(name: "Apple Run")
-    ]
-    viewModel.searchText = "Marathon"
-
-    let names = viewModel.filteredRaces.map(\.name)
-    #expect(names == ["Berlin Marathon", "Boston Marathon"])
-  }
-
-  @Test("filteredRaces search is case-insensitive")
-  func testFilteredRacesCaseInsensitive() {
-    let viewModel = RacesViewModel()
-    viewModel.races = [makeRace(name: "Boston Marathon"), makeRace(name: "Apple Run")]
-    viewModel.searchText = "marathon"
-
-    #expect(viewModel.filteredRaces.count == 1)
-    #expect(viewModel.filteredRaces.first?.name == "Boston Marathon")
-  }
-
-  @Test("filteredRaces returns empty when no races match the search")
-  func testFilteredRacesNoMatch() {
-    let viewModel = RacesViewModel()
-    viewModel.races = [makeRace(name: "Boston Marathon"), makeRace(name: "Apple Run")]
-    viewModel.searchText = "XYZ"
-
-    #expect(viewModel.filteredRaces.isEmpty)
-  }
-
-  @Test("filteredRaces results remain sorted alphabetically after filtering")
-  func testFilteredRacesSortedAfterFilter() {
-    let viewModel = RacesViewModel()
-    viewModel.races = [
-      makeRace(name: "Vancouver Marathon"),
-      makeRace(name: "Boston Marathon"),
-      makeRace(name: "Berlin Marathon")
-    ]
-    viewModel.searchText = "Marathon"
-
-    let names = viewModel.filteredRaces.map(\.name)
-    #expect(names == ["Berlin Marathon", "Boston Marathon", "Vancouver Marathon"])
-  }
-
-  @Test("filteredRaces returns the single race when only one is loaded")
-  func testFilteredRacesSingleRace() {
+  @Test("sortedRaces returns the single race when only one is loaded")
+  func testSortedRacesSingleRace() {
     let viewModel = RacesViewModel()
     viewModel.races = [makeRace(name: "Boston Marathon")]
 
-    #expect(viewModel.filteredRaces.count == 1)
-    #expect(viewModel.filteredRaces.first?.name == "Boston Marathon")
-  }
-
-  @Test("filteredRaces returns all races sorted when search matches all of them")
-  func testFilteredRacesSearchMatchesAll() {
-    let viewModel = RacesViewModel()
-    viewModel.races = [makeRace(name: "Berlin Run"), makeRace(name: "Apple Run")]
-    viewModel.searchText = "Run"
-
-    let names = viewModel.filteredRaces.map(\.name)
-    #expect(names == ["Apple Run", "Berlin Run"])
-  }
-
-  @Test("filteredRaces matches a partial name substring")
-  func testFilteredRacesPartialMatch() {
-    let viewModel = RacesViewModel()
-    viewModel.races = [makeRace(name: "Boston Marathon"), makeRace(name: "Apple Run")]
-    viewModel.searchText = "Bos"
-
-    #expect(viewModel.filteredRaces.count == 1)
-    #expect(viewModel.filteredRaces.first?.name == "Boston Marathon")
+    #expect(viewModel.sortedRaces.count == 1)
+    #expect(viewModel.sortedRaces.first?.name == "Boston Marathon")
   }
 }

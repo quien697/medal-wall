@@ -9,18 +9,15 @@ import SwiftUI
 
 struct RaceList: View {
   let races: [Race]
-  let searchText: String
   /// Whether a row can be swiped away; off while the list reloads.
   let canDelete: Bool
   let onDelete: (Race) -> Void
 
   var body: some View {
     Group {
-      if races.isEmpty && searchText.isEmpty {
+      if races.isEmpty {
         EmptyState(
           title: "No Race Events", description: "Tap the + button to add your first race event!")
-      } else if races.isEmpty {
-        RaceNoResultState(searchText: searchText)
       } else {
         List(races) { race in
           NavigationLink {
@@ -53,18 +50,14 @@ struct RaceList: View {
 }
 
 #Preview("Races") {
-  RaceList(races: Race.sampleData, searchText: "", canDelete: true, onDelete: { _ in })
+  RaceList(races: Race.sampleData, canDelete: true, onDelete: { _ in })
 }
 
 #Preview("Empty") {
-  RaceList(races: [], searchText: "", canDelete: true, onDelete: { _ in })
+  RaceList(races: [], canDelete: true, onDelete: { _ in })
 }
 
 #Preview("Loading") {
-  RaceList(races: Race.placeholders, searchText: "", canDelete: true, onDelete: { _ in })
+  RaceList(races: Race.placeholders, canDelete: true, onDelete: { _ in })
     .skeleton(true)
-}
-
-#Preview("No Search Results") {
-  RaceList(races: [], searchText: "XYZ Marathon", canDelete: true, onDelete: { _ in })
 }

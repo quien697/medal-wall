@@ -57,7 +57,7 @@ struct RacesViewModelRepositoryTests {
 
     await viewModel.loadRaces()
 
-    #expect(viewModel.filteredRaces.first?.editionCount == 0)
+    #expect(viewModel.sortedRaces.first?.editionCount == 0)
   }
 
   @Test("a real edition count passes through unchanged")
@@ -67,7 +67,7 @@ struct RacesViewModelRepositoryTests {
 
     await viewModel.loadRaces()
 
-    #expect(viewModel.filteredRaces.first?.editionCount == 3)
+    #expect(viewModel.sortedRaces.first?.editionCount == 3)
   }
 
   @Test("a failed delete surfaces raceDeleteFailed and keeps the race")
@@ -268,18 +268,17 @@ struct RacesViewModelRepositoryTests {
     #expect(viewModel.displayedRaces.map(\.id) == Race.placeholders.map(\.id))
   }
 
-  @Test("once loaded the list shows the searched races")
-  func testDisplayedRacesAreSearchedAfterLoad() async {
+  @Test("once loaded the list shows every loaded race, sorted")
+  func testDisplayedRacesAreSortedAfterLoad() async {
     let repository = StubRaceRepository(races: [
-      makeRace(id: "boston", name: "Boston Marathon"),
-      makeRace(id: "taipei", name: "Taipei Marathon")
+      makeRace(id: "taipei", name: "Taipei Marathon"),
+      makeRace(id: "boston", name: "Boston Marathon")
     ])
     let viewModel = RacesViewModel(repository: repository)
+
     await viewModel.loadRaces()
 
-    viewModel.searchText = "Taipei"
-
-    #expect(viewModel.displayedRaces.map(\.id) == ["taipei"])
+    #expect(viewModel.displayedRaces.map(\.id) == ["boston", "taipei"])
   }
 
   @Test("a failed first load shows no races, so the empty state shows")

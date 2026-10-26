@@ -60,8 +60,23 @@ struct StringCatalogTests {
   func testRaceListKeysAreTranslated() {
     let keys = [
       "No Race Events",
-      "No race events match '%@'",
       "^[%lld edition](inflect: true)"
+    ]
+
+    for key in keys {
+      #expect(zhTWTable[key] != nil, "missing zh-TW entry for \(key)")
+    }
+  }
+
+  @Test("The Search tab's zh-TW strings ship translated")
+  func testSearchKeysAreTranslated() {
+    let keys = [
+      "Search",
+      "Search Races and Medals",
+      "Find any race by name, city or country.",
+      "Search races and medals",
+      "Your Collection",
+      "Races"
     ]
 
     for key in keys {
@@ -154,6 +169,13 @@ struct StringCatalogTests {
     #expect(zhTWTable["Distance must be greater than zero, with at most 4 decimal places."] == nil)
     #expect(
       zhTWTable["Please enter a distance greater than 0, with up to 4 decimal places."] == nil)
+  }
+
+  @Test("The Races list's retired search strings are gone from the catalog")
+  func testRetiredRaceSearchStringsRemoved() {
+    #expect(zhTWTable["Search race events..."] == nil)
+    #expect(zhTWTable["No race events match '%@'"] == nil)
+    #expect(zhTWTable["No Results"] == nil)
   }
 
   @Test("Every zh-TW entry keeps the format specifiers of its key")

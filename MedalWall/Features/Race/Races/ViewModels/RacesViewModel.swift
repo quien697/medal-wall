@@ -20,9 +20,6 @@ final class RacesViewModel {
   private(set) var hasLoaded = false
   var error: AppError?
 
-  // MARK: - Filter
-  var searchText: String = ""
-
   // MARK: - Dependencies
   private let repository: any RaceRepository
   private let storageService: any PhotoStorage
@@ -40,16 +37,11 @@ final class RacesViewModel {
   }
 
   // MARK: - Computed
-  /// The races to show, searched and sorted, each with `editionCount` clamped to zero or
-  /// more: the count is maintained server-side, so a corrupt value must not reach a row and
-  /// render as "-1 editions".
-  var filteredRaces: [Race] {
-    let searched =
-      searchText.isEmpty
-      ? races
-      : races.filter { $0.name.localizedStandardContains(searchText) }
-    return
-      searched
+  /// The races to show, sorted by name, each with `editionCount` clamped to zero or more: the
+  /// count is maintained server-side, so a corrupt value must not reach a row and render as
+  /// "-1 editions".
+  var sortedRaces: [Race] {
+    races
       .sorted { $0.name.localizedCompare($1.name) == .orderedAscending }
       .map { race in
         var clamped = race
@@ -63,10 +55,10 @@ final class RacesViewModel {
     isLoading && !hasLoaded
   }
 
-  /// The races the list shows: placeholders while bones stand in for them, the searched races
+  /// The races the list shows: placeholders while bones stand in for them, the sorted races
   /// otherwise.
   var displayedRaces: [Race] {
-    isShowingSkeleton ? Race.placeholders : filteredRaces
+    isShowingSkeleton ? Race.placeholders : sortedRaces
   }
 
   /// Whether a race may be swiped away: not while a load runs, since its older data would bring
