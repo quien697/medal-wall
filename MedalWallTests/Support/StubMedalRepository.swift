@@ -51,11 +51,14 @@ actor StubMedalRepository: MedalRepository {
   }
 
   // MARK: - MedalRepository
+  /// Answers with the medals stored when the fetch started, as a request answers with what the
+  /// server held when it was asked, so a held fetch can land with data that is out of date.
   func fetchMedals(userId: String) async throws -> [Medal] {
     fetchCallCount += 1
+    let snapshot = medals.filter { $0.userID == userId }
     await fetchHold.enter()
     try fetchOutcome.get()
-    return medals.filter { $0.userID == userId }
+    return snapshot
   }
 
   func fetchMedal(id: String, userId: String) async throws -> Medal? {

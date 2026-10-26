@@ -76,11 +76,14 @@ actor StubRaceRepository: RaceRepository {
   }
 
   // MARK: - RaceRepository
+  /// Answers with the races stored when the fetch started, as a request answers with what the
+  /// server held when it was asked, so a held fetch can land with data that is out of date.
   func fetchRaces() async throws -> [Race] {
     fetchCallCount += 1
+    let snapshot = races
     await fetchHold.enter()
     try fetchOutcome.get()
-    return races
+    return snapshot
   }
 
   func fetchRace(id: String) async throws -> Race? {

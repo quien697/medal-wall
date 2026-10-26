@@ -21,6 +21,10 @@ struct ContentView: View {
       Tab("Race", systemImage: "figure.run") {
         RacesView()
       }  // Tab
+
+      Tab("Search", systemImage: "magnifyingglass", role: .search) {
+        SearchView()
+      }  // Tab
     }  // TabView
   }
 }

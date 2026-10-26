@@ -24,7 +24,6 @@ struct RacesView: View {
     NavigationStack {
       RaceList(
         races: viewModel.displayedRaces,
-        searchText: viewModel.searchText,
         canDelete: viewModel.canDeleteRaces,
         onDelete: { race in
           selectedRace = race
@@ -37,8 +36,6 @@ struct RacesView: View {
       .background(Color.Background.primary)
       .toolbarTitleDisplayMode(.inlineLarge)
       .toolbarRole(.editor)
-      .searchable(text: $viewModel.searchText, prompt: "Search race events...")
-      .autocorrectionDisabled()
       .task {
         await viewModel.loadRaces()
       }

@@ -49,4 +49,17 @@ struct RaceComputedTests {
 
     #expect(race.fullWebsiteUrl == nil)
   }
+
+  @Test("withClampedEditionCounts lifts a negative edition count to zero and keeps the rest")
+  func testWithClampedEditionCounts() {
+    let races = [
+      Race(id: "corrupt", name: "Corrupt", place: place, editionCount: -1, createdBy: "user1"),
+      Race(id: "valid", name: "Valid", place: place, editionCount: 3, createdBy: "user1")
+    ]
+
+    let clamped = races.withClampedEditionCounts
+
+    #expect(clamped.map(\.id) == ["corrupt", "valid"])
+    #expect(clamped.map(\.editionCount) == [0, 3])
+  }
 }
