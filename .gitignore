@@ -91,6 +91,8 @@ iOSInjectionProject/
 
 # Firebase
 .firebase/
+*-debug.log
+rules-tests/node_modules/
 
 # AI Agent
 CLAUDE.local.md

@@ -1,0 +1,116 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isUser(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    function isValidRaceEvent(event) {
+      return event is map
+        && event.kind == 'distance'
+        && event.value is number
+        && event.value > 0
+        && event.value < 10000
+        && math.abs(event.value * 10000 - math.round(event.value * 10000)) < 0.00001
+        && event.unit in ['kilometers', 'miles']
+        && event.type in ['inPerson', 'virtual', 'wheelChair'];
+    }
+
+    function isValidPlace(place) {
+      return place is map
+        && place.countryCode is string
+        && place.countryCode.matches('[A-Z]{2}')
+        && place.city is string
+        && place.city.trim().size() > 0
+        && (!('region' in place) || place.region is string);
+    }
+
+    function isValidMedal(medal) {
+      return isValidRaceEvent(medal.raceEvent)
+        && isValidPlace(medal.place)
+        && (!('result' in medal)
+          || (medal.result is map
+            && medal.result.value is number
+            && medal.result.value > 0
+            && medal.result.unit == 'seconds'));
+    }
+
+    // Rules can't loop, so only the first distance is checked. An edition may have none.
+    function isValidEdition(edition) {
+      return edition.raceEvents is list
+        && (edition.raceEvents.size() == 0 || isValidRaceEvent(edition.raceEvents[0]));
+    }
+
+    match /users/{uid} {
+      allow get: if isUser(uid);
+      allow create: if isUser(uid) && request.resource.data.uid == uid;
+      allow update: if isUser(uid) && !changedKeys().hasAny(['uid']);
+
+      match /medals/{medalId} {
+        allow read: if isUser(uid);
+        allow create: if isUser(uid)
+          && request.resource.data.userID == uid
+          && request.resource.data.id == medalId
+          && isValidMedal(request.resource.data);
+        allow update: if isUser(uid)
+          && !changedKeys().hasAny(['userID', 'id'])
+          && isValidMedal(request.resource.data);
+        allow delete: if isUser(uid);
+      }
+    }
+
+    match /races/{raceId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.id == raceId
+        && request.resource.data.editionCount == 0
+        && isValidPlace(request.resource.data.place);
+      allow update: if isUser(resource.data.createdBy)
+        && !changedKeys().hasAny(['id', 'createdBy'])
+        && ((!changedKeys().hasAny(['editionCount'])
+              && isValidPlace(request.resource.data.place))
+          || (changedKeys().hasOnly(['editionCount'])
+              && math.abs(request.resource.data.editionCount - resource.data.editionCount) == 1));
+      allow delete: if isUser(resource.data.createdBy);
+
+      match /editions/{editionId} {
+        function racePath() {
+          return /databases/$(database)/documents/races/$(raceId);
+        }
+
+        function isRaceCreator() {
+          return isUser(get(racePath()).data.createdBy);
+        }
+
+        function countChange() {
+          return getAfter(racePath()).data.editionCount - get(racePath()).data.editionCount;
+        }
+
+        allow read: if signedIn();
+        allow create: if isRaceCreator()
+          && request.resource.data.createdBy == request.auth.uid
+          && request.resource.data.id == editionId
+          && request.resource.data.raceId == raceId
+          && countChange() == 1
+          && isValidEdition(request.resource.data);
+        allow update: if isRaceCreator()
+          && !changedKeys().hasAny(['id', 'raceId', 'createdBy'])
+          && isValidEdition(request.resource.data);
+        // One edition deleted lowers the count; a race delete takes its editions in the same batch.
+        allow delete: if isRaceCreator()
+          && (!existsAfter(racePath()) || countChange() == -1);
+      }
+    }
+  }
+}

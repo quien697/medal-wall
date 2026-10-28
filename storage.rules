@@ -1,0 +1,47 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isUser(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // MW-25 adds the size cap here: && request.resource.size < N * 1024 * 1024
+    function isJpeg() {
+      return request.resource.contentType == 'image/jpeg';
+    }
+
+    function racePath(raceId) {
+      return /databases/(default)/documents/races/$(raceId);
+    }
+
+    // The race's creator, or anyone while the race doesn't exist: Add Race uploads the logo
+    // before creating the race, and logos are deleted after the race is.
+    function canChangeRaceFiles(raceId) {
+      return signedIn()
+        && (!firestore.exists(racePath(raceId))
+          || firestore.get(racePath(raceId)).data.createdBy == request.auth.uid);
+    }
+
+    match /users/{uid}/avatar/{file} {
+      allow read, delete: if isUser(uid);
+      allow create, update: if isUser(uid) && isJpeg();
+    }
+
+    match /users/{uid}/medals/{medalId}/{allPaths=**} {
+      allow read, delete: if isUser(uid);
+      allow create, update: if isUser(uid) && isJpeg();
+    }
+
+    match /races/{raceId}/{allPaths=**} {
+      allow read: if signedIn();
+      allow create, update: if canChangeRaceFiles(raceId) && isJpeg();
+      allow delete: if canChangeRaceFiles(raceId);
+    }
+  }
+}

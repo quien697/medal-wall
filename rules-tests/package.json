@@ -1,0 +1,14 @@
+{
+  "name": "medal-wall-rules-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "firebase emulators:exec --only firestore,storage --project demo-medal-wall \"node --test --test-concurrency=1\"",
+    "deploy": "firebase deploy --only firestore:rules,storage"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "6.0.0",
+    "firebase": "13.1.0",
+    "firebase-tools": "15.34.1"
+  }
+}
