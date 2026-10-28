@@ -46,4 +46,26 @@ struct RaceDetailViewModelTests {
 
     #expect(viewModel.error == nil)
   }
+
+  // MARK: - Creator
+  @Test("the race's creator may edit and delete it")
+  func testCreatorCanManageRace() {
+    let viewModel = RaceDetailViewModel(race: makeRace())
+
+    #expect(viewModel.canManageRace(userID: "user-1"))
+  }
+
+  @Test("another user may not edit or delete the race")
+  func testAnotherUserCannotManageRace() {
+    let viewModel = RaceDetailViewModel(race: makeRace())
+
+    #expect(!viewModel.canManageRace(userID: "user-2"))
+  }
+
+  @Test("with no signed-in user no one may edit or delete the race")
+  func testNoUserCannotManageRace() {
+    let viewModel = RaceDetailViewModel(race: makeRace())
+
+    #expect(!viewModel.canManageRace(userID: nil))
+  }
 }

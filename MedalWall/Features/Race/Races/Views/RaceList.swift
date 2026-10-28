@@ -9,9 +9,6 @@ import SwiftUI
 
 struct RaceList: View {
   let races: [Race]
-  /// Whether a row can be swiped away; off while the list reloads.
-  let canDelete: Bool
-  let onDelete: (Race) -> Void
 
   var body: some View {
     Group {
@@ -33,15 +30,6 @@ struct RaceList: View {
           .listRowBackground(Color.Surface.primary)
           // A list row is a card, though not drawn by `surfaceStyle()`.
           .environment(\.skeletonSurface, .card)
-          .swipeActions(edge: .trailing) {
-            if canDelete {
-              Button(role: .destructive) {
-                onDelete(race)
-              } label: {
-                Label("Delete", systemImage: "trash")
-              }  // Button
-            }
-          }
         }  // List
         .scrollContentBackground(.hidden)
       }
@@ -50,14 +38,14 @@ struct RaceList: View {
 }
 
 #Preview("Races") {
-  RaceList(races: Race.sampleData, canDelete: true, onDelete: { _ in })
+  RaceList(races: Race.sampleData)
 }
 
 #Preview("Empty") {
-  RaceList(races: [], canDelete: true, onDelete: { _ in })
+  RaceList(races: [])
 }
 
 #Preview("Loading") {
-  RaceList(races: Race.placeholders, canDelete: true, onDelete: { _ in })
+  RaceList(races: Race.placeholders)
     .skeleton(true)
 }

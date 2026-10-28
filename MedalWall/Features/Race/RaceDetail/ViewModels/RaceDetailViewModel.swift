@@ -52,6 +52,12 @@ final class RaceDetailViewModel {
   }
 
   // MARK: - Functions
+  /// Whether the user may edit and delete the race: only its creator may, and no one while
+  /// signed out.
+  func canManageRace(userID: String?) -> Bool {
+    race.createdBy == userID
+  }
+
   /// Reloads the race data from Firestore to reflect any edits.
   func loadRace() async {
     do {

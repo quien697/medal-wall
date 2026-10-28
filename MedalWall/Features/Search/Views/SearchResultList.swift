@@ -73,6 +73,7 @@ struct SearchResultList: View {
     )
     .background(Color.Background.primary)
   }  // NavigationStack
+  .environment(UserManager())
 }
 
 #Preview("Races only") {
@@ -80,4 +81,5 @@ struct SearchResultList: View {
     SearchResultList(medals: [], races: Race.sampleData, personalRecordIDs: [])
       .background(Color.Background.primary)
   }  // NavigationStack
+  .environment(UserManager())
 }

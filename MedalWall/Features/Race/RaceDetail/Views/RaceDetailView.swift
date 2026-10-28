@@ -10,6 +10,7 @@ import SwiftUI
 struct RaceDetailView: View {
   // MARK: - Environment
   @Environment(\.dismiss) private var dismiss
+  @Environment(UserManager.self) private var userManager
 
   // MARK: - State
   @State private var viewModel: RaceDetailViewModel
@@ -44,23 +45,25 @@ struct RaceDetailView: View {
       await viewModel.loadEditions()
     }
     .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Menu("More Options", systemImage: "ellipsis") {
-          Button {
-            isPresentingEditRace = true
-          } label: {
-            Label("Edit Race", systemImage: "square.and.pencil")
-          }  // Button
+      if viewModel.canManageRace(userID: userManager.currentUserID) {
+        ToolbarItem(placement: .topBarTrailing) {
+          Menu("More Options", systemImage: "ellipsis") {
+            Button {
+              isPresentingEditRace = true
+            } label: {
+              Label("Edit Race", systemImage: "square.and.pencil")
+            }  // Button
 
-          Divider()
+            Divider()
 
-          Button(role: .destructive) {
-            isPresentingDeleteRaceConfirm = true
-          } label: {
-            Label("Delete Race", systemImage: "trash")
-          }  // Button
-        }  // Menu
-      }  // ToolbarItem
+            Button(role: .destructive) {
+              isPresentingDeleteRaceConfirm = true
+            } label: {
+              Label("Delete Race", systemImage: "trash")
+            }  // Button
+          }  // Menu
+        }  // ToolbarItem
+      }
     }  // toolbar
     .alert(isPresented: $isPresentingDeleteRaceConfirm) {
       .deleteConfirmation(
@@ -106,4 +109,5 @@ struct RaceDetailView: View {
   NavigationStack {
     RaceDetailView(race: Race.taipei)
   }
+  .environment(UserManager())
 }
