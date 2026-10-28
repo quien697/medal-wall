@@ -1,15 +1,18 @@
 # races Specification
 
 ## Purpose
-Let a signed-in user manage races and their per-year editions — full CRUD over `Race`
-and its `RaceEdition` subcollection — including manually cascading edition deletes, since
-Firestore does not cascade-delete subcollections.
+Let any signed-in user add races and read every race and its per-year editions, and let a
+race's creator update and delete it and manage its `RaceEdition` subcollection — including
+manually cascading edition deletes, since Firestore does not cascade-delete subcollections.
 ## Requirements
 ### Requirement: Race Management
-The system SHALL allow a signed-in user to create, read, update, and delete a `Race`,
-identified by name, place, an optional photo, and an optional website URL. A race's place
-SHALL follow the shape defined by the `place-entry` capability, which owns the representation
-of a place and how one is chosen.
+The system SHALL allow any signed-in user to create and read a `Race`, identified by name,
+place, an optional photo, and an optional website URL, and SHALL record the uid of the user who
+creates it as its `createdBy`. Only the race's creator, the signed-in user whose uid equals its
+`createdBy`, SHALL update or delete it. Race Detail SHALL show its menu of Edit Race and Delete
+Race to the creator alone; anyone else SHALL see no such menu. The Races list SHALL NOT offer
+to delete a race. A race's place SHALL follow the shape defined by the `place-entry`
+capability, which owns the representation of a place and how one is chosen.
 
 Every logo upload SHALL go to a new storage location, never over a file a race or edition
 points at. A logo the race no longer holds — a removed or replaced race or edition logo, a
@@ -26,7 +29,21 @@ partway keeps the race with fewer editions, and never leaves editions under a de
 
 #### Scenario: Create a race
 - **WHEN** a user submits a new race with a name and place
-- **THEN** the system creates a `Race` record and it appears in the race list
+- **THEN** the system creates a `Race` record with that user as its creator, and it appears in
+  the race list
+
+#### Scenario: The creator opens their race
+- **WHEN** the user who created a race opens its Race Detail
+- **THEN** its menu offers Edit Race and Delete Race
+
+#### Scenario: Another user opens the race
+- **WHEN** a user opens Race Detail for a race another user created
+- **THEN** no menu offering Edit Race or Delete Race shows, and the race and its editions show
+  as they do for its creator
+
+#### Scenario: The Races list does not delete
+- **WHEN** a user swipes a race in the Races list
+- **THEN** no delete action is offered
 
 #### Scenario: Delete a race removes its editions
 - **WHEN** a user deletes a race that has between one and 499 editions
@@ -84,15 +101,17 @@ that a value corrupted by any means cannot present a negative number of editions
 - **THEN** the race list displays `0 editions`
 
 ### Requirement: Race Edition Management
-The system SHALL allow a signed-in user to create, read, update, and delete a
-`RaceEdition` belonging to a `Race`, recording a year, a start date, an end date, an
-optional photo, and a list of distances offered for that edition. The year SHALL be a
-Gregorian year, and the span of dates it allows SHALL be that Gregorian year, whatever
-calendar the device uses, because editions are shared with other users and clients.
+The system SHALL allow any signed-in user to read the `RaceEdition`s belonging to a `Race`, and
+only the race's creator to create, update, and delete them. An edition records a year, a start
+date, an end date, an optional photo, and a list of distances offered for that edition.
+Editions SHALL be added, edited and deleted only from Edit Race, which only the race's creator
+can open. The year SHALL be a Gregorian year, and the span of dates it allows SHALL be that
+Gregorian year, whatever calendar the device uses, because editions are shared with other users
+and clients.
 
 #### Scenario: Add an edition to a race
-- **WHEN** a user adds an edition with a year, start date, end date, and at least one
-  distance to an existing race
+- **WHEN** a race's creator adds an edition with a year, start date, end date, and at least
+  one distance to that race
 - **THEN** the system creates a `RaceEdition` in that race's editions subcollection
 
 #### Scenario: One-day edition display
@@ -137,17 +156,13 @@ preset row rather than typing it into the custom field.
 - **THEN** it is refused as a duplicate distance
 
 ### Requirement: Offline Race Delete Is Refused
-Before deleting a race, from Race Detail or the Races list, the system SHALL check for a
-connection. Without one, the delete SHALL be refused with "No internet connection" before
-anything is deleted, and the race SHALL stay where it is.
+Before deleting a race from Race Detail, the system SHALL check for a connection. Without one,
+the delete SHALL be refused with "No internet connection" before anything is deleted, and Race
+Detail SHALL stay open.
 
 #### Scenario: Delete a race from Race Detail while offline
 - **WHEN** a user confirms deleting a race from Race Detail with no connection
 - **THEN** "No internet connection" is shown, nothing is deleted, and Race Detail stays open
-
-#### Scenario: Delete a race from the Races list while offline
-- **WHEN** a user confirms deleting a race from the Races list with no connection
-- **THEN** "No internet connection" is shown, nothing is deleted, and the race stays in the list
 
 ### Requirement: Custom Distance Entry With Its Own Unit
 The system SHALL accept a custom distance as a number together with a unit chosen by a

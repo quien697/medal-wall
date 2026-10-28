@@ -25,10 +25,10 @@
 
 - [x] 3.1 Build, and run the full test suite
 - [x] 3.2 `openspec validate mw-37-security-rules --strict`
-- [ ] 3.3 In the simulator: a race you created shows the ⋯ menu; a race created by another uid
+- [x] 3.3 In the simulator: a race you created shows the ⋯ menu; a race created by another uid
       shows none, its editions still listed; no race in the Races list swipes to delete
 
 ## 4. Archive
 
-- [ ] 4.1 Archive the change, then reword the `races` spec's Purpose, which still says a
+- [x] 4.1 Archive the change, then reword the `races` spec's Purpose, which still says a
       signed-in user has full CRUD over races and editions
