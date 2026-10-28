@@ -189,4 +189,63 @@ struct RacesViewModelRepositoryTests {
 
     #expect(viewModel.displayedRaces.isEmpty)
   }
+
+  // MARK: - Late loads
+  @Test("a load that lands after a newer one leaves the newer races", .timeLimit(.minutes(1)))
+  func testStaleLoadLeavesNewerRaces() async throws {
+    let repository = StubRaceRepository(races: [makeRace(id: "a"), makeRace(id: "b")])
+    let viewModel = RacesViewModel(repository: repository)
+    await repository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+    _ = try await repository.deleteRace(id: "b")
+
+    await viewModel.loadRaces()
+    await repository.fetchHold.release()
+    await olderLoad.value
+
+    #expect(viewModel.races.map(\.id) == ["a"])
+  }
+
+  @Test("a load that fails after a newer one succeeded sets no error", .timeLimit(.minutes(1)))
+  func testStaleLoadFailureSetsNoError() async {
+    let repository = StubRaceRepository(races: [makeRace(id: "a")])
+    let viewModel = RacesViewModel(repository: repository)
+    await repository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+
+    await viewModel.loadRaces()
+    await repository.setFetchOutcome(.failure(.raceFetchFailed("offline")))
+    await repository.fetchHold.release()
+    await olderLoad.value
+
+    #expect(viewModel.error == nil)
+    #expect(viewModel.races.map(\.id) == ["a"])
+  }
+
+  @Test(
+    "a load that finishes before a newer one changes nothing and leaves the list loading",
+    .timeLimit(.minutes(1)))
+  func testStaleLoadFinishingFirstKeepsLoading() async throws {
+    let repository = StubRaceRepository(races: [makeRace(id: "a")])
+    let viewModel = RacesViewModel(repository: repository)
+    await repository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+    try await repository.createRace(makeRace(id: "b"))
+    await repository.fetchHold.holdNext()
+    let newerLoad = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+
+    await repository.fetchHold.release()
+    await olderLoad.value
+
+    #expect(viewModel.races.isEmpty)
+    #expect(viewModel.isShowingSkeleton)
+    await repository.fetchHold.release()
+    await newerLoad.value
+    #expect(viewModel.races.map(\.id) == ["a", "b"])
+    #expect(!viewModel.isLoading)
+  }
 }
