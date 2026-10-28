@@ -9,7 +9,7 @@ it. Two places in the app edit or delete a race:
   Races list and from Search.
 - The Races list's swipe-to-delete (`RaceList` → `RacesView` → `RacesViewModel.deleteRace`).
 
-The Firebase rules for 1.2.0 (written in the console, listed in MW-37) refuse a race update or
+The Firebase rules for 1.2.0 (`firestore.rules`, `storage.rules`) refuse a race update or
 delete, and any edition write, from anyone but the race's `createdBy`. Medals are not affected:
 a medal holds no reference to a race.
 
@@ -33,25 +33,23 @@ a medal holds no reference to a race.
 `RaceDetailView` reads `userManager.currentUserID` from the environment and passes it in, the
 way `SearchView` and `MedalsView` pass it to their loads.
 
-A function taking the uid, rather than a uid stored on the view model: the view model is
-built in the view's `init`, before the environment is readable, and `UserManager` is the one
-source of truth for who is signed in.
+The uid is passed in on each call because the view model is built in the view's `init`, before
+the environment is readable, and `UserManager` is the one source of truth for who is signed in.
 
 `race.createdBy` is set once, when the race is created, and race updates keep it unchanged, so
 reloading the race after an edit cannot change the answer.
 
-### Hide the menu, don't disable it
+### The menu is left out for anyone but the creator
 The ⋯ menu holds only Edit Race and Delete Race, so for anyone but the creator the whole
-`ToolbarItem` is left out. A disabled menu, or one that opens empty, would offer something that
-does nothing.
+`ToolbarItem` is left out, and Race Detail offers them nothing to tap.
 
-### Remove swipe-to-delete for everyone
-Per-row swipe — some races swipeable, others not — reads as broken, so `RaceList` loses its
-swipe action outright. Everything that existed only for it goes too: `RaceList`'s `canDelete`
-and `onDelete`, `RacesView`'s selected race and delete confirmation, and in `RacesViewModel`
-`deleteRace(_:)`, `canDeleteRaces`, and the `storageService` and `networkMonitor` dependencies
-nothing else uses. Their tests go with them. Race Detail's delete keeps its own tests: logos
-deleted after the race, logos kept when the delete fails, offline refused.
+### No swipe-to-delete on the Races list
+A race is deleted from Race Detail only, for every user, so every row of the Races list behaves
+the same. `RaceList` has no swipe action, and nothing remains that only it used: `RaceList`'s
+`canDelete` and `onDelete`, `RacesView`'s selected race and delete confirmation, and in
+`RacesViewModel` `deleteRace(_:)`, `canDeleteRaces`, and the `storageService` and
+`networkMonitor` dependencies. Race Detail's delete has its own tests: logos deleted after the
+race, logos kept when the delete fails, offline refused.
 
 ### Editions need no check of their own
 Editions are added, edited and deleted only inside Edit Race, and Edit Race opens only from the

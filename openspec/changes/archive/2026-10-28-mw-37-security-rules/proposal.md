@@ -11,11 +11,10 @@ each ending in a save or delete error.
 - **Race Detail** shows its ⋯ menu (Edit Race, Delete Race) only to the race's creator: the
   signed-in user whose uid the race records as `createdBy`. Anyone else sees no menu. Editions
   are added, edited and deleted only from Edit Race, so they follow.
-- **BREAKING (UI):** the **Races list** no longer offers swipe-to-delete, to anyone. A list where
-  some rows swipe and others don't reads as broken; a race is deleted from Race Detail.
+- **BREAKING (UI):** the **Races list** no longer offers swipe-to-delete, to anyone, so every row
+  behaves the same; a race is deleted from Race Detail.
 - Adding a race is unchanged: every signed-in user can, and becomes its creator.
-- The rules themselves are written by hand in the Firebase console and are not kept in this
-  repo; the MW-37 ticket lists them.
+- The rules themselves live in `firestore.rules` and `storage.rules`, tested in `rules-tests/`.
 
 ## Capabilities
 
