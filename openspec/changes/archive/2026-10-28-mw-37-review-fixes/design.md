@@ -41,10 +41,14 @@ Its dev dependencies are pinned: `firebase-tools`, `@firebase/rules-unit-testing
 framework to install.
 
 `npm test` runs `firebase emulators:exec --only firestore,storage --project demo-medal-wall
-"node --test"`. A `demo-` project id keeps the emulators offline: no login, and nothing can
-reach the real project. The CLI finds `firebase.json` by walking up from `rules-tests/`, so it
-loads the same rules files the deploy uses. `npm run deploy` runs the deploy command above with
-the same pinned CLI, after a one-time `npx firebase login`.
+"node --test --test-concurrency=1"`. The test files run one at a time because they share the
+emulators: each loads its rules into the Firestore emulator, `firestore.test.js` clears
+Firestore after every test, and `storage.test.js` seeds the races its rules read there, so two
+files at once replace each other's rules and wipe each other's data. A `demo-` project id
+keeps the emulators offline: no login, and nothing can reach the real project. The CLI finds
+`firebase.json` by walking up from `rules-tests/`, so it loads the same rules files the deploy
+uses. `npm run deploy` runs the deploy command above with the same pinned CLI, after a
+one-time `npx firebase login`.
 
 The emulators need JDK 21 or newer: firebase-tools refuses an older Java.
 
@@ -53,9 +57,9 @@ One test file per rules file, each test acting as the owner, another user, or no
 seeded with the rules switched off:
 - every read and write the app makes, shaped as the app makes it, including the batches: an
   edition create or delete with its count change, and a race delete that takes its editions
-- the refusals: other users' profiles, medals and races; a count change without its edition;
-  a changed `id`, `userID` or `createdBy`; a distance with a bad unit, value or decimals; a
-  signed-out request
+- the refusals: other users' profiles, medals and races; an edition added or deleted without
+  its count change, or a count change of more than one; a changed `id`, `userID` or
+  `createdBy`; a distance with a bad unit, value or decimals; a signed-out request
 - Storage: owner-only user files, race files for the race's creator or while the race doesn't
   exist, and JPEG-only uploads
 
