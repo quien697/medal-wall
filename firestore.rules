@@ -45,9 +45,36 @@ service cloud.firestore {
             && medal.result.unit == 'seconds'));
     }
 
-    // Rules can't loop, so only the first distance is checked. An edition may have none.
+    // The app reads a missing or null optional as none.
+    function isOptionalString(value) {
+      return value == null || value is string;
+    }
+
+    // Everything `Race`'s decoder needs: one race it can't read fails the whole Races list.
+    function isValidRace(race) {
+      return race.name is string
+        && race.name.trim().size() > 0
+        && isValidPlace(race.place)
+        && race.editionCount is int
+        && race.createdBy is string
+        && race.createdAt is timestamp
+        && race.updatedAt is timestamp
+        && isOptionalString(race.get('photoUrl', null))
+        && isOptionalString(race.get('websiteUrl', null));
+    }
+
+    // Everything `RaceEdition`'s decoder needs. Rules can't loop, so only the first distance is
+    // checked. An edition may have none.
     function isValidEdition(edition) {
-      return edition.raceEvents is list
+      return edition.year is int
+        && edition.startDate is timestamp
+        && edition.endDate is timestamp
+        && edition.raceId is string
+        && edition.createdBy is string
+        && edition.createdAt is timestamp
+        && edition.updatedAt is timestamp
+        && isOptionalString(edition.get('photoUrl', null))
+        && edition.raceEvents is list
         && (edition.raceEvents.size() == 0 || isValidRaceEvent(edition.raceEvents[0]));
     }
 
@@ -75,14 +102,15 @@ service cloud.firestore {
         && request.resource.data.createdBy == request.auth.uid
         && request.resource.data.id == raceId
         && request.resource.data.editionCount == 0
-        && isValidPlace(request.resource.data.place);
+        && isValidRace(request.resource.data);
       allow update: if isUser(resource.data.createdBy)
         && !changedKeys().hasAny(['id', 'createdBy'])
-        && ((!changedKeys().hasAny(['editionCount'])
-              && isValidPlace(request.resource.data.place))
+        && isValidRace(request.resource.data)
+        && (!changedKeys().hasAny(['editionCount'])
           || (changedKeys().hasOnly(['editionCount'])
               && math.abs(request.resource.data.editionCount - resource.data.editionCount) == 1));
-      allow delete: if isUser(resource.data.createdBy);
+      // Another device may have deleted the race first; deleting it again changes nothing.
+      allow delete: if resource == null || isUser(resource.data.createdBy);
 
       match /editions/{editionId} {
         function racePath() {
@@ -98,14 +126,17 @@ service cloud.firestore {
         }
 
         allow read: if signedIn();
+        // A race holds at most 200 editions, as `Race.maxEditionCount` in the app.
         allow create: if isRaceCreator()
           && request.resource.data.createdBy == request.auth.uid
           && request.resource.data.id == editionId
           && request.resource.data.raceId == raceId
           && countChange() == 1
+          && getAfter(racePath()).data.editionCount <= 200
           && isValidEdition(request.resource.data);
         allow update: if isRaceCreator()
           && !changedKeys().hasAny(['id', 'raceId', 'createdBy'])
+          && countChange() == 0
           && isValidEdition(request.resource.data);
         // One edition deleted lowers the count; a race delete takes its editions in the same batch.
         allow delete: if isRaceCreator()

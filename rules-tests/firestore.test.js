@@ -269,6 +269,35 @@ describe('races/{raceId}', () => {
     );
   });
 
+  test('a new race the app cannot read is refused', async () => {
+    const { name, ...withoutName } = race('bob');
+    const badRaces = [
+      withoutName,
+      race('bob', { name: '  ' }),
+      race('bob', { createdAt: '2025-12-21' }),
+      race('bob', { updatedAt: 1766275200 }),
+      race('bob', { photoUrl: 5 }),
+      race('bob', { websiteUrl: ['https://example.com'] }),
+    ];
+    for (const badRace of badRaces) {
+      await assertFails(setDoc(doc(db('bob'), 'races/race-1'), badRace));
+    }
+  });
+
+  test('a race may hold no photo or website as null', async () => {
+    await assertSucceeds(setDoc(doc(db('bob'), 'races/race-1'), race('bob', { photoUrl: null, websiteUrl: null })));
+  });
+
+  test('an update the app cannot read is refused', async () => {
+    const stored = race('alice', { editionCount: 2 });
+    await seed('races/race-1', stored);
+    for (const changes of [{ name: '' }, { createdAt: '2025-12-21' }, { photoUrl: 5 }]) {
+      await assertFails(updateDoc(doc(db('alice'), 'races/race-1'), raceUpdate(stored, changes)));
+    }
+    await seed('races/race-2', race('alice', { id: 'race-2', editionCount: 1.5 }));
+    await assertFails(updateDoc(doc(db('alice'), 'races/race-2'), { editionCount: increment(1) }));
+  });
+
   test("the creator can update the race's own fields and clear its photo", async () => {
     const stored = race('alice', { photoUrl: 'https://example.com/logo.jpg', editionCount: 3 });
     await seed('races/race-1', stored);
@@ -305,6 +334,10 @@ describe('races/{raceId}', () => {
 
   test('the creator can delete a race that has no editions', async () => {
     await seed('races/race-1', race('alice'));
+    await assertSucceeds(deleteDoc(doc(db('alice'), 'races/race-1')));
+  });
+
+  test('deleting a race that is already gone succeeds', async () => {
     await assertSucceeds(deleteDoc(doc(db('alice'), 'races/race-1')));
   });
 });
@@ -347,6 +380,48 @@ describe('races/{raceId}/editions/{editionId}', () => {
   test("an edition's first distance must be one the app can read", async () => {
     await seed('races/race-1', race('alice'));
     await assertFails(createEdition(db('alice'), edition('alice', { raceEvents: [raceEvent({ unit: 'km' })] })));
+  });
+
+  test('an edition the app cannot read is refused', async () => {
+    await seed('races/race-1', race('alice'));
+    const { year, ...withoutYear } = edition('alice');
+    const badEditions = [
+      withoutYear,
+      edition('alice', { year: '2025' }),
+      edition('alice', { startDate: '2025-12-21' }),
+      edition('alice', { endDate: 1766275200 }),
+      edition('alice', { createdAt: '2025-12-21' }),
+      edition('alice', { photoUrl: 5 }),
+    ];
+    for (const badEdition of badEditions) {
+      await assertFails(createEdition(db('alice'), badEdition));
+    }
+  });
+
+  test('an edition update the app cannot read is refused', async () => {
+    await seedRaceWithEdition();
+    await assertFails(updateDoc(doc(db('alice'), editionPath), { startDate: '2025-12-21' }));
+  });
+
+  test('an edition may hold no photo as null', async () => {
+    await seed('races/race-1', race('alice'));
+    await assertSucceeds(createEdition(db('alice'), edition('alice', { photoUrl: null })));
+  });
+
+  test('a race with 199 editions takes one more', async () => {
+    await seed('races/race-1', race('alice', { editionCount: 199 }));
+    await assertSucceeds(createEdition(db('alice'), edition('alice')));
+  });
+
+  test('a race with 200 editions takes no more', async () => {
+    await seed('races/race-1', race('alice', { editionCount: 200 }));
+    await assertFails(createEdition(db('alice'), edition('alice')));
+  });
+
+  test('an edition update cannot change the count', async () => {
+    await seedRaceWithEdition();
+    // A retried add of an edition that already exists: the set is an update.
+    await assertFails(createEdition(db('alice'), edition('alice')));
   });
 
   test('an edition cannot be added without raising the count', async () => {
@@ -392,14 +467,15 @@ describe('races/{raceId}/editions/{editionId}', () => {
     await assertFails(deleteEdition(db('bob'), 'edition-1'));
   });
 
-  test("the race's creator can delete the race with all its editions in one batch", async () => {
-    await seed('races/race-1', race('alice', { editionCount: 3 }));
-    for (const id of ['edition-1', 'edition-2', 'edition-3']) {
+  test("the race's creator can delete the race with all 200 editions in one batch", async () => {
+    const ids = Array.from({ length: 200 }, (_, index) => `edition-${index}`);
+    await seed('races/race-1', race('alice', { editionCount: 200 }));
+    for (const id of ids) {
       await seed(`races/race-1/editions/${id}`, edition('alice', { id }));
     }
     const firestore = db('alice');
     const batch = writeBatch(firestore);
-    for (const id of ['edition-1', 'edition-2', 'edition-3']) {
+    for (const id of ids) {
       batch.delete(doc(firestore, `races/race-1/editions/${id}`));
     }
     batch.delete(doc(firestore, 'races/race-1'));

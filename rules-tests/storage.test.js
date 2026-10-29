@@ -142,6 +142,22 @@ describe('race and edition logos', () => {
     await seedRace('alice');
     await assertFails(upload('alice', paths[0], { contentType: 'image/heic' }));
   });
+
+  test('nothing else under a race is writable, whether or not the race exists', async () => {
+    const otherPaths = [
+      'races/race-1/other.jpg',
+      'races/race-1/raceLogo/nested/3F2A.jpg',
+      'races/race-1/editions/edition-1/other.jpg',
+      'races/race-1/editions/edition-1/editionLogo/nested/3F2A.jpg',
+    ];
+    for (const path of otherPaths) {
+      await assertFails(upload('bob', path));
+    }
+    await seedRace('alice');
+    for (const path of otherPaths) {
+      await assertFails(upload('alice', path));
+    }
+  });
 });
 
 describe('anything else', () => {

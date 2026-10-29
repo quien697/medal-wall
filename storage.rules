@@ -38,7 +38,26 @@ service firebase.storage {
       allow create, update: if isUser(uid) && isJpeg();
     }
 
-    match /races/{raceId}/{allPaths=**} {
+    // A race's files only at the four logo paths the app uses, the same rules for each.
+    match /races/{raceId}/raceLogo/{file} {
+      allow read: if signedIn();
+      allow create, update: if canChangeRaceFiles(raceId) && isJpeg();
+      allow delete: if canChangeRaceFiles(raceId);
+    }
+
+    match /races/{raceId}/logo.jpg {
+      allow read: if signedIn();
+      allow create, update: if canChangeRaceFiles(raceId) && isJpeg();
+      allow delete: if canChangeRaceFiles(raceId);
+    }
+
+    match /races/{raceId}/editions/{editionId}/editionLogo/{file} {
+      allow read: if signedIn();
+      allow create, update: if canChangeRaceFiles(raceId) && isJpeg();
+      allow delete: if canChangeRaceFiles(raceId);
+    }
+
+    match /races/{raceId}/editions/{editionId}/logo.jpg {
       allow read: if signedIn();
       allow create, update: if canChangeRaceFiles(raceId) && isJpeg();
       allow delete: if canChangeRaceFiles(raceId);
