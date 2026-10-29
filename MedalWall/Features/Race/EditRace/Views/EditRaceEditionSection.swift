@@ -15,6 +15,8 @@ struct EditRaceEditionSection: View {
   let isShowingSkeleton: Bool
   let namespace: Namespace.ID
   let transitionID: String
+  /// Whether Add is enabled: false once the race holds `Race.maxEditionCount` editions.
+  let canAddEdition: Bool
   let onTapAddEdition: () -> Void
   let onTapEdition: (DraftRaceEdition) -> Void
   let onDelete: (String) -> Void
@@ -70,8 +72,15 @@ struct EditRaceEditionSection: View {
           vPadding: 0,
           hPadding: 0
         )
+        .disabled(!canAddEdition)
         .matchedTransitionSource(id: transitionID, in: namespace)
       }  // HStack
+    } footer: {
+      if !canAddEdition {
+        Text("A race can have up to \(Race.maxEditionCount) editions.")
+          .font(.TypeScale.caption)
+          .foregroundStyle(Color.Text.secondary)
+      }
     }  // Section
     .listRowBackground(Color.Surface.primary)
   }
@@ -124,6 +133,7 @@ struct EditRaceEditionSection: View {
       isShowingSkeleton: false,
       namespace: namespace,
       transitionID: "transitionID",
+      canAddEdition: true,
       onTapAddEdition: {},
       onTapEdition: { _ in },
       onDelete: { _ in }
@@ -143,6 +153,7 @@ struct EditRaceEditionSection: View {
       isShowingSkeleton: false,
       namespace: namespace,
       transitionID: "transitionID",
+      canAddEdition: true,
       onTapAddEdition: {},
       onTapEdition: { _ in },
       onDelete: { _ in }
@@ -159,6 +170,27 @@ struct EditRaceEditionSection: View {
       isShowingSkeleton: true,
       namespace: namespace,
       transitionID: "transitionID",
+      canAddEdition: true,
+      onTapAddEdition: {},
+      onTapEdition: { _ in },
+      onDelete: { _ in }
+    )
+  }
+}
+
+#Preview("At the Limit") {
+  @Previewable @Namespace var namespace
+
+  Form {
+    EditRaceEditionSection(
+      editions: [
+        DraftRaceEdition(from: .taipei2025),
+        DraftRaceEdition(from: .taipei2019)
+      ],
+      isShowingSkeleton: false,
+      namespace: namespace,
+      transitionID: "transitionID",
+      canAddEdition: false,
       onTapAddEdition: {},
       onTapEdition: { _ in },
       onDelete: { _ in }

@@ -143,6 +143,11 @@ struct StringCatalogTests {
     #expect(zhTWTable["Loading"] == "載入中")
   }
 
+  @Test("Edit Race's edition limit note ships translated")
+  func testEditionLimitNoteIsTranslated() {
+    #expect(zhTWTable["A race can have up to %lld editions."] == "一場賽事最多可有 %lld 個屆次。")
+  }
+
   @Test("The You tab's empty state ships translated")
   func testProfileUnavailableIsTranslated() {
     #expect(zhTWTable["Profile Unavailable"] == "個人資料無法使用")

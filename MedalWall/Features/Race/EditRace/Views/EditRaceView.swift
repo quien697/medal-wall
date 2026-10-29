@@ -67,6 +67,7 @@ struct EditRaceView: View {
             isShowingSkeleton: viewModel.isShowingEditionsSkeleton,
             namespace: namespace,
             transitionID: addEdition,
+            canAddEdition: viewModel.canAddEdition,
             onTapAddEdition: { isPresentingAddEdition = true },
             onTapEdition: { selectedEdition = $0 },
             onDelete: viewModel.stageDeleteEdition

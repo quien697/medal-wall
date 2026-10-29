@@ -81,6 +81,15 @@ final class EditRaceViewModel {
       .sorted { $0.startDate > $1.startDate }
   }
 
+  /// Whether another edition fits under `Race.maxEditionCount`, counting staged additions and
+  /// deletions. Until the editions load, the race's stored count stands in for the ones not
+  /// shown yet.
+  var canAddEdition: Bool {
+    let unloadedCount = hasLoadedEditions ? 0 : max(0, race?.editionCount ?? 0)
+    let stagedCount = draftEditions.filter { !editionIdsToDelete.contains($0.id) }.count
+    return unloadedCount + stagedCount < Race.maxEditionCount
+  }
+
   var isFormValid: Bool {
     !trimmedName.isEmpty && place.isValid
   }
