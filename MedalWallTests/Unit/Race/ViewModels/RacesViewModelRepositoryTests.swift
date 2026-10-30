@@ -225,9 +225,9 @@ struct RacesViewModelRepositoryTests {
   }
 
   @Test(
-    "a load that finishes before a newer one changes nothing and leaves the list loading",
+    "a load that finishes before a newer one shows its result and leaves the list loading",
     .timeLimit(.minutes(1)))
-  func testStaleLoadFinishingFirstKeepsLoading() async throws {
+  func testOlderLoadFinishingFirstShowsItsResult() async throws {
     let repository = StubRaceRepository(races: [makeRace(id: "a")])
     let viewModel = RacesViewModel(repository: repository)
     await repository.fetchHold.holdNext()
@@ -241,11 +241,35 @@ struct RacesViewModelRepositoryTests {
     await repository.fetchHold.release()
     await olderLoad.value
 
-    #expect(viewModel.races.isEmpty)
-    #expect(viewModel.isShowingSkeleton)
+    #expect(viewModel.races.map(\.id) == ["a"])
+    #expect(viewModel.isLoading)
     await repository.fetchHold.release()
     await newerLoad.value
     #expect(viewModel.races.map(\.id) == ["a", "b"])
+    #expect(!viewModel.isLoading)
+  }
+
+  @Test(
+    "a newer load that fails after an older one loaded keeps the older races",
+    .timeLimit(.minutes(1)))
+  func testNewerFailureKeepsOlderRaces() async {
+    let repository = StubRaceRepository(races: [makeRace(id: "a")])
+    let viewModel = RacesViewModel(repository: repository)
+    await repository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+    await repository.fetchHold.holdNext()
+    let newerLoad = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+
+    await repository.fetchHold.release()
+    await olderLoad.value
+    await repository.setFetchOutcome(.failure(.raceFetchFailed("offline")))
+    await repository.fetchHold.release()
+    await newerLoad.value
+
+    #expect(viewModel.races.map(\.id) == ["a"])
+    #expect(viewModel.error != nil)
     #expect(!viewModel.isLoading)
   }
 }

@@ -20,12 +20,10 @@ final class RaceDetailViewModel {
   /// Whether a load of the editions has succeeded, so a reload keeps them on screen.
   private(set) var hasLoaded = false
   var error: AppError?
-  /// Numbers each load of the editions, so a fetch that returns after a newer load has started
-  /// leaves the newer load's editions, error and loading state alone. Loads are never
-  /// cancelled, so they can overlap.
-  private var editionsLoadGeneration = 0
-  /// Numbers each reload of the race, for the same reason.
-  private var raceLoadGeneration = 0
+  /// Orders the editions loads, so an older load's editions never replace a newer load's.
+  private var editionsLoads = LoadSequence()
+  /// Orders the reloads of the race, for the same reason.
+  private var raceLoads = LoadSequence()
 
   // MARK: - Dependencies
   private let repository: any RaceRepository
@@ -64,13 +62,13 @@ final class RaceDetailViewModel {
     race.createdBy == userID
   }
 
-  /// Reloads the race data from Firestore to reflect any edits.
+  /// Reloads the race data from Firestore to reflect any edits. Its race shows unless a newer
+  /// reload's already has.
   func loadRace() async {
-    raceLoadGeneration += 1
-    let generation = raceLoadGeneration
+    let load = raceLoads.begin()
     do {
       let fetched = try await repository.fetchRace(id: race.id)
-      guard generation == raceLoadGeneration else { return }
+      guard raceLoads.shouldApply(load) else { return }
       if let fetched {
         race = fetched
       }
@@ -79,23 +77,22 @@ final class RaceDetailViewModel {
     }
   }
 
-  /// Loads all editions for this race from Firestore, newest first. A load that is no longer
-  /// the newest changes nothing.
+  /// Loads all editions for this race from Firestore, newest first. Its editions show unless a
+  /// newer load's already have, and only the newest load presents an error or ends loading.
   func loadEditions() async {
-    editionsLoadGeneration += 1
-    let generation = editionsLoadGeneration
+    let load = editionsLoads.begin()
     isLoading = true
     defer {
-      if generation == editionsLoadGeneration { isLoading = false }
+      if editionsLoads.isNewest(load) { isLoading = false }
     }
 
     do {
       let fetched = try await repository.fetchEditions(raceId: race.id)
-      guard generation == editionsLoadGeneration else { return }
+      guard editionsLoads.shouldApply(load) else { return }
       editions = fetched.sorted { $0.startDate > $1.startDate }
       hasLoaded = true
     } catch {
-      guard generation == editionsLoadGeneration else { return }
+      guard editionsLoads.isNewest(load) else { return }
       self.error = .raceFetchFailed(error.localizedDescription)
     }
   }

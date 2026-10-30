@@ -199,9 +199,9 @@ struct ProfileViewModelRepositoryTests {
   }
 
   @Test(
-    "a load that finishes before a newer one changes nothing and leaves the tab loading",
+    "a load that finishes before a newer one shows its result and leaves the tab loading",
     .timeLimit(.minutes(1)))
-  func testStaleLoadFinishingFirstKeepsLoading() async throws {
+  func testOlderLoadFinishingFirstShowsItsResult() async throws {
     let repository = StubMedalRepository(medals: [makeMedal(id: "a")])
     let viewModel = ProfileViewModel(repository: repository)
     await repository.fetchHold.holdNext()
@@ -215,11 +215,35 @@ struct ProfileViewModelRepositoryTests {
     await repository.fetchHold.release()
     await olderLoad.value
 
-    #expect(viewModel.medals.isEmpty)
-    #expect(viewModel.isShowingSkeleton)
+    #expect(viewModel.medals.map(\.id) == ["a"])
+    #expect(viewModel.isLoading)
     await repository.fetchHold.release()
     await newerLoad.value
     #expect(viewModel.medals.map(\.id) == ["a", "b"])
+    #expect(!viewModel.isLoading)
+  }
+
+  @Test(
+    "a newer load that fails after an older one loaded keeps the older medals",
+    .timeLimit(.minutes(1)))
+  func testNewerFailureKeepsOlderMedals() async {
+    let repository = StubMedalRepository(medals: [makeMedal(id: "a")])
+    let viewModel = ProfileViewModel(repository: repository)
+    await repository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.loadMedals(userId: "uid") }
+    await repository.fetchHold.waitForStart()
+    await repository.fetchHold.holdNext()
+    let newerLoad = Task { await viewModel.loadMedals(userId: "uid") }
+    await repository.fetchHold.waitForStart()
+
+    await repository.fetchHold.release()
+    await olderLoad.value
+    await repository.setFetchOutcome(.failure(.medalFetchFailed("offline")))
+    await repository.fetchHold.release()
+    await newerLoad.value
+
+    #expect(viewModel.medals.map(\.id) == ["a"])
+    #expect(viewModel.error != nil)
     #expect(!viewModel.isLoading)
   }
 }

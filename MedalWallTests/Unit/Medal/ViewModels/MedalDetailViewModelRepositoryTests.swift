@@ -117,6 +117,31 @@ struct MedalDetailViewModelRepositoryTests {
     #expect(viewModel.medal.name == "Taipei Marathon")
   }
 
+  @Test(
+    "a newer reload that fails after an older one loaded keeps the older medal",
+    .timeLimit(.minutes(1)))
+  func testNewerReloadFailureKeepsOlderMedal() async throws {
+    let medal = makeMedal()
+    let repository = StubMedalRepository(medals: [medal])
+    let viewModel = MedalDetailViewModel(medal: medal, repository: repository)
+    try await repository.updateMedal(makeMedal(name: "Taipei Marathon 2019"))
+    await repository.medalFetchHold.holdNext()
+    let olderReload = Task { try await viewModel.reloadMedal() }
+    await repository.medalFetchHold.waitForStart()
+    await repository.medalFetchHold.holdNext()
+    let newerReload = Task { try await viewModel.reloadMedal() }
+    await repository.medalFetchHold.waitForStart()
+
+    await repository.medalFetchHold.release()
+    _ = await olderReload.result
+    await repository.setFetchOutcome(.failure(.unknown))
+    await repository.medalFetchHold.release()
+    let newerResult = await newerReload.result
+
+    #expect(viewModel.medal.name == "Taipei Marathon 2019")
+    #expect(throws: AppError.self) { try newerResult.get() }
+  }
+
   // MARK: - Photos
   private func makeMedalWithPhotos() -> Medal {
     var medal = makeMedal()

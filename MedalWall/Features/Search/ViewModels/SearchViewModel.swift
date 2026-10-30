@@ -25,10 +25,10 @@ final class SearchViewModel {
   private(set) var hasFinishedLoadingMedals = false
   /// Whether the race fetch has finished at least once, succeeded or failed.
   private(set) var hasFinishedLoadingRaces = false
-  /// Numbers each load, so a fetch that returns after a newer load has started leaves the
-  /// newer load's data, errors and finished flags alone. Loads are never cancelled, so they
-  /// can overlap.
-  private var loadGeneration = 0
+  /// Orders the medal fetches, so an older load's medals never replace a newer load's.
+  private var medalLoads = LoadSequence()
+  /// Orders the race fetches, for the same reason.
+  private var raceLoads = LoadSequence()
 
   // MARK: - Filter
   var searchText = ""
@@ -90,44 +90,45 @@ final class SearchViewModel {
   /// Loads the user's medals and every race side by side, so either arrives without waiting
   /// on the other. With no signed-in user the medals are skipped.
   func load(userId: String?) async {
-    loadGeneration += 1
-    let generation = loadGeneration
-    async let medalLoad: Void = loadMedals(userId: userId, generation: generation)
-    await loadRaces(generation: generation)
-    await medalLoad
+    let medalLoad = medalLoads.begin()
+    let raceLoad = raceLoads.begin()
+    async let medalsLoaded: Void = loadMedals(userId: userId, load: medalLoad)
+    await loadRaces(load: raceLoad)
+    await medalsLoaded
   }
 
-  /// Loads the user's medals, keeping the previous ones if the fetch fails. A load that is no
-  /// longer the newest changes nothing.
-  private func loadMedals(userId: String?, generation: Int) async {
+  /// Loads the user's medals, keeping the previous ones if the fetch fails. Its medals show
+  /// unless a newer load's already have; only the newest load presents an error or counts as
+  /// finished.
+  private func loadMedals(userId: String?, load: Int) async {
     defer {
-      if generation == loadGeneration { hasFinishedLoadingMedals = true }
+      if medalLoads.isNewest(load) { hasFinishedLoadingMedals = true }
     }
     guard let userId else { return }
 
     do {
       let fetched = try await medalRepository.fetchMedals(userId: userId)
-      guard generation == loadGeneration else { return }
+      guard medalLoads.shouldApply(load) else { return }
       medals = fetched
     } catch {
-      guard generation == loadGeneration, self.error == nil else { return }
+      guard medalLoads.isNewest(load), self.error == nil else { return }
       self.error = .medalFetchFailed(error.localizedDescription)
     }
   }
 
-  /// Loads every race, keeping the previous ones if the fetch fails. A load that is no longer
-  /// the newest changes nothing.
-  private func loadRaces(generation: Int) async {
+  /// Loads every race, keeping the previous ones if the fetch fails. Its races show unless a
+  /// newer load's already have; only the newest load presents an error or counts as finished.
+  private func loadRaces(load: Int) async {
     defer {
-      if generation == loadGeneration { hasFinishedLoadingRaces = true }
+      if raceLoads.isNewest(load) { hasFinishedLoadingRaces = true }
     }
 
     do {
       let fetched = try await raceRepository.fetchRaces()
-      guard generation == loadGeneration else { return }
+      guard raceLoads.shouldApply(load) else { return }
       races = fetched
     } catch {
-      guard generation == loadGeneration, self.error == nil else { return }
+      guard raceLoads.isNewest(load), self.error == nil else { return }
       self.error = .raceFetchFailed(error.localizedDescription)
     }
   }

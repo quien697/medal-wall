@@ -19,10 +19,8 @@ final class RacesViewModel {
   /// Whether a load has succeeded, so a reload keeps the races on screen.
   private(set) var hasLoaded = false
   var error: AppError?
-  /// Numbers each load, so a fetch that returns after a newer load has started leaves the
-  /// newer load's races, error and loading state alone. Loads are never cancelled, so they can
-  /// overlap.
-  private var loadGeneration = 0
+  /// Orders this screen's loads, so an older load's races never replace a newer load's.
+  private var loads = LoadSequence()
 
   // MARK: - Dependencies
   private let repository: any RaceRepository
@@ -52,22 +50,22 @@ final class RacesViewModel {
   }
 
   // MARK: - Functions
-  /// Loads all races from Firestore. A load that is no longer the newest changes nothing.
+  /// Loads all races from Firestore. Its races show unless a newer load's already have, and
+  /// only the newest load presents an error or ends loading.
   func loadRaces() async {
-    loadGeneration += 1
-    let generation = loadGeneration
+    let load = loads.begin()
     isLoading = true
     defer {
-      if generation == loadGeneration { isLoading = false }
+      if loads.isNewest(load) { isLoading = false }
     }
 
     do {
       let fetched = try await repository.fetchRaces()
-      guard generation == loadGeneration else { return }
+      guard loads.shouldApply(load) else { return }
       races = fetched
       hasLoaded = true
     } catch {
-      guard generation == loadGeneration else { return }
+      guard loads.isNewest(load) else { return }
       self.error = .raceFetchFailed(error.localizedDescription)
     }
   }

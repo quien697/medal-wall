@@ -164,6 +164,33 @@ struct SearchViewModelRepositoryTests {
     #expect(viewModel.isShowingNoResults)
   }
 
+  @Test(
+    "A newer load whose races fail after an older one loaded keeps the older races",
+    .timeLimit(.minutes(1)))
+  func testNewerRaceFailureKeepsOlderRaces() async {
+    let raceRepository = StubRaceRepository(races: [makeRace(id: "race", name: "Taipei Run")])
+    let viewModel = SearchViewModel(
+      medalRepository: StubMedalRepository(), raceRepository: raceRepository)
+    await raceRepository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.load(userId: "uid") }
+    await raceRepository.fetchHold.waitForStart()
+    await raceRepository.fetchHold.holdNext()
+    let newerLoad = Task { await viewModel.load(userId: "uid") }
+    await raceRepository.fetchHold.waitForStart()
+
+    await raceRepository.fetchHold.release()
+    await olderLoad.value
+    await raceRepository.setFetchOutcome(.failure(.raceFetchFailed("offline")))
+    await raceRepository.fetchHold.release()
+    await newerLoad.value
+
+    #expect(viewModel.races.map(\.id) == ["race"])
+    guard case .raceFetchFailed = viewModel.error else {
+      Issue.record("expected raceFetchFailed, got \(String(describing: viewModel.error))")
+      return
+    }
+  }
+
   // MARK: - No results
   @Test("No results shows once both loads finish with nothing matching")
   func testNoResultsAfterBothLoads() async {

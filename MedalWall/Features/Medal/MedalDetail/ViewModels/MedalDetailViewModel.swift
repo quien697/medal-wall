@@ -20,10 +20,9 @@ final class MedalDetailViewModel {
   private static let unfilled = "—"
 
   // MARK: - State
-  /// Numbers each reload, so a reload that returns after a newer one has started leaves the
-  /// newer one's medal and record marker alone. Reloads are never cancelled, so they can
-  /// overlap.
-  private var reloadGeneration = 0
+  /// Orders the reloads, so an older reload's medal and record marker never replace a newer
+  /// reload's.
+  private var reloads = LoadSequence()
 
   // MARK: - Dependencies
   private let repository: any MedalRepository
@@ -142,25 +141,24 @@ final class MedalDetailViewModel {
   /// the repository directly: `self` is main-actor isolated and so can cross into a child
   /// task, where the injected `any MedalRepository` existential cannot.
   ///
-  /// Whatever loads is applied. A failed fetch throws `AppError.medalFetchFailed`, so the
-  /// screen can say it is out of date rather than quietly keep showing the pre-edit medal. A
-  /// reload that is no longer the newest applies nothing more and throws nothing.
+  /// Whatever loads is applied, unless a newer reload's result already has been. A failed fetch
+  /// throws `AppError.medalFetchFailed`, so the screen can say it is out of date rather than
+  /// quietly keep showing the pre-edit medal; only the newest reload throws.
   func reloadMedal() async throws(AppError) {
-    reloadGeneration += 1
-    let generation = reloadGeneration
+    let load = reloads.begin()
     async let updatedMedal = fetchMedal()
     async let allMedals = fetchAllMedals()
     do {
       let updated = try await updatedMedal
-      guard generation == reloadGeneration else { return }
+      guard reloads.shouldApply(load) else { return }
       if let updated {
         medal = updated
       }
       let recordIDs = try await allMedals.personalRecordIDs
-      guard generation == reloadGeneration else { return }
+      guard reloads.shouldApply(load) else { return }
       personalRecordIDs = recordIDs
     } catch {
-      guard generation == reloadGeneration else { return }
+      guard reloads.isNewest(load) else { return }
       throw .medalFetchFailed(error.localizedDescription)
     }
   }

@@ -285,8 +285,10 @@ struct RaceDetailViewModelRepositoryTests {
 
     #expect(viewModel.displayedEditions.isEmpty)
   }
+}
 
-  // MARK: - Late loads
+// MARK: - Late loads
+extension RaceDetailViewModelRepositoryTests {
   @Test("a load that lands after a newer one leaves the newer editions", .timeLimit(.minutes(1)))
   func testStaleLoadLeavesNewerEditions() async throws {
     let repository = StubRaceRepository(
@@ -323,9 +325,9 @@ struct RaceDetailViewModelRepositoryTests {
   }
 
   @Test(
-    "a load that finishes before a newer one changes nothing and leaves the editions loading",
+    "a load that finishes before a newer one shows its result and leaves the editions loading",
     .timeLimit(.minutes(1)))
-  func testStaleLoadFinishingFirstKeepsLoading() async throws {
+  func testOlderLoadFinishingFirstShowsItsResult() async throws {
     let repository = StubRaceRepository(
       races: [makeRace()], editions: [raceId: [makeEdition(id: "a")]])
     let viewModel = RaceDetailViewModel(race: makeRace(), repository: repository)
@@ -340,8 +342,8 @@ struct RaceDetailViewModelRepositoryTests {
     await repository.fetchHold.release()
     await olderLoad.value
 
-    #expect(viewModel.editions.isEmpty)
-    #expect(viewModel.isShowingSkeleton)
+    #expect(viewModel.editions.map(\.id) == ["a"])
+    #expect(viewModel.isLoading)
     await repository.fetchHold.release()
     await newerLoad.value
     #expect(Set(viewModel.editions.map(\.id)) == ["a", "b"])
@@ -369,5 +371,30 @@ struct RaceDetailViewModelRepositoryTests {
     await olderReload.value
 
     #expect(viewModel.race.name == "Taipei City Marathon")
+  }
+
+  @Test(
+    "a newer load that fails after an older one loaded keeps the older editions",
+    .timeLimit(.minutes(1)))
+  func testNewerFailureKeepsOlderEditions() async {
+    let repository = StubRaceRepository(
+      races: [makeRace()], editions: [raceId: [makeEdition(id: "a")]])
+    let viewModel = RaceDetailViewModel(race: makeRace(), repository: repository)
+    await repository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.loadEditions() }
+    await repository.fetchHold.waitForStart()
+    await repository.fetchHold.holdNext()
+    let newerLoad = Task { await viewModel.loadEditions() }
+    await repository.fetchHold.waitForStart()
+
+    await repository.fetchHold.release()
+    await olderLoad.value
+    await repository.setFetchOutcome(.failure(.raceFetchFailed("offline")))
+    await repository.fetchHold.release()
+    await newerLoad.value
+
+    #expect(viewModel.editions.map(\.id) == ["a"])
+    #expect(viewModel.error != nil)
+    #expect(!viewModel.isLoading)
   }
 }
