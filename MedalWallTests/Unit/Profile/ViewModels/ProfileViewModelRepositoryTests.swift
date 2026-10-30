@@ -163,4 +163,63 @@ struct ProfileViewModelRepositoryTests {
     #expect(viewModel.bestHalfTime == Medal.placeholders.bestHalfTime?.formattedHMS)
     #expect(viewModel.fullMarathonProgress == .compute(liveCount: Medal.placeholders.fullCount))
   }
+
+  // MARK: - Late loads
+  @Test("a load that lands after a newer one leaves the newer medals", .timeLimit(.minutes(1)))
+  func testStaleLoadLeavesNewerMedals() async throws {
+    let repository = StubMedalRepository(medals: [makeMedal(id: "a"), makeMedal(id: "b")])
+    let viewModel = ProfileViewModel(repository: repository)
+    await repository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.loadMedals(userId: "uid") }
+    await repository.fetchHold.waitForStart()
+    try await repository.deleteMedal(id: "b", userId: "uid")
+
+    await viewModel.loadMedals(userId: "uid")
+    await repository.fetchHold.release()
+    await olderLoad.value
+
+    #expect(viewModel.medals.map(\.id) == ["a"])
+  }
+
+  @Test("a load that fails after a newer one succeeded sets no error", .timeLimit(.minutes(1)))
+  func testStaleLoadFailureSetsNoError() async {
+    let repository = StubMedalRepository(medals: [makeMedal(id: "a")])
+    let viewModel = ProfileViewModel(repository: repository)
+    await repository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.loadMedals(userId: "uid") }
+    await repository.fetchHold.waitForStart()
+
+    await viewModel.loadMedals(userId: "uid")
+    await repository.setFetchOutcome(.failure(.medalFetchFailed("offline")))
+    await repository.fetchHold.release()
+    await olderLoad.value
+
+    #expect(viewModel.error == nil)
+    #expect(viewModel.medals.map(\.id) == ["a"])
+  }
+
+  @Test(
+    "a load that finishes before a newer one changes nothing and leaves the tab loading",
+    .timeLimit(.minutes(1)))
+  func testStaleLoadFinishingFirstKeepsLoading() async throws {
+    let repository = StubMedalRepository(medals: [makeMedal(id: "a")])
+    let viewModel = ProfileViewModel(repository: repository)
+    await repository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.loadMedals(userId: "uid") }
+    await repository.fetchHold.waitForStart()
+    try await repository.createMedal(makeMedal(id: "b"))
+    await repository.fetchHold.holdNext()
+    let newerLoad = Task { await viewModel.loadMedals(userId: "uid") }
+    await repository.fetchHold.waitForStart()
+
+    await repository.fetchHold.release()
+    await olderLoad.value
+
+    #expect(viewModel.medals.isEmpty)
+    #expect(viewModel.isShowingSkeleton)
+    await repository.fetchHold.release()
+    await newerLoad.value
+    #expect(viewModel.medals.map(\.id) == ["a", "b"])
+    #expect(!viewModel.isLoading)
+  }
 }

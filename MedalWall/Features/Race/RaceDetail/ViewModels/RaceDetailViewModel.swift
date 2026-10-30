@@ -20,6 +20,12 @@ final class RaceDetailViewModel {
   /// Whether a load of the editions has succeeded, so a reload keeps them on screen.
   private(set) var hasLoaded = false
   var error: AppError?
+  /// Numbers each load of the editions, so a fetch that returns after a newer load has started
+  /// leaves the newer load's editions, error and loading state alone. Loads are never
+  /// cancelled, so they can overlap.
+  private var editionsLoadGeneration = 0
+  /// Numbers each reload of the race, for the same reason.
+  private var raceLoadGeneration = 0
 
   // MARK: - Dependencies
   private let repository: any RaceRepository
@@ -60,25 +66,36 @@ final class RaceDetailViewModel {
 
   /// Reloads the race data from Firestore to reflect any edits.
   func loadRace() async {
+    raceLoadGeneration += 1
+    let generation = raceLoadGeneration
     do {
-      if let updated = try await repository.fetchRace(id: race.id) {
-        race = updated
+      let fetched = try await repository.fetchRace(id: race.id)
+      guard generation == raceLoadGeneration else { return }
+      if let fetched {
+        race = fetched
       }
     } catch {
       // silently ignore — stale data is preferable to an error on dismiss
     }
   }
 
-  /// Loads all editions for this race from Firestore, newest first.
+  /// Loads all editions for this race from Firestore, newest first. A load that is no longer
+  /// the newest changes nothing.
   func loadEditions() async {
+    editionsLoadGeneration += 1
+    let generation = editionsLoadGeneration
     isLoading = true
-    defer { isLoading = false }
+    defer {
+      if generation == editionsLoadGeneration { isLoading = false }
+    }
 
     do {
-      editions = try await repository.fetchEditions(raceId: race.id)
-        .sorted { $0.startDate > $1.startDate }
+      let fetched = try await repository.fetchEditions(raceId: race.id)
+      guard generation == editionsLoadGeneration else { return }
+      editions = fetched.sorted { $0.startDate > $1.startDate }
       hasLoaded = true
     } catch {
+      guard generation == editionsLoadGeneration else { return }
       self.error = .raceFetchFailed(error.localizedDescription)
     }
   }

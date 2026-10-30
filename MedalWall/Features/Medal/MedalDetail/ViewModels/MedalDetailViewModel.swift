@@ -19,6 +19,12 @@ final class MedalDetailViewModel {
   var personalRecordIDs: Set<String>
   private static let unfilled = "—"
 
+  // MARK: - State
+  /// Numbers each reload, so a reload that returns after a newer one has started leaves the
+  /// newer one's medal and record marker alone. Reloads are never cancelled, so they can
+  /// overlap.
+  private var reloadGeneration = 0
+
   // MARK: - Dependencies
   private let repository: any MedalRepository
   private let storageService: any PhotoStorage
@@ -137,16 +143,24 @@ final class MedalDetailViewModel {
   /// task, where the injected `any MedalRepository` existential cannot.
   ///
   /// Whatever loads is applied. A failed fetch throws `AppError.medalFetchFailed`, so the
-  /// screen can say it is out of date rather than quietly keep showing the pre-edit medal.
+  /// screen can say it is out of date rather than quietly keep showing the pre-edit medal. A
+  /// reload that is no longer the newest applies nothing more and throws nothing.
   func reloadMedal() async throws(AppError) {
+    reloadGeneration += 1
+    let generation = reloadGeneration
     async let updatedMedal = fetchMedal()
     async let allMedals = fetchAllMedals()
     do {
-      if let updated = try await updatedMedal {
+      let updated = try await updatedMedal
+      guard generation == reloadGeneration else { return }
+      if let updated {
         medal = updated
       }
-      personalRecordIDs = try await allMedals.personalRecordIDs
+      let recordIDs = try await allMedals.personalRecordIDs
+      guard generation == reloadGeneration else { return }
+      personalRecordIDs = recordIDs
     } catch {
+      guard generation == reloadGeneration else { return }
       throw .medalFetchFailed(error.localizedDescription)
     }
   }

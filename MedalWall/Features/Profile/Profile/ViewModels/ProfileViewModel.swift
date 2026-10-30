@@ -19,6 +19,10 @@ final class ProfileViewModel {
   /// Whether a load has succeeded, so a reload keeps the statistics on screen.
   private(set) var hasLoaded = false
   var error: AppError?
+  /// Numbers each load, so a fetch that returns after a newer load has started leaves the
+  /// newer load's medals, error and loading state alone. Loads are never cancelled, so they can
+  /// overlap.
+  private var loadGeneration = 0
 
   // MARK: - Dependencies
   private let repository: any MedalRepository
@@ -54,15 +58,23 @@ final class ProfileViewModel {
   }
 
   // MARK: - Functions
-  /// Loads all medals for the given user from Firestore, keeping the current ones if the fetch fails.
+  /// Loads all medals for the given user from Firestore, keeping the current ones if the fetch
+  /// fails. A load that is no longer the newest changes nothing.
   func loadMedals(userId: String) async {
-    defer { isLoading = false }
+    loadGeneration += 1
+    let generation = loadGeneration
     isLoading = true
+    defer {
+      if generation == loadGeneration { isLoading = false }
+    }
 
     do {
-      medals = try await repository.fetchMedals(userId: userId)
+      let fetched = try await repository.fetchMedals(userId: userId)
+      guard generation == loadGeneration else { return }
+      medals = fetched
       hasLoaded = true
     } catch {
+      guard generation == loadGeneration else { return }
       self.error = .medalFetchFailed(error.localizedDescription)
     }
   }

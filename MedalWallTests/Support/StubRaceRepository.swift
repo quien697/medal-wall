@@ -86,10 +86,13 @@ actor StubRaceRepository: RaceRepository {
     return snapshot
   }
 
+  /// Answers with the race stored when the fetch started, as `fetchRaces` does.
   func fetchRace(id: String) async throws -> Race? {
     fetchCallCount += 1
+    let snapshot = races.first { $0.id == id }
+    await fetchHold.enter()
     try fetchOutcome.get()
-    return races.first { $0.id == id }
+    return snapshot
   }
 
   func createRace(_ race: Race) async throws {
@@ -117,11 +120,13 @@ actor StubRaceRepository: RaceRepository {
     return deleted
   }
 
+  /// Answers with the editions stored when the fetch started, as `fetchRaces` does.
   func fetchEditions(raceId: String) async throws -> [RaceEdition] {
     fetchCallCount += 1
     editionFetchesInFlight += 1
     maxConcurrentEditionFetches = max(maxConcurrentEditionFetches, editionFetchesInFlight)
     defer { editionFetchesInFlight -= 1 }
+    let snapshot = editions[raceId] ?? []
     await fetchHold.enter()
     if editionFetchLatency > .zero {
       try await Task.sleep(for: editionFetchLatency)
@@ -130,7 +135,7 @@ actor StubRaceRepository: RaceRepository {
     if failingEditionRaceIDs.contains(raceId) {
       throw AppError.raceFetchFailed("editions unavailable")
     }
-    return editions[raceId] ?? []
+    return snapshot
   }
 
   func createEdition(_ edition: RaceEdition) async throws {

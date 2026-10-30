@@ -22,6 +22,9 @@ actor StubMedalRepository: MedalRepository {
   private var fetchOutcome: Result<Void, AppError>
   /// Holds a fetch in flight while a test looks at the load.
   let fetchHold = FetchHold()
+  /// Holds `fetchMedal` alone, so a test can hold a medal's fetch while the collection fetch
+  /// beside it goes through.
+  let medalFetchHold = FetchHold()
   private let writeOutcome: Result<Void, AppError>
   private let deleteOutcome: Result<Void, AppError>
 
@@ -61,10 +64,13 @@ actor StubMedalRepository: MedalRepository {
     return snapshot
   }
 
+  /// Answers with the medal stored when the fetch started, as `fetchMedals` does.
   func fetchMedal(id: String, userId: String) async throws -> Medal? {
     fetchCallCount += 1
+    let snapshot = medals.first { $0.id == id && $0.userID == userId }
+    await medalFetchHold.enter()
     try fetchOutcome.get()
-    return medals.first { $0.id == id && $0.userID == userId }
+    return snapshot
   }
 
   func createMedal(_ medal: Medal) async throws {
