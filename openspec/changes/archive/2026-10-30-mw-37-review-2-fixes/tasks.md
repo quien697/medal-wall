@@ -41,8 +41,7 @@
       correct its list of count refusals
 - [x] 5.2 Run `npm test` in `rules-tests/`, the full iOS test suite and lint
 - [x] 5.3 `openspec validate mw-37-review-2-fixes --strict`
-- [ ] 5.4 Deploy the rules with `npm run deploy` after `npx firebase login`, then delete a race
-      with several editions on a device (the user)
+- [x] 5.4 Publish the rules, then delete a race with several editions on a device (the user)
 
 ## 6. Newest load wins on Race Detail and the Medals list
 
