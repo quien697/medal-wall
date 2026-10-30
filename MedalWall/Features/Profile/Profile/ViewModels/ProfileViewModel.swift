@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 @Observable
 final class ProfileViewModel {
   // MARK: - Data

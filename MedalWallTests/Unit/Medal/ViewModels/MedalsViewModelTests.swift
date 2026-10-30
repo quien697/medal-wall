@@ -10,6 +10,7 @@ import Testing
 
 @testable import MedalWall
 
+@MainActor
 struct MedalsViewModelTests {
 
   private func makeDate(_ year: Int, _ month: Int, _ day: Int) -> Date {

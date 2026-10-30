@@ -10,6 +10,7 @@ import Testing
 
 @testable import MedalWall
 
+@MainActor
 struct MedalDetailViewModelTests {
 
   /// A throwaway `UserDefaults` suite pinning English, so number formatting does not
