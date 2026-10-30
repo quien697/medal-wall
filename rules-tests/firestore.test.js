@@ -238,6 +238,12 @@ describe('users/{uid}/medals/{medalId}', () => {
     );
   });
 
+  test('a medal may hold no finish time or region as null', async () => {
+    await assertSucceeds(
+      setDoc(doc(db('alice'), medalPath), medal('alice', { result: null, place: place({ region: null }) })),
+    );
+  });
+
   test('a place needs a two-letter country code and a city', async () => {
     await assertSucceeds(
       setDoc(doc(db('alice'), medalPath), medal('alice', { place: place({ region: 'Taipei' }) })),
@@ -330,6 +336,11 @@ describe('races/{raceId}', () => {
     await assertFails(
       updateDoc(doc(db('alice'), 'races/race-1'), { editionCount: increment(1), name: 'Renamed' }),
     );
+  });
+
+  test('the edition count cannot go below zero', async () => {
+    await seed('races/race-1', race('alice'));
+    await assertFails(updateDoc(doc(db('alice'), 'races/race-1'), { editionCount: increment(-1) }));
   });
 
   test('the creator can delete a race that has no editions', async () => {
@@ -455,6 +466,26 @@ describe('races/{raceId}/editions/{editionId}', () => {
   test("the race's creator can delete an edition with its count", async () => {
     await seedRaceWithEdition();
     await assertSucceeds(deleteEdition(db('alice'), 'edition-1'));
+  });
+
+  test('an edition already gone cannot lower the count', async () => {
+    await seed('races/race-1', race('alice', { editionCount: 1 }));
+    await assertFails(deleteEdition(db('alice'), 'edition-1'));
+  });
+
+  test("the race's creator can delete an edition left under a race that is gone", async () => {
+    await seed(editionPath, edition('alice'));
+    await assertFails(deleteDoc(doc(db('bob'), editionPath)));
+    await assertSucceeds(deleteDoc(doc(db('alice'), editionPath)));
+  });
+
+  test('deleting a race and its editions already deleted elsewhere succeeds', async () => {
+    const firestore = db('alice');
+    const batch = writeBatch(firestore);
+    batch.delete(doc(firestore, editionPath));
+    batch.delete(doc(firestore, 'races/race-1/editions/edition-2'));
+    batch.delete(doc(firestore, 'races/race-1'));
+    await assertSucceeds(batch.commit());
   });
 
   test('an edition cannot be deleted without lowering the count', async () => {

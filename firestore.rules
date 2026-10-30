@@ -26,28 +26,28 @@ service cloud.firestore {
         && event.type in ['inPerson', 'virtual', 'wheelChair'];
     }
 
+    // The app reads a missing or null optional as none.
+    function isOptionalString(value) {
+      return value == null || value is string;
+    }
+
     function isValidPlace(place) {
       return place is map
         && place.countryCode is string
         && place.countryCode.matches('[A-Z]{2}')
         && place.city is string
         && place.city.trim().size() > 0
-        && (!('region' in place) || place.region is string);
+        && isOptionalString(place.get('region', null));
     }
 
     function isValidMedal(medal) {
       return isValidRaceEvent(medal.raceEvent)
         && isValidPlace(medal.place)
-        && (!('result' in medal)
+        && (medal.get('result', null) == null
           || (medal.result is map
             && medal.result.value is number
             && medal.result.value > 0
             && medal.result.unit == 'seconds'));
-    }
-
-    // The app reads a missing or null optional as none.
-    function isOptionalString(value) {
-      return value == null || value is string;
     }
 
     // Everything `Race`'s decoder needs: one race it can't read fails the whole Races list.
@@ -56,6 +56,7 @@ service cloud.firestore {
         && race.name.trim().size() > 0
         && isValidPlace(race.place)
         && race.editionCount is int
+        && race.editionCount >= 0
         && race.createdBy is string
         && race.createdAt is timestamp
         && race.updatedAt is timestamp
@@ -138,9 +139,14 @@ service cloud.firestore {
           && !changedKeys().hasAny(['id', 'raceId', 'createdBy'])
           && countChange() == 0
           && isValidEdition(request.resource.data);
-        // One edition deleted lowers the count; a race delete takes its editions in the same batch.
-        allow delete: if isRaceCreator()
-          && (!existsAfter(racePath()) || countChange() == -1);
+        // An edition left under a race that is gone goes to its creator, the race's; one
+        // already gone changes nothing. Otherwise a race delete takes its editions in the same
+        // batch, or one existing edition deleted lowers the count.
+        allow delete: if (signedIn()
+            && !exists(racePath())
+            && (resource == null || resource.data.createdBy == request.auth.uid))
+          || (isRaceCreator()
+            && (!existsAfter(racePath()) || (resource != null && countChange() == -1)));
       }
     }
   }
