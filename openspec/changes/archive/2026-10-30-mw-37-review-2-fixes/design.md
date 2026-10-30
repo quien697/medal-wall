@@ -119,8 +119,10 @@ the medal fetch while the collection fetch beside it goes through.
 ## Risks / Trade-offs
 
 - [`editionCount` is not the true number of editions] → the limit trusts the count, which only
-  the creator can push off, by a lone change of one at a time. A race's delete still fits one
-  commit unless the count is short by about 300.
+  the race's creator can push off: by a lone change of one, or by one commit that adds several
+  editions with a single count change, since each edition's rule sees only the count the commit
+  leaves. The app adds one edition per commit. A race's delete still fits one commit unless the
+  count is short by about 300.
 - [The lookup caching is checked only in the emulator] → after the deploy, delete a race with
   several editions on a device.
 - [The rules and `Race.maxEditionCount` hold the same number] → each names the other in a
