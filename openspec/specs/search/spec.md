@@ -147,8 +147,8 @@ is still running; a reload SHALL NOT hide it.
 ### Requirement: Search Data Loading
 The Search tab SHALL load the races and the signed-in user's medals each time it appears,
 including when the user returns to it from a result's detail screen, and SHALL filter them on
-the phone. Leaving the Search screen while a load runs SHALL NOT cancel the load. A load that
-finishes after a newer load has started SHALL NOT change the results or present an error. While
+the phone. Leaving the Search screen while a load runs SHALL NOT cancel the load. A load's medals or
+races SHALL NOT replace a newer load's, and only the newest load SHALL present an error. While
 a reload runs, the results already shown SHALL stay. The Search tab SHALL NOT show skeleton
 bones or a loading indicator; a section appears when its data has loaded.
 
@@ -168,6 +168,11 @@ bones or a loading indicator; a section appears when its data has loaded.
 #### Scenario: A reload keeps results
 - **WHEN** the Search tab reappears with results on screen
 - **THEN** those results stay until the reload replaces them
+
+#### Scenario: A newer load fails after an older one loaded
+- **WHEN** an older load succeeds while a newer load runs, and the newer load's race fetch
+  then fails
+- **THEN** the older load's races stay searchable, and the race fetch error sheet shows
 
 ### Requirement: Search Load Failure
 When the medals or the races fail to load, the system SHALL present the error sheet for that

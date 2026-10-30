@@ -304,9 +304,9 @@ one.
   same as a timed medal
 
 ### Requirement: Medal List Loading
-The Medals list SHALL show the result of its newest load. A load that finishes after a newer
-load has started SHALL NOT change the medals shown, present an error, or end the newer load's
-loading state, whether it finishes before or after the newer load.
+The Medals list SHALL never replace what it shows with an older load's result: a load's
+medals SHALL show unless a newer load's medals have already shown, and only the newest load
+SHALL present an error or end the loading state.
 
 #### Scenario: An older load finishes last
 - **WHEN** a load that started before a medal was deleted from Medal Detail finishes after the
@@ -319,4 +319,9 @@ loading state, whether it finishes before or after the newer load.
 
 #### Scenario: An older load finishes first
 - **WHEN** an older load finishes while a newer load is still running
-- **THEN** the list keeps what it showed before, still loading, until the newer load finishes
+- **THEN** its medals show, and the list stays loading until the newer load finishes
+
+#### Scenario: A newer load fails after an older one loaded
+- **WHEN** an older load succeeds while a newer load runs, and the newer load then fails
+- **THEN** the older load's medals stay on the list, and the error shows
+

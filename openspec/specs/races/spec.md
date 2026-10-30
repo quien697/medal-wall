@@ -59,6 +59,11 @@ SHALL succeed.
   already deleted it
 - **THEN** the delete succeeds and Race Detail closes, with no delete error
 
+#### Scenario: A race deleted on another device during the delete
+- **WHEN** a race's creator deletes it from Race Detail, and another of their devices deletes
+  it after this one has fetched the race's editions but before this delete commits
+- **THEN** the delete succeeds and Race Detail closes, with no delete error
+
 #### Scenario: Delete a race removes its logos
 - **WHEN** a user deletes a race and the delete succeeds
 - **THEN** the system deletes the race's logo and every edition's logo from storage; if the
@@ -76,7 +81,8 @@ editions, and each count change SHALL be committed in the same batch as the edit
 describes. An update to a race's own fields MUST NOT write `editionCount`, because a client
 editing a name holds only the count it happened to read earlier, and races are a shared,
 globally readable collection whose count another client may have changed since. An update to
-an edition MUST NOT be committed with a count change.
+an edition MUST NOT be committed with a count change, and the backend SHALL refuse a count
+below zero or a count change for an edition that does not exist.
 
 A count read back from Firestore SHALL be clamped to zero or more before it is displayed, so
 that a value corrupted by any means cannot present a negative number of editions.
@@ -100,6 +106,12 @@ that a value corrupted by any means cannot present a negative number of editions
 - **WHEN** a client commits a write to an existing edition together with a change to its
   race's `editionCount`, such as a retried add of an edition that already exists
 - **THEN** the backend refuses the commit, and neither the edition nor the count changes
+
+#### Scenario: Deleting an edition already deleted elsewhere
+- **WHEN** a race's creator deletes an edition that another of their devices has already
+  deleted
+- **THEN** the backend refuses the delete, the count stays equal to the editions left, and the
+  user is shown the delete error
 
 #### Scenario: A stored count is negative
 - **WHEN** a race is read whose stored `editionCount` is below zero
@@ -211,9 +223,9 @@ number and unit equal to a standard distance SHALL be saved as that standard dis
 - **THEN** it is saved as the Full Marathon and reads `Full`
 
 ### Requirement: Races List Loading
-The Races list SHALL show the result of its newest load. A load that finishes after a newer
-load has started SHALL NOT change the races shown, present an error, or end the newer load's
-loading state, whether it finishes before or after the newer load.
+The Races list SHALL never replace what it shows with an older load's result: a load's races
+SHALL show unless a newer load's races have already shown, and only the newest load SHALL
+present an error or end the loading state.
 
 #### Scenario: An older load finishes last
 - **WHEN** a load that started before a race was deleted from Race Detail finishes after the
@@ -226,14 +238,19 @@ loading state, whether it finishes before or after the newer load.
 
 #### Scenario: An older load finishes first
 - **WHEN** an older load finishes while a newer load is still running
-- **THEN** the list keeps what it showed before, still loading, until the newer load finishes
+- **THEN** its races show, and the list stays loading until the newer load finishes
+
+#### Scenario: A newer load fails after an older one loaded
+- **WHEN** an older load succeeds while a newer load runs, and the newer load then fails
+- **THEN** the older load's races stay on the list, and the error shows
 
 ### Requirement: Edition Limit
 A race SHALL hold at most 200 editions. Edit Race SHALL disable Add in its Editions section
 once the race's editions, counting staged additions and deletions, reach 200, and SHALL then
 show the note "A race can have up to 200 editions." Before the race's editions have loaded,
-the race's stored edition count SHALL stand in for them. The backend SHALL refuse an edition
-that would take a race past 200, whichever client sends it.
+the race's stored edition count SHALL stand in for them. The backend SHALL refuse a commit
+that leaves a race's edition count above 200, whichever client sends it. It checks the count,
+not the editions, so every client SHALL add one edition per commit, with its count change.
 
 #### Scenario: A race at the limit
 - **WHEN** a race's creator opens Edit Race for a race with 200 editions
@@ -250,7 +267,7 @@ that would take a race past 200, whichever client sends it.
 - **THEN** Add is disabled
 
 #### Scenario: Another client adds past the limit
-- **WHEN** any client commits an edition that would take a race to 201 editions
+- **WHEN** any client commits an edition that would take a race's count to 201
 - **THEN** the backend refuses the commit, and neither the edition nor the count changes
 
 ### Requirement: Shared Race Data Stays Readable
@@ -270,10 +287,9 @@ website URL SHALL be absent, null, or text.
 - **THEN** the backend refuses it, and the race's editions still load
 
 ### Requirement: Race Detail Loading
-Race Detail SHALL show the result of its newest editions load, and the race from its newest
-reload of the race. A load that finishes after a newer load of the same kind has started SHALL
-NOT change what is shown, present an error, or end the newer load's loading state, whether it
-finishes before or after the newer load.
+Race Detail SHALL never replace its editions, or the race, with an older load's result: a
+load's result SHALL show unless a newer load of the same kind has already shown its result,
+and only the newest load of a kind SHALL present an error or end the loading state.
 
 #### Scenario: An older load finishes last
 - **WHEN** the load that started when Race Detail opened finishes after the load that started
@@ -286,9 +302,14 @@ finishes before or after the newer load.
 
 #### Scenario: An older load finishes first
 - **WHEN** an older load finishes while a newer load is still running
-- **THEN** Race Detail keeps what it showed before, still loading, until the newer load finishes
+- **THEN** its editions show, and Race Detail stays loading until the newer load finishes
 
 #### Scenario: An older reload of the race finishes last
 - **WHEN** Edit Race closes twice, and the reload of the race that started the first time
   finishes after the one that started the second time
 - **THEN** Race Detail shows the race as the second edit left it
+
+#### Scenario: A newer load fails after an older one loaded
+- **WHEN** an older editions load succeeds while a newer one runs, and the newer one then fails
+- **THEN** the older load's editions stay on Race Detail, and the error shows
+

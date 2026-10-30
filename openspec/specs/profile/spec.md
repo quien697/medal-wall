@@ -108,10 +108,9 @@ reachable. Edit Profile SHALL be disabled until the profile has loaded.
   has come from the server
 
 ### Requirement: You Tab Loading
-The You tab's statistics and achievements SHALL come from its newest load of the medals. A load
-that finishes after a newer load has started SHALL NOT change the medals they come from,
-present an error, or end the newer load's loading state, whether it finishes before or after
-the newer load.
+The You tab's statistics and achievements SHALL never come from an older load than the one
+they already show: a load's medals SHALL be used unless a newer load's medals already are, and
+only the newest load SHALL present an error or end the loading state.
 
 #### Scenario: An older load finishes last
 - **WHEN** a load that started before a medal was deleted finishes after the load that started
@@ -124,4 +123,9 @@ the newer load.
 
 #### Scenario: An older load finishes first
 - **WHEN** an older load finishes while a newer load is still running
-- **THEN** the tab keeps what it showed before, still loading, until the newer load finishes
+- **THEN** its statistics show, and the tab stays loading until the newer load finishes
+
+#### Scenario: A newer load fails after an older one loaded
+- **WHEN** an older load succeeds while a newer load runs, and the newer load then fails
+- **THEN** the statistics from the older load stay, and the error shows
+
