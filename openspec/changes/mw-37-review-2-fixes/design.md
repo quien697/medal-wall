@@ -26,7 +26,10 @@ or the count drops by one, so every batch before the last is refused.
   is MW-35.
 - A size cap on uploads (MW-25).
 - Validating medals and profiles further: each is read only by its owner.
-- The stale editions load in Race Detail (a follow-up, as for the Medals list).
+- Loads that run once each time their screen opens: Edit Race, the race picker and the photo
+  loads. Nothing starts a second one while the first runs.
+- `UserManager`'s profile load: it is app state rather than a screen's load, and already drops
+  a result for an account that has changed.
 
 ## Decisions
 
@@ -88,6 +91,30 @@ their tests go.
 Repeated lookups of the same document are cached and do not count toward Firestore's limit of
 20 lookups per batch. Checked in the emulator: a batch deleting a race with 200 editions passes,
 while the emulator does enforce the limit (a write with 11 different lookups is refused).
+
+### Newest load wins on every screen
+Every load a screen can start again while one is running numbers each load, as `RacesViewModel`
+and `SearchViewModel` do. After its fetch, a load that is no longer the newest returns without
+touching what it loads, `hasLoaded` or `error`, and only the newest load ends `isLoading`.
+Loads are never cancelled, so they can overlap:
+
+| Load | Starts when |
+|---|---|
+| `RaceDetailViewModel.loadEditions` | Race Detail opens; Edit Race closes |
+| `RaceDetailViewModel.loadRace` | Edit Race closes |
+| `MedalsViewModel.loadMedals` | the Medals list appears; Add Medal closes |
+| `ProfileViewModel.loadMedals` | the You tab appears |
+| `MedalDetailViewModel.reloadMedal` | Edit Medal closes |
+
+`loadRace` and `loadEditions` count separately: each is the newest of its own kind.
+`reloadMedal` fetches the medal and the whole collection side by side and still applies
+whatever loads, checking after each fetch: once a newer reload has started it applies nothing
+more and throws nothing.
+
+The stubs' `fetchEditions`, `fetchRace` and `fetchMedal` answer with what was stored when the
+fetch started, as `fetchRaces` and `fetchMedals` do, so a held fetch can land out of date.
+`fetchRace` goes through `FetchHold`; `fetchMedal` has a hold of its own, so a test can hold
+the medal fetch while the collection fetch beside it goes through.
 
 ## Risks / Trade-offs
 

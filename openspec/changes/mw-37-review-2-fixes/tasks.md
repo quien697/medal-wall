@@ -43,3 +43,22 @@
 - [x] 5.3 `openspec validate mw-37-review-2-fixes --strict`
 - [ ] 5.4 Deploy the rules with `npm run deploy` after `npx firebase login`, then delete a race
       with several editions on a device (the user)
+
+## 6. Newest load wins on Race Detail and the Medals list
+
+- [x] 6.1 Make `StubRaceRepository.fetchEditions` answer with the editions stored when the fetch
+      started, as `fetchRaces` does
+- [x] 6.2 Write failing `RaceDetailViewModel` tests: an older editions load that lands after a
+      newer one, one that fails after a newer one succeeded, and one that finishes first; then
+      number each load in `loadEditions`
+- [x] 6.3 The same tests and fix for `MedalsViewModel.loadMedals`
+- [x] 6.4 Run the full iOS test suite and lint, and `openspec validate mw-37-review-2-fixes --strict`
+- [x] 6.5 Make `StubRaceRepository.fetchRace` and `StubMedalRepository.fetchMedal` answer with
+      what was stored when they started, and holdable (`fetchMedal` by a hold of its own)
+- [x] 6.6 Write failing `ProfileViewModel` tests (the same three cases); number each load in
+      `loadMedals`
+- [x] 6.7 Write a failing `RaceDetailViewModel` test that an older race reload landing last
+      leaves the newer race; number each `loadRace`
+- [x] 6.8 Write failing `MedalDetailViewModel` tests that an older reload landing last leaves
+      the newer medal, and one failing last throws nothing; number each `reloadMedal`
+- [x] 6.9 Run the full iOS test suite and lint, and `openspec validate mw-37-review-2-fixes --strict`

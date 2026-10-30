@@ -142,3 +142,27 @@ website URL SHALL be absent, null, or text.
 #### Scenario: An edition with a date stored as text
 - **WHEN** any client writes an edition whose `startDate` is text rather than a timestamp
 - **THEN** the backend refuses it, and the race's editions still load
+
+### Requirement: Race Detail Loading
+Race Detail SHALL show the result of its newest editions load, and the race from its newest
+reload of the race. A load that finishes after a newer load of the same kind has started SHALL
+NOT change what is shown, present an error, or end the newer load's loading state, whether it
+finishes before or after the newer load.
+
+#### Scenario: An older load finishes last
+- **WHEN** the load that started when Race Detail opened finishes after the load that started
+  when Edit Race closed, having deleted an edition
+- **THEN** the deleted edition stays off Race Detail
+
+#### Scenario: An older load fails last
+- **WHEN** an older load fails after a newer load has loaded the editions
+- **THEN** no error is shown and the newer editions stay
+
+#### Scenario: An older load finishes first
+- **WHEN** an older load finishes while a newer load is still running
+- **THEN** Race Detail keeps what it showed before, still loading, until the newer load finishes
+
+#### Scenario: An older reload of the race finishes last
+- **WHEN** Edit Race closes twice, and the reload of the race that started the first time
+  finishes after the one that started the second time
+- **THEN** Race Detail shows the race as the second edit left it
