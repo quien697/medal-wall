@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 @Observable
 final class MedalDetailViewModel {
   // MARK: - Data
@@ -18,6 +19,11 @@ final class MedalDetailViewModel {
   /// the "PR" tag should follow the latest state without the user popping the screen.
   var personalRecordIDs: Set<String>
   private static let unfilled = "—"
+
+  // MARK: - State
+  /// Orders the reloads, so an older reload's medal and record marker never replace a newer
+  /// reload's.
+  private var reloads = LoadSequence()
 
   // MARK: - Dependencies
   private let repository: any MedalRepository
@@ -136,17 +142,24 @@ final class MedalDetailViewModel {
   /// the repository directly: `self` is main-actor isolated and so can cross into a child
   /// task, where the injected `any MedalRepository` existential cannot.
   ///
-  /// Whatever loads is applied. A failed fetch throws `AppError.medalFetchFailed`, so the
-  /// screen can say it is out of date rather than quietly keep showing the pre-edit medal.
+  /// Whatever loads is applied, unless a newer reload's result already has been. A failed fetch
+  /// throws `AppError.medalFetchFailed`, so the screen can say it is out of date rather than
+  /// quietly keep showing the pre-edit medal; only the newest reload throws.
   func reloadMedal() async throws(AppError) {
+    let load = reloads.begin()
     async let updatedMedal = fetchMedal()
     async let allMedals = fetchAllMedals()
     do {
-      if let updated = try await updatedMedal {
+      let updated = try await updatedMedal
+      guard reloads.shouldApply(load) else { return }
+      if let updated {
         medal = updated
       }
-      personalRecordIDs = try await allMedals.personalRecordIDs
+      let recordIDs = try await allMedals.personalRecordIDs
+      guard reloads.shouldApply(load) else { return }
+      personalRecordIDs = recordIDs
     } catch {
+      guard reloads.isNewest(load) else { return }
       throw .medalFetchFailed(error.localizedDescription)
     }
   }

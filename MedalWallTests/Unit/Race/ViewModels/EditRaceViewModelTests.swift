@@ -11,6 +11,7 @@ import UIKit
 
 @testable import MedalWall
 
+@MainActor
 struct EditRaceViewModelTests {
   private let place = Place(countryCode: "CA", city: "Vancouver")
 

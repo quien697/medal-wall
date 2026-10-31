@@ -53,9 +53,6 @@ final class RaceFirestoreRepository: RaceRepository {
   private static let editionsCollection = "editions"
   private static let editionCountField = "editionCount"
 
-  /// Firestore commits at most 500 operations in one batch.
-  static let batchLimit = 500
-
   /// Every race field an update writes. `editionCount` is absent on purpose: the edition
   /// operations own it, and a client editing a name holds only the count it read earlier.
   ///
@@ -134,38 +131,21 @@ final class RaceFirestoreRepository: RaceRepository {
     return fields
   }
 
-  /// Deletes a race and all of its editions in batched commits, since Firestore does not
-  /// cascade-delete subcollections.
+  /// Deletes a race and all of its editions in one batched commit, since Firestore does not
+  /// cascade-delete subcollections. A race holds at most `Race.maxEditionCount` editions, so
+  /// they always fit Firestore's 500 writes per commit.
   ///
   /// No count updates: decrementing a document this same batch deletes is work for nothing.
   @discardableResult
   func deleteRace(id: String) async throws -> [RaceEdition] {
     let editions = try await fetchEditions(raceId: id)
-    let chunks = Self.deletionChunks(editionIds: editions.map { $0.id })
-
-    for (index, chunk) in chunks.enumerated() {
-      let batch = db.batch()
-      for editionId in chunk {
-        batch.deleteDocument(editionsRef(raceId: id).document(editionId))
-      }
-      if index == chunks.count - 1 {
-        batch.deleteDocument(db.collection(Self.collection).document(id))
-      }
-      try await batch.commit()
+    let batch = db.batch()
+    for edition in editions {
+      batch.deleteDocument(editionsRef(raceId: id).document(edition.id))
     }
+    batch.deleteDocument(db.collection(Self.collection).document(id))
+    try await batch.commit()
     return editions
-  }
-
-  /// Splits edition ids into batches that leave room for the race delete, which always goes
-  /// in the last one: an interrupted delete then leaves a race holding fewer editions rather
-  /// than editions orphaned under a race that is already gone.
-  static func deletionChunks(editionIds: [String]) -> [[String]] {
-    guard !editionIds.isEmpty else { return [[]] }
-
-    let editionsPerChunk = batchLimit - 1
-    return stride(from: 0, to: editionIds.count, by: editionsPerChunk).map { start in
-      Array(editionIds[start..<min(start + editionsPerChunk, editionIds.count)])
-    }
   }
 
   // MARK: - Race Edition

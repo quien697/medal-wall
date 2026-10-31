@@ -11,9 +11,7 @@ struct RacesView: View {
   // MARK: - State
   @State private var viewModel = RacesViewModel()
   @State private var errorWrapper: ErrorWrapper?
-  @State private var selectedRace: Race?
   @State private var isPresentingAddRace = false
-  @State private var isPresentingDeleteConfirm = false
 
   // MARK: - Namespace
   @Namespace private var namespace
@@ -22,72 +20,55 @@ struct RacesView: View {
   // MARK: - Body
   var body: some View {
     NavigationStack {
-      RaceList(
-        races: viewModel.displayedRaces,
-        canDelete: viewModel.canDeleteRaces,
-        onDelete: { race in
-          selectedRace = race
-          isPresentingDeleteConfirm = true
+      RaceList(races: viewModel.displayedRaces)
+        .skeleton(viewModel.isShowingSkeleton)
+        .scrollIndicators(.hidden)
+        .navigationTitle("Races")
+        .background(Color.Background.primary)
+        .toolbarTitleDisplayMode(.inlineLarge)
+        .toolbarRole(.editor)
+        .task {
+          await viewModel.loadRaces()
         }
-      )
-      .skeleton(viewModel.isShowingSkeleton)
-      .scrollIndicators(.hidden)
-      .navigationTitle("Races")
-      .background(Color.Background.primary)
-      .toolbarTitleDisplayMode(.inlineLarge)
-      .toolbarRole(.editor)
-      .task {
-        await viewModel.loadRaces()
-      }
-      .toolbar {
-        ToolbarItem(placement: .title) {
-          ExpandedNavigationTitle(title: "Races")
-        }  // ToolbarItem
+        .toolbar {
+          ToolbarItem(placement: .title) {
+            ExpandedNavigationTitle(title: "Races")
+          }  // ToolbarItem
 
-        ToolbarItem(placement: .topBarTrailing) {
-          Button {
-            isPresentingAddRace = true
-          } label: {
-            Image(systemName: "plus")
-          }  // Button
-          .matchedTransitionSource(id: addRace, in: namespace)
-          .buttonStyle(.glassProminent)
-        }  // ToolbarItem
-      }  // toolbar
-      .alert(isPresented: $isPresentingDeleteConfirm) {
-        .deleteConfirmation(
-          .race(name: selectedRace?.name ?? .appLocalized("Race")),
-          onDelete: {
-            if let race = selectedRace {
-              Task { await viewModel.deleteRace(race) }
+          ToolbarItem(placement: .topBarTrailing) {
+            Button {
+              isPresentingAddRace = true
+            } label: {
+              Image(systemName: "plus")
+            }  // Button
+            .matchedTransitionSource(id: addRace, in: namespace)
+            .buttonStyle(.glassProminent)
+          }  // ToolbarItem
+        }  // toolbar
+        .onChange(of: viewModel.error) { _, error in
+          if let error {
+            errorWrapper = ErrorWrapper(error: error)
+          }
+        }
+        .sheet(
+          isPresented: $isPresentingAddRace,
+          onDismiss: {
+            Task {
+              await viewModel.loadRaces()
             }
+          },
+          content: {
+            AddRaceView()
+              .navigationTransition(.zoom(sourceID: addRace, in: namespace))
           }
         )
-      }  // alert
-      .onChange(of: viewModel.error) { _, error in
-        if let error {
-          errorWrapper = ErrorWrapper(error: error)
-        }
-      }
-      .sheet(
-        isPresented: $isPresentingAddRace,
-        onDismiss: {
-          Task {
-            await viewModel.loadRaces()
+        .sheet(
+          item: $errorWrapper,
+          onDismiss: { viewModel.error = nil },
+          content: { wrapper in
+            ErrorView(errorWrapper: wrapper)
           }
-        },
-        content: {
-          AddRaceView()
-            .navigationTransition(.zoom(sourceID: addRace, in: namespace))
-        }
-      )
-      .sheet(
-        item: $errorWrapper,
-        onDismiss: { viewModel.error = nil },
-        content: { wrapper in
-          ErrorView(errorWrapper: wrapper)
-        }
-      )  // sheet
+        )  // sheet
     }  // NavigationStack
   }
 }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 @Observable
 final class ProfileViewModel {
   // MARK: - Data
@@ -19,6 +20,8 @@ final class ProfileViewModel {
   /// Whether a load has succeeded, so a reload keeps the statistics on screen.
   private(set) var hasLoaded = false
   var error: AppError?
+  /// Orders this screen's loads, so an older load's medals never replace a newer load's.
+  private var loads = LoadSequence()
 
   // MARK: - Dependencies
   private let repository: any MedalRepository
@@ -54,15 +57,23 @@ final class ProfileViewModel {
   }
 
   // MARK: - Functions
-  /// Loads all medals for the given user from Firestore, keeping the current ones if the fetch fails.
+  /// Loads all medals for the given user from Firestore, keeping the current ones if the fetch
+  /// fails. Its medals are used unless a newer load's already are, and only the newest load
+  /// presents an error or ends loading.
   func loadMedals(userId: String) async {
-    defer { isLoading = false }
+    let load = loads.begin()
     isLoading = true
+    defer {
+      if loads.isNewest(load) { isLoading = false }
+    }
 
     do {
-      medals = try await repository.fetchMedals(userId: userId)
+      let fetched = try await repository.fetchMedals(userId: userId)
+      guard loads.shouldApply(load) else { return }
+      medals = fetched
       hasLoaded = true
     } catch {
+      guard loads.isNewest(load) else { return }
       self.error = .medalFetchFailed(error.localizedDescription)
     }
   }

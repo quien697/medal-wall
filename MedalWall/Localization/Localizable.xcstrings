@@ -114,6 +114,16 @@
         }
       }
     },
+    "A race can have up to %lld editions." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一場賽事最多可有 %lld 個屆次。"
+          }
+        }
+      }
+    },
     "Achievements" : {
       "localizations" : {
         "zh-TW" : {

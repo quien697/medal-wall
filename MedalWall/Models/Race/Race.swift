@@ -8,6 +8,10 @@
 import Foundation
 
 struct Race: Codable, Identifiable {
+  /// The most editions a race holds: one a year covers the oldest races. `firestore.rules`
+  /// refuses more with the same number, and a race's delete fits one commit.
+  static let maxEditionCount = 200
+
   let id: String
   var name: String
   var photoUrl: String?

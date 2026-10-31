@@ -9,6 +9,7 @@ import Testing
 
 @testable import MedalWall
 
+@MainActor
 struct RacesViewModelTests {
   private let place = Place(countryCode: "CA", city: "Vancouver")
 

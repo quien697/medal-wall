@@ -5,7 +5,6 @@
 //  Created by Quien on 2026-09-22.
 //
 
-import Foundation
 import Testing
 
 @testable import MedalWall
@@ -68,106 +67,6 @@ struct RacesViewModelRepositoryTests {
     await viewModel.loadRaces()
 
     #expect(viewModel.sortedRaces.first?.editionCount == 3)
-  }
-
-  @Test("a failed delete surfaces raceDeleteFailed and keeps the race")
-  func testFailedDeleteSurfacesError() async {
-    let race = makeRace(id: "a")
-    let repository = StubRaceRepository(
-      races: [race], deleteOutcome: .failure(.raceDeleteFailed))
-    let viewModel = RacesViewModel(repository: repository, networkMonitor: StubNetworkMonitor())
-    await viewModel.loadRaces()
-
-    await viewModel.deleteRace(race)
-
-    #expect(viewModel.error == .raceDeleteFailed)
-    #expect(viewModel.races.map(\.id) == ["a"])
-    #expect(await repository.races.count == 1)
-  }
-
-  @Test("a successful delete removes the race locally and in the store")
-  func testSuccessfulDelete() async {
-    let race = makeRace(id: "a")
-    let repository = StubRaceRepository(races: [race, makeRace(id: "b")])
-    let viewModel = RacesViewModel(repository: repository, networkMonitor: StubNetworkMonitor())
-    await viewModel.loadRaces()
-
-    await viewModel.deleteRace(race)
-
-    #expect(viewModel.error == nil)
-    #expect(viewModel.races.map(\.id) == ["b"])
-    #expect(await repository.deletedRaceIDs == ["a"])
-  }
-
-  // MARK: - Photos
-  /// A race with a logo, one edition with a logo and one without.
-  private func makeRepositoryWithLogos(deleteOutcome: Result<Void, AppError> = .success(()))
-    -> (Race, StubRaceRepository)
-  {
-    var race = makeRace(id: "a")
-    race.photoUrl = "https://example.com/logo.jpg"
-    let raceDay = Date(timeIntervalSince1970: 1_577_836_800)
-    let withLogo = RaceEdition(
-      id: "edition-logo", raceId: race.id, year: 2019, startDate: raceDay, endDate: raceDay,
-      photoUrl: "https://example.com/edition.jpg", raceEvents: [], createdBy: "uid")
-    let withoutLogo = RaceEdition(
-      id: "edition-plain", raceId: race.id, year: 2018, startDate: raceDay, endDate: raceDay,
-      createdBy: "uid")
-    let repository = StubRaceRepository(
-      races: [race], editions: [race.id: [withLogo, withoutLogo]], deleteOutcome: deleteOutcome)
-    return (race, repository)
-  }
-
-  @Test("a deleted race's logos are deleted from Storage once the race is deleted")
-  func testDeletedRaceLogosDeletedAfterDelete() async {
-    let (race, repository) = makeRepositoryWithLogos()
-    let storage = StubPhotoStorage()
-    let viewModel = RacesViewModel(
-      repository: repository, storageService: storage, networkMonitor: StubNetworkMonitor())
-    await viewModel.loadRaces()
-
-    await viewModel.deleteRace(race)
-
-    #expect(
-      await storage.deletedURLs == [
-        "https://example.com/logo.jpg", "https://example.com/edition.jpg"
-      ])
-    #expect(
-      await storage.deletedOwners == [
-        .race(raceId: "a"), .edition(raceId: "a", editionId: "edition-logo")
-      ])
-  }
-
-  @Test("a race's logos stay in Storage when the race fails to delete")
-  func testRaceLogosKeptWhenDeleteFails() async {
-    let (race, repository) = makeRepositoryWithLogos(deleteOutcome: .failure(.raceDeleteFailed))
-    let storage = StubPhotoStorage()
-    let viewModel = RacesViewModel(
-      repository: repository, storageService: storage, networkMonitor: StubNetworkMonitor())
-    await viewModel.loadRaces()
-
-    await viewModel.deleteRace(race)
-
-    #expect(await storage.deletedURLs.isEmpty)
-  }
-
-  // MARK: - Offline
-  @Test("deleting a race offline is refused and the race stays in the list")
-  func testOfflineDeleteIsRefused() async {
-    let (race, repository) = makeRepositoryWithLogos()
-    let storage = StubPhotoStorage()
-    let networkMonitor = StubNetworkMonitor()
-    networkMonitor.isConnectedNow = false
-    let viewModel = RacesViewModel(
-      repository: repository, storageService: storage, networkMonitor: networkMonitor)
-    await viewModel.loadRaces()
-
-    await viewModel.deleteRace(race)
-
-    #expect(viewModel.error == .noInternetConnection)
-    #expect(viewModel.races.map(\.id) == [race.id])
-    #expect(await repository.deletedRaceIDs.isEmpty)
-    #expect(await storage.deletedURLs.isEmpty)
   }
 
   // MARK: - First load vs reload
@@ -291,30 +190,86 @@ struct RacesViewModelRepositoryTests {
     #expect(viewModel.displayedRaces.isEmpty)
   }
 
-  // MARK: - Delete during reload
-  @Test(
-    "a race cannot be deleted while the list reloads, whose older data would bring it back",
-    .timeLimit(.minutes(1)))
-  func testNoDeleteDuringReload() async {
-    let repository = StubRaceRepository(races: [makeRace(id: "a")])
+  // MARK: - Late loads
+  @Test("a load that lands after a newer one leaves the newer races", .timeLimit(.minutes(1)))
+  func testStaleLoadLeavesNewerRaces() async throws {
+    let repository = StubRaceRepository(races: [makeRace(id: "a"), makeRace(id: "b")])
     let viewModel = RacesViewModel(repository: repository)
-    await viewModel.loadRaces()
     await repository.fetchHold.holdNext()
-
-    let reload = Task { await viewModel.loadRaces() }
+    let olderLoad = Task { await viewModel.loadRaces() }
     await repository.fetchHold.waitForStart()
+    _ = try await repository.deleteRace(id: "b")
 
-    #expect(!viewModel.canDeleteRaces)
+    await viewModel.loadRaces()
     await repository.fetchHold.release()
-    await reload.value
+    await olderLoad.value
+
+    #expect(viewModel.races.map(\.id) == ["a"])
   }
 
-  @Test("once the races have loaded they can be deleted")
-  func testDeleteAfterLoad() async {
-    let viewModel = RacesViewModel(repository: StubRaceRepository(races: [makeRace(id: "a")]))
+  @Test("a load that fails after a newer one succeeded sets no error", .timeLimit(.minutes(1)))
+  func testStaleLoadFailureSetsNoError() async {
+    let repository = StubRaceRepository(races: [makeRace(id: "a")])
+    let viewModel = RacesViewModel(repository: repository)
+    await repository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
 
     await viewModel.loadRaces()
+    await repository.setFetchOutcome(.failure(.raceFetchFailed("offline")))
+    await repository.fetchHold.release()
+    await olderLoad.value
 
-    #expect(viewModel.canDeleteRaces)
+    #expect(viewModel.error == nil)
+    #expect(viewModel.races.map(\.id) == ["a"])
+  }
+
+  @Test(
+    "a load that finishes before a newer one shows its result and leaves the list loading",
+    .timeLimit(.minutes(1)))
+  func testOlderLoadFinishingFirstShowsItsResult() async throws {
+    let repository = StubRaceRepository(races: [makeRace(id: "a")])
+    let viewModel = RacesViewModel(repository: repository)
+    await repository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+    try await repository.createRace(makeRace(id: "b"))
+    await repository.fetchHold.holdNext()
+    let newerLoad = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+
+    await repository.fetchHold.release()
+    await olderLoad.value
+
+    #expect(viewModel.races.map(\.id) == ["a"])
+    #expect(viewModel.isLoading)
+    await repository.fetchHold.release()
+    await newerLoad.value
+    #expect(viewModel.races.map(\.id) == ["a", "b"])
+    #expect(!viewModel.isLoading)
+  }
+
+  @Test(
+    "a newer load that fails after an older one loaded keeps the older races",
+    .timeLimit(.minutes(1)))
+  func testNewerFailureKeepsOlderRaces() async {
+    let repository = StubRaceRepository(races: [makeRace(id: "a")])
+    let viewModel = RacesViewModel(repository: repository)
+    await repository.fetchHold.holdNext()
+    let olderLoad = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+    await repository.fetchHold.holdNext()
+    let newerLoad = Task { await viewModel.loadRaces() }
+    await repository.fetchHold.waitForStart()
+
+    await repository.fetchHold.release()
+    await olderLoad.value
+    await repository.setFetchOutcome(.failure(.raceFetchFailed("offline")))
+    await repository.fetchHold.release()
+    await newerLoad.value
+
+    #expect(viewModel.races.map(\.id) == ["a"])
+    #expect(viewModel.error != nil)
+    #expect(!viewModel.isLoading)
   }
 }

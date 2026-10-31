@@ -1,0 +1,153 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isUser(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    function isValidRaceEvent(event) {
+      return event is map
+        && event.kind == 'distance'
+        && event.value is number
+        && event.value > 0
+        && event.value < 10000
+        && math.abs(event.value * 10000 - math.round(event.value * 10000)) < 0.00001
+        && event.unit in ['kilometers', 'miles']
+        && event.type in ['inPerson', 'virtual', 'wheelChair'];
+    }
+
+    // The app reads a missing or null optional as none.
+    function isOptionalString(value) {
+      return value == null || value is string;
+    }
+
+    function isValidPlace(place) {
+      return place is map
+        && place.countryCode is string
+        && place.countryCode.matches('[A-Z]{2}')
+        && place.city is string
+        && place.city.trim().size() > 0
+        && isOptionalString(place.get('region', null));
+    }
+
+    function isValidMedal(medal) {
+      return isValidRaceEvent(medal.raceEvent)
+        && isValidPlace(medal.place)
+        && (medal.get('result', null) == null
+          || (medal.result is map
+            && medal.result.value is number
+            && medal.result.value > 0
+            && medal.result.unit == 'seconds'));
+    }
+
+    // Everything `Race`'s decoder needs: one race it can't read fails the whole Races list.
+    function isValidRace(race) {
+      return race.name is string
+        && race.name.trim().size() > 0
+        && isValidPlace(race.place)
+        && race.editionCount is int
+        && race.editionCount >= 0
+        && race.createdBy is string
+        && race.createdAt is timestamp
+        && race.updatedAt is timestamp
+        && isOptionalString(race.get('photoUrl', null))
+        && isOptionalString(race.get('websiteUrl', null));
+    }
+
+    // Everything `RaceEdition`'s decoder needs. Rules can't loop, so only the first distance is
+    // checked. An edition may have none.
+    function isValidEdition(edition) {
+      return edition.year is int
+        && edition.startDate is timestamp
+        && edition.endDate is timestamp
+        && edition.raceId is string
+        && edition.createdBy is string
+        && edition.createdAt is timestamp
+        && edition.updatedAt is timestamp
+        && isOptionalString(edition.get('photoUrl', null))
+        && edition.raceEvents is list
+        && (edition.raceEvents.size() == 0 || isValidRaceEvent(edition.raceEvents[0]));
+    }
+
+    match /users/{uid} {
+      allow get: if isUser(uid);
+      allow create: if isUser(uid) && request.resource.data.uid == uid;
+      allow update: if isUser(uid) && !changedKeys().hasAny(['uid']);
+
+      match /medals/{medalId} {
+        allow read: if isUser(uid);
+        allow create: if isUser(uid)
+          && request.resource.data.userID == uid
+          && request.resource.data.id == medalId
+          && isValidMedal(request.resource.data);
+        allow update: if isUser(uid)
+          && !changedKeys().hasAny(['userID', 'id'])
+          && isValidMedal(request.resource.data);
+        allow delete: if isUser(uid);
+      }
+    }
+
+    match /races/{raceId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.id == raceId
+        && request.resource.data.editionCount == 0
+        && isValidRace(request.resource.data);
+      allow update: if isUser(resource.data.createdBy)
+        && !changedKeys().hasAny(['id', 'createdBy'])
+        && isValidRace(request.resource.data)
+        && (!changedKeys().hasAny(['editionCount'])
+          || (changedKeys().hasOnly(['editionCount'])
+              && math.abs(request.resource.data.editionCount - resource.data.editionCount) == 1));
+      // Another device may have deleted the race first; deleting it again changes nothing.
+      allow delete: if resource == null || isUser(resource.data.createdBy);
+
+      match /editions/{editionId} {
+        function racePath() {
+          return /databases/$(database)/documents/races/$(raceId);
+        }
+
+        function isRaceCreator() {
+          return isUser(get(racePath()).data.createdBy);
+        }
+
+        function countChange() {
+          return getAfter(racePath()).data.editionCount - get(racePath()).data.editionCount;
+        }
+
+        allow read: if signedIn();
+        // A race holds at most 200 editions, as `Race.maxEditionCount` in the app.
+        allow create: if isRaceCreator()
+          && request.resource.data.createdBy == request.auth.uid
+          && request.resource.data.id == editionId
+          && request.resource.data.raceId == raceId
+          && countChange() == 1
+          && getAfter(racePath()).data.editionCount <= 200
+          && isValidEdition(request.resource.data);
+        allow update: if isRaceCreator()
+          && !changedKeys().hasAny(['id', 'raceId', 'createdBy'])
+          && countChange() == 0
+          && isValidEdition(request.resource.data);
+        // An edition left under a race that is gone goes to its creator, the race's; one
+        // already gone changes nothing. Otherwise a race delete takes its editions in the same
+        // batch, or one existing edition deleted lowers the count.
+        allow delete: if (signedIn()
+            && !exists(racePath())
+            && (resource == null || resource.data.createdBy == request.auth.uid))
+          || (isRaceCreator()
+            && (!existsAfter(racePath()) || (resource != null && countChange() == -1)));
+      }
+    }
+  }
+}

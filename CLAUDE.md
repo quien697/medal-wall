@@ -133,6 +133,8 @@ Key value types (not persisted directly): `RaceEvent`, `RaceResult`, `RaceDistan
 - **Test:** `xcodebuild test -project MedalWall.xcodeproj -scheme MedalWall -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.5'`
 - **Single test:** append `-only-testing:MedalWallTests/<TestClass>/<testMethod>`
 - **Lint:** SwiftLint runs automatically as an Xcode build phase; swift-format runs via pre-commit hook
+- **Rules tests:** `cd rules-tests && npm install && npm test` — runs `firestore.rules` and `storage.rules` in the Firebase emulators (needs JDK 21+)
+- **Deploy rules:** `cd rules-tests && npm run deploy` (after a one-time `npx firebase login`). The repo is the rules' source of truth: change them here, never in the console
 
 ---
 

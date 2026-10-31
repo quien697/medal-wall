@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 @Observable
 final class RacesViewModel {
   // MARK: - Data
@@ -19,21 +20,15 @@ final class RacesViewModel {
   /// Whether a load has succeeded, so a reload keeps the races on screen.
   private(set) var hasLoaded = false
   var error: AppError?
+  /// Orders this screen's loads, so an older load's races never replace a newer load's.
+  private var loads = LoadSequence()
 
   // MARK: - Dependencies
   private let repository: any RaceRepository
-  private let storageService: any PhotoStorage
-  private let networkMonitor: any NetworkMonitor
 
   // MARK: - Init
-  init(
-    repository: (any RaceRepository)? = nil,
-    storageService: (any PhotoStorage)? = nil,
-    networkMonitor: (any NetworkMonitor)? = nil
-  ) {
+  init(repository: (any RaceRepository)? = nil) {
     self.repository = repository ?? RaceFirestoreRepository()
-    self.storageService = storageService ?? StorageService()
-    self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
   }
 
   // MARK: - Computed
@@ -55,40 +50,24 @@ final class RacesViewModel {
     isShowingSkeleton ? Race.placeholders : sortedRaces
   }
 
-  /// Whether a race may be swiped away: not while a load runs, since its older data would bring
-  /// back a race deleted meanwhile.
-  var canDeleteRaces: Bool {
-    !isLoading
-  }
-
   // MARK: - Functions
-  /// Loads all races from Firestore.
+  /// Loads all races from Firestore. Its races show unless a newer load's already have, and
+  /// only the newest load presents an error or ends loading.
   func loadRaces() async {
+    let load = loads.begin()
     isLoading = true
-    defer { isLoading = false }
+    defer {
+      if loads.isNewest(load) { isLoading = false }
+    }
 
     do {
-      races = try await repository.fetchRaces()
+      let fetched = try await repository.fetchRaces()
+      guard loads.shouldApply(load) else { return }
+      races = fetched
       hasLoaded = true
     } catch {
+      guard loads.isNewest(load) else { return }
       self.error = .raceFetchFailed(error.localizedDescription)
-    }
-  }
-
-  /// Deletes the race from Firestore and removes it from the local list, then deletes its
-  /// logos from Storage. Offline, it reports `noInternetConnection` without deleting anything.
-  func deleteRace(_ race: Race) async {
-    guard await networkMonitor.isConnected() else {
-      error = .noInternetConnection
-      return
-    }
-
-    do {
-      let deletedEditions = try await repository.deleteRace(id: race.id)
-      races.removeAll { $0.id == race.id }
-      await storageService.deleteLogos(of: race, editions: deletedEditions)
-    } catch {
-      self.error = .raceDeleteFailed
     }
   }
 }
