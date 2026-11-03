@@ -12,7 +12,7 @@ The visual baseline lives outside this repo, in `../../documents/Design System/`
 (absolute: `~/Code/Personal/Projects/medal-wall/documents/Design System/`):
 - **`Medal Wall Design System v*.html`** — the source of truth for colour, type,
   spacing/radius/elevation, components, and the `color.*` token list.
-- **`Medal Wall iOS v*.html`** — iOS screen mockups (login, medal wall, medal detail,
+- **`Medal Wall - iOS v*.html`** — iOS screen mockups (login, medal wall, medal detail,
   races) showing how those tokens compose per screen.
 
 Filenames are versioned and get renamed, so glob the folder rather than hardcoding a
