@@ -716,7 +716,7 @@
 			repositoryURL = "https://github.com/quien697/CropImage";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 1.1.0;
 			};
 		};
 		60D4C5462FD6C40E008DFA1D /* XCRemoteSwiftPackageReference "TimePicker" */ = {
