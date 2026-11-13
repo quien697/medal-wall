@@ -6,11 +6,11 @@ The system SHALL open a medal's detail with the medal itself — its front, pres
 set as display type. The identity band SHALL carry nothing else, so the name and the medal
 are what the screen opens with.
 
-When the medal has a back photo, a button in the medal's top-right corner SHALL name the face
-in view, FRONT or BACK, and tapping it SHALL flip the medal to the other face. The button
-SHALL NOT be shown when the medal has no back. Tapping the medal itself SHALL NOT flip it. The
-flip SHALL turn the medal over with `motion.flip`, and SHALL be a fade instead when Reduce
-Motion is on. The detail SHALL open on the front.
+A label in the medal's top-right corner SHALL name the face in view, FRONT or BACK, and
+tapping anywhere on the medal SHALL flip it to the other face, whether or not that face has a
+photo; a face without one SHALL show its placeholder. The label SHALL have no action of its
+own. The flip SHALL turn the medal over with `motion.flip`, and SHALL be a fade instead when
+Reduce Motion is on. The detail SHALL open on the front.
 
 #### Scenario: The medal and its race name open the screen
 - **WHEN** a user opens a medal's detail
@@ -22,25 +22,22 @@ Motion is on. The detail SHALL open on the front.
 - **THEN** it wraps rather than truncating, and the band grows to hold it
 
 #### Scenario: Flipping to the back
-- **WHEN** a medal has a back and the user taps the FRONT button
-- **THEN** the medal turns over to show its back, and the button reads BACK
+- **WHEN** a medal's front is in view and the user taps anywhere on the medal
+- **THEN** the medal turns over to show its back, and the label reads BACK
 
 #### Scenario: Flipping back to the front
-- **WHEN** the back is in view and the user taps the BACK button
-- **THEN** the medal turns over to show its front, and the button reads FRONT
+- **WHEN** the back is in view and the user taps anywhere on the medal
+- **THEN** the medal turns over to show its front, and the label reads FRONT
 
-#### Scenario: No back, no button
-- **WHEN** a medal has no back photo
-- **THEN** no face button is shown and the medal cannot be flipped
-
-#### Scenario: Tapping the medal does not flip it
-- **WHEN** a medal has a back and the user taps the medal image itself
-- **THEN** the face in view stays the same
+#### Scenario: A medal without a back
+- **WHEN** a medal has no back photo and the user taps it
+- **THEN** the medal turns over to the back's placeholder, and the label reads BACK
 
 #### Scenario: A back without a front
 - **WHEN** a medal has a back and no front
-- **THEN** the detail opens on the front placeholder, and the FRONT button flips it to the back
+- **THEN** the detail opens on the front placeholder, and tapping the medal flips it to the
+  back
 
 #### Scenario: Reduce Motion
-- **WHEN** Reduce Motion is on and the user taps the face button
+- **WHEN** Reduce Motion is on and the user taps the medal
 - **THEN** the other face fades in instead of the medal turning over

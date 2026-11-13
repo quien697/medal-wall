@@ -9,8 +9,10 @@ Design System v4.7.0 and the iOS mock v4.8.0 define the new medal image: a squar
 (`radius.image`, porcelain fill, ash hairline) at 280 / 96 / 46 pt, a cutout whose shadow follows
 its alpha (`elevation.cutout`), a FRONT / BACK face button on the details hero, `motion.flip`,
 two `PhotoSlot`s in the edit form, and a reference photo flow. `tokens.json` already records
-v4.7.0. Two of its choices are not adopted: the gilt bar under the square, and the mock's search
-medal row (which drops the place and adds the time).
+v4.7.0. Four of its choices are not adopted: the gilt bar under the square, the
+background-removed cutout (the image is the framed photo), the face button (a label names the
+face on every medal, and the whole medal flips), and the mock's search medal row (which drops the place and
+adds the time).
 
 Existing medal data is test data. Firestore documents are read by future web and Android
 clients, so stored names must not be iOS-shaped.
@@ -18,13 +20,14 @@ clients, so stored names must not be iOS-shaped.
 ## Goals / Non-Goals
 
 **Goals:**
-- Optional front and back photos per medal, each a transparent 840 × 840 PNG cut out on the
-  device.
+- Optional front and back photos per medal, each an 840 × 840 JPEG framed on the device.
 - One square medal image used by the list, search and the details, with no gold on it.
-- A face button that flips the details medal when a back exists.
-- Every piece of new logic testable without Vision, the camera or Firebase.
+- Tapping the details medal flips it, with a FRONT / BACK label naming the face in view; an
+  empty face shows its placeholder.
+- Every piece of new logic testable without the camera or Firebase.
 
 **Non-Goals:**
+- Removing a photo's background.
 - Share cards, a camera with a guide overlay, swiping between medals in the details.
 - Migrating `photoUrl` or its `cover/` files.
 - Restyling the `CropImage` screen to match the mock's framing step (thirds grid, hint, Reset).
@@ -32,15 +35,24 @@ clients, so stored names must not be iOS-shaped.
 
 ## Decisions
 
-### Two flat fields: `frontPhotoUrl` and `backPhotoUrl`
-`Medal.photoUrl` is replaced by `frontPhotoUrl: String?` and `backPhotoUrl: String?`, and
-`MedalFirestoreRepository.medalUpdateFields` swaps `photoUrl` for the two (its test fails if a
-`Medal` field is missing from the list). Flat keys match `photoUrl` on `User`, `Race` and
-`RaceEdition`, and each face is cleared independently by the existing partial-update rule.
+### One `photoUrls` map, keyed by face
+`Medal.photoUrl` is replaced by `photoUrls: MedalPhotoUrls?`, stored as
+`photoUrls: { front, back }` with a key only for a face that has a photo. The keys are the
+faces' Storage folder names. `MedalPhotoUrls` (`Models/Medal`) holds `front: String?` and
+`back: String?`, reads a face's URL by `MedalFace` subscript, and reports `isEmpty`; code that
+handles both faces loops over `MedalFace.allCases` instead of repeating itself per face.
+`MedalFirestoreRepository.medalUpdateFields` swaps `photoUrl` for `photoUrls` (its test fails
+if a `Medal` field is missing from the list).
+- A medal without photos stores no map: `EditMedalViewModel.save` sets `photoUrls` to `nil`
+  when both faces are empty, so the field is omitted on create and deleted on update. An empty
+  map another client stores still decodes, as no photos, since both keys are optional.
+- An update writes the whole map, as it writes `place`, `raceEvent` and `result`, so a face
+  missing from it is dropped from the stored document. A key another client adds inside the
+  map does not survive an iOS edit, which the rules below keep from arising.
+- *Two flat fields, `frontPhotoUrl` and `backPhotoUrl`*: rejected. Nothing groups them for a
+  reader of the document, and every per-face read, write and delete is written twice.
 - *Keep `photoUrl` as the front and add `backPhotoUrl`*: rejected. A web or Android client would
   have to know that `photoUrl` means the front. Renaming is free while the data is test data.
-- *A `photos: { front, back }` map*: rejected. Nothing else in the schema nests photo URLs, and
-  it buys nothing over two optional fields.
 
 A legacy `photoUrl` left in an old document is never read and, as an unlisted field, never
 written.
@@ -50,152 +62,170 @@ written.
 storage folder, the slot labels, and the details' face in view. One type keeps "which face"
 from being re-derived from a `Bool` in four places.
 
-### PNG uploads to per-face folders
+### JPEG uploads to per-face folders
 `PhotoStorage.uploadMedalPhoto(userId:medalId:image:)` becomes
-`uploadMedalFace(userId:medalId:face:image:)`, which writes `pngData()` with
-`contentType = "image/png"` to `users/{uid}/medals/{medalId}/{front|back}/{UUID}.png`. A new
-name per upload keeps the existing "never overwrite a file a medal points at" rule.
-`PhotoOwner.medal` already owns everything under the medal's folder, so deletes need no change.
-Event photos stay JPEG.
+`uploadMedalFace(userId:medalId:face:image:)`, which uploads the face as a JPEG, encoded by
+`UIImage.uploadData()` like every other photo, to
+`users/{uid}/medals/{medalId}/{front|back}/{UUID}.jpg`. A new name per upload keeps the
+existing "never overwrite a file a medal points at" rule. `PhotoOwner.medal` already owns
+everything under the medal's folder, so deletes need no change.
 
-`storage.rules` splits the medal match: `front/{file}` and `back/{file}` accept only
-`image/png`, `eventPhotos/{file}` only `image/jpeg`, and read and delete stay open to the owner
-across the whole medal folder so an old `cover/` file can still be deleted. `rules-tests/`
-covers each folder with the right type, the wrong type, and another user.
+`storage.rules` does not change: its medal match, `users/{uid}/medals/{medalId}/{allPaths=**}`,
+already lets the owner read, delete and upload a JPEG anywhere in the folder, so the new
+`front/` and `back/` folders and an old `cover/` file are covered. `rules-tests/` adds cases for
+`front/` and `back/` — the owner's JPEG is accepted, a PNG is refused, another user is refused —
+so a later split of the medal match cannot drop them unnoticed.
 
-### Frame first, then remove the background
-The user frames a square on the original photo; Vision then processes only that square.
-Framing cuts off hands and table edges before segmentation, so what is left in the frame is
-mostly the medal, and a failure has an obvious fix: reframe tighter with the same photo.
-- *Remove the background first, then frame the cutout*: rejected. Segmentation would run on
-  the whole scene, where a hand or a table edge competes with the medal as the subject.
+`firestore.rules`' `isValidMedal` accepts `photoUrls` when it is absent or null, or a map whose
+keys are only `front` and `back`, each absent, null or a string, mirroring how it checks
+`result`. `rules-tests/` covers each face alone, both, an empty map, a non-map, a non-string
+URL, an unknown key, and an update that replaces or deletes the map.
 
-### Background removal: Vision, behind a protocol
-`BackgroundRemovalService` (behind `protocol BackgroundRemoval`) runs
-`VNGenerateForegroundInstanceMaskRequest` on the framed square, masks **all** foreground
-instances with `croppedToInstancesExtent: false`, so the medal keeps the position the user
-framed it in, and renders the result at 840 × 840 into a non-opaque renderer at scale 1. No
-foreground instance throws `noMedalFound`. The work runs off the main actor.
-- *VisionKit subject lifting (`ImageAnalyzer`)*: rejected. It is built for interactive lifting
-  from a view, and is harder to drive and test headless.
-- *A bundled Core ML segmentation model*: rejected. Vision already ships one on the device.
-- *Only the instance under the square's centre*: rejected for now. A medal with an open centre
-  would be lost, and framing already removes the surroundings. Revisit if hands inside the
-  square survive the cutout.
-
-`EditMedalViewModel` takes `(any BackgroundRemoval)? = nil`, resolved with
-`?? BackgroundRemovalService()`, like its other dependencies, so tests use a stub.
-
-### Framing reuses `CropImage`, with a new output-size option
-`CropImageView` with `.square` provides the pinch-and-drag framing. Its `crop` renders through
-`ImageRenderer` at the renderer's default scale of 1, so a square comes out at its on-screen
-side in pixels — roughly 300 px on a 402 pt wide phone — well under 840. `CropImage` gains an
-optional output side (or render scale): an additive, non-breaking **1.1.0** whose default keeps
-today's output for existing callers. MedalWall bumps its dependency and asks for at least 840 px.
+### Framing reuses `CropImage`'s screen, at 840 px
+`CropImageView(image:cropShape: .square, outputSide: 840)` provides the pinch-and-drag framing
+and returns the square at 840 × 840 pixels. Without `outputSide`, `CropImage` renders the square
+at its on-screen side at scale 1, roughly 300 px on a 402 pt wide phone. `outputSide` arrived in
+`CropImage` **1.1.0**, an additive release whose default keeps the old output for the avatar,
+race and edition crops. MedalWall requires `CropImage` from 1.1.0 (up to the next major) from
+its remote repository, like its other packages, because CI checks out only this repository.
 The package's own screen is used as it is; the mock's framing screen is a reference.
 - *Upscale the ~300 px crop*: rejected. The details draw the medal at 280 pt, 840 px at @3x, and
   an upscaled crop would be visibly soft.
-- *A framing view inside MedalWall*: rejected. It would duplicate the gesture and clamping logic
-  the package already has and tests.
+- *A framing screen built on `CropArea`, with the mock's thirds grid, hint and Reset*: not
+  needed. The ready-made screen frames a square at 840 px, which is all this change asks of it.
 
-### The flow lives in the edit form
-Each face runs: tip sheet → library or camera → `CropImageView(.square)` → clearing → slot.
-- `MedalPhotoTipsView` (sheet) names the face and offers Choose photo and, when
-  `isCameraAvailable`, Take photo. The view model reads camera availability from an injected
-  closure that defaults to `UIImagePickerController.isSourceTypeAvailable(.camera)`, so tests
-  can set it.
-- `CameraPickerView` wraps `UIImagePickerController` with `.camera`. There is no SwiftUI
-  camera picker. `NSCameraUsageDescription` goes in `Info.plist`, with a new
+### `PhotoSlot` runs the flow
+Each face runs: slot → source alert → library or camera → `CropImageView` → slot. The design
+system's `PhotoSlot`, in `Shared/Components`, owns all of it, so a form hands it a photo and
+receives a framed one:
+`PhotoSlot(photo:imageType:cropShape:outputSide:title:message:placeholderText:offersCamera:onPick:onRemove:onError:)`.
+It holds only presentation state (which alert, picker, camera or sheet is up, and the picked
+photo for the crop sheet) and passes a photo that fails to load to `onError`, which the form
+shows as it shows any other error. The crop sheet is presented from the picked photo itself,
+`.sheet(item:)` with a `PickedPhoto`, never from a flag beside it: a sheet's content reading
+`@State` its view's body never reads gets the value from before the first presentation, so the
+first crop screen would open without the photo. The medal form is its first user. The avatar, race and
+edition keep `EditPhotoPicker` until a later change moves them.
+- Tapping a slot opens an alert titled by the form, here "Front photo" or "Back photo",
+  offering **Choose Photo**, **Take Photo** while `offersCamera` is true, **Remove Photo**
+  (destructive) when the slot is filled, and **Cancel**, stacked as full-width buttons in the
+  middle of the screen. Replacing a face is choosing or taking a new photo from the same alert.
+  The buttons are verbs, as alert buttons are: "Take Photo" and "Choose Photo", not "Camera"
+  and "Photo Library".
+- The medal form's message says how to shoot the medal: flat on a plain surface from straight
+  above, or hung on a plain wall, with everything else out of the shot, in even light with no
+  flash. A clear background makes a clean photo now, and it is what a later background removal
+  needs from the stored 840 px squares. The message names no background removal, which the app
+  does not do.
+- Take Photo is offered whether or not the camera can open, and tapping it reads
+  `CameraAccess`, from whether the device has a camera
+  (`UIImagePickerController.isSourceTypeAvailable(.camera)`) and
+  `AVCaptureDevice.authorizationStatus(for: .video)`:
+  - `granted`: the camera opens.
+  - `undetermined`: iOS asks, and the camera opens if the user allows it.
+  - `denied` (access turned off, or restricted by Screen Time): an alert, "Allow Camera Access",
+    "Turn on camera access in Settings to take a photo.", with **Open Settings** and **Cancel**.
+  - `unavailable` (no camera, as in the Simulator): an alert, "No Camera", "This device has no
+    camera. Choose a photo instead.", with the system's OK.
+  `CameraAccess` is a plain mapping of the two inputs, so its tests cover every case without
+  a device.
+- `CameraPickerView`, in `Shared/Components`, wraps `UIImagePickerController` with `.camera`.
+  There is no SwiftUI camera picker. `NSCameraUsageDescription` goes in `Info.plist`, with a new
   `InfoPlist.xcstrings` for its zh-TW text.
-- Clearing shows in the slot itself (a spinner and "Clearing background…") while the rest of
-  the form stays usable. Save is disabled until it finishes, because saving mid-clear would
-  silently drop the photo.
-- *A full-screen clearing step, as in the mock*: rejected. Keeping the user in the form is
-  simpler, and the mock flow is a reference.
-- No medal found shows an alert with **Reframe** (re-presents the crop sheet with the same
-  picked photo) and **Cancel**. It is not an `AppError` through `ErrorView`, because that sheet
-  offers only Continue.
+- *A tip sheet before the source, as in the mock*: rejected. The alert's message carries the
+  tips without adding a step.
 
-`EditMedalViewModel` stages `frontPhoto` and `backPhoto` (`UIImage?`), a set of changed faces,
-`clearingFace: MedalFace?` and `unrecognizedFace: MedalFace?`. `save()` resolves each face as the
-cover photo resolves today: unchanged keeps its URL, changed uploads, removed becomes `nil`. A
-replaced or removed face is deleted only after the save succeeds. The view holds only
-presentation state: which sheet is up, and the picked photo kept for Reframe.
+`EditMedalViewModel` stages `frontPhoto` and `backPhoto` (`UIImage?`) and a set of changed
+faces. A framed photo is staged for its face as it arrives, and removing a face stages `nil`;
+neither touches the other face. `save()` resolves each face as the cover photo resolves today:
+unchanged keeps its URL, changed uploads, removed becomes `nil`. A replaced or removed face is
+deleted only after the save succeeds.
 
-### One `MedalImage` component, no ring
-`MedalImage` (Shared/Components) draws the square: `Surface.primary` fill, `Border.primary`
-hairline, `radius.image`, the cutout drawn `.scaledToFit` inside, `.elevation(.cutout(side:))`,
-and, without an image, the `medal.fill` glyph labelled "Front" (glyph alone at 46 pt). It wraps
-`PhotoImage`, so caching, downsampling and the loading spinner are unchanged. `ImageType`'s
-medal cases become `.rect(cornerRadius: .Radius.image)`, `.medal` grows to 280 pt, and the
-skeleton bone follows `ImageType.shape`, so it turns square on its own.
+### Medals use `PhotoImage`, with no ring
+A medal is drawn by `PhotoImage`, like every other photo, so caching, downsampling, the loading
+spinner and the skeleton bone are shared. `ImageType`'s medal cases become
+`.rect(cornerRadius: .Radius.image)` and `.medal` grows to 280 pt, so the photo fills a square,
+and the bone, which follows `ImageType.shape`, turns square on its own. Without a photo,
+`PhotoImage` shows `PlaceholderImage`, which takes an optional text beneath its glyph:
+`PhotoImage(…, placeholderText:)` passes it through. The list and the details label a missing
+face with `MedalFace.title` ("Front", "Back"); search's 46 pt square shows the glyph alone.
+- *A medal-only image component, with the design system's porcelain fill and ash hairline*:
+  rejected. Without a cutout a medal is a photo like any other, and a second component would
+  copy `PhotoImage`'s loading for a fill no photo shows and a hairline.
 
 `MedalRingViewModifier` is deleted with its three call sites (`MedalRow`, `SearchMedalRow`,
-`MedalDetailHeroSection`). `Elevation.ring` stays, because it is still a design system token.
+`MedalDetailHeroSection`), and `ElevationViewModifier` with it: the ring was the only view that
+cast a design system shadow. The square casts none. `elevation.cutout` follows a cutout's
+alpha, and on an opaque photo it would shadow the whole square, which the design system keeps
+flat.
 
-`Elevation` gains `case cutout(side: CGFloat)`, from the token list: light, y 0.08·s, blur
-0.1·s, ink 28%; dark, a 1 pt paper rim at 50% plus y 0.08·s, blur 0.12·s, black 55%. The
-modifier reads the colour scheme. SwiftUI's shadow follows an image's alpha, so the medal casts
-the shadow and the square does not.
+### The flip: state and its math in the view model, motion in the view
+`MedalDetailViewModel` holds `faceInView`, the face the user turned to whether or not it has a
+photo, with `toggleFace()` and `flipHint`. It also holds the flip's math
+as static functions, so it is tested without a view: `flipAngle(showing:)` (0 for the front,
+180 for the back), `rotation(showing:turns:)` (that angle while the medal turns, none under
+Reduce Motion), `faceOpacity(_:flipAngle:turns:)` (a face shows only while it faces the viewer,
+swapping at 90°, or crossfades under Reduce Motion) and `flipAnimation(turns:)`
+(`Animation.Motion.flip`, `.spring(response: 0.45, dampingFraction: 0.78)`, or
+`Animation.Motion.flipReduced`, `.easeInOut(duration: 0.2)`). A new `Animation+Extensions.swift`
+holds both motions, beside the other token extensions.
 
-`CachedAsyncImage` writes the downloaded bytes to disk and downsamples them with ImageIO, which
-keeps alpha, so it needs no change.
-
-### The flip: state in the view model, motion in the view
-`MedalDetailViewModel` holds `visibleFace: MedalFace = .front`, `hasBack` and `toggleFace()`,
-and exposes the button's label. `MedalDetailHeroSection` turns the medal with `rotation3DEffect`
-about the y axis using `Animation.Motion.flip` (`.spring(response: 0.45, dampingFraction:
-0.78)`), swapping faces at 90°. Under Reduce Motion it crossfades with
-`Animation.Motion.flipReduced` (`.easeInOut(duration: 0.2)`). A new `Animation+Extensions.swift`
-holds both, beside the other token extensions. `MedalFaceButton` is an ink capsule in the
-image's top-right corner. Its VoiceOver label is the face in view, with the hint "Shows the
-back" or "Shows the front". The image itself has no tap action.
+`MedalFlipImage` draws the two faces back to back and turns them with `rotation3DEffect` about
+the y axis, passing `turns: !reduceMotion` to those functions, since Reduce Motion is read from
+the environment. Each face wears `MedalFaceVisibilityViewModifier` (in `MedalDetail/Modifiers`),
+which animates the flip angle alongside the turn so every frame asks `faceOpacity` for that
+angle. An empty face shows the photo placeholder labelled with that face. The face label, an
+ink chip (`.chipStyle(.primary)`, since chips name things), sits in the medal's top-right
+corner on every medal, inset `.Space.stack`, outside the turning faces so it never mirrors. The
+label has no action of its own. `MedalDetailHeroSection` makes the whole medal one plain button
+that flips it. The button's VoiceOver label is the face in view, with the hint "Shows the back"
+or "Shows the front".
 
 ### Edit form slots
-`EditMedalPhotosSection` lays out two `MedalPhotoSlot`s, Front then Back. An empty slot
-(dashed pewter, "+ Add front") starts the flow. A filled slot opens a `confirmationDialog`
-titled "Front photo" or "Back photo" with Replace Photo, Remove Photo (destructive) and Cancel,
-and takes a 2 pt ink ring while the dialog is up.
+`EditMedalPhotosSection` lays out two `PhotoSlot`s, Front then Back, each labelled with its face
+beneath. A slot is empty (dashed pewter, "+ Add front"), filled, or active: it takes a 2 pt ink
+ring while its alert is up. It is drawn at its `ImageType`'s size, shrinking to the width it is
+given, so the two 280 pt `.medal` slots share the row.
 
 ### Declared deviations
-`openspec/design-system/deviations.md` gains two entries, both `unreported` until the designer
+`openspec/design-system/deviations.md` gains four entries, all `unreported` until the designer
 confirms:
 - `component.MedalImage.earnedBar`: not drawn. The list and the details already state "No time
   recorded", the bar would mark the default rather than the exception, and gold under a gold
   medal competes with the photo.
+- `component.MedalImage`: drawn by `PhotoImage` — the framed photo filling the square with no
+  edge and no `elevation.cutout`, and, without one, the shared photo placeholder labelled with
+  the face — where the design system draws a background-removed cutout on porcelain with an ash
+  hairline. Removing the background is left to a later change; until then a medal is a photo
+  like any other.
+- `component.MedalImage.faceButton`: a FRONT / BACK label names the face in view on every
+  medal, and tapping anywhere on the medal flips it, to an empty face's placeholder too, where
+  the design system makes the corner capsule the button that flips, shown only when a back
+  exists. The whole medal is the target, so turning it over needs no aim at a small corner
+  control; the corner only names the face. An empty face in view invites adding its photo. The design system keeps the medal untappable because
+  its square carries gilt, and no gilt bar is drawn here; adopting the bar would reopen this.
 - iOS mock v4.8.0 search medal row: keeps the place and shows no time. The place is how a match
   by place explains itself (`search` spec, "A medal found by its place").
 
 ## Risks / Trade-offs
 
-- [Vision's foreground mask may not run in the iOS Simulator] → Unit tests never call Vision:
-  they use the `BackgroundRemoval` stub. The real service is checked on a device, early, before
-  the UI is built on top of it.
-- [The camera is unavailable in the Simulator] → Take photo is hidden there by the availability
-  check. It is verified on a device.
-- [The `elevation.cutout` formula may not match the mock's rendered shadows] → The token list
-  wins. If it looks wrong on a device, record a deviation rather than copying the mock.
-- [An 840 × 840 PNG is far larger than the JPEGs] → It holds one medal on transparency, and
-  Storage has no size cap yet (MW-25). CachedAsyncImage downsamples it for the 96 and 46 pt
-  squares.
+- [The camera is unavailable in the Simulator] → Take Photo says so there. The camera is
+  verified on a device.
+- [A photo's background stays in the medal image] → Framing a tight square leaves little of
+  it, and the deviation entry keeps the gap visible until a change removes backgrounds.
 - [Old test medals keep their `cover/` files in Storage] → They are test data. Deleting such a
   medal no longer finds the file, which stays until cleaned up by hand.
-- [The live rules reject PNG until deployed] → Deploy `storage.rules` before any build that
-  uploads a face runs against the live project.
-- [`CropImage` is a public package] → The new option is additive with today's behaviour as the
-  default, released as a minor version.
+- [`CropImage` is a public package] → `outputSide` is additive with the old output as the
+  default, released as the minor version 1.1.0.
 
 ## Migration Plan
 
-1. Release `CropImage` 1.1.0 and bump MedalWall's dependency.
-2. Deploy `storage.rules` (`cd rules-tests && npm run deploy`) once `rules-tests` passes, before
-   running a build that uploads faces.
+1. Require `CropImage` 1.1.0 (released).
+2. No rules deploy: `storage.rules` is unchanged.
 3. No data migration. Medals saved before this change show the front placeholder.
 
-Rollback: revert the branch; the PNG rules only widen what the owner may upload, so they can
-stay.
+Rollback: revert the branch.
 
 ## Open Questions
 
-- Does `VNGenerateForegroundInstanceMaskRequest` run in the iOS 26.5 Simulator? This only
-  decides where the real service is exercised, not the design.
+None.
