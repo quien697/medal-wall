@@ -47,7 +47,12 @@ service cloud.firestore {
           || (medal.result is map
             && medal.result.value is number
             && medal.result.value > 0
-            && medal.result.unit == 'seconds'));
+            && medal.result.unit == 'seconds'))
+        && (medal.get('photoUrls', null) == null
+          || (medal.photoUrls is map
+            && medal.photoUrls.keys().hasOnly(['front', 'back'])
+            && isOptionalString(medal.photoUrls.get('front', null))
+            && isOptionalString(medal.photoUrls.get('back', null))));
     }
 
     // Everything `Race`'s decoder needs: one race it can't read fails the whole Races list.

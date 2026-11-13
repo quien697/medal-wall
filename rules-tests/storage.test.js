@@ -62,6 +62,8 @@ describe("a user's own files", () => {
     'users/alice/avatar/profile.jpg',
     'users/alice/medals/medal-1/cover/3F2A.jpg',
     'users/alice/medals/medal-1/eventPhotos/photo-1.jpg',
+    'users/alice/medals/medal-1/front/3F2A.jpg',
+    'users/alice/medals/medal-1/back/3F2A.jpg',
     'users/alice/medals/medal-1/medal.jpg',
   ];
 
@@ -88,7 +90,9 @@ describe("a user's own files", () => {
   });
 
   test('only JPEG uploads are accepted', async () => {
-    await assertFails(upload('alice', paths[0], { contentType: 'image/png' }));
+    for (const path of paths) {
+      await assertFails(upload('alice', path, { contentType: 'image/png' }));
+    }
   });
 
   test('nothing else under the user is writable', async () => {
