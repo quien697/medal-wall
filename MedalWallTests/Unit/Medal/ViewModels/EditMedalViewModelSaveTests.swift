@@ -26,7 +26,7 @@ struct EditMedalViewModelSaveTests {
       name: "Taipei Marathon",
       date: Date(timeIntervalSince1970: 1_577_836_800),
       bibNumber: "00001",
-      photoUrl: "https://example.com/cover.jpg",
+      photoUrls: MedalPhotoUrls(front: "https://example.com/cover.jpg"),
       place: Place(countryCode: "TW", city: "Taipei City"),
       raceEvent: .default,
       note: "Old note",
@@ -111,7 +111,8 @@ struct EditMedalViewModelSaveTests {
     let created = try #require(await repository.createdMedals.first)
     expectFilledForm(created)
     #expect(created.userID == "uid")
-    #expect(created.photoUrl == nil)
+    // A medal added without photos stores no photo URLs at all, not an empty map.
+    #expect(created.photoUrls == nil)
     #expect(created.eventPhotos.isEmpty)
   }
 
@@ -129,7 +130,7 @@ struct EditMedalViewModelSaveTests {
     #expect(updated.id == "medal-taipei")
     #expect(updated.userID == "uid")
     #expect(updated.createdAt == Date(timeIntervalSince1970: 1_577_923_200))
-    #expect(updated.photoUrl == "https://example.com/cover.jpg")
+    #expect(updated.photoUrls?.front == "https://example.com/cover.jpg")
   }
 
   @Test(

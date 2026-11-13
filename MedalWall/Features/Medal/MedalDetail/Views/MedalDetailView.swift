@@ -28,8 +28,12 @@ struct MedalDetailView: View {
   var body: some View {
     ScrollView {
       MedalDetailHeroSection(
-        photoUrl: viewModel.medal.photoUrl,
-        name: viewModel.medal.name
+        frontPhotoUrl: viewModel.medal.photoUrls?.front,
+        backPhotoUrl: viewModel.medal.photoUrls?.back,
+        faceInView: viewModel.faceInView,
+        flipHint: viewModel.flipHint,
+        name: viewModel.medal.name,
+        onToggleFace: viewModel.toggleFace
       )
 
       MedalDetailInfoSection(

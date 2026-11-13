@@ -37,7 +37,7 @@ internal-consistency report below.
 | `color` | `MedalWall/Assets.xcassets/Colors/*.colorset/Contents.json` |
 | `type` | `Font.TypeScale` in `MedalWall/Shared/Extensions/Font+Extensions.swift` |
 | `radius`, `space` | `CGFloat.Radius` / `CGFloat.Space` in `CGFloat+Extensions.swift` |
-| `elevation` | `Elevation` in `MedalWall/Shared/Modifiers/ElevationViewModifier.swift` |
+| `elevation` | `hairline`: the border `surfaceStyle` draws (`SurfaceViewModifier.swift`). Shadow levels: an `Elevation` enum in `MedalWall/Shared/Modifiers/`. There is none while no view casts a design system shadow, so each one is `unimplemented` |
 | `component` | `ActionStyle` (and the pressed and disabled states it draws), `ActionShape`, `ChipStyle`, `TagStyle` in `MedalWall/Shared/Modifiers/`; the `TierBadge`, `Progress` and `Skeleton` colour roles in `Color+Extensions.swift`; `ProgressBar`'s height and `CGFloat.Radius.progressTrack`; `BoneSize` in `SkeletonViewModifier.swift` |
 | `component.Tracking` | `CGFloat.Tracking` in `CGFloat+Extensions.swift` |
 
@@ -58,10 +58,9 @@ the same. `champagne` is exactly this case and is a match, not a deviation.
 
 `elevation` values do not compare numerically. The design system states a CSS `box-shadow`
 (blur, spread, y-offset, opacity); SwiftUI's `shadow(radius:x:y:)` has no negative-spread
-equivalent, so `ElevationViewModifier.swift` already approximates every level with a tighter
-radius and lower opacity — its doc comment says so. Match `elevation` by **level name presence**,
-not by whether the opacity or radius numbers line up: a level named in both is a match regardless
-of its approximated numbers. A level in code with no design system counterpart, or named in the
+equivalent, so any shadow level the code builds is an approximation. Match `elevation` by
+**level name presence**, not by whether the opacity or radius numbers line up: a level named in
+both is a match regardless of its approximated numbers. A level in code with no design system counterpart, or named in the
 design system with no code counterpart, is the real signal — treat that as `undeclared lead` /
 `unimplemented` as usual.
 

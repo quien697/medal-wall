@@ -145,7 +145,8 @@ struct MedalDetailViewModelRepositoryTests {
   // MARK: - Photos
   private func makeMedalWithPhotos() -> Medal {
     var medal = makeMedal()
-    medal.photoUrl = "https://example.com/medal.jpg"
+    medal.photoUrls = MedalPhotoUrls(
+      front: "https://example.com/front.png", back: "https://example.com/back.png")
     medal.eventPhotos = [
       EventPhoto(id: "event-start", imageUrl: "https://example.com/start.jpg", sortOrder: 0),
       EventPhoto(id: "event-finish", imageUrl: "https://example.com/finish.jpg", sortOrder: 1)
@@ -165,11 +166,11 @@ struct MedalDetailViewModelRepositoryTests {
 
     #expect(
       await storage.deletedURLs == [
-        "https://example.com/medal.jpg", "https://example.com/start.jpg",
-        "https://example.com/finish.jpg"
+        "https://example.com/front.png", "https://example.com/back.png",
+        "https://example.com/start.jpg", "https://example.com/finish.jpg"
       ])
     let owner = PhotoOwner.medal(userId: "uid", medalId: "medal-a")
-    #expect(await storage.deletedOwners == [owner, owner, owner])
+    #expect(await storage.deletedOwners == [owner, owner, owner, owner])
   }
 
   @Test("a medal's photos stay in Storage when the medal fails to delete")

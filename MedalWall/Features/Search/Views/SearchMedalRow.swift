@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-/// One medal as a search result: its photo in the gold ring, its date, its name, where it was
-/// run, and its distance.
+/// One medal as a search result: its front, its date, its name, where it was run, and its
+/// distance.
 ///
 /// A medal can be found by its place, so the row shows it, beneath the name as a race row
 /// does. The distance has a line of its own, so a long custom distance never shares one.
@@ -23,8 +23,9 @@ struct SearchMedalRow: View {
   // MARK: - Body
   var body: some View {
     HStack(spacing: .Space.row) {
+      // Centred in the race image's width, so the medal and race sections' text lines up.
       PhotoImage(urlString: photoUrl, as: .medalSearchThumbnail)
-        .medalRing()
+        .frame(width: ImageType.raceSearchThumbnail.size.width)
 
       VStack(alignment: .leading) {
         Text(date)

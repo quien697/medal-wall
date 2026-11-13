@@ -44,7 +44,6 @@ the source cannot carry:
   cannot change. Shape carries the distinction; never swap them. Gaining a remove
   affordance moves a label across: a deletable distance is a chip, the same distance
   read-only is a tag.
-- `ElevationViewModifier.swift` — `.elevation(…)`.
 
 A fixed colour needs a fixed counterpart: anything sitting on `Record.personalBest`
 (no dark slot) must use `Record.onPersonalBest`, or it inverts out from under its background.

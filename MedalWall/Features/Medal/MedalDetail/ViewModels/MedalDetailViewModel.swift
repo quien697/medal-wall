@@ -24,6 +24,9 @@ final class MedalDetailViewModel {
   /// Orders the reloads, so an older reload's medal and record marker never replace a newer
   /// reload's.
   private var reloads = LoadSequence()
+  /// The face the details show, whether or not it has a photo: an empty face shows its
+  /// placeholder.
+  private(set) var faceInView: MedalFace = .front
 
   // MARK: - Dependencies
   private let repository: any MedalRepository
@@ -46,6 +49,14 @@ final class MedalDetailViewModel {
   }
 
   // MARK: - Computed
+  /// What tapping the medal does, for VoiceOver.
+  var flipHint: LocalizedStringKey {
+    switch faceInView {
+    case .front: "Shows the back"
+    case .back: "Shows the front"
+    }
+  }
+
   /// Whether this medal currently holds a record at its distance.
   var isPersonalRecord: Bool {
     personalRecordIDs.contains(medal.id)
@@ -169,12 +180,48 @@ final class MedalDetailViewModel {
     try await repository.fetchMedal(id: medal.id, userId: medal.userID)
   }
 
+  /// Turns the medal over to its other face, empty or not.
+  func toggleFace() {
+    faceInView = faceInView == .front ? .back : .front
+  }
+
+  /// How far the medal is turned, in degrees, with `face` in view: 0 for the front, 180 for the
+  /// back. Animating between them gives each frame's angle, which `faceOpacity` reads.
+  static func flipAngle(showing face: MedalFace) -> Double {
+    face == .back ? 180 : 0
+  }
+
+  /// The medal's rotation with `face` in view: its flip angle while the medal `turns`, and none
+  /// under Reduce Motion, where the faces crossfade in place.
+  static func rotation(showing face: MedalFace, turns: Bool) -> Double {
+    turns ? flipAngle(showing: face) : 0
+  }
+
+  /// How visible `face` is at `flipAngle`.
+  ///
+  /// While the medal `turns`, a face shows only while it faces the viewer, swapping at 90°
+  /// where the medal is edge-on; a plain fade would show both faces across the whole turn.
+  /// Under Reduce Motion the faces crossfade.
+  static func faceOpacity(_ face: MedalFace, flipAngle: Double, turns: Bool) -> Double {
+    let backProgress = flipAngle / 180
+    if turns {
+      let frontFacesViewer = flipAngle < 90
+      return frontFacesViewer == (face == .front) ? 1 : 0
+    }
+    return face == .front ? 1 - backProgress : backProgress
+  }
+
+  /// The flip's motion: `motion.flip` while the medal `turns`, a fade under Reduce Motion.
+  static func flipAnimation(turns: Bool) -> Animation {
+    turns ? .Motion.flip : .Motion.flipReduced
+  }
+
   /// Fetches the owner's whole collection, for the concurrent reload above.
   private func fetchAllMedals() async throws -> [Medal] {
     try await repository.fetchMedals(userId: medal.userID)
   }
 
-  /// Deletes the medal from Firestore, then its cover and event photos from Storage. The
+  /// Deletes the medal from Firestore, then its front, back and event photos from Storage. The
   /// photos go only once the medal is gone, so a failed delete never leaves the medal pointing
   /// at deleted files; a photo that fails to delete is left behind rather than failing a
   /// delete that already happened. Offline, it throws `AppError.noInternetConnection` before
@@ -184,8 +231,10 @@ final class MedalDetailViewModel {
 
     try await repository.deleteMedal(id: medal.id, userId: medal.userID)
     let owner = PhotoOwner.medal(userId: medal.userID, medalId: medal.id)
-    if let photoUrl = medal.photoUrl {
-      try? await storageService.deletePhoto(url: photoUrl, ownedBy: owner)
+    for face in MedalFace.allCases {
+      if let photoUrl = medal.photoUrls?[face] {
+        try? await storageService.deletePhoto(url: photoUrl, ownedBy: owner)
+      }
     }
     for eventPhoto in medal.eventPhotos {
       try? await storageService.deletePhoto(url: eventPhoto.imageUrl, ownedBy: owner)

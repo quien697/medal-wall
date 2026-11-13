@@ -56,6 +56,56 @@ struct StringCatalogTests {
     }
   }
 
+  @Test("The medal photos' zh-TW strings ship translated")
+  func testMedalPhotoKeysAreTranslated() {
+    let keys = [
+      "Photos",
+      "Front",
+      "Back",
+      "Add front",
+      "Add back",
+      "Front photo",
+      "Back photo",
+      "Choose Photo",
+      "Take Photo",
+      "Remove Photo",
+      "Lay it flat on a plain surface and shoot from straight above, or hang it on a plain wall. "
+        + "Keep everything else out of the shot, and use even light with no flash.",
+      "Shows the back",
+      "Shows the front"
+    ]
+
+    for key in keys {
+      #expect(zhTWTable[key] != nil, "missing zh-TW entry for \(key)")
+    }
+  }
+
+  @Test("The camera access alerts' zh-TW strings ship translated")
+  func testCameraAccessKeysAreTranslated() {
+    let keys = [
+      "Allow Camera Access",
+      "Turn on camera access in Settings to take a photo.",
+      "Open Settings",
+      "No Camera",
+      "This device has no camera. Choose a photo instead."
+    ]
+
+    for key in keys {
+      #expect(zhTWTable[key] != nil, "missing zh-TW entry for \(key)")
+    }
+  }
+
+  @Test("The camera permission prompt ships translated")
+  func testCameraUsageDescriptionIsTranslated() throws {
+    let defaults = UserDefaults(suiteName: "StringCatalogTests")
+    defaults?.set(AppLanguage.zhTW.rawValue, forKey: AppLanguage.storageKey)
+    let bundle = AppLanguage.resolvedBundle(from: defaults ?? .standard)
+    let path = try #require(bundle.path(forResource: "InfoPlist", ofType: "strings"))
+    let table = NSDictionary(contentsOfFile: path) as? [String: String]
+
+    #expect(table?["NSCameraUsageDescription"] != nil)
+  }
+
   @Test("The race list's zh-TW strings ship translated")
   func testRaceListKeysAreTranslated() {
     let keys = [

@@ -5,7 +5,6 @@
 //  Created by Quien on 2026-04-09.
 //
 
-import CropImage
 import PhotosUI
 import SwiftUI
 
@@ -18,12 +17,8 @@ struct EditMedalView: View {
   @State private var viewModel: EditMedalViewModel
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingDistancePicker: Bool = false
-  @State private var isPresentingCropImageView: Bool = false
   @State private var isPresentingRaceEntryPicker: Bool = false
   @State private var isPresentingPlacePicker: Bool = false
-  @State private var isPresentingPhotoPicker: Bool = false
-  @State private var selectedPhoto: PhotosPickerItem?
-  @State private var rawPickedImage: UIImage?
   @State private var isPresentingEventPhotosPicker: Bool = false
   @State private var selectedEventPhotos: [PhotosPickerItem] = []
 
@@ -36,19 +31,12 @@ struct EditMedalView: View {
   var body: some View {
     NavigationStack {
       Form {
-        EditPhotoPicker(
-          photo: viewModel.photo,
-          imageType: .medal,
-          onChooseFromLibrary: {
-            isPresentingPhotoPicker = true
-          },
-          onRemove: {
-            selectedPhoto = nil
-            rawPickedImage = nil
-            viewModel.clearPhoto()
-          }
+        EditMedalPhotosSection(
+          photo: { viewModel.photo(for: $0) },
+          onPick: { viewModel.updatePhoto(with: $0, for: $1) },
+          onRemove: { viewModel.clearPhoto(for: $0) },
+          onError: { errorWrapper = ErrorWrapper(error: $0) }
         )
-        .listRowBackground(Color.clear)
 
         EditMedalAutoFillSection {
           isPresentingRaceEntryPicker = true
@@ -135,25 +123,7 @@ struct EditMedalView: View {
       }  // toolbar
       .interactiveDismissDisabled()
       .task {
-        await viewModel.loadPhoto()
-      }
-      .photosPicker(
-        isPresented: $isPresentingPhotoPicker,
-        selection: $selectedPhoto,
-        matching: .images
-      )
-      .onChange(of: selectedPhoto) { _, newItem in
-        guard let newItem else { return }
-        Task {
-          if let data = try? await newItem.loadTransferable(type: Data.self),
-            let uiImage = UIImage(data: data)
-          {
-            rawPickedImage = uiImage
-            isPresentingCropImageView = true
-          } else {
-            errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
-          }
-        }
+        await viewModel.loadPhotos()
       }
       .photosPicker(
         isPresented: $isPresentingEventPhotosPicker,
@@ -182,23 +152,6 @@ struct EditMedalView: View {
           selectedEventPhotos = []
         }
       }
-      .sheet(
-        isPresented: $isPresentingCropImageView,
-        onDismiss: {
-          selectedPhoto = nil
-          rawPickedImage = nil
-        },
-        content: {
-          CropImageView(
-            image: rawPickedImage,
-            cropShape: .circle
-          ) { croppedImage in
-            if let croppedImage {
-              viewModel.updatePhoto(with: croppedImage)
-            }
-          }
-        }
-      )
       .sheet(isPresented: $isPresentingDistancePicker) {
         EditDistanceView(
           mode: .edit,

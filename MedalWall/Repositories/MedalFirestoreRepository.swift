@@ -42,7 +42,7 @@ final class MedalFirestoreRepository: MedalRepository {
     "name",
     "date",
     "bibNumber",
-    "photoUrl",
+    "photoUrls",
     "place",
     "raceEvent",
     "result",

@@ -12,28 +12,30 @@ import SwiftUI
 /// placeholder when there is nothing to show.
 ///
 /// Use `init(photo:as:)` for a locally held `UIImage` (e.g. an edit draft), or
-/// `init(urlString:as:)` for a remote URL loaded via `CachedAsyncImage`. The gold ring
-/// is not part of the image — a caller that knows the medal was earned adds it with
-/// `.medalRing()`. Inside a skeleton the photo is one bone in its shape, with no
-/// placeholder glyph or spinner.
+/// `init(urlString:as:)` for a remote URL loaded via `CachedAsyncImage`. Pass `placeholderText`
+/// to label the placeholder, such as a medal's face. Inside a skeleton the photo is one bone in
+/// its shape, with no placeholder glyph or spinner.
 struct PhotoImage: View {
   private let photo: UIImage?
   private let urlString: String?
   private let imageType: ImageType
+  private let placeholderText: LocalizedStringKey?
 
   /// Displays a locally held UIImage, falling back to the placeholder if nil.
-  init(photo: UIImage?, as imageType: ImageType) {
+  init(photo: UIImage?, as imageType: ImageType, placeholderText: LocalizedStringKey? = nil) {
     self.photo = photo
     self.urlString = nil
     self.imageType = imageType
+    self.placeholderText = placeholderText
   }
 
   /// Fetches and displays an image from a URL string, falling back to the placeholder if
   /// nil or loading fails.
-  init(urlString: String?, as imageType: ImageType) {
+  init(urlString: String?, as imageType: ImageType, placeholderText: LocalizedStringKey? = nil) {
     self.photo = nil
     self.urlString = urlString
     self.imageType = imageType
+    self.placeholderText = placeholderText
   }
 
   var body: some View {
@@ -46,14 +48,14 @@ struct PhotoImage: View {
           case .success(let image):
             styled(image)
           default:
-            PlaceholderImage(as: imageType)
+            PlaceholderImage(as: imageType, text: placeholderText)
               .overlay {
                 if case .empty = phase { ProgressView() }
               }
           }
         }
       } else {
-        PlaceholderImage(as: imageType)
+        PlaceholderImage(as: imageType, text: placeholderText)
       }
     }  // Group
     .skeletonBone(imageType.shape)
@@ -71,9 +73,6 @@ struct PhotoImage: View {
 
 #Preview("Image Photo") {
   VStack(spacing: 20) {
-    PhotoImage(photo: UIImage(named: "bmo-vancouver-marathon"), as: .medal)
-      .medalRing()
-
     PhotoImage(photo: UIImage(named: "taipei-marathon"), as: .raceHero)
 
     PhotoImage(photo: UIImage(named: "taipei-marathon-2019"), as: .avatar)
