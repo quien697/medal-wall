@@ -90,6 +90,7 @@ struct EditMedalView: View {
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
       .background(Color.Background.primary)
+      .disabled(viewModel.isLoading)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .close) {

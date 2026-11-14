@@ -76,6 +76,7 @@ struct EditRaceView: View {
       .navigationBarTitleDisplayMode(.inline)
       .scrollContentBackground(.hidden)
       .background(Color.Background.primary)
+      .disabled(viewModel.isLoading)
       .task {
         await viewModel.load()
       }
