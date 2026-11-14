@@ -5,7 +5,6 @@
 //  Created by Quien on 2026-11-12.
 //
 
-import AVFoundation
 import CropImage
 import PhotosUI
 import SwiftUI
@@ -28,12 +27,10 @@ struct PhotoSlot: View {
   // MARK: - State
   @State private var isPresentingOptions = false
   @State private var isPresentingPhotoPicker = false
-  @State private var isPresentingCamera = false
-  @State private var isPresentingCameraSettings = false
-  @State private var isPresentingNoCamera = false
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var takenPhoto: UIImage?
   @State private var photoToCrop: PickedPhoto?
+  @State private var viewModel = PhotoSlotViewModel()
 
   // MARK: - Properties
   private let photo: UIImage?
@@ -117,7 +114,9 @@ struct PhotoSlot: View {
         }
     }  // Button
     .buttonStyle(.plain)
-    .accessibilityLabel(photo == nil ? (placeholderText ?? title) : title)
+    .accessibilityLabel(
+      PhotoSlotViewModel.accessibilityLabel(
+        photo: photo, title: title, placeholderText: placeholderText))
     .alert(Text(title), isPresented: $isPresentingOptions) {
       Button("Choose Photo") {
         isPresentingPhotoPicker = true
@@ -125,20 +124,7 @@ struct PhotoSlot: View {
 
       if offersCamera {
         Button("Take Photo") {
-          switch CameraAccess.current {
-          case .granted:
-            isPresentingCamera = true
-          case .undetermined:
-            Task {
-              if await AVCaptureDevice.requestAccess(for: .video) {
-                isPresentingCamera = true
-              }
-            }
-          case .denied:
-            isPresentingCameraSettings = true
-          case .unavailable:
-            isPresentingNoCamera = true
-          }
+          viewModel.takePhoto()
         }  // Button
       }
 
@@ -154,7 +140,7 @@ struct PhotoSlot: View {
         Text(message)
       }
     }  // alert
-    .alert("Allow Camera Access", isPresented: $isPresentingCameraSettings) {
+    .alert("Allow Camera Access", isPresented: $viewModel.isPresentingCameraSettings) {
       Button("Open Settings") {
         if let url = URL(string: UIApplication.openSettingsURLString) {
           openURL(url)
@@ -165,7 +151,7 @@ struct PhotoSlot: View {
     } message: {
       Text("Turn on camera access in Settings to take a photo.")
     }  // alert
-    .alert("No Camera", isPresented: $isPresentingNoCamera) {
+    .alert("No Camera", isPresented: $viewModel.isPresentingNoCamera) {
     } message: {
       Text("This device has no camera. Choose a photo instead.")
     }  // alert
@@ -189,7 +175,7 @@ struct PhotoSlot: View {
       }
     }
     .fullScreenCover(
-      isPresented: $isPresentingCamera,
+      isPresented: $viewModel.isPresentingCamera,
       onDismiss: {
         if let takenPhoto { photoToCrop = PickedPhoto(image: takenPhoto) }
         takenPhoto = nil
