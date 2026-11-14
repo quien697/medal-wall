@@ -88,35 +88,28 @@ struct PhotoSlot: View {
               .resizable()
               .scaledToFill()
               .background(Color.Surface.primary)
-          } else {
-            VStack(spacing: .Space.inline) {
-              Image(systemName: "plus")
-
-              if let placeholderText {
-                Text(placeholderText)
-              }
-            }  // VStack
-            .font(.TypeScale.headline)
-            .foregroundStyle(Color.Text.primary)
           }
         }
         .clipShape(imageType.shape)
         .contentShape(imageType.shape)
         .overlay {
-          if isPresentingOptions {
-            imageType.shape.stroke(Color.Accent.primary, lineWidth: 2)
-          } else if photo != nil {
+          if photo != nil {
             imageType.shape.stroke(Color.Border.primary, lineWidth: 1)
           } else {
-            imageType.shape.stroke(
-              Color.Border.placeholder, style: StrokeStyle(lineWidth: 1.5, dash: [6, 4]))
+            EmptyPhotoSlot(as: imageType, text: placeholderText)
+          }
+        }
+        .overlay {
+          if isPresentingOptions {
+            imageType.shape.stroke(Color.Accent.primary, lineWidth: 2)
           }
         }
     }  // Button
     .buttonStyle(.plain)
     .accessibilityLabel(
       PhotoSlotViewModel.accessibilityLabel(
-        photo: photo, title: title, placeholderText: placeholderText))
+        photo: photo, title: title, placeholderText: placeholderText)
+    )
     .alert(Text(title), isPresented: $isPresentingOptions) {
       Button("Choose Photo") {
         isPresentingPhotoPicker = true
