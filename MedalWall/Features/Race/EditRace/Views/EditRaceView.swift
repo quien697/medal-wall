@@ -18,12 +18,11 @@ struct EditRaceView: View {
   @State private var viewModel: EditRaceViewModel
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingPhotoPicker: Bool = false
-  @State private var isPresentingCropImageView: Bool = false
   @State private var isPresentingAddEdition = false
   @State private var isPresentingPlacePicker = false
   @State private var selectedEdition: DraftRaceEdition?
   @State private var selectedPhoto: PhotosPickerItem?
-  @State private var rawPickedImage: UIImage?
+  @State private var photoToCrop: PickedPhoto?
 
   // MARK: - Namespace
   @Namespace private var namespace
@@ -46,7 +45,6 @@ struct EditRaceView: View {
           },
           onRemove: {
             selectedPhoto = nil
-            rawPickedImage = nil
             viewModel.clearPhoto()
           }
         )
@@ -121,8 +119,7 @@ struct EditRaceView: View {
           if let data = try? await newItem.loadTransferable(type: Data.self),
             let uiImage = UIImage(data: data)
           {
-            rawPickedImage = uiImage
-            isPresentingCropImageView = true
+            photoToCrop = PickedPhoto(image: uiImage)
           } else {
             errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
           }
@@ -134,14 +131,13 @@ struct EditRaceView: View {
         }
       }
       .sheet(
-        isPresented: $isPresentingCropImageView,
+        item: $photoToCrop,
         onDismiss: {
           selectedPhoto = nil
-          rawPickedImage = nil
         },
-        content: {
+        content: { pickedPhoto in
           CropImageView(
-            image: rawPickedImage,
+            image: pickedPhoto.image,
             cropShape: .square
           ) { croppedImage in
             if let croppedImage {

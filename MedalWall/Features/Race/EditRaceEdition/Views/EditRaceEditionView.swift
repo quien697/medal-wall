@@ -16,11 +16,10 @@ struct EditRaceEditionView: View {
 
   // MARK: - State
   @State private var isPresentingPhotoPicker = false
-  @State private var isPresentingCropImageView = false
   @State private var isPresentingAddDistance = false
   @State private var isPresentingDeleteConfirm = false
   @State private var selectedPhoto: PhotosPickerItem?
-  @State private var rawPickedImage: UIImage?
+  @State private var photoToCrop: PickedPhoto?
   @State private var errorWrapper: ErrorWrapper?
   @State private var viewModel: EditRaceEditionViewModel
 
@@ -61,7 +60,6 @@ struct EditRaceEditionView: View {
           },
           onRemove: {
             selectedPhoto = nil
-            rawPickedImage = nil
             viewModel.clearPhoto()
           }
         )
@@ -146,22 +144,20 @@ struct EditRaceEditionView: View {
           if let data = try? await newItem.loadTransferable(type: Data.self),
             let uiImage = UIImage(data: data)
           {
-            rawPickedImage = uiImage
-            isPresentingCropImageView = true
+            photoToCrop = PickedPhoto(image: uiImage)
           } else {
             errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
           }
         }
       }
       .sheet(
-        isPresented: $isPresentingCropImageView,
+        item: $photoToCrop,
         onDismiss: {
           selectedPhoto = nil
-          rawPickedImage = nil
         },
-        content: {
+        content: { pickedPhoto in
           CropImageView(
-            image: rawPickedImage,
+            image: pickedPhoto.image,
             cropShape: .square
           ) { croppedImage in
             if let croppedImage { viewModel.updatePhoto(with: croppedImage) }

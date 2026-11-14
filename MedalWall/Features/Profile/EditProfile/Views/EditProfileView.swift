@@ -18,9 +18,8 @@ struct EditProfileView: View {
   @State private var viewModel: EditProfileViewModel
   @State private var errorWrapper: ErrorWrapper?
   @State private var isPresentingPhotoPicker: Bool = false
-  @State private var isPresentingCropImageView: Bool = false
   @State private var selectedPhoto: PhotosPickerItem?
-  @State private var rawPickedImage: UIImage?
+  @State private var photoToCrop: PickedPhoto?
 
   // MARK: - Init
   init(profile: User) {
@@ -39,7 +38,6 @@ struct EditProfileView: View {
           },
           onRemove: {
             selectedPhoto = nil
-            rawPickedImage = nil
             viewModel.clearPhoto()
           }
         )
@@ -100,21 +98,19 @@ struct EditProfileView: View {
           if let data = try? await newItem.loadTransferable(type: Data.self),
             let uiImage = UIImage(data: data)
           {
-            rawPickedImage = uiImage
-            isPresentingCropImageView = true
+            photoToCrop = PickedPhoto(image: uiImage)
           } else {
             errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
           }
         }
       }
       .sheet(
-        isPresented: $isPresentingCropImageView,
+        item: $photoToCrop,
         onDismiss: {
           selectedPhoto = nil
-          rawPickedImage = nil
         },
-        content: {
-          CropImageView(image: rawPickedImage, cropShape: .circle) { croppedImage in
+        content: { pickedPhoto in
+          CropImageView(image: pickedPhoto.image, cropShape: .circle) { croppedImage in
             if let croppedImage {
               viewModel.updatePhoto(with: croppedImage)
             }
