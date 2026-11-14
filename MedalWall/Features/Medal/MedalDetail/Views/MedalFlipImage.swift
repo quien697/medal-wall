@@ -13,15 +13,12 @@ import SwiftUI
 /// A FRONT / BACK label in its corner names the face in view, and an empty face shows its
 /// placeholder. The label stays still while the medal turns, so it never mirrors.
 struct MedalFlipImage: View {
-  // MARK: - Environment
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-  // MARK: - Properties
   let frontPhotoUrl: String?
   let backPhotoUrl: String?
   let faceInView: MedalFace
 
-  // MARK: - Body
   var body: some View {
     ZStack(alignment: .topTrailing) {
       ZStack {

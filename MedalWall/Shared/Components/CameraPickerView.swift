@@ -14,13 +14,10 @@ import UIKit
 /// `CameraAccess.current` is `granted`: the Simulator has no camera, and the controller raises
 /// an exception there.
 struct CameraPickerView: UIViewControllerRepresentable {
-  // MARK: - Environment
   @Environment(\.dismiss) private var dismiss
 
-  // MARK: - Properties
   let onCapture: (UIImage) -> Void
 
-  // MARK: - UIViewControllerRepresentable
   func makeUIViewController(context: Context) -> UIImagePickerController {
     let picker = UIImagePickerController()
     picker.sourceType = .camera
