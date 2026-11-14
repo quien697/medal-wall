@@ -223,7 +223,8 @@ confirms:
 ## Migration Plan
 
 1. Require `CropImage` 1.1.0 (released).
-2. No rules deploy: `storage.rules` is unchanged.
+2. Deploy `firestore.rules` (`cd rules-tests && npm run deploy`), which checks the `photoUrls`
+   map. `storage.rules` is unchanged.
 3. No data migration. Medals saved before this change show the front placeholder.
 
 Rollback: revert the branch.
