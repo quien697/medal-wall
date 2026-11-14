@@ -61,6 +61,7 @@ and edition photos to `PhotoSlot`.
 - `search`: a medal result shows the medal's front photo, with no gold ring.
 - `skeleton-loading`: bone appearance no longer refers to a medal ring, which no longer
   exists.
+- `edit-sheets`: a sheet that is saving disables its form as well as Cancel.
 - `design-system-sync`: the check pairs `elevation.hairline` with the border `surfaceStyle`
   draws, and reports every shadow level as unimplemented while the code defines no
   `Elevation`.

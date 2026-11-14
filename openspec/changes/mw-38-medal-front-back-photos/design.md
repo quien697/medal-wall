@@ -106,7 +106,8 @@ form shows as it shows any other error. The crop sheet is presented from the pic
 `.sheet(item:)` with a `PickedPhoto`, never from a flag beside it: a sheet's content reading
 `@State` its view's body never reads gets the value from before the first presentation, so the
 first crop screen would open without the photo. The medal form is its first user. The avatar, race and
-edition keep `EditPhotoPicker` until a later change moves them.
+edition keep `EditPhotoPicker` until a later change moves them, and present their crop sheets
+from a `PickedPhoto` the same way.
 - Tapping a slot opens an alert titled by the form, here "Front photo" or "Back photo",
   offering **Choose Photo**, **Take Photo** while `offersCamera` is true, **Remove Photo**
   (destructive) when the slot is filled, and **Cancel**, stacked as full-width buttons in the

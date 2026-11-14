@@ -155,6 +155,11 @@
       into `PhotoSlotViewModel` (`Shared/Components/PhotoSlot/`)
 - [x] 11.3 Drop `// MARK:` from `MedalFlipImage` and `CameraPickerView`, which have fewer than
       5 properties
+- [x] 11.4 Edit Profile, Edit Race and Edit Edition present their crop sheets from a
+      `PickedPhoto` with `.sheet(item:)`, as `PhotoSlot` does, so the first crop screen opens
+      with the photo. No unit test: presentation only
+- [x] 11.5 Edit Medal and Edit Race disable their form while saving, as Edit Profile does
+      (`edit-sheets` delta). No unit test: a view modifier
 
 ## 12. Archive
 
