@@ -11,8 +11,8 @@ import UIKit
 /// The system camera, with no guide overlay, handing back the photo taken.
 ///
 /// SwiftUI has no camera picker, so this wraps `UIImagePickerController`. Present it only when
-/// `CameraAccess.current` is `granted`: the Simulator has no camera, and the controller raises
-/// an exception there.
+/// `CameraAccess.current` is `granted`: on a device with no camera, the controller raises an
+/// exception.
 struct CameraPickerView: UIViewControllerRepresentable {
   @Environment(\.dismiss) private var dismiss
 

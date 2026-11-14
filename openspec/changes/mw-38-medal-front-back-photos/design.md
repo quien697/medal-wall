@@ -127,7 +127,7 @@ from a `PickedPhoto` the same way.
   - `undetermined`: iOS asks, and the camera opens if the user allows it.
   - `denied` (access turned off, or restricted by Screen Time): an alert, "Allow Camera Access",
     "Turn on camera access in Settings to take a photo.", with **Open Settings** and **Cancel**.
-  - `unavailable` (no camera, as in the Simulator): an alert, "No Camera", "This device has no
+  - `unavailable` (the device has no camera): an alert, "No Camera", "This device has no
     camera. Choose a photo instead.", with the system's OK.
   `CameraAccess` is a plain mapping of the two inputs, so its tests cover every case without
   a device.
@@ -212,8 +212,8 @@ confirms:
 
 ## Risks / Trade-offs
 
-- [The camera is unavailable in the Simulator] → Take Photo says so there. The camera is
-  verified on a device.
+- [The camera itself is verified only on a device] → What Take Photo leads to for each kind
+  of camera access is covered by `PhotoSlotViewModel`'s tests.
 - [A photo's background stays in the medal image] → Framing a tight square leaves little of
   it, and the deviation entry keeps the gap visible until a change removes backgrounds.
 - [Old test medals keep their `cover/` files in Storage] → They are test data. Deleting such a

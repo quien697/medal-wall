@@ -17,7 +17,7 @@ enum CameraAccess {
   case undetermined
   /// Camera access is turned off, or restricted by Screen Time; only Settings can turn it on.
   case denied
-  /// The device has no camera, as in the Simulator.
+  /// The device has no camera.
   case unavailable
 
   /// Maps the device's camera and the app's authorization `status` to what Take Photo does.
