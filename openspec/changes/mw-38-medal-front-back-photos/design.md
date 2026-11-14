@@ -99,9 +99,10 @@ Each face runs: slot → source alert → library or camera → `CropImageView` 
 system's `PhotoSlot`, in `Shared/Components`, owns all of it, so a form hands it a photo and
 receives a framed one:
 `PhotoSlot(photo:imageType:cropShape:outputSide:title:message:placeholderText:offersCamera:onPick:onRemove:onError:)`.
-It holds only presentation state (which alert, picker, camera or sheet is up, and the picked
-photo for the crop sheet) and passes a photo that fails to load to `onError`, which the form
-shows as it shows any other error. The crop sheet is presented from the picked photo itself,
+It holds presentation state (which alert, picker or sheet is up, and the picked photo for the
+crop sheet), and its view model, `PhotoSlotViewModel`, decides what Take Photo leads to and
+what VoiceOver reads for the slot. It passes a photo that fails to load to `onError`, which the
+form shows as it shows any other error. The crop sheet is presented from the picked photo itself,
 `.sheet(item:)` with a `PickedPhoto`, never from a flag beside it: a sheet's content reading
 `@State` its view's body never reads gets the value from before the first presentation, so the
 first crop screen would open without the photo. The medal form is its first user. The avatar, race and
@@ -183,7 +184,8 @@ or "Shows the front".
 
 ### Edit form slots
 `EditMedalPhotosSection` lays out two `PhotoSlot`s, Front then Back, each labelled with its face
-beneath. A slot is empty (dashed pewter, "+ Add front"), filled, or active: it takes a 2 pt ink
+beneath. A slot is empty (`EmptyPhotoSlot`, the one dashed pewter slot every form shows, here
+"+ Add front"), filled, or active: it takes a 2 pt ink
 ring while its alert is up. It is drawn at its `ImageType`'s size, shrinking to the width it is
 given, so the two 280 pt `.medal` slots share the row.
 

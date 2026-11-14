@@ -145,9 +145,20 @@
       this change
 - [ ] 10.4 Deploy `firestore.rules` (`cd rules-tests && npm run deploy`) once the user agrees
 
-## 11. Archive
+## 11. Code review
 
-- [ ] 11.1 Archive per memory (OpenSpec can't drop a scenario): replace each MODIFIED block in
+- [x] 11.1 `PhotoSlot` draws its empty state with `EmptyPhotoSlot`, which takes an optional
+      label beneath a `title1` plus and shrinks to the space it is given, so every empty photo
+      slot is the same 2 pt dashed pewter edge. No unit test: layout only
+- [x] 11.2 Write failing `PhotoSlotViewModelTests` for what Take Photo presents for each
+      `CameraAccess` and for the slot's VoiceOver label; then move that logic out of the view
+      into `PhotoSlotViewModel` (`Shared/Components/PhotoSlot/`)
+- [x] 11.3 Drop `// MARK:` from `MedalFlipImage` and `CameraPickerView`, which have fewer than
+      5 properties
+
+## 12. Archive
+
+- [ ] 12.1 Archive per memory (OpenSpec can't drop a scenario): replace each MODIFIED block in
       `openspec/specs/` by script, create `openspec/specs/medal-photos/spec.md` (with a
       Purpose) from the ADDED requirements, check `git diff`, run
       `openspec validate --specs --strict`, then `openspec archive mw-38-medal-front-back-photos
