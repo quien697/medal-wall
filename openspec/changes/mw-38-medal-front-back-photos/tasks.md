@@ -161,9 +161,29 @@
 - [x] 11.5 Edit Medal and Edit Race disable their form while saving, as Edit Profile does
       (`edit-sheets` delta). No unit test: a view modifier
 
-## 12. Archive
+## 12. Every form photo is a PhotoSlot
 
-- [ ] 12.1 Archive per memory (OpenSpec can't drop a scenario): replace each MODIFIED block in
+- [x] 12.1 Write failing `PhotoSlotViewModelTests`: a picked photo's data becomes the photo to
+      frame, or `.photoDataInvalid`; a photo taken becomes the photo to frame once the camera
+      closes, and closing it without one frames nothing; `content(photo:storedPhotoStatus:)`
+      gives photo, loading, failed or empty, and every state but empty offers Remove Photo and
+      reads the title. Then move that logic out of `PhotoSlot` into `PhotoSlotViewModel`
+- [x] 12.2 Add `StoredPhotoStatus` (`Shared/UIModels`, on the test target's include list). Write
+      failing tests for `EditMedalViewModel` (per face), `EditProfileViewModel`,
+      `EditRaceViewModel` and `EditRaceEditionViewModel`: a stored photo is `loading` until it
+      downloads, cleared when it does, `failed` when it can't, and cleared by picking or
+      removing a photo; a form with no stored photo has none. Then add it
+- [x] 12.3 `PhotoSlot` takes `storedPhotoStatus` and draws loading and failed with a hairline,
+      Remove Photo offered; previews for both. No unit test beyond 12.1: layout only
+- [x] 12.4 Edit Profile, Edit Race and Edit Edition use `PhotoSlot` (design.md, Every form photo
+      is a `PhotoSlot`); delete `EditPhotoPicker` and `photoHint` with its tests; remove the old
+      picker's strings and add the new ones with zh-TW, covered by `StringCatalogTests`
+- [x] 12.5 Run the full suite; render the three forms' slots in every state, light and dark,
+      with a temporary test
+
+## 13. Archive
+
+- [ ] 13.1 Archive per memory (OpenSpec can't drop a scenario): replace each MODIFIED block in
       `openspec/specs/` by script, create `openspec/specs/medal-photos/spec.md` (with a
       Purpose) from the ADDED requirements, check `git diff`, run
       `openspec validate --specs --strict`, then `openspec archive mw-38-medal-front-back-photos

@@ -14,8 +14,12 @@ iOS mock v4.8.0 now draw the medal visuals this needs.
 - New photo flow for each face: **Choose Photo** or **Take Photo** (the system camera, no
   guide overlay) → frame the medal in a square on the original photo → the framed square drops
   into the slot as an 840 × 840 JPEG.
-- This square framing replaces the circle crop for medals. Avatar, race and edition photos
-  are unchanged.
+- This square framing replaces the circle crop for medals. The profile photo keeps its
+  circle, and race and edition photos their square.
+- The profile photo, a race logo and an edition photo are set through the same `PhotoSlot`
+  as a medal's faces, Take Photo included, replacing the old photo picker. A stored photo
+  shows a spinner while it downloads and "Couldn't load" if it fails, and still offers a new
+  photo or removing it.
 - The edit form shows two square slots, Front and Back, drawn by a new shared `PhotoSlot`.
   Tapping a slot offers Choose Photo and Take Photo, and a filled slot also offers Remove Photo.
   Removing one face leaves the other in place.
@@ -42,8 +46,7 @@ iOS mock v4.8.0 now draw the medal visuals this needs.
 - The medal skeleton bone becomes a square with `radius.image`.
 
 Out of scope: removing a photo's background, share cards, a camera with a shape guide overlay,
-migrating existing photos, swiping between medals in the details, and moving the avatar, race
-and edition photos to `PhotoSlot`.
+migrating existing photos, and swiping between medals in the details.
 
 ## Capabilities
 
@@ -61,7 +64,8 @@ and edition photos to `PhotoSlot`.
 - `search`: a medal result shows the medal's front photo, with no gold ring.
 - `skeleton-loading`: bone appearance no longer refers to a medal ring, which no longer
   exists.
-- `edit-sheets`: a sheet that is saving disables its form as well as Cancel.
+- `edit-sheets`: a sheet that is saving disables its form as well as Cancel, and every photo a
+  sheet sets goes through one photo slot that shows a stored photo loading or failing to load.
 - `design-system-sync`: the check pairs `elevation.hairline` with the border `surfaceStyle`
   draws, and reports every shadow level as unimplemented while the code defines no
   `Elevation`.
@@ -83,15 +87,19 @@ and edition photos to `PhotoSlot`.
   medal's flip image, face label and face visibility modifier.
 - **Edit Medal:** `EditMedalViewModel` stages two faces instead of one cover photo;
   `EditMedalView` replaces its circle crop with the square flow.
+- **Edit Profile, Edit Race, Edit Edition:** their photo becomes a `PhotoSlot`, and their
+  picker, loading and crop sheet go; each view model tracks its stored photo's
+  `StoredPhotoStatus`. `EditRaceEditionViewModel.photoHint` is removed.
 - **Shared UI:** `ImageType` medal cases become squares (hero 280); `PlaceholderImage` takes
   an optional text beneath its glyph, passed through `PhotoImage`; `MedalRingViewModifier` is
-  removed, and `ElevationViewModifier` with it (the ring was its only user); a flip motion
-  constant is added.
+  removed, and `ElevationViewModifier` with it (the ring was its only user); `EditPhotoPicker`
+  is removed; a flip motion constant is added.
 - **Dependency:** `CropImage` 1.1.0 (the user's own library) adds an output size, so a framed
   square is saved at 840 × 840. MedalWall requires it from the package's remote repository.
 - **App configuration:** `NSCameraUsageDescription`, localized for zh-TW.
 - **Localization:** new strings for the slots, the source alert, the camera access alerts and
-  the face label and flip hints, in English and zh-TW.
+  the face label and flip hints, the three new slot titles, the edition's message and
+  "Couldn't load", in English and zh-TW; the old picker's strings are removed.
 - **Design system:** four new `deviations.md` entries (the gilt bar, the photo in place of a
   cutout, the face label in place of the face button, the search row); `CLAUDE.md` and the
   `design-system-check` skill stop naming `ElevationViewModifier`.

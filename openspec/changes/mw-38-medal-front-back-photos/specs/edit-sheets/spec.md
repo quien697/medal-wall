@@ -33,3 +33,30 @@ deleting a photo — SHALL give up within 30 seconds when the connection is lost
   photo is being deleted
 - **THEN** the delete gives up within 30 seconds, the photo is left in storage, and the sheet
   closes
+
+## ADDED Requirements
+
+### Requirement: Photo Slots
+Every photo an edit sheet sets — a medal's front and back, the profile photo, a race logo and an
+edition photo — SHALL be set through the same photo slot, which offers **Choose Photo**,
+**Take Photo**, and **Remove Photo** once there is a photo. While a stored photo downloads, its
+slot SHALL show that it is loading. If it cannot be downloaded, the slot SHALL say it couldn't
+load and SHALL still offer Choose Photo, Take Photo and Remove Photo. A stored photo that could
+not be downloaded SHALL be kept on save unless the user replaces or removes it.
+
+#### Scenario: A stored photo is downloading
+- **WHEN** a user opens an edit sheet whose stored photo has not downloaded yet
+- **THEN** its slot shows a spinner, not the empty slot
+
+#### Scenario: A stored photo cannot be downloaded
+- **WHEN** a stored photo fails to download
+- **THEN** its slot says it couldn't load, and tapping it offers Choose Photo, Take Photo and
+  Remove Photo
+
+#### Scenario: Removing a photo that couldn't load
+- **WHEN** a user removes a stored photo that couldn't load, and saves
+- **THEN** the photo is removed as it would be had it loaded
+
+#### Scenario: Saving without touching a photo that couldn't load
+- **WHEN** a user saves without replacing or removing a stored photo that couldn't load
+- **THEN** the stored photo is kept

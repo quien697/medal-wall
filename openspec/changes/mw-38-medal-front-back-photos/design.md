@@ -31,7 +31,7 @@ clients, so stored names must not be iOS-shaped.
 - Share cards, a camera with a guide overlay, swiping between medals in the details.
 - Migrating `photoUrl` or its `cover/` files.
 - Restyling the `CropImage` screen to match the mock's framing step (thirds grid, hint, Reset).
-- Any change to avatar, race or edition photos, or to search rows beyond their image.
+- Any change to search rows beyond their image.
 
 ## Decisions
 
@@ -100,14 +100,14 @@ system's `PhotoSlot`, in `Shared/Components`, owns all of it, so a form hands it
 receives a framed one:
 `PhotoSlot(photo:imageType:cropShape:outputSide:title:message:placeholderText:offersCamera:onPick:onRemove:onError:)`.
 It holds presentation state (which alert, picker or sheet is up, and the picked photo for the
-crop sheet), and its view model, `PhotoSlotViewModel`, decides what Take Photo leads to and
-what VoiceOver reads for the slot. It passes a photo that fails to load to `onError`, which the
+crop sheet), and its view model, `PhotoSlotViewModel`, decides what Take Photo leads to, turns
+a picked or taken photo into the one the crop sheet frames, and decides what the slot shows and
+what VoiceOver reads for it. It passes a photo that fails to load to `onError`, which the
 form shows as it shows any other error. The crop sheet is presented from the picked photo itself,
 `.sheet(item:)` with a `PickedPhoto`, never from a flag beside it: a sheet's content reading
 `@State` its view's body never reads gets the value from before the first presentation, so the
-first crop screen would open without the photo. The medal form is its first user. The avatar, race and
-edition keep `EditPhotoPicker` until a later change moves them, and present their crop sheets
-from a `PickedPhoto` the same way.
+first crop screen would open without the photo. Every form photo goes through it, so the flow
+exists once (see Every form photo is a `PhotoSlot`).
 - Tapping a slot opens an alert titled by the form, here "Front photo" or "Back photo",
   offering **Choose Photo**, **Take Photo** while `offersCamera` is true, **Remove Photo**
   (destructive) when the slot is filled, and **Cancel**, stacked as full-width buttons in the
@@ -189,6 +189,37 @@ beneath. A slot is empty (`EmptyPhotoSlot`, the one dashed pewter slot every for
 "+ Add front"), filled, or active: it takes a 2 pt ink
 ring while its alert is up. It is drawn at its `ImageType`'s size, shrinking to the width it is
 given, so the two 280 pt `.medal` slots share the row.
+
+### Every form photo is a `PhotoSlot`
+Edit Profile, Edit Race and Edit Edition set their photo through `PhotoSlot` too, and
+`EditPhotoPicker` is deleted with their own picker, loading and crop sheet. Each slot is drawn
+at its `ImageType`'s size and offers Take Photo like a medal face, so every form behaves the
+same:
+- Edit Profile: "Profile photo", `.avatar`, framed in a circle.
+- Edit Race: "Race logo", `.raceHero`, framed in a square.
+- Edit Edition: "Edition photo", `.raceHero`, framed in a square, with the message "Leave it
+  empty to use the race logo." in its alert.
+
+None carries text beneath it: the slot's plus says what tapping does, so the old "Tap to add a
+photo" hints and the edition's `photoHint` are gone. Their framed output keeps `CropImage`'s
+default size.
+
+### A stored photo while it downloads
+A form downloads its stored photo when it opens, and a download can be slow or fail.
+`StoredPhotoStatus` (`Shared/UIModels`) is `loading` or `failed`; each edit view model holds
+one per stored photo (one per face for a medal), `loading` from its init while there is a
+stored URL, cleared when the photo arrives or the user picks or removes one, and `failed` when
+the download returns nothing. `PhotoSlot` takes it as `storedPhotoStatus`, and
+`PhotoSlotViewModel.content(photo:storedPhotoStatus:)` decides what the slot shows:
+- `photo`: the photo, with a 1 pt hairline.
+- `loading`: a spinner, with the hairline.
+- `failed`: a warning glyph over "Couldn't load", with the hairline.
+- `empty`: `EmptyPhotoSlot`.
+
+Every state but `empty` offers Remove Photo and reads its title to VoiceOver. A stored photo
+that could not load is kept on save unless the user replaces or removes it, because the view
+models only write a photo the user changed. There is no retry control; reopening the form
+downloads again.
 
 ### Declared deviations
 `openspec/design-system/deviations.md` gains four entries, all `unreported` until the designer
