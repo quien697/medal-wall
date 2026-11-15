@@ -110,4 +110,51 @@ struct EditMedalViewModelPhotoTests {
     #expect(viewModel.photo(for: .front) == nil)
     #expect(viewModel.photo(for: .back) === framedPhoto)
   }
+
+  // MARK: - Stored photo status
+  @Test("a stored face is loading until it downloads")
+  func testStoredFaceLoads() async throws {
+    let viewModel = makeViewModel(medal: makeMedal(frontPhotoUrl: try makeStoredPhoto(.red)))
+    #expect(viewModel.storedPhotoStatus(for: .front) == .loading)
+
+    await viewModel.loadPhotos()
+
+    #expect(viewModel.storedPhotoStatus(for: .front) == nil)
+  }
+
+  @Test("a stored face that can't be downloaded is marked failed")
+  func testStoredFaceFails() async {
+    let viewModel = makeViewModel(
+      medal: makeMedal(frontPhotoUrl: "file:///nonexistent/stored-photo.jpg"))
+
+    await viewModel.loadPhotos()
+
+    #expect(viewModel.storedPhotoStatus(for: .front) == .failed)
+    #expect(viewModel.photo(for: .front) == nil)
+  }
+
+  @Test("a face with no stored photo has no status")
+  func testFaceWithoutStoredPhoto() async throws {
+    let viewModel = makeViewModel(medal: makeMedal(frontPhotoUrl: try makeStoredPhoto(.red)))
+    #expect(viewModel.storedPhotoStatus(for: .back) == nil)
+
+    await viewModel.loadPhotos()
+
+    #expect(viewModel.storedPhotoStatus(for: .back) == nil)
+  }
+
+  @Test("framing or removing a face ends its stored photo's status", arguments: [true, false])
+  func testChangingFaceEndsStatus(frames: Bool) async {
+    let viewModel = makeViewModel(
+      medal: makeMedal(frontPhotoUrl: "file:///nonexistent/stored-photo.jpg"))
+    await viewModel.loadPhotos()
+
+    if frames {
+      viewModel.updatePhoto(with: framedPhoto, for: .front)
+    } else {
+      viewModel.clearPhoto(for: .front)
+    }
+
+    #expect(viewModel.storedPhotoStatus(for: .front) == nil)
+  }
 }

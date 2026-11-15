@@ -33,6 +33,7 @@ struct EditMedalView: View {
       Form {
         EditMedalPhotosSection(
           photo: { viewModel.photo(for: $0) },
+          storedPhotoStatus: { viewModel.storedPhotoStatus(for: $0) },
           onPick: { viewModel.updatePhoto(with: $0, for: $1) },
           onRemove: { viewModel.clearPhoto(for: $0) },
           onError: { errorWrapper = ErrorWrapper(error: $0) }

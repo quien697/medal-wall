@@ -127,4 +127,75 @@ struct EditProfileViewModelTests {
     #expect(await storage.uploadCallCount == 0)
     #expect(await repository.updatedUsers.isEmpty)
   }
+
+  // MARK: - Stored photo status
+  @Test("a stored photo is loading until it downloads")
+  func testStoredPhotoLoads() async throws {
+    let viewModel = EditProfileViewModel(profile: makeProfile(photoUrl: try makeStoredPhotoFile()))
+    #expect(viewModel.storedPhotoStatus == .loading)
+
+    await viewModel.loadExistingPhoto()
+
+    #expect(viewModel.storedPhotoStatus == nil)
+    #expect(viewModel.photo != nil)
+  }
+
+  @Test("a stored photo that can't be downloaded is marked failed")
+  func testStoredPhotoFails() async {
+    let viewModel = EditProfileViewModel(
+      profile: makeProfile(photoUrl: "file:///nonexistent/stored-photo.jpg"))
+
+    await viewModel.loadExistingPhoto()
+
+    #expect(viewModel.storedPhotoStatus == .failed)
+  }
+
+  @Test("a profile with no stored photo has no status")
+  func testNoStoredPhoto() {
+    #expect(EditProfileViewModel(profile: makeProfile()).storedPhotoStatus == nil)
+  }
+
+  @Test("picking or removing a photo ends the stored photo's status", arguments: [true, false])
+  func testChangingPhotoEndsStatus(picks: Bool) async {
+    let viewModel = EditProfileViewModel(
+      profile: makeProfile(photoUrl: "file:///nonexistent/stored-photo.jpg"))
+    await viewModel.loadExistingPhoto()
+
+    if picks {
+      viewModel.updatePhoto(with: UIImage())
+    } else {
+      viewModel.clearPhoto()
+    }
+
+    #expect(viewModel.storedPhotoStatus == nil)
+  }
+
+  @Test("a stored photo that couldn't load keeps its URL on save")
+  func testFailedStoredPhotoKept() async {
+    let viewModel = EditProfileViewModel(
+      profile: makeProfile(photoUrl: "file:///nonexistent/stored-photo.jpg"))
+    await viewModel.loadExistingPhoto()
+
+    #expect(viewModel.makeUpdatedUser().photoUrl == "file:///nonexistent/stored-photo.jpg")
+  }
+
+  @Test("removing a stored photo that couldn't load clears its URL on save")
+  func testFailedStoredPhotoRemoved() async {
+    let viewModel = EditProfileViewModel(
+      profile: makeProfile(photoUrl: "file:///nonexistent/stored-photo.jpg"))
+    await viewModel.loadExistingPhoto()
+
+    viewModel.clearPhoto()
+
+    #expect(viewModel.makeUpdatedUser().photoUrl == nil)
+  }
+
+  /// A file URL holding a 1 × 1 PNG, for the form to download as its stored photo.
+  private func makeStoredPhotoFile() throws -> String {
+    let image = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { _ in }
+    let url = FileManager.default.temporaryDirectory
+      .appendingPathComponent("\(UUID().uuidString).png")
+    try #require(image.pngData()).write(to: url)
+    return url.absoluteString
+  }
 }

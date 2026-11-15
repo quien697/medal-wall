@@ -95,6 +95,21 @@ struct StringCatalogTests {
     }
   }
 
+  @Test("The photo slots' zh-TW strings ship translated")
+  func testPhotoSlotKeysAreTranslated() {
+    let keys = [
+      "Profile photo",
+      "Race logo",
+      "Edition photo",
+      "Leave it empty to use the race logo.",
+      "Couldn't load"
+    ]
+
+    for key in keys {
+      #expect(zhTWTable[key] != nil, "missing zh-TW entry for \(key)")
+    }
+  }
+
   @Test("The camera permission prompt ships translated")
   func testCameraUsageDescriptionIsTranslated() throws {
     let defaults = UserDefaults(suiteName: "StringCatalogTests")

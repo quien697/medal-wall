@@ -187,22 +187,6 @@ struct EditRaceEditionViewModelTests {
 
     #expect(viewModel.distances.isEmpty)
   }
-
-  // MARK: - photoHint
-  @Test("photoHint prompts to add when photo is nil")
-  func testPhotoHintNilPhoto() {
-    let viewModel = makeViewModel()
-
-    #expect(viewModel.photoHint.contains("add a new"))
-  }
-
-  @Test("photoHint prompts to update when photo is set")
-  func testPhotoHintWithPhoto() {
-    let viewModel = makeViewModel()
-    viewModel.photo = UIImage()
-
-    #expect(viewModel.photoHint.contains("update the"))
-  }
 }
 
 // MARK: - addDistance validation

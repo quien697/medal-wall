@@ -34,6 +34,8 @@ final class EditMedalViewModel {
   var error: AppError?
   /// The faces the user replaced or removed; the others keep their stored URLs on save.
   private(set) var changedFaces: Set<MedalFace> = []
+  /// Each stored face the form is not showing: still downloading, or one that couldn't be.
+  private var storedPhotoStatuses: [MedalFace: StoredPhotoStatus] = [:]
 
   // MARK: - Dependencies
   let mode: ItemEditMode
@@ -77,6 +79,9 @@ final class EditMedalViewModel {
       self.draftEventPhotos = medal.eventPhotos
         .sorted { $0.sortOrder < $1.sortOrder }
         .map { DraftEventPhoto(id: $0.id, imageUrl: $0.imageUrl) }
+      for face in MedalFace.allCases where medal.photoUrls?[face] != nil {
+        self.storedPhotoStatuses[face] = .loading
+      }
     }
   }
 
@@ -110,8 +115,13 @@ final class EditMedalViewModel {
     }
   }
 
-  /// Downloads the medal's stored faces so the form can show them. A face the user changed
-  /// while they downloaded keeps the change.
+  /// The status of `face`'s stored photo while the form isn't showing it, or `nil`.
+  func storedPhotoStatus(for face: MedalFace) -> StoredPhotoStatus? {
+    storedPhotoStatuses[face]
+  }
+
+  /// Downloads the medal's stored faces so the form can show them, marking a face that can't
+  /// be downloaded as failed. A face the user changed while they downloaded keeps the change.
   func loadPhotos() async {
     async let loadedFront = UIImage.load(from: medal?.photoUrls?.front)
     async let loadedBack = UIImage.load(from: medal?.photoUrls?.back)
@@ -119,6 +129,10 @@ final class EditMedalViewModel {
 
     if !changedFaces.contains(.front) { frontPhoto = front }
     if !changedFaces.contains(.back) { backPhoto = back }
+
+    for face in MedalFace.allCases where storedPhotoStatuses[face] == .loading {
+      storedPhotoStatuses[face] = photo(for: face) == nil ? .failed : nil
+    }
   }
 
   /// Stages a photo framed for `face`, leaving the other face as it is.
@@ -271,6 +285,7 @@ final class EditMedalViewModel {
     case .back: backPhoto = photo
     }
     changedFaces.insert(face)
+    storedPhotoStatuses[face] = nil
   }
 
   /// Returns the final URL of `face`: the stored one while the face is unchanged, an upload of

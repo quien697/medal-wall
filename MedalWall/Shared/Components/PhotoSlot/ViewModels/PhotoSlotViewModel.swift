@@ -15,6 +15,10 @@ final class PhotoSlotViewModel {
   var isPresentingCamera = false
   var isPresentingCameraSettings = false
   var isPresentingNoCamera = false
+  /// The photo the camera handed back, framed once the camera has closed.
+  var takenPhoto: UIImage?
+  /// The photo picked or taken, waiting in the crop sheet to be framed.
+  var photoToCrop: PickedPhoto?
 
   /// iOS's camera access prompt while it is up. Exposed so tests can await it.
   @ObservationIgnored private(set) var cameraAccessRequest: Task<Void, Never>?
@@ -56,12 +60,41 @@ final class PhotoSlotViewModel {
     }
   }
 
+  /// Hands a photo picked from the library to the crop sheet, or returns the error to show when
+  /// its data is not an image.
+  func framePickedPhoto(_ data: Data?) -> AppError? {
+    guard let data, let image = UIImage(data: data) else { return .photoDataInvalid }
+    photoToCrop = PickedPhoto(image: image)
+    return nil
+  }
+
+  /// Hands the photo taken to the crop sheet once the camera has closed; closing it without one
+  /// frames nothing.
+  func cameraDidClose() {
+    if let takenPhoto {
+      photoToCrop = PickedPhoto(image: takenPhoto)
+    }
+    takenPhoto = nil
+  }
+
+  /// What a slot shows: the form's photo when it has one, and otherwise its stored photo's
+  /// status, or nothing.
+  static func content(photo: UIImage?, storedPhotoStatus: StoredPhotoStatus?) -> PhotoSlotContent {
+    if let photo { return .photo(photo) }
+
+    switch storedPhotoStatus {
+    case .loading: return .loading
+    case .failed: return .failed
+    case nil: return .empty
+    }
+  }
+
   /// What VoiceOver reads for a slot: its placeholder text while it is empty, if it has one,
   /// and otherwise its title.
   static func accessibilityLabel(
-    photo: UIImage?, title: LocalizedStringKey, placeholderText: LocalizedStringKey?
+    content: PhotoSlotContent, title: LocalizedStringKey, placeholderText: LocalizedStringKey?
   ) -> LocalizedStringKey {
-    guard photo == nil, let placeholderText else { return title }
+    guard content == .empty, let placeholderText else { return title }
     return placeholderText
   }
 }

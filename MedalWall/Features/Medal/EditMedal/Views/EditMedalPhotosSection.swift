@@ -15,6 +15,7 @@ import SwiftUI
 /// is framed as an 840 × 840 square.
 struct EditMedalPhotosSection: View {
   let photo: (MedalFace) -> UIImage?
+  let storedPhotoStatus: (MedalFace) -> StoredPhotoStatus?
   let onPick: (UIImage, MedalFace) -> Void
   let onRemove: (MedalFace) -> Void
   let onError: (AppError) -> Void
@@ -26,6 +27,7 @@ struct EditMedalPhotosSection: View {
           VStack(spacing: .Space.stack) {
             PhotoSlot(
               photo: photo(face),
+              storedPhotoStatus: storedPhotoStatus(face),
               imageType: .medal,
               cropShape: .square,
               outputSide: 840,
@@ -68,6 +70,7 @@ struct EditMedalPhotosSection: View {
   Form {
     EditMedalPhotosSection(
       photo: { $0 == .front ? frontPhoto : nil },
+      storedPhotoStatus: { $0 == .back ? .failed : nil },
       onPick: { photo, face in if face == .front { frontPhoto = photo } },
       onRemove: { face in if face == .front { frontPhoto = nil } },
       onError: { _ in }

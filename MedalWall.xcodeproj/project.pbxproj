@@ -131,6 +131,7 @@
 				Shared/UIModels/DeletePrompt.swift,
 				Shared/UIModels/ItemEditMode.swift,
 				Shared/UIModels/LoadSequence.swift,
+				Shared/UIModels/StoredPhotoStatus.swift,
 			);
 			target = 60B570BE2EA616CA000B3FDE /* MedalWallTests */;
 		};

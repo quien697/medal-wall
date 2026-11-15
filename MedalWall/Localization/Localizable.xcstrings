@@ -338,16 +338,6 @@
         }
       }
     },
-    "Choose from Library" : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "從照片圖庫選擇"
-          }
-        }
-      }
-    },
     "Choose Photo" : {
       "localizations" : {
         "zh-TW" : {
@@ -404,6 +394,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "使用 Google 繼續"
+          }
+        }
+      }
+    },
+    "Couldn't load" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法載入"
           }
         }
       }
@@ -660,16 +660,6 @@
         }
       }
     },
-    "Edit Photo" : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "編輯照片"
-          }
-        }
-      }
-    },
     "Edit Profile" : {
       "localizations" : {
         "zh-TW" : {
@@ -696,6 +686,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "屆次刪除失敗"
+          }
+        }
+      }
+    },
+    "Edition photo" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "屆次照片"
           }
         }
       }
@@ -1046,6 +1046,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "平放在素色表面上並從正上方拍攝，或掛在素色牆面上。畫面中不要有其他物品，並在均勻光線下拍攝，不要開閃光燈。"
+          }
+        }
+      }
+    },
+    "Leave it empty to use the race logo." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "留空以使用賽事標誌。"
           }
         }
       }
@@ -1645,6 +1655,16 @@
         }
       }
     },
+    "Profile photo" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "個人資料照片"
+          }
+        }
+      }
+    },
     "Profile Unavailable" : {
       "localizations" : {
         "zh-TW" : {
@@ -1681,6 +1701,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "賽事刪除失敗"
+          }
+        }
+      }
+    },
+    "Race logo" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "賽事標誌"
           }
         }
       }
@@ -1941,46 +1971,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "點選 + 按鈕新增你的第一場賽事！"
-          }
-        }
-      }
-    },
-    "Tap to add a new edition photo,\nor leave empty to use the race logo." : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "點選以新增屆次照片，\n或留空以使用賽事標誌。"
-          }
-        }
-      }
-    },
-    "Tap to add a photo" : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "點選以新增照片"
-          }
-        }
-      }
-    },
-    "Tap to update the edition photo,\nor leave empty to use the race logo." : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "點選以更新屆次照片，\n或留空以使用賽事標誌。"
-          }
-        }
-      }
-    },
-    "Tap to update the photo" : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "點選以更新照片"
           }
         }
       }
