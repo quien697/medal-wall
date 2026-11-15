@@ -18,6 +18,7 @@ struct CameraPickerView: UIViewControllerRepresentable {
 
   let onCapture: (UIImage) -> Void
 
+  /// Creates the system camera, reporting to the coordinator.
   func makeUIViewController(context: Context) -> UIImagePickerController {
     let picker = UIImagePickerController()
     picker.sourceType = .camera
@@ -25,8 +26,10 @@ struct CameraPickerView: UIViewControllerRepresentable {
     return picker
   }
 
+  /// Leaves the camera as it is: nothing it shows depends on SwiftUI state.
   func updateUIViewController(_ picker: UIImagePickerController, context: Context) {}
 
+  /// Creates the coordinator that hands the photo back and closes the camera.
   func makeCoordinator() -> Coordinator {
     Coordinator(onCapture: onCapture, dismiss: dismiss)
   }
