@@ -31,7 +31,7 @@ contain, not by their position or artboard, because the layout changes between v
 | Family | Find the block containing | Yields |
 |---|---|---|
 | `color` | lines starting `color.paper` | name → light hex, dark hex, role |
-| `type` | a Swift `extension Font…` | name → size, weight, tabular |
+| `type` | a Swift `extension Font…` | name, nested as the block nests it (`Field.label`) → size, weight, tabular |
 | `radius` | lines starting `radius.tag` | name → number, or `capsule` |
 | `elevation` | lines starting `elevation.` — **the same block as `radius`**; read both prefixes out of it, not `radius.` alone | name → CSS shadow spec, or a plain border |
 | `space` | a Swift `extension CGFloat` with `struct Space` | name → number |
@@ -80,22 +80,18 @@ both is a match regardless of its approximated numbers. A level in code with no 
 design system with no code counterpart, is the real signal — treat that as `undeclared lead` /
 `unimplemented` as usual.
 
-Names are compared too, not only values. Two spelling conventions pair a design system name
-with a differently written code name, because both keep the same words: a camel-case name split
-into a nested type (`fieldLabel` → `Field.label`), and a size letter spelled out (`numericL` →
-`Numeric.large`). State the pairings you used:
+Names are compared too, not only values. The design system's Swift blocks use the code's own
+names and nesting — `Font.TypeScale.label`, `Field.label`, `Numeric.large`, `CGFloat.Space.inline`
+— so compare them as written; no mapping makes two different names equal. The Kotlin and CSS
+blocks spell the same tokens flat (`fieldLabel`, `numericL`, `--text-field-label`); read them under
+those names only for the internal-consistency report below.
 
-```
-fieldLabel → Field.label      numericL → Numeric.large
-fieldValue → Field.value      numericM → Numeric.medium
-                              numericS → Numeric.small
-```
-
-Any other difference — a different word for the same token, as `overline` in code for the design
-system's `label` once was — is `name drift`, even when the values agree. Report it with the
-number of places the code name is used, and leave the rename to the user: renaming is a refactor
-across the codebase, not a value to write. Never add a pairing to the list above to make a name
-drift go away; a deliberate name difference goes in the ledger like any other deviation.
+Any difference between a Swift name and the code's — another word, as `overline` for `label` and
+`Font.Step` for `Font.TypeScale` once were, or another nesting, as `fieldLabel` for `Field.label` —
+is `name drift`, even when the values agree. Report it with the number of places the code name
+is used, and leave the rename to the user: renaming is a refactor across the codebase, not a
+value to write. Never bridge a name drift with a mapping; a deliberate name difference goes in
+the ledger like any other deviation.
 
 `radius.pill` is `capsule` and has no constant — SwiftUI expresses it natively, so its absence
 from `CGFloat.Radius` is correct, not missing. A design system token you cannot pair with
@@ -107,7 +103,7 @@ Every token gets one verdict:
 |---|---|
 | `match` | equal — not listed individually |
 | `drift` | both have it, values differ, no ledger entry — **a problem** |
-| `name drift` | both have it, under a different word in code that neither convention above explains, no ledger entry — **a problem** |
+| `name drift` | both have it, under a different name in code than in the design system's Swift block, no ledger entry — **a problem** |
 | `undeclared lead` | in code, not in the design system, no ledger entry — **a problem** |
 | `declared deviation` | differs, and a ledger entry stands — the iOS value wins |
 | `unimplemented` | in the design system, not in code — informational, never a problem |

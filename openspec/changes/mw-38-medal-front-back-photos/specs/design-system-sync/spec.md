@@ -69,7 +69,7 @@ for them — and SHALL assign every token exactly one verdict:
 |---|---|---|
 | `match` | present in both, values equal | not reported individually |
 | `drift` | present in both, values differ, no ledger entry | a problem |
-| `name drift` | present in both, under a different word in code that neither naming convention explains, no ledger entry | a problem |
+| `name drift` | present in both, under a different name in code than in the design system's Swift block, no ledger entry | a problem |
 | `undeclared lead` | in code, absent from the design system, no ledger entry | a problem |
 | `declared deviation` | differs from the design system in either shape, and a ledger entry stands | the iOS value wins; reported per its ledger status |
 | `unimplemented` | in the design system, absent from code | informational |
@@ -88,12 +88,13 @@ builds; a level present in one side and absent from the other is the signal, not
 values. `elevation.hairline`, a border with no shadow, SHALL pair with the border
 `surfaceStyle` draws; every other level SHALL pair with a case of `Elevation`.
 
-Names SHALL be compared as well as values. Only two conventions pair a design system name with
-a differently written code name, because both keep the same words: a camel-case name split into
-a nested type (`fieldLabel` against `Field.label`) and a size letter spelled out (`numericL`
-against `Numeric.large`). The check SHALL say which pairings it applied, so a wrong pairing is
-visible rather than hidden. Any other difference in name SHALL be reported as `name drift` with
-the number of places the code name is used, and SHALL NOT be renamed by the check.
+Names SHALL be compared as well as values. The design system's Swift blocks name and nest
+tokens as the code does (`Font.TypeScale.label`, `Field.label`, `Numeric.large`), so the check
+SHALL compare those names as written, with no mapping between different names. The Kotlin and
+CSS blocks spell the same tokens flat (`fieldLabel`, `--text-field-label`); the check SHALL read
+them under those names only to compare the design system with itself. Any difference between a
+Swift name and the code's — another word or another nesting — SHALL be reported as `name drift`
+with the number of places the code name is used, and SHALL NOT be renamed by the check.
 
 The check SHALL conclude with an explicit statement of whether any `drift`, `name drift` or
 `undeclared lead` was found.
@@ -132,13 +133,14 @@ The check SHALL conclude with an explicit statement of whether any `drift`, `nam
 - **THEN** the check reports every elevation level except `hairline` as `unimplemented`
 
 #### Scenario: Names differ by convention
-- **WHEN** a design system token and its code counterpart differ only by nesting or a spelled-out
-  size letter
-- **THEN** the check pairs them and states the pairing it used
+- **WHEN** the Kotlin or CSS block spells a token flat, as `fieldLabel` or `--text-field-label`
+- **THEN** the check reads it under that name only to compare the platform blocks with one
+  another, and compares the code with the Swift block's `Field.label`
 
 #### Scenario: A token has a different name in code
-- **WHEN** a design system token and its code counterpart use different words, as `label` and
-  `overline`, and no ledger entry covers it
+- **WHEN** a name in the design system's Swift block and its code counterpart differ, by a word
+  as `label` and `overline` or by nesting as `fieldLabel` and `Field.label`, and no ledger entry
+  covers it
 - **THEN** the check reports `name drift` with both names and how many places use the code
   name, even when the values agree, and renames nothing
 

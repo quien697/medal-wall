@@ -202,6 +202,9 @@
 - [x] 13.6 Rename `Font.TypeScale.overline` and `BoneSize.overline` to `label`, as the design
       system names the 11 pt step; the sync now compares names and reports `name drift` instead
       of pairing `label` with `overline`
+- [x] 13.7 The design system's Swift blocks now use the code's names (`Font.TypeScale`,
+      `Field.label`, `Numeric.large`): the sync compares names as written, with no pairings, and
+      `tokens.json` records the type steps under those names
 
 ## 14. Archive
 
