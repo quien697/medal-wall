@@ -146,7 +146,7 @@
       with it turned off
 - [x] 10.3 Run `design-system-sync`: no problems; Design System v4.7.1 and Mockup - iOS
       v4.8.2 state MW-38's four choices, so their entries are resolved
-- [ ] 10.4 Deploy `firestore.rules` (`cd rules-tests && npm run deploy`) once the user agrees
+- [x] 10.4 Deploy `firestore.rules` (`cd rules-tests && npm run deploy`) once the user agrees
 
 ## 11. Code review
 
@@ -208,7 +208,7 @@
 
 ## 14. Archive
 
-- [ ] 14.1 Archive per memory (OpenSpec can't drop a scenario): replace each MODIFIED block in
+- [x] 14.1 Archive per memory (OpenSpec can't drop a scenario): replace each MODIFIED block in
       `openspec/specs/` by script, create `openspec/specs/medal-photos/spec.md` (with a
       Purpose) from the ADDED requirements, check `git diff`, run
       `openspec validate --specs --strict`, then `openspec archive mw-38-medal-front-back-photos
