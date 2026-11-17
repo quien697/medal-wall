@@ -80,13 +80,22 @@ both is a match regardless of its approximated numbers. A level in code with no 
 design system with no code counterpart, is the real signal — treat that as `undeclared lead` /
 `unimplemented` as usual.
 
-Names differ by convention. State which pairings you used:
+Names are compared too, not only values. Two spelling conventions pair a design system name
+with a differently written code name, because both keep the same words: a camel-case name split
+into a nested type (`fieldLabel` → `Field.label`), and a size letter spelled out (`numericL` →
+`Numeric.large`). State the pairings you used:
 
 ```
-fieldLabel → Field.label      numericL → Numeric.large     label → overline
+fieldLabel → Field.label      numericL → Numeric.large
 fieldValue → Field.value      numericM → Numeric.medium
                               numericS → Numeric.small
 ```
+
+Any other difference — a different word for the same token, as `overline` in code for the design
+system's `label` once was — is `name drift`, even when the values agree. Report it with the
+number of places the code name is used, and leave the rename to the user: renaming is a refactor
+across the codebase, not a value to write. Never add a pairing to the list above to make a name
+drift go away; a deliberate name difference goes in the ledger like any other deviation.
 
 `radius.pill` is `capsule` and has no constant — SwiftUI expresses it natively, so its absence
 from `CGFloat.Radius` is correct, not missing. A design system token you cannot pair with
@@ -98,6 +107,7 @@ Every token gets one verdict:
 |---|---|
 | `match` | equal — not listed individually |
 | `drift` | both have it, values differ, no ledger entry — **a problem** |
+| `name drift` | both have it, under a different word in code that neither convention above explains, no ledger entry — **a problem** |
 | `undeclared lead` | in code, not in the design system, no ledger entry — **a problem** |
 | `declared deviation` | differs, and a ledger entry stands — the iOS value wins |
 | `unimplemented` | in the design system, not in code — informational, never a problem |
@@ -142,7 +152,8 @@ For `open` entries the actionable thing is inaction, not the deviation:
    out by name any family that **shrank**, before anything else. A family you failed to read
    looks exactly like agreement, so this is the one guard against your own worst failure. With no
    previous record, say you are establishing the baseline.
-2. **Problems** — `drift` and `undeclared lead`, with both values.
+2. **Problems** — `drift`, `name drift` and `undeclared lead`, with both values, or for
+   `name drift` both names and how many places use the code name.
 3. **Unreported deviations** — ask whether each has been raised with design.
 4. **Reported deviations** — with age; flag stalled ones.
 5. **Resolved and superseded entries** — what you deleted, with the design system's words, and
@@ -153,7 +164,8 @@ For `open` entries the actionable thing is inaction, not the deviation:
    others carry, report it. These are defects **in the design system**, not in the code: no
    platform block has authority over the others, so this never counts as `drift`. As of v4.7.1,
    `display` and `Wordmark.name` are 32 in the Swift and CSS blocks and 28 in the Kotlin block.
-8. **A verdict line** — say plainly whether any `drift` or `undeclared lead` was found. Say it
+8. **A verdict line** — say plainly whether any `drift`, `name drift` or `undeclared lead` was
+   found. Say it
    even when the answer is none; silence is not a result.
 9. **Values to write** — the list and the one question in **Writing the code**, when there is
    anything to write.
@@ -208,6 +220,7 @@ whether to write them. Write only on a yes; on a no, leave every Swift file as i
 - the modifier enums, `PhotoSlotContent`, or any other case list, and any shape — a new case,
   state or shape is behaviour: report it, and leave it to an OpenSpec change
 - a token the code does not have yet (`unimplemented`) — adding one is a feature, not a sync
+- a name — `name drift` is reported, and the rename is the user's call
 - any doc comment
 
 The role structs and enums are design reasoning written as code. `Record.earned = Pigment.gilt`

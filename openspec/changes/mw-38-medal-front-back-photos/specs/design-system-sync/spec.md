@@ -69,6 +69,7 @@ for them — and SHALL assign every token exactly one verdict:
 |---|---|---|
 | `match` | present in both, values equal | not reported individually |
 | `drift` | present in both, values differ, no ledger entry | a problem |
+| `name drift` | present in both, under a different word in code that neither naming convention explains, no ledger entry | a problem |
 | `undeclared lead` | in code, absent from the design system, no ledger entry | a problem |
 | `declared deviation` | differs from the design system in either shape, and a ledger entry stands | the iOS value wins; reported per its ledger status |
 | `unimplemented` | in the design system, absent from code | informational |
@@ -87,12 +88,14 @@ builds; a level present in one side and absent from the other is the signal, not
 values. `elevation.hairline`, a border with no shadow, SHALL pair with the border
 `surfaceStyle` draws; every other level SHALL pair with a case of `Elevation`.
 
-Where a design system token name and its code counterpart differ by convention — `fieldLabel`
-against `Field.label`, `numericL` against `Numeric.large`, `label` against `overline` — the
-check SHALL resolve them and SHALL say which pairings it applied, so a wrong pairing is
-visible rather than hidden.
+Names SHALL be compared as well as values. Only two conventions pair a design system name with
+a differently written code name, because both keep the same words: a camel-case name split into
+a nested type (`fieldLabel` against `Field.label`) and a size letter spelled out (`numericL`
+against `Numeric.large`). The check SHALL say which pairings it applied, so a wrong pairing is
+visible rather than hidden. Any other difference in name SHALL be reported as `name drift` with
+the number of places the code name is used, and SHALL NOT be renamed by the check.
 
-The check SHALL conclude with an explicit statement of whether any `drift` or
+The check SHALL conclude with an explicit statement of whether any `drift`, `name drift` or
 `undeclared lead` was found.
 
 #### Scenario: A colour's hex differs between the design system and the asset catalog
@@ -129,11 +132,18 @@ The check SHALL conclude with an explicit statement of whether any `drift` or
 - **THEN** the check reports every elevation level except `hairline` as `unimplemented`
 
 #### Scenario: Names differ by convention
-- **WHEN** a design system token and its code counterpart are spelled differently
+- **WHEN** a design system token and its code counterpart differ only by nesting or a spelled-out
+  size letter
 - **THEN** the check pairs them and states the pairing it used
 
+#### Scenario: A token has a different name in code
+- **WHEN** a design system token and its code counterpart use different words, as `label` and
+  `overline`, and no ledger entry covers it
+- **THEN** the check reports `name drift` with both names and how many places use the code
+  name, even when the values agree, and renames nothing
+
 #### Scenario: Everything agrees
-- **WHEN** no token has a `drift` or `undeclared lead` verdict
+- **WHEN** no token has a `drift`, `name drift` or `undeclared lead` verdict
 - **THEN** the check says so explicitly rather than reporting nothing
 
 ### Requirement: Ledger Entries Are Resolved When The Design System Moves

@@ -199,6 +199,9 @@
 - [x] 13.5 Rename the skill `design-system-sync`; it compares and, once the user agrees, writes
       every shared token file — adding `Animation.Motion`, `ImageType`'s medal sizes, `BoneSize`,
       `ProgressBar` and `PhotoSlotContent` to its scope (`design-system-sync` delta)
+- [x] 13.6 Rename `Font.TypeScale.overline` and `BoneSize.overline` to `label`, as the design
+      system names the 11 pt step; the sync now compares names and reports `name drift` instead
+      of pairing `label` with `overline`
 
 ## 14. Archive
 
