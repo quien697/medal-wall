@@ -11,7 +11,7 @@ import SwiftUI
 ///
 /// There is no section-title type step, on purpose: a heading is `callout` turned
 /// heavy, uppercased and tracked +1pt, in `Text.secondary`. Case and colour already
-/// separate it from a `Field.label` above it and an `overline` beside it, and a step
+/// separate it from a `Field.label` above it and a `label` beside it, and a step
 /// that only ever appeared through this modifier would drift from it the first time
 /// either changed.
 struct SectionTitleViewModifier: ViewModifier {

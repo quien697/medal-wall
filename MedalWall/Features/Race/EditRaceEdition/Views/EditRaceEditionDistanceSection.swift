@@ -23,7 +23,7 @@ struct EditRaceEditionDistanceSection: View {
               onRemove(distance)
             } label: {
               Image(systemName: "xmark")
-                .font(.TypeScale.overline)
+                .font(.TypeScale.label)
                 .foregroundStyle(Color.Text.tertiary)
             }  // Button
             .buttonStyle(.plain)

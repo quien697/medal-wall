@@ -31,7 +31,7 @@ struct PlaceholderImage: View {
 
       if let text {
         Text(text)
-          .font(.TypeScale.overline)
+          .font(.TypeScale.label)
           .tracking(.Tracking.label)
           .textCase(.uppercase)
       }

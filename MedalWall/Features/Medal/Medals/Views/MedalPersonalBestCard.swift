@@ -38,11 +38,11 @@ struct MedalPersonalBestCard: View {
         Spacer()
 
         Text(distance)
-          .font(.TypeScale.overline)
+          .font(.TypeScale.label)
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
-          .skeletonBone(.overline)
+          .skeletonBone(.label)
       }  // HStack
       .padding(.bottom, .Space.inline)
 
@@ -61,11 +61,11 @@ struct MedalPersonalBestCard: View {
 
       HStack {
         Text(pace)
-          .font(.TypeScale.overline)
+          .font(.TypeScale.label)
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
-          .skeletonBone(.overline)
+          .skeletonBone(.label)
 
         Spacer()
 

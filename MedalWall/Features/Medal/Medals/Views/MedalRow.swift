@@ -30,11 +30,11 @@ struct MedalRow: View {
 
       VStack(alignment: .leading, spacing: .Space.inline) {
         Text(date)
-          .font(.TypeScale.overline)
+          .font(.TypeScale.label)
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
-          .skeletonBone(.overline)
+          .skeletonBone(.label)
 
         Text(name)
           .font(.TypeScale.headline)
@@ -43,11 +43,11 @@ struct MedalRow: View {
           .skeletonBone(.headline)
 
         Text(distance)
-          .font(.TypeScale.overline)
+          .font(.TypeScale.label)
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
-          .skeletonBone(.overline)
+          .skeletonBone(.label)
 
         if let finishTime {
           HStack(spacing: .Space.stack) {
@@ -64,11 +64,11 @@ struct MedalRow: View {
           .padding(.top, .Space.inline)
         } else {
           Text("No time recorded")
-            .font(.TypeScale.overline)
+            .font(.TypeScale.label)
             .tracking(metadataTracking)
             .textCase(.uppercase)
             .foregroundStyle(Color.Text.secondary)
-            .skeletonBone(.overline)
+            .skeletonBone(.label)
             .padding(.top, .Space.inline)
         }
       }  // VStack

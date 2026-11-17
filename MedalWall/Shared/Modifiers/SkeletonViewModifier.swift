@@ -38,7 +38,7 @@ enum BoneSize {
   case body
   case callout
   case caption
-  case overline
+  case label
   case numericMedium
   case numericLarge
   case tag
@@ -46,7 +46,7 @@ enum BoneSize {
 
   var height: CGFloat {
     switch self {
-    case .overline, .caption: 10
+    case .label, .caption: 10
     case .body: 12
     case .callout: 14
     case .headline: 16

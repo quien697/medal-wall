@@ -31,11 +31,11 @@ struct MedalYearHeader: View {
         Spacer()
 
         Text("^[\(count) medal](inflect: true)")
-          .font(.TypeScale.overline)
+          .font(.TypeScale.label)
           .tracking(.Tracking.label)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
-          .skeletonBone(.overline)
+          .skeletonBone(.label)
       }  // HStack
 
       Rectangle()

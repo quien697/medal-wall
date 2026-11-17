@@ -26,6 +26,6 @@ struct ChipViewModifierTests {
 
   @Test("a call site font replaces the default rather than being dropped")
   func testCallSiteFontOverridesTheDefault() {
-    #expect(modifier(font: .TypeScale.overline).resolvedFont == Font.TypeScale.overline)
+    #expect(modifier(font: .TypeScale.label).resolvedFont == Font.TypeScale.label)
   }
 }

@@ -21,7 +21,7 @@ struct MedalDetailInfoRow: View {
   var body: some View {
     HStack(alignment: .firstTextBaseline, spacing: .Space.gutter) {
       Text(label)
-        .font(.TypeScale.overline)
+        .font(.TypeScale.label)
         .tracking(.Tracking.label)
         .textCase(.uppercase)
         .foregroundStyle(Color.Text.secondary)
@@ -36,7 +36,7 @@ struct MedalDetailInfoRow: View {
 
         if let secondaryValue {
           Text(secondaryValue)
-            .font(.TypeScale.overline)
+            .font(.TypeScale.label)
             .foregroundStyle(Color.Text.secondary)
         }
       }  // VStack

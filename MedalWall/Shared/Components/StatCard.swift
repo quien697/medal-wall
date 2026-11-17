@@ -45,13 +45,13 @@ struct StatCard: View {
         .skeletonBone(titleBone)
 
       Text(subtitle)
-        .font(.TypeScale.overline)
+        .font(.TypeScale.label)
         .tracking(.Tracking.label)
         .textCase(.uppercase)
         .foregroundStyle(Color.Text.tertiary)
         .lineLimit(1)
         .minimumScaleFactor(0.5)
-        .skeletonBone(.overline)
+        .skeletonBone(.label)
     }  // VStack
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .surfaceStyle(

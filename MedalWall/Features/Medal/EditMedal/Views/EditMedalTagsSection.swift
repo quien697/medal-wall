@@ -23,7 +23,7 @@ struct EditMedalTagsSection: View {
               onRemove(tag)
             } label: {
               Image(systemName: "xmark")
-                .font(.TypeScale.overline)
+                .font(.TypeScale.label)
             }  // Button
           }  // HStack
           .chipStyle(.neutral)

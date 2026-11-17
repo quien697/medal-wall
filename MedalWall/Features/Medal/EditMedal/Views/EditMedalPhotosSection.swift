@@ -44,7 +44,7 @@ struct EditMedalPhotosSection: View {
             )  // PhotoSlot
 
             Text(face.title)
-              .font(.TypeScale.overline)
+              .font(.TypeScale.label)
               .tracking(.Tracking.label)
               .textCase(.uppercase)
               .foregroundStyle(Color.Text.tertiary)

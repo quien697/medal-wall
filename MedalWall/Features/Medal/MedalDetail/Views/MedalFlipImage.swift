@@ -41,7 +41,7 @@ struct MedalFlipImage: View {
       Text(faceInView.title)
         .textCase(.uppercase)
         .tracking(.Tracking.tag)
-        .chipStyle(.primary, font: .TypeScale.overline, vPadding: 4, hPadding: 8)
+        .chipStyle(.primary, font: .TypeScale.label, vPadding: 4, hPadding: 8)
         .padding(.Space.stack)
     }  // ZStack
     .contentShape(ImageType.medal.shape)
