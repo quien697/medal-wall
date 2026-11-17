@@ -221,32 +221,45 @@ that could not load is kept on save unless the user replaces or removes it, beca
 models only write a photo the user changed. There is no retry control; reopening the form
 downloads again.
 
-### Declared deviations
-`openspec/design-system/deviations.md` gains four entries, all `unreported` until the designer
-confirms:
-- `component.MedalImage.earnedBar`: not drawn. The list and the details already state "No time
-  recorded", the bar would mark the default rather than the exception, and gold under a gold
-  medal competes with the photo.
-- `component.MedalImage`: drawn by `PhotoImage` — the framed photo filling the square with no
-  edge and no `elevation.cutout`, and, without one, the shared photo placeholder labelled with
-  the face — where the design system draws a background-removed cutout on porcelain with an ash
-  hairline. Removing the background is left to a later change; until then a medal is a photo
-  like any other.
-- `component.MedalImage.faceButton`: a FRONT / BACK label names the face in view on every
-  medal, and tapping anywhere on the medal flips it, to an empty face's placeholder too, where
-  the design system makes the corner capsule the button that flips, shown only when a back
-  exists. The whole medal is the target, so turning it over needs no aim at a small corner
-  control; the corner only names the face. An empty face in view invites adding its photo. The design system keeps the medal untappable because
-  its square carries gilt, and no gilt bar is drawn here; adopting the bar would reopen this.
-- iOS mock v4.8.0 search medal row: keeps the place and shows no time. The place is how a match
-  by place explains itself (`search` spec, "A medal found by its place").
+### The design system lives in Claude
+The design system and the iOS mockups are pages of one Claude design canvas, linked from
+`CLAUDE.md`: "Design System v…" and "Mockup - iOS v…". Claude Code reads them with the Artifact tool, so a
+session always checks against the current page and nothing has to be copied into the repo when
+the designer releases a version. `tokens.json` stays the committed record of what the code was
+last checked against.
+- The canvas index, `project/canvas.json`, names each page and gives every artboard its page.
+  The `#page-…` links in `CLAUDE.md` are the editor's own ids and are not in the index, so a
+  page is found by its name — the one starting "Design System", the one containing "iOS v" —
+  and its version is read from the name.
+- `tokens.json`'s `source` records the canvas, the page, its version, the artifact version
+  read, and a hash of that page's artboards in canvas order. The artifact version moves with
+  an edit to any page; the hash moves only when the Design System page does.
+- The check that runs every session reads only the index's page names.
+
+### What the design system states for MW-38
+Design System v4.7.1 and Mockup - iOS v4.8.2 state these choices, so `deviations.md` holds no
+entry for MW-38:
+- No earned mark on a medal image. The list and the details already state "No time recorded", a
+  gilt bar would mark the default rather than the exception, and gold under a gold medal
+  competes with the photo.
+- The medal image is the framed photo, drawn by `PhotoImage` like every other photo: it fills
+  the square with no edge and no shadow, and without one the shared placeholder is labelled with
+  the face. Removing the background is left to a later change, and a shadow from an opaque
+  photo would shadow the whole square.
+- A FRONT / BACK label names the face in view on every medal, and tapping anywhere on the medal
+  flips it, to an empty face's placeholder too. The whole medal is the target, so turning it
+  over needs no aim at a small corner control; an empty face in view invites adding its photo.
+  With no gilt on the medal, tapping it breaks no rule.
+- The search medal row keeps the place and shows no time: the place is how a match by place
+  explains itself (`search` spec, "A medal found by its place").
+- A face is saved as an 840 × 840 JPEG, and `PhotoSlot` has loading and failed states.
 
 ## Risks / Trade-offs
 
 - [The camera itself is verified only on a device] → What Take Photo leads to for each kind
   of camera access is covered by `PhotoSlotViewModel`'s tests.
 - [A photo's background stays in the medal image] → Framing a tight square leaves little of
-  it, and the deviation entry keeps the gap visible until a change removes backgrounds.
+  it, and the design system names background removal as a later version.
 - [Old test medals keep their `cover/` files in Storage] → They are test data. Deleting such a
   medal no longer finds the file, which stays until cleaned up by hand.
 - [`CropImage` is a public package] → `outputSide` is additive with the old output as the

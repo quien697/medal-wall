@@ -4,17 +4,20 @@
       2026-11-03, ticket MW-38: `component.MedalImage.earnedBar` (code: not drawn; design system:
       gilt bar 3 pt, 2 pt at `.thumb`, along the square's bottom edge), and the iOS mock v4.8.0
       search medal row (code: date, name, place, distance, no time; mock: name, date,
-      distance · time, no place). Use the reasons in design.md, Declared deviations
+      distance · time, no place). Use the reasons in design.md, What the design system
+      states for MW-38
 - [x] 1.2 Add a row for `component.MedalImage`, status `unreported`, since 2026-11-12, ticket
       MW-38 (code: drawn by `PhotoImage`, the photo filling the square with no edge and no
       `elevation.cutout`, the shared placeholder labelled with the face; design system: a
       background-removed cutout casting `elevation.cutout`, on porcelain with an ash hairline),
-      with the reason in design.md, Declared deviations
+      with the reason in design.md, What the design system
+      states for MW-38
 - [x] 1.3 Add a row for `component.MedalImage.faceButton`, status `unreported`, since
       2026-11-13, ticket MW-38 (code: a FRONT / BACK label names the face in view on every
       medal and tapping anywhere on it flips it, to an empty face's placeholder too; design
       system: the corner button names the face and flips it, shown only when a back exists),
-      with the reason in design.md, Declared deviations
+      with the reason in design.md, What the design system
+      states for MW-38
 
 ## 2. CropImage output size (`~/Code/Libraries/iOS/CropImage`)
 
@@ -82,7 +85,7 @@
 - [x] 6.4 Delete `MedalRingViewModifier.swift` and its three call sites, and
       `ElevationViewModifier.swift`, which only the ring used; drop the ring from
       `PhotoImage`'s doc comment and preview
-- [x] 6.5 Stop naming `ElevationViewModifier` in `CLAUDE.md` and the `design-system-check`
+- [x] 6.5 Stop naming `ElevationViewModifier` in `CLAUDE.md` and the `design-system-sync`
       skill, and add the `design-system-sync` delta
 
 ## 7. Edit form
@@ -137,12 +140,12 @@
 
 - [x] 10.1 Run the full test suite and `rules-tests`; confirm the new test names ran (memory:
       xcodebuild can run stale tests)
-- [ ] 10.2 On a device: frame a medal from the library and one taken with the camera; check
+- [x] 10.2 On a device: frame a medal from the library and one taken with the camera; check
       the front fills its square in the list, search and the details; flip in light and dark,
       and with Reduce Motion; tap Take Photo before camera access is asked, once allowed, and
       with it turned off
-- [ ] 10.3 Run `design-system-check`; it should report only the four declared deviations for
-      this change
+- [x] 10.3 Run `design-system-sync`: no problems; Design System v4.7.1 and Mockup - iOS
+      v4.8.2 state MW-38's four choices, so their entries are resolved
 - [ ] 10.4 Deploy `firestore.rules` (`cd rules-tests && npm run deploy`) once the user agrees
 
 ## 11. Code review
@@ -181,9 +184,25 @@
 - [x] 12.5 Run the full suite; render the three forms' slots in every state, light and dark,
       with a temporary test
 
-## 13. Archive
+## 13. Design system in Claude
 
-- [ ] 13.1 Archive per memory (OpenSpec can't drop a scenario): replace each MODIFIED block in
+- [x] 13.1 Point `CLAUDE.md`, the `design-system-sync` skill and `docs/development-workflow.md`
+      at the canvas's Design System and iOS pages, found by name (design.md, The design system
+      lives in Claude); add the `design-system-sync` delta for token capture and the
+      every-session check
+- [x] 13.2 Run `design-system-sync` against the canvas (10.3), writing `tokens.json`'s new
+      `source`
+- [x] 13.3 The check deletes the ledger entries a release resolves (skill, `design-system-sync`
+      delta, workflow doc); delete MW-38's four resolved entries and the ledger's notes on past
+      resolutions
+- [x] 13.4 `CLAUDE.md`: how to take a "Hand off to Claude Code" prompt from the canvas
+- [x] 13.5 Rename the skill `design-system-sync`; it compares and, once the user agrees, writes
+      every shared token file — adding `Animation.Motion`, `ImageType`'s medal sizes, `BoneSize`,
+      `ProgressBar` and `PhotoSlotContent` to its scope (`design-system-sync` delta)
+
+## 14. Archive
+
+- [ ] 14.1 Archive per memory (OpenSpec can't drop a scenario): replace each MODIFIED block in
       `openspec/specs/` by script, create `openspec/specs/medal-photos/spec.md` (with a
       Purpose) from the ADDED requirements, check `git diff`, run
       `openspec validate --specs --strict`, then `openspec archive mw-38-medal-front-back-photos

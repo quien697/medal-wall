@@ -30,18 +30,16 @@ iOS mock v4.8.0 now draw the medal visuals this needs.
   and 46 pt in search, always showing the front, with a labelled placeholder when there is no
   front. The photo fills the square, drawn by the same component as every other photo.
 - **No gold ring or bar on medal images.** The circular earned ring is removed from medal
-  images, and the gilt bar Design System v4.7.0 draws under the square is not adopted
-  (declared in `deviations.md`). The list and the details already say "No time recorded"
-  for a medal without a finish time.
-- **The medal image is the framed photo, not a background-removed cutout** on porcelain with an
-  ash hairline, as Design System v4.7.0 draws it (declared in `deviations.md`).
+  images, and the square carries no gilt bar ("no earned mark", Design System v4.7.1). The list
+  and the details already say "No time recorded" for a medal without a finish time.
+- **The medal image is the framed photo, not a background-removed cutout**: it fills the square
+  with no edge and no shadow (Design System v4.7.1).
 - Details: tapping anywhere on the medal flips it, and a FRONT / BACK label in its top-right
   corner names the face in view; an empty face shows its placeholder. The label is not a button
-  of its own and shows on every medal, where Design System v4.7.0 makes it the flip button,
-  shown only when a back exists (declared in `deviations.md`). The flip
-  uses `motion.flip`, and a fade under Reduce Motion.
-- Search medal rows keep their place line and show no finish time, unlike the v4.8.0 mock
-  (declared in `deviations.md`). Only their image changes.
+  of its own and shows on every medal (Design System v4.7.1). The flip uses `motion.flip`, and
+  a fade under Reduce Motion.
+- Search medal rows keep their place line and show no finish time (Mockup - iOS v4.8.2). Only
+  their image changes.
 - The personal-best carousel keeps showing no medal image.
 - The medal skeleton bone becomes a square with `radius.image`.
 
@@ -66,9 +64,12 @@ migrating existing photos, and swiping between medals in the details.
   exists.
 - `edit-sheets`: a sheet that is saving disables its form as well as Cancel, and every photo a
   sheet sets goes through one photo slot that shows a stored photo loading or failing to load.
-- `design-system-sync`: the check pairs `elevation.hairline` with the border `surfaceStyle`
-  draws, and reports every shadow level as unimplemented while the code defines no
-  `Elevation`.
+- `design-system-sync`: the check reads the design system from the Design System page of the
+  Claude design canvas, found by its name; deletes the ledger entries a release resolves;
+  compares every shared token file and, once the user agrees, writes the design system's values
+  into them; pairs `elevation.hairline` with the border
+  `surfaceStyle` draws; and reports every shadow level as unimplemented while the code defines
+  no `Elevation`.
 
 ## Impact
 
@@ -100,9 +101,15 @@ migrating existing photos, and swiping between medals in the details.
 - **Localization:** new strings for the slots, the source alert, the camera access alerts and
   the face label and flip hints, the three new slot titles, the edition's message and
   "Couldn't load", in English and zh-TW; the old picker's strings are removed.
-- **Design system:** four new `deviations.md` entries (the gilt bar, the photo in place of a
-  cutout, the face label in place of the face button, the search row); `CLAUDE.md` and the
-  `design-system-check` skill stop naming `ElevationViewModifier`.
+- **Design system:** Design System v4.7.1 and Mockup - iOS v4.8.2 state MW-38's medal image,
+  face label, search row, JPEG faces and photo slot states, so `deviations.md` holds no MW-38
+  entry; the `design-system-check` skill becomes `design-system-sync`, which deletes the ledger
+  entries a release resolves and, once the user agrees, writes the design system's values into
+  every shared token file; `CLAUDE.md`
+  says how to take a "Hand off to Claude Code" prompt from the canvas; `CLAUDE.md` and the
+  `design-system-sync` skill stop naming `ElevationViewModifier`; they, the workflow doc and
+  `tokens.json` point at the design system in the Claude design canvas instead of the local
+  HTML documents.
 - **Specs:** the `medals` delta replaces the scenario "Replace a medal's cover photo" with
   "Replace a medal's front photo", so archiving merges that requirement by hand (OpenSpec's
   archive refuses a MODIFIED block that drops a scenario).
