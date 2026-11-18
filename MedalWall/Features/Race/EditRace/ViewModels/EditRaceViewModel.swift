@@ -23,6 +23,8 @@ final class EditRaceViewModel {
   private(set) var hasLoadedEditions = false
   var error: AppError?
   private(set) var isPhotoChanged = false
+  /// The stored logo while the form isn't showing it: still downloading, or one that couldn't be.
+  private(set) var storedPhotoStatus: StoredPhotoStatus?
 
   // MARK: - Edition Staging
   private var originalEditions: [RaceEdition] = []
@@ -59,6 +61,7 @@ final class EditRaceViewModel {
       self.place = race.place
       self.websiteUrl = race.websiteUrl ?? ""
       self.isEditionsLoading = true
+      self.storedPhotoStatus = race.photoUrl == nil ? nil : .loading
     }
   }
 
@@ -152,24 +155,30 @@ final class EditRaceViewModel {
     }
   }
 
-  /// Downloads the existing race photo into `photo` so the picker shows the current image.
+  /// Downloads the existing race photo into `photo` so the slot shows the current image,
+  /// marking it as failed when it can't be downloaded.
   func loadExistingPhoto() async {
     let existingPhoto = await loadImage(race?.photoUrl)
     guard !isPhotoChanged else { return }
 
     photo = existingPhoto
+    if storedPhotoStatus == .loading {
+      storedPhotoStatus = existingPhoto == nil ? .failed : nil
+    }
   }
 
   /// Replaces the current photo and marks it as changed.
   func updatePhoto(with uiImage: UIImage) {
     photo = uiImage
     isPhotoChanged = true
+    storedPhotoStatus = nil
   }
 
   /// Clears the current photo and marks it as changed.
   func clearPhoto() {
     photo = nil
     isPhotoChanged = true
+    storedPhotoStatus = nil
   }
 
   /// Creates or updates the race in Firestore, uploading the logo only when the photo was changed.

@@ -12,7 +12,8 @@ struct Medal: Codable, Identifiable {
   var name: String
   var date: Date
   var bibNumber: String
-  var photoUrl: String?
+  /// The front and back photos' URLs; `nil` when the medal has neither.
+  var photoUrls: MedalPhotoUrls?
   var place: Place
   /// The event this medal was earned in: its distance, a standard such as Full or a custom
   /// one such as 10 mi, and how it was run (in person, virtual or wheelchair).
@@ -37,7 +38,7 @@ struct Medal: Codable, Identifiable {
     name: String,
     date: Date,
     bibNumber: String,
-    photoUrl: String? = nil,
+    photoUrls: MedalPhotoUrls? = nil,
     place: Place,
     raceEvent: RaceEvent,
     result: RaceResult? = nil,
@@ -59,7 +60,7 @@ struct Medal: Codable, Identifiable {
     self.name = name
     self.date = date
     self.bibNumber = bibNumber
-    self.photoUrl = photoUrl
+    self.photoUrls = photoUrls
     self.place = place
     self.raceEvent = raceEvent
     self.result = result

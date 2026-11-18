@@ -90,6 +90,8 @@
 				"Models/Medal/Medal+Computed.swift",
 				"Models/Medal/Medal+Search.swift",
 				"Models/Medal/Medal+Stats.swift",
+				Models/Medal/MedalFace.swift,
+				Models/Medal/MedalPhotoUrls.swift,
 				Models/Medal/RaceResult.swift,
 				Models/Race/Race.swift,
 				"Models/Race/Race+Computed.swift",
@@ -122,12 +124,14 @@
 				Shared/Components/PlacePicker/ViewModels/PlacePickerViewModel.swift,
 				Shared/Errors/AppError.swift,
 				Shared/Errors/ErrorWrapper.swift,
+				"Shared/Extensions/Animation+Extensions.swift",
 				"Shared/Extensions/Date+Extensions.swift",
 				"Shared/Extensions/TimeInterval+Extensions.swift",
 				"Shared/Extensions/UIImage+Extensions.swift",
 				Shared/UIModels/DeletePrompt.swift,
 				Shared/UIModels/ItemEditMode.swift,
 				Shared/UIModels/LoadSequence.swift,
+				Shared/UIModels/StoredPhotoStatus.swift,
 			);
 			target = 60B570BE2EA616CA000B3FDE /* MedalWallTests */;
 		};
@@ -716,7 +720,7 @@
 			repositoryURL = "https://github.com/quien697/CropImage";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 1.1.0;
 			};
 		};
 		60D4C5462FD6C40E008DFA1D /* XCRemoteSwiftPackageReference "TimePicker" */ = {

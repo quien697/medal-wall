@@ -112,10 +112,11 @@ A→Z in the user's locale, two races sharing a name ordered by identifier.
   before "T"
 
 ### Requirement: Result Content
-Each medal result SHALL show the medal's photo in its gold ring, its date, its name, its
-displayed place, and its distance on a line of its own. Each race result SHALL show the race's
-photo, its name, its displayed place and its edition count, the count clamped to zero or more.
-Results SHALL NOT offer swipe actions.
+Each medal result SHALL show the medal's front, presented as the `medal-photos` capability's
+medal image at 46 pt with no gold ring, then its date, its name, its displayed place, and its
+distance on a line of its own. A medal result SHALL NOT show a finish time. Each race result
+SHALL show the race's photo, its name, its displayed place and its edition count, the count
+clamped to zero or more. Results SHALL NOT offer swipe actions.
 
 #### Scenario: A medal found by its place
 - **WHEN** the query "Taiwan" matches a medal run in Taipei City by its place alone
@@ -128,6 +129,10 @@ Results SHALL NOT offer swipe actions.
 #### Scenario: A corrupt edition count
 - **WHEN** a matching race's stored edition count is negative
 - **THEN** its row shows "0 editions"
+
+#### Scenario: A medal result shows its front
+- **WHEN** a matching medal has a front photo
+- **THEN** its row shows the front in a 46 pt square with no gold ring
 
 ### Requirement: No Results
 When a non-empty query matches no medal and no race, the system SHALL show the system's

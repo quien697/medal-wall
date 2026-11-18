@@ -28,7 +28,7 @@ struct MedalYearSection: View {
           .navigationTransition(.zoom(sourceID: medal.id, in: namespace))
         } label: {
           MedalRow(
-            photoUrl: medal.photoUrl,
+            photoUrl: medal.photoUrls?.front,
             date: medal.date.formattedMonthDayYear(),
             name: medal.name,
             distance: medal.raceEvent.displayLabel,

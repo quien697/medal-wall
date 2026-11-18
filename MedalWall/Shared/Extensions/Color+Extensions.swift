@@ -69,7 +69,7 @@ extension Color {
     static let primary = Pigment.inkNavy
   }
 
-  /// Something the user earned — a medal's ring, a tier mark. Never tappable, and never
+  /// Something the user earned — the seal, a tier mark. Never tappable, and never
   /// a value: a finish time is text, not an award.
   struct Record {
     static let earned = Pigment.gilt

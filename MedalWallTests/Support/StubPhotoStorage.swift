@@ -22,6 +22,7 @@ actor StubPhotoStorage: PhotoStorage {
   // MARK: - Recorded calls
   private(set) var uploadCallCount = 0
   private(set) var uploadedEditionLogoIDs: [String] = []
+  private(set) var uploadedFaces: [MedalFace] = []
   private(set) var deletedURLs: [String] = []
   private(set) var deletedOwners: [PhotoOwner] = []
 
@@ -46,8 +47,11 @@ actor StubPhotoStorage: PhotoStorage {
     return try recordUpload()
   }
 
-  func uploadMedalPhoto(userId: String, medalId: String, image: UIImage) async throws -> String {
-    try recordUpload()
+  func uploadMedalFace(userId: String, medalId: String, face: MedalFace, image: UIImage)
+    async throws -> String
+  {
+    uploadedFaces.append(face)
+    return try recordUpload()
   }
 
   func uploadMedalEventPhoto(

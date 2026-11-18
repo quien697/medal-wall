@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-/// One medal as the collection list presents it: the thumbnail beside the race it came
-/// from, its distance, and the time it was run in.
+/// One medal as the collection list presents it: its front beside the race it came from,
+/// its distance, and the time it was run in.
 ///
-/// The gold ring is unconditional — it marks a medal, not a result — so an untimed race
-/// wears it exactly like a timed one. What the ring never does is stand in for the record:
-/// that is the champagne tag, and only the fastest medal at a distance carries it.
+/// The medal image carries no gold, so a timed and an untimed medal look alike until their
+/// times: an untimed one reads "No time recorded". The record is the champagne tag, and only
+/// the fastest medal at a distance carries it.
 struct MedalRow: View {
   // MARK: - Properties
   private let metadataTracking: CGFloat = .Tracking.label
@@ -26,16 +26,15 @@ struct MedalRow: View {
   // MARK: - Body
   var body: some View {
     HStack(spacing: .Space.gutter) {
-      PhotoImage(urlString: photoUrl, as: .medalThumbnail)
-        .medalRing()
+      PhotoImage(urlString: photoUrl, as: .medalThumbnail, placeholderText: MedalFace.front.title)
 
       VStack(alignment: .leading, spacing: .Space.inline) {
         Text(date)
-          .font(.TypeScale.overline)
+          .font(.TypeScale.label)
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
-          .skeletonBone(.overline)
+          .skeletonBone(.label)
 
         Text(name)
           .font(.TypeScale.headline)
@@ -44,11 +43,11 @@ struct MedalRow: View {
           .skeletonBone(.headline)
 
         Text(distance)
-          .font(.TypeScale.overline)
+          .font(.TypeScale.label)
           .tracking(metadataTracking)
           .textCase(.uppercase)
           .foregroundStyle(Color.Text.secondary)
-          .skeletonBone(.overline)
+          .skeletonBone(.label)
 
         if let finishTime {
           HStack(spacing: .Space.stack) {
@@ -65,11 +64,11 @@ struct MedalRow: View {
           .padding(.top, .Space.inline)
         } else {
           Text("No time recorded")
-            .font(.TypeScale.overline)
+            .font(.TypeScale.label)
             .tracking(metadataTracking)
             .textCase(.uppercase)
             .foregroundStyle(Color.Text.secondary)
-            .skeletonBone(.overline)
+            .skeletonBone(.label)
             .padding(.top, .Space.inline)
         }
       }  // VStack

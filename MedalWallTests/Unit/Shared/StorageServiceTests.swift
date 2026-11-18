@@ -56,4 +56,32 @@ struct StorageServiceTests {
 
     #expect(steps == ["put", "downloadURL", "delete"])
   }
+
+  // MARK: - Medal face paths
+  @Test("a medal's front is stored as a JPEG with a new name in its front folder")
+  func testFrontPath() throws {
+    let path = StorageService.Path.medalFace(userId: "uid-a", medalId: "medal-a", face: .front)
+    let prefix = "users/uid-a/medals/medal-a/front/"
+
+    #expect(path.hasPrefix(prefix))
+    #expect(path.hasSuffix(".jpg"))
+    let name = path.dropFirst(prefix.count).dropLast(".jpg".count)
+    #expect(UUID(uuidString: String(name)) != nil)
+  }
+
+  @Test("a medal's back is stored as a JPEG in its back folder")
+  func testBackPath() {
+    let path = StorageService.Path.medalFace(userId: "uid-a", medalId: "medal-a", face: .back)
+
+    #expect(path.hasPrefix("users/uid-a/medals/medal-a/back/"))
+    #expect(path.hasSuffix(".jpg"))
+  }
+
+  @Test("every face upload gets a new name, so it never overwrites a stored face")
+  func testFacePathIsNewEachTime() {
+    let first = StorageService.Path.medalFace(userId: "uid-a", medalId: "medal-a", face: .front)
+    let second = StorageService.Path.medalFace(userId: "uid-a", medalId: "medal-a", face: .front)
+
+    #expect(first != second)
+  }
 }

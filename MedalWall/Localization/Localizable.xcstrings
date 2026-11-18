@@ -146,12 +146,32 @@
         }
       }
     },
+    "Add back" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增背面"
+          }
+        }
+      }
+    },
     "Add editions to track your race history." : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "新增屆次以追蹤你的參賽紀錄。"
+          }
+        }
+      }
+    },
+    "Add front" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新增正面"
           }
         }
       }
@@ -186,6 +206,16 @@
         }
       }
     },
+    "Allow Camera Access" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允許取用相機"
+          }
+        }
+      }
+    },
     "Appearance" : {
       "localizations" : {
         "zh-TW" : {
@@ -204,6 +234,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "平均配速"
+          }
+        }
+      }
+    },
+    "Back" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "背面"
+          }
+        }
+      }
+    },
+    "Back photo" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "背面照片"
           }
         }
       }
@@ -288,12 +338,12 @@
         }
       }
     },
-    "Choose from Library" : {
+    "Choose Photo" : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "從照片圖庫選擇"
+            "value" : "選擇照片"
           }
         }
       }
@@ -344,6 +394,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "使用 Google 繼續"
+          }
+        }
+      }
+    },
+    "Couldn't load" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法載入"
           }
         }
       }
@@ -600,16 +660,6 @@
         }
       }
     },
-    "Edit Photo" : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "編輯照片"
-          }
-        }
-      }
-    },
     "Edit Profile" : {
       "localizations" : {
         "zh-TW" : {
@@ -636,6 +686,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "屆次刪除失敗"
+          }
+        }
+      }
+    },
+    "Edition photo" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "屆次照片"
           }
         }
       }
@@ -810,6 +870,26 @@
         }
       }
     },
+    "Front" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正面"
+          }
+        }
+      }
+    },
+    "Front photo" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正面照片"
+          }
+        }
+      }
+    },
     "Full" : {
       "localizations" : {
         "zh-TW" : {
@@ -956,6 +1036,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "姓氏"
+          }
+        }
+      }
+    },
+    "Lay it flat on a plain surface and shoot from straight above, or hang it on a plain wall. Keep everything else out of the shot, and use even light with no flash." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平放在素色表面上並從正上方拍攝，或掛在素色牆面上。畫面中不要有其他物品，並在均勻光線下拍攝，不要開閃光燈。"
+          }
+        }
+      }
+    },
+    "Leave it empty to use the race logo." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "留空以使用賽事標誌。"
           }
         }
       }
@@ -1113,6 +1213,16 @@
         }
       }
     },
+    "No Camera" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有相機"
+          }
+        }
+      }
+    },
     "No Distances" : {
       "localizations" : {
         "zh-TW" : {
@@ -1253,6 +1363,16 @@
         }
       }
     },
+    "Open Settings" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前往設定"
+          }
+        }
+      }
+    },
     "optional" : {
       "localizations" : {
         "zh-TW" : {
@@ -1301,6 +1421,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "照片資料無效"
+          }
+        }
+      }
+    },
+    "Photos" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "照片"
           }
         }
       }
@@ -1525,6 +1655,16 @@
         }
       }
     },
+    "Profile photo" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "個人資料照片"
+          }
+        }
+      }
+    },
     "Profile Unavailable" : {
       "localizations" : {
         "zh-TW" : {
@@ -1561,6 +1701,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "賽事刪除失敗"
+          }
+        }
+      }
+    },
+    "Race logo" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "賽事標誌"
           }
         }
       }
@@ -1695,6 +1845,26 @@
         }
       }
     },
+    "Shows the back" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示背面"
+          }
+        }
+      }
+    },
+    "Shows the front" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "顯示正面"
+          }
+        }
+      }
+    },
     "Sign In Failed" : {
       "localizations" : {
         "zh-TW" : {
@@ -1765,6 +1935,16 @@
         }
       }
     },
+    "Take Photo" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拍照"
+          }
+        }
+      }
+    },
     "Tap a distance to select the race entry." : {
       "localizations" : {
         "zh-TW" : {
@@ -1791,46 +1971,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "點選 + 按鈕新增你的第一場賽事！"
-          }
-        }
-      }
-    },
-    "Tap to add a new edition photo,\nor leave empty to use the race logo." : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "點選以新增屆次照片，\n或留空以使用賽事標誌。"
-          }
-        }
-      }
-    },
-    "Tap to add a photo" : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "點選以新增照片"
-          }
-        }
-      }
-    },
-    "Tap to update the edition photo,\nor leave empty to use the race logo." : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "點選以更新屆次照片，\n或留空以使用賽事標誌。"
-          }
-        }
-      }
-    },
-    "Tap to update the photo" : {
-      "localizations" : {
-        "zh-TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "點選以更新照片"
           }
         }
       }
@@ -1868,6 +2008,16 @@
         }
       }
     },
+    "This device has no camera. Choose a photo instead." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這部裝置沒有相機，請改為選擇照片。"
+          }
+        }
+      }
+    },
     "This distance already exists." : {
       "localizations" : {
         "zh-TW" : {
@@ -1894,6 +2044,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "總人數"
+          }
+        }
+      }
+    },
+    "Turn on camera access in Settings to take a photo." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請在「設定」中開啟相機取用權限，才能拍照。"
           }
         }
       }

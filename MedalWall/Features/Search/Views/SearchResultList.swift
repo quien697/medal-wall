@@ -26,7 +26,7 @@ struct SearchResultList: View {
               MedalDetailView(medal: medal, personalRecordIDs: personalRecordIDs)
             } label: {
               SearchMedalRow(
-                photoUrl: medal.photoUrl,
+                photoUrl: medal.photoUrls?.front,
                 date: medal.date.formattedMonthDayYear(),
                 name: medal.name,
                 place: medal.place.formatted,

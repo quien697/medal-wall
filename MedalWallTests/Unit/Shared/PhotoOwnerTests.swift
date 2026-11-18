@@ -64,12 +64,14 @@ struct PhotoOwnerTests {
   }
 
   // MARK: - Medal
-  @Test("a medal owns its cover and event photos, including the cover stored before unique names")
+  @Test("a medal owns its faces, its event photos and the cover stored before them")
   func testMedalOwnsPhotos() {
     let owner = PhotoOwner.medal(userId: "uid-a", medalId: "medal-a")
 
     #expect(owner.owns(path: "users/uid-a/medals/medal-a/cover/3F2A.jpg"))
     #expect(owner.owns(path: "users/uid-a/medals/medal-a/eventPhotos/3F2A.jpg"))
+    #expect(owner.owns(path: "users/uid-a/medals/medal-a/front/3F2A.jpg"))
+    #expect(owner.owns(path: "users/uid-a/medals/medal-a/back/3F2A.jpg"))
     #expect(owner.owns(path: "users/uid-a/medals/medal-a/medal.jpg"))
   }
 

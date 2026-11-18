@@ -50,7 +50,7 @@ enum TagStyle {
   fileprivate var font: Font {
     switch self {
     case .neutralInCard, .neutralOnPage: Font.TypeScale.caption
-    case .record, .success, .error: Font.TypeScale.overline
+    case .record, .success, .error: Font.TypeScale.label
     }
   }
 

@@ -18,6 +18,8 @@ final class EditProfileViewModel {
 
   // MARK: - State
   private(set) var isPhotoChanged = false
+  /// The stored photo while the form isn't showing it: still downloading, or one that couldn't be.
+  private(set) var storedPhotoStatus: StoredPhotoStatus?
   private(set) var isLoading = false
 
   // MARK: - Dependencies
@@ -36,6 +38,7 @@ final class EditProfileViewModel {
     self.bio = profile.bio ?? ""
     self.gender = profile.gender
     self.birthday = profile.birthday
+    self.storedPhotoStatus = profile.photoUrl == nil ? nil : .loading
   }
 
   // MARK: - Computed
@@ -48,24 +51,29 @@ final class EditProfileViewModel {
 
   // MARK: - Functions
   /// Downloads the existing profile photo so the form can show it, unless a new one was
-  /// picked while it loaded.
+  /// picked while it loaded, marking it as failed when it can't be downloaded.
   func loadExistingPhoto() async {
     let existingPhoto = await UIImage.load(from: profile.photoUrl)
     guard !isPhotoChanged else { return }
 
     photo = existingPhoto
+    if storedPhotoStatus == .loading {
+      storedPhotoStatus = existingPhoto == nil ? .failed : nil
+    }
   }
 
   /// Sets the newly picked profile photo and marks it as changed.
   func updatePhoto(with uiImage: UIImage) {
     photo = uiImage
     isPhotoChanged = true
+    storedPhotoStatus = nil
   }
 
   /// Clears the profile photo and marks it as changed.
   func clearPhoto() {
     photo = nil
     isPhotoChanged = true
+    storedPhotoStatus = nil
   }
 
   /// Returns a copy of the profile with the current draft values applied.

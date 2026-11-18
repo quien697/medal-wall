@@ -6,7 +6,6 @@
 //
 
 import CropImage
-import PhotosUI
 import SwiftUI
 
 struct EditProfileView: View {
@@ -17,10 +16,6 @@ struct EditProfileView: View {
   // MARK: - State
   @State private var viewModel: EditProfileViewModel
   @State private var errorWrapper: ErrorWrapper?
-  @State private var isPresentingPhotoPicker: Bool = false
-  @State private var isPresentingCropImageView: Bool = false
-  @State private var selectedPhoto: PhotosPickerItem?
-  @State private var rawPickedImage: UIImage?
 
   // MARK: - Init
   init(profile: User) {
@@ -31,18 +26,17 @@ struct EditProfileView: View {
   var body: some View {
     NavigationStack {
       Form {
-        EditPhotoPicker(
+        PhotoSlot(
           photo: viewModel.photo,
+          storedPhotoStatus: viewModel.storedPhotoStatus,
           imageType: .avatar,
-          onChooseFromLibrary: {
-            isPresentingPhotoPicker = true
-          },
-          onRemove: {
-            selectedPhoto = nil
-            rawPickedImage = nil
-            viewModel.clearPhoto()
-          }
-        )
+          cropShape: .circle,
+          title: "Profile photo",
+          onPick: { viewModel.updatePhoto(with: $0) },
+          onRemove: { viewModel.clearPhoto() },
+          onError: { errorWrapper = ErrorWrapper(error: $0) }
+        )  // PhotoSlot
+        .frame(maxWidth: .infinity)
         .listRowBackground(Color.clear)
 
         EditProfileInfoSection(
@@ -89,38 +83,6 @@ struct EditProfileView: View {
         }  // ToolbarItem
       }  // toolbar
       .interactiveDismissDisabled()
-      .photosPicker(
-        isPresented: $isPresentingPhotoPicker,
-        selection: $selectedPhoto,
-        matching: .images
-      )
-      .onChange(of: selectedPhoto) { _, newItem in
-        guard let newItem else { return }
-        Task {
-          if let data = try? await newItem.loadTransferable(type: Data.self),
-            let uiImage = UIImage(data: data)
-          {
-            rawPickedImage = uiImage
-            isPresentingCropImageView = true
-          } else {
-            errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
-          }
-        }
-      }
-      .sheet(
-        isPresented: $isPresentingCropImageView,
-        onDismiss: {
-          selectedPhoto = nil
-          rawPickedImage = nil
-        },
-        content: {
-          CropImageView(image: rawPickedImage, cropShape: .circle) { croppedImage in
-            if let croppedImage {
-              viewModel.updatePhoto(with: croppedImage)
-            }
-          }
-        }
-      )
       .sheet(
         item: $errorWrapper,
         content: { wrapper in

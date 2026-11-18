@@ -23,8 +23,9 @@ protocol PhotoStorage {
   func uploadRaceEditionLogo(raceId: String, editionId: String, image: UIImage) async throws
     -> String
 
-  /// Uploads a medal cover photo and returns its download URL.
-  func uploadMedalPhoto(userId: String, medalId: String, image: UIImage) async throws -> String
+  /// Uploads one face of a medal and returns its download URL.
+  func uploadMedalFace(userId: String, medalId: String, face: MedalFace, image: UIImage)
+    async throws -> String
 
   /// Uploads a medal event photo and returns its download URL.
   func uploadMedalEventPhoto(
@@ -96,7 +97,7 @@ final class StorageService: PhotoStorage {
   // MARK: - Paths
   /// Each replaceable photo gets a new file name on every upload, so an upload never
   /// overwrites the file a saved record still points at.
-  private enum Path {
+  enum Path {
     static func userAvatar(uid: String) -> String {
       "users/\(uid)/avatar/\(UUID().uuidString).jpg"
     }
@@ -109,8 +110,13 @@ final class StorageService: PhotoStorage {
       "races/\(raceId)/editions/\(editionId)/editionLogo/\(UUID().uuidString).jpg"
     }
 
-    static func medalPhoto(userId: String, medalId: String) -> String {
-      "users/\(userId)/medals/\(medalId)/cover/\(UUID().uuidString).jpg"
+    static func medalFace(userId: String, medalId: String, face: MedalFace) -> String {
+      let folder =
+        switch face {
+        case .front: "front"
+        case .back: "back"
+        }
+      return "users/\(userId)/medals/\(medalId)/\(folder)/\(UUID().uuidString).jpg"
     }
 
     /// Named after its `EventPhoto.id` (a UUID made when the photo is picked), so a file in
@@ -142,9 +148,11 @@ final class StorageService: PhotoStorage {
   }
 
   // MARK: - Functions -> Medal
-  /// Uploads a medal cover photo and returns the download URL.
-  func uploadMedalPhoto(userId: String, medalId: String, image: UIImage) async throws -> String {
-    try await upload(image: image, to: Path.medalPhoto(userId: userId, medalId: medalId))
+  /// Uploads one face of a medal and returns the download URL.
+  func uploadMedalFace(userId: String, medalId: String, face: MedalFace, image: UIImage)
+    async throws -> String
+  {
+    try await upload(image: image, to: Path.medalFace(userId: userId, medalId: medalId, face: face))
   }
 
   /// Uploads a medal event photo and returns the download URL.

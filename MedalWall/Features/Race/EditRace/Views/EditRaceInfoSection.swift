@@ -37,7 +37,7 @@ struct EditRaceInfoSection: View {
             .font(.TypeScale.Field.value)
 
           Image(systemName: "chevron.right")
-            .font(.TypeScale.overline)
+            .font(.TypeScale.label)
             .padding(.leading, -6)
         }  // HStack
         .foregroundStyle(place.formatted.isEmpty ? Color.Text.tertiary : Color.Text.primary)

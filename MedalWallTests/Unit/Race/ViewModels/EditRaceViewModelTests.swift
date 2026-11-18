@@ -248,4 +248,64 @@ struct EditRaceViewModelTests {
 
     #expect(viewModel.photo === pickedPhoto)
   }
+
+  // MARK: - Stored photo status
+  private func makeRace(photoUrl: String?) -> Race {
+    var race = Race(name: "Vancouver Marathon", place: place, createdBy: "user-1")
+    race.photoUrl = photoUrl
+    return race
+  }
+
+  @Test("a stored logo is loading until it downloads")
+  func testStoredLogoLoads() async throws {
+    let race = makeRace(photoUrl: try makeStoredPhotoFile())
+    let viewModel = EditRaceViewModel(mode: .edit, race: race)
+    #expect(viewModel.storedPhotoStatus == .loading)
+
+    await viewModel.loadExistingPhoto()
+
+    #expect(viewModel.storedPhotoStatus == nil)
+    #expect(viewModel.photo != nil)
+  }
+
+  @Test("a stored logo that can't be downloaded is marked failed")
+  func testStoredLogoFails() async {
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: makeRace(photoUrl: "file:///nonexistent/stored-photo.jpg"))
+
+    await viewModel.loadExistingPhoto()
+
+    #expect(viewModel.storedPhotoStatus == .failed)
+  }
+
+  @Test("a race with no stored logo has no status")
+  func testNoStoredLogo() {
+    let viewModel = EditRaceViewModel(mode: .edit, race: makeRace(photoUrl: nil))
+
+    #expect(viewModel.storedPhotoStatus == nil)
+  }
+
+  @Test("picking or removing a logo ends the stored logo's status", arguments: [true, false])
+  func testChangingLogoEndsStatus(picks: Bool) async {
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: makeRace(photoUrl: "file:///nonexistent/stored-photo.jpg"))
+    await viewModel.loadExistingPhoto()
+
+    if picks {
+      viewModel.updatePhoto(with: UIImage())
+    } else {
+      viewModel.clearPhoto()
+    }
+
+    #expect(viewModel.storedPhotoStatus == nil)
+  }
+
+  /// A file URL holding a 1 × 1 PNG, for the form to download as its stored photo.
+  private func makeStoredPhotoFile() throws -> String {
+    let image = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { _ in }
+    let url = FileManager.default.temporaryDirectory
+      .appendingPathComponent("\(UUID().uuidString).png")
+    try #require(image.pngData()).write(to: url)
+    return url.absoluteString
+  }
 }

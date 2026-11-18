@@ -20,7 +20,10 @@ struct MedalFirestoreRepositoryTests {
       name: "Taipei Marathon",
       date: .now,
       bibNumber: "1024",
-      photoUrl: isFull ? "https://example.com/medal.jpg" : nil,
+      photoUrls: isFull
+        ? MedalPhotoUrls(
+          front: "https://example.com/front.png", back: "https://example.com/back.png")
+        : nil,
       place: Place(countryCode: "TW", city: "Taipei City"),
       raceEvent: RaceEvent(category: .full, type: .inPerson),
       result: isFull ? .seconds(12_600) : nil,
@@ -48,6 +51,7 @@ struct MedalFirestoreRepositoryTests {
     // the previously stored value would survive the edit.
     #expect(Set(fields.keys) == Set(storedKeys))
     #expect(fields["result"] as? [String: Any] == nil)
+    #expect(fields["photoUrls"] as? [String: Any] == nil)
   }
 
   @Test("a medal stores its race event and result under those names, not the old ones")
@@ -63,6 +67,33 @@ struct MedalFirestoreRepositoryTests {
     #expect(fields["event"] == nil)
     #expect(fields["distance"] == nil)
     #expect(fields["finishTime"] == nil)
+  }
+
+  @Test("a medal stores its photos as one photoUrls map keyed by face, not the old fields")
+  func testPhotoUrlsFieldName() throws {
+    let fields = try MedalFirestoreRepository.updateFields(for: makeMedal(isFull: true))
+    let photoUrls = fields["photoUrls"] as? [String: Any]
+
+    #expect(photoUrls?["front"] as? String == "https://example.com/front.png")
+    #expect(photoUrls?["back"] as? String == "https://example.com/back.png")
+    // An old name left in `medalUpdateFields` would show up here as a delete.
+    #expect(fields["frontPhotoUrl"] == nil)
+    #expect(fields["backPhotoUrl"] == nil)
+    #expect(fields["photoUrl"] == nil)
+  }
+
+  /// The update writes the whole map, so a face missing from it is dropped from the stored
+  /// document.
+  @Test("a medal with only a front stores no back key")
+  func testFrontOnlyStoresNoBackKey() throws {
+    var medal = makeMedal(isFull: true)
+    medal.photoUrls = MedalPhotoUrls(front: "https://example.com/front.png")
+
+    let fields = try MedalFirestoreRepository.updateFields(for: medal)
+    let photoUrls = fields["photoUrls"] as? [String: Any]
+
+    #expect(photoUrls?["front"] as? String == "https://example.com/front.png")
+    #expect(photoUrls?.keys.contains("back") == false)
   }
 
   @Test("every stored medal field is covered by the update field list")

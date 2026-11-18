@@ -21,6 +21,8 @@ final class EditRaceEditionViewModel {
 
   // MARK: - State
   var isPhotoChanged = false
+  /// The stored photo while the form isn't showing it: still downloading, or one that couldn't be.
+  private(set) var storedPhotoStatus: StoredPhotoStatus?
 
   // MARK: - Dependencies
   let mode: ItemEditMode
@@ -39,6 +41,7 @@ final class EditRaceEditionViewModel {
       self.endDate = draft.endDate
       self.distances = draft.distances
       self.photo = draft.displayPhoto
+      self.storedPhotoStatus = draft.displayPhotoUrl == nil ? nil : .loading
     } else {
       let currentYear = Date.now.year
       self.year = currentYear
@@ -51,12 +54,6 @@ final class EditRaceEditionViewModel {
   }
 
   // MARK: - Computed
-  var photoHint: String {
-    photo == nil
-      ? .appLocalized("Tap to add a new edition photo,\nor leave empty to use the race logo.")
-      : .appLocalized("Tap to update the edition photo,\nor leave empty to use the race logo.")
-  }
-
   var isFormValid: Bool {
     year >= minYear && year <= maxYear && startDate <= endDate
   }
@@ -78,7 +75,8 @@ final class EditRaceEditionViewModel {
   }
 
   // MARK: - Functions
-  /// Downloads the existing edition photo into `photo` so the picker shows the current image.
+  /// Downloads the existing edition photo into `photo` so the slot shows the current image,
+  /// marking it as failed when it can't be downloaded.
   func loadExistingPhoto() async {
     guard let photoUrl = draft?.displayPhotoUrl else { return }
 
@@ -86,18 +84,23 @@ final class EditRaceEditionViewModel {
     guard !isPhotoChanged else { return }
 
     photo = existingPhoto
+    if storedPhotoStatus == .loading {
+      storedPhotoStatus = existingPhoto == nil ? .failed : nil
+    }
   }
 
   /// Replaces the current photo and marks it as changed.
   func updatePhoto(with uiImage: UIImage) {
     photo = uiImage
     isPhotoChanged = true
+    storedPhotoStatus = nil
   }
 
   /// Clears the current photo and marks it as changed.
   func clearPhoto() {
     photo = nil
     isPhotoChanged = true
+    storedPhotoStatus = nil
   }
 
   /// Toggles the one-day flag and aligns the end date with start date when enabled.

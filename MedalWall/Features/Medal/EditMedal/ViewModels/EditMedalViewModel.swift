@@ -11,7 +11,10 @@ final class EditMedalViewModel {
   var name: String = ""
   var date: Date = .now
   var bibNumber: String = ""
-  var photo: UIImage?
+  /// The front as the form shows it: the stored photo once loaded, or a staged framed photo.
+  private(set) var frontPhoto: UIImage?
+  /// The back as the form shows it: the stored photo once loaded, or a staged framed photo.
+  private(set) var backPhoto: UIImage?
   var place = Place(countryCode: "", city: "")
   var distance: RaceEvent = .default
   var finishTime: TimeInterval?
@@ -29,7 +32,10 @@ final class EditMedalViewModel {
   // MARK: - State
   var isLoading = false
   var error: AppError?
-  private(set) var isPhotoChanged = false
+  /// The faces the user replaced or removed; the others keep their stored URLs on save.
+  private(set) var changedFaces: Set<MedalFace> = []
+  /// Each stored face the form is not showing: still downloading, or one that couldn't be.
+  private var storedPhotoStatuses: [MedalFace: StoredPhotoStatus] = [:]
 
   // MARK: - Dependencies
   let mode: ItemEditMode
@@ -73,6 +79,9 @@ final class EditMedalViewModel {
       self.draftEventPhotos = medal.eventPhotos
         .sorted { $0.sortOrder < $1.sortOrder }
         .map { DraftEventPhoto(id: $0.id, imageUrl: $0.imageUrl) }
+      for face in MedalFace.allCases where medal.photoUrls?[face] != nil {
+        self.storedPhotoStatuses[face] = .loading
+      }
     }
   }
 
@@ -98,24 +107,42 @@ final class EditMedalViewModel {
   }
 
   // MARK: - Functions
-  /// Downloads the existing medal cover photo so the edit form can display it.
-  func loadPhoto() async {
-    let existingPhoto = await UIImage.load(from: medal?.photoUrl)
-    guard !isPhotoChanged else { return }
-
-    photo = existingPhoto
+  /// The photo the form shows for `face`.
+  func photo(for face: MedalFace) -> UIImage? {
+    switch face {
+    case .front: frontPhoto
+    case .back: backPhoto
+    }
   }
 
-  /// Sets the newly selected cover photo and marks it as changed.
-  func updatePhoto(with uiImage: UIImage) {
-    self.photo = uiImage
-    isPhotoChanged = true
+  /// The status of `face`'s stored photo while the form isn't showing it, or `nil`.
+  func storedPhotoStatus(for face: MedalFace) -> StoredPhotoStatus? {
+    storedPhotoStatuses[face]
   }
 
-  /// Clears the cover photo and marks it as changed.
-  func clearPhoto() {
-    self.photo = nil
-    isPhotoChanged = true
+  /// Downloads the medal's stored faces so the form can show them, marking a face that can't
+  /// be downloaded as failed. A face the user changed while they downloaded keeps the change.
+  func loadPhotos() async {
+    async let loadedFront = UIImage.load(from: medal?.photoUrls?.front)
+    async let loadedBack = UIImage.load(from: medal?.photoUrls?.back)
+    let (front, back) = await (loadedFront, loadedBack)
+
+    if !changedFaces.contains(.front) { frontPhoto = front }
+    if !changedFaces.contains(.back) { backPhoto = back }
+
+    for face in MedalFace.allCases where storedPhotoStatuses[face] == .loading {
+      storedPhotoStatuses[face] = photo(for: face) == nil ? .failed : nil
+    }
+  }
+
+  /// Stages a photo framed for `face`, leaving the other face as it is.
+  func updatePhoto(with photo: UIImage, for face: MedalFace) {
+    stage(photo, for: face)
+  }
+
+  /// Removes the photo of `face`, leaving the other face as it is.
+  func clearPhoto(for face: MedalFace) {
+    stage(nil, for: face)
   }
 
   /// Appends new event photos from the photo picker.
@@ -158,7 +185,7 @@ final class EditMedalViewModel {
   }
 
   /// Saves the medal to Firestore, uploading any new photos to Firebase Storage first.
-  /// A removed or replaced cover photo, or a removed event photo, is deleted from Storage only
+  /// A removed or replaced face, or a removed event photo, is deleted from Storage only
   /// after the medal saves, so a failed save never points at a deleted file. A failed save
   /// deletes the photos uploaded for it. Offline, it throws `AppError.noInternetConnection`
   /// before uploading or writing anything. Name, bib number and note are saved without
@@ -172,15 +199,21 @@ final class EditMedalViewModel {
     let owner = PhotoOwner.medal(userId: userID, medalId: medalId)
     var uploadedUrls: [String] = []
     do {
-      let photoUrl = try await resolvedPhotoUrl(userId: userID, uploadedUrls: &uploadedUrls)
+      let frontUrl = try await resolvedPhotoUrl(
+        for: .front, userId: userID, uploadedUrls: &uploadedUrls)
+      let backUrl = try await resolvedPhotoUrl(
+        for: .back, userId: userID, uploadedUrls: &uploadedUrls)
       let eventPhotos = try await resolvedEventPhotos(userId: userID, uploadedUrls: &uploadedUrls)
+      let resolvedPhotoUrls = MedalPhotoUrls(front: frontUrl, back: backUrl)
+      // A medal without photos stores no map rather than an empty one.
+      let photoUrls = resolvedPhotoUrls.isEmpty ? nil : resolvedPhotoUrls
 
       if let medal, mode == .edit {
         var updated = medal
         updated.name = trimmedName
         updated.date = date
         updated.bibNumber = trimmedBibNumber
-        updated.photoUrl = photoUrl
+        updated.photoUrls = photoUrls
         updated.place = place
         updated.raceEvent = distance
         updated.result = finishTime.map(RaceResult.seconds)
@@ -195,20 +228,14 @@ final class EditMedalViewModel {
         updated.tags = tags
         updated.eventPhotos = eventPhotos
         try await repository.updateMedal(updated)
-        if let oldPhotoUrl = medal.photoUrl, oldPhotoUrl != photoUrl {
-          try? await storageService.deletePhoto(url: oldPhotoUrl, ownedBy: owner)
-        }
-        let keptEventPhotoIDs = Set(eventPhotos.map(\.id))
-        for removed in medal.eventPhotos where !keptEventPhotoIDs.contains(removed.id) {
-          try? await storageService.deletePhoto(url: removed.imageUrl, ownedBy: owner)
-        }
+        await deletePhotos(of: medal, droppedBy: updated, ownedBy: owner)
       } else {
         let newMedal = Medal(
           id: medalId,
           name: trimmedName,
           date: date,
           bibNumber: trimmedBibNumber,
-          photoUrl: photoUrl,
+          photoUrls: photoUrls,
           place: place,
           raceEvent: distance,
           result: finishTime.map(RaceResult.seconds),
@@ -234,17 +261,44 @@ final class EditMedalViewModel {
     }
   }
 
-  /// Returns the final cover photo URL: the existing one while the photo is unchanged, an
-  /// upload of a newly picked one, or `nil` for a removed one. A removed photo is deleted from
-  /// Storage only after the medal saves, so a failed save never points at a deleted file.
-  private func resolvedPhotoUrl(userId: String, uploadedUrls: inout [String]) async throws
-    -> String?
+  /// Deletes from Storage every photo `stored` held that `saved` no longer does: a replaced or
+  /// removed face, and each removed event photo. Call only after `saved` is written, so a
+  /// failed save never points at a deleted file; a photo that fails to delete is left behind.
+  private func deletePhotos(of stored: Medal, droppedBy saved: Medal, ownedBy owner: PhotoOwner)
+    async
   {
-    guard isPhotoChanged else { return medal?.photoUrl }
-    guard let photo else { return nil }
+    for face in MedalFace.allCases {
+      if let oldUrl = stored.photoUrls?[face], oldUrl != saved.photoUrls?[face] {
+        try? await storageService.deletePhoto(url: oldUrl, ownedBy: owner)
+      }
+    }
+    let keptEventPhotoIDs = Set(saved.eventPhotos.map(\.id))
+    for removed in stored.eventPhotos where !keptEventPhotoIDs.contains(removed.id) {
+      try? await storageService.deletePhoto(url: removed.imageUrl, ownedBy: owner)
+    }
+  }
 
-    let url = try await storageService.uploadMedalPhoto(
-      userId: userId, medalId: medalId, image: photo
+  /// Stages `photo` for `face` and marks the face as changed.
+  private func stage(_ photo: UIImage?, for face: MedalFace) {
+    switch face {
+    case .front: frontPhoto = photo
+    case .back: backPhoto = photo
+    }
+    changedFaces.insert(face)
+    storedPhotoStatuses[face] = nil
+  }
+
+  /// Returns the final URL of `face`: the stored one while the face is unchanged, an upload of
+  /// a staged photo, or `nil` for a removed one. A removed face is deleted from Storage only
+  /// after the medal saves, so a failed save never points at a deleted file.
+  private func resolvedPhotoUrl(
+    for face: MedalFace, userId: String, uploadedUrls: inout [String]
+  ) async throws -> String? {
+    guard changedFaces.contains(face) else { return medal?.photoUrls?[face] }
+    guard let photo = photo(for: face) else { return nil }
+
+    let url = try await storageService.uploadMedalFace(
+      userId: userId, medalId: medalId, face: face, image: photo
     )
     uploadedUrls.append(url)
     return url

@@ -238,6 +238,32 @@ describe('users/{uid}/medals/{medalId}', () => {
     );
   });
 
+  test('a medal may have photo URLs, a map holding only a front and a back string', async () => {
+    const front = 'https://example.com/front.jpg';
+    const back = 'https://example.com/back.jpg';
+    for (const photoUrls of [{ front }, { back }, { front, back }, {}]) {
+      await assertSucceeds(setDoc(doc(db('alice'), medalPath), medal('alice', { photoUrls })));
+    }
+    const badPhotoUrls = ['x', { front: 5 }, { back: null, side: front }, { front, back, cover: front }];
+    for (const photoUrls of badPhotoUrls) {
+      await assertFails(setDoc(doc(db('alice'), medalPath), medal('alice', { photoUrls })));
+    }
+  });
+
+  test('an update can replace or clear the photo URLs, but not break them', async () => {
+    const front = 'https://example.com/front.jpg';
+    await seed(medalPath, medal('alice', { photoUrls: { front, back: 'https://example.com/back.jpg' } }));
+    await assertSucceeds(
+      updateDoc(doc(db('alice'), medalPath), { ...medal('alice'), photoUrls: { front } }),
+    );
+    await assertFails(
+      updateDoc(doc(db('alice'), medalPath), { ...medal('alice'), photoUrls: { front: 5 } }),
+    );
+    await assertSucceeds(
+      updateDoc(doc(db('alice'), medalPath), { ...medal('alice'), photoUrls: deleteField() }),
+    );
+  });
+
   test('a medal may hold no finish time or region as null', async () => {
     await assertSucceeds(
       setDoc(doc(db('alice'), medalPath), medal('alice', { result: null, place: place({ region: null }) })),

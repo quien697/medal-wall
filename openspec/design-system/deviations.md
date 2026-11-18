@@ -1,25 +1,19 @@
 # Design System Deviations
 
-Deliberate differences between the iOS implementation and the Design System document.
+Deliberate differences between the iOS implementation and the design system (the Design System
+page of the Claude design canvas; see `CLAUDE.md`).
 
-**While an entry stands, the iOS value wins.** The check does not report it as a problem and
-`apply` does not overwrite it. Do not "fix" a token listed here — read the Why column first.
+**While an entry stands, the iOS value wins.** `design-system-sync` does not report it as a
+problem and never writes over it. Do not "fix" a token listed here — read the Why column first.
 
 `Status` is `unreported` (design has not been told; the check asks about it every run) or
 `reported` (design knows and it is waiting on a release; the check lists it with its age and
 does not re-litigate). An entry still `reported` two design system releases after it was
 raised is flagged as stalled.
 
-An entry is deleted when a release adopts the iOS value. When a release names the token with a
-*different* value, the check reports it as superseded and asks for a decision rather than
-choosing.
+`design-system-sync` deletes an entry once a release adopts the iOS value, leaving no note here;
+git history keeps it. When a release names the token with a *different* value, the check reports
+it as superseded and asks for a decision rather than choosing.
 
 | Token | Code | Design system | Why | Status | Since | Ticket |
 |---|---|---|---|---|---|---|
-
-`color.navy950` (MW-29, since 2026-08-26) was resolved in v4.5.3, which
-named the same fixed ink as `color.obsidian` — the code was renamed `Navy950` → `Obsidian` to
-match.
-
-Skeleton bone sizes (MW-14, since 2026-10-21) were resolved in v4.6.0, which states the same
-bar heights, `radius.tag` corners and capsule chip as `BoneSize`.
