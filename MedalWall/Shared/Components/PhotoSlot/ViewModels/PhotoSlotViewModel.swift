@@ -68,6 +68,24 @@ final class PhotoSlotViewModel {
     return nil
   }
 
+  /// The error to show for a framed photo whose JPEG Storage would refuse for its size, or
+  /// `nil` when the photo can be used.
+  func checkFramedPhoto(_ photo: UIImage) async -> AppError? {
+    await Self.uploadProblem(with: photo)
+  }
+
+  /// The error `photo` would meet on upload, or `nil`. Runs off the main actor, since encoding
+  /// a full-resolution crop takes a noticeable moment.
+  @concurrent
+  nonisolated private static func uploadProblem(with photo: UIImage) async -> AppError? {
+    do {
+      _ = try photo.checkedUploadData()
+      return nil
+    } catch {
+      return error as? AppError ?? .photoDataInvalid
+    }
+  }
+
   /// Hands the photo taken to the crop sheet once the camera has closed; closing it without one
   /// frames nothing.
   func cameraDidClose() {

@@ -30,7 +30,6 @@ struct EditMedalPhotosSection: View {
               storedPhotoStatus: storedPhotoStatus(face),
               imageType: .medal,
               cropShape: .square,
-              outputSide: 840,
               title: face.photoTitle,
               message: """
                 Lay it flat on a plain surface and shoot from straight above, or hang it on a \

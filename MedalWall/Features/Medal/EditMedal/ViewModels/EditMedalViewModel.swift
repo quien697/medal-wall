@@ -145,9 +145,34 @@ final class EditMedalViewModel {
     stage(nil, for: face)
   }
 
-  /// Appends new event photos from the photo picker.
-  func addEventPhotos(_ dataList: [Data]) {
-    draftEventPhotos.append(contentsOf: dataList.map { DraftEventPhoto(data: $0) })
+  /// Appends new event photos from the photo picker, each staged as the picked bytes, so the
+  /// save uploads the same JPEG the check measured.
+  ///
+  /// An item that is not an image, or whose JPEG Storage would refuse for its size, is skipped.
+  /// Once the others are added, throws `.photoTooLarge` if any item was too large, and
+  /// otherwise `.photoDataInvalid` if any was not an image.
+  func addEventPhotos(_ dataList: [Data]) async throws {
+    let problems = await Self.uploadProblems(in: dataList)
+    for (data, problem) in zip(dataList, problems) where problem == nil {
+      draftEventPhotos.append(DraftEventPhoto(data: data))
+    }
+    if problems.contains(AppError.photoTooLarge) { throw AppError.photoTooLarge }
+    if problems.contains(AppError.photoDataInvalid) { throw AppError.photoDataInvalid }
+  }
+
+  /// The error each picked item would meet on upload, or `nil` for one that uploads. Runs off
+  /// the main actor, since encoding a full-resolution photo takes a noticeable moment.
+  @concurrent
+  nonisolated private static func uploadProblems(in dataList: [Data]) async -> [AppError?] {
+    dataList.map { data in
+      guard let image = UIImage(data: data) else { return .photoDataInvalid }
+      do {
+        _ = try image.checkedUploadData()
+        return nil
+      } catch {
+        return error as? AppError ?? .photoDataInvalid
+      }
+    }
   }
 
   /// Removes an event photo draft by id.

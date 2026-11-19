@@ -119,6 +119,19 @@ struct PhotoSlotViewModelTests {
     #expect(viewModel.photoToCrop != nil)
   }
 
+  @Test("a large picked photo is framed at its own pixel size, never shrunk")
+  func testLargePickedPhotoKeepsPixelSize() throws {
+    let viewModel = makeViewModel(access: .granted)
+    let data = try #require(
+      TestPhotos.plain(width: 4000, height: 3000).jpegData(compressionQuality: 0.8))
+
+    _ = viewModel.framePickedPhoto(data)
+
+    let photo = try #require(viewModel.photoToCrop?.image)
+    #expect(photo.size.width * photo.scale == 4000)
+    #expect(photo.size.height * photo.scale == 3000)
+  }
+
   @Test(
     "a picked photo that is not an image frames nothing and is reported",
     arguments: [nil, Data("not an image".utf8)])
@@ -129,6 +142,22 @@ struct PhotoSlotViewModelTests {
 
     #expect(error == .photoDataInvalid)
     #expect(viewModel.photoToCrop == nil)
+  }
+
+  @Test("a framed photo whose JPEG is over the upload limit is reported as too large")
+  func testFramedPhotoOverLimitIsReported() async throws {
+    let viewModel = makeViewModel(access: .granted)
+    let framedPhoto = try #require(TestPhotos.noise())
+
+    #expect(await viewModel.checkFramedPhoto(framedPhoto) == .photoTooLarge)
+  }
+
+  @Test("a framed photo under the upload limit can be used")
+  func testFramedPhotoUnderLimitIsUsable() async {
+    let viewModel = makeViewModel(access: .granted)
+    let framedPhoto = TestPhotos.plain(width: 400, height: 400)
+
+    #expect(await viewModel.checkFramedPhoto(framedPhoto) == nil)
   }
 
   @Test("a photo taken is framed once the camera closes")

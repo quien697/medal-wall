@@ -216,6 +216,18 @@ struct LocalizedDisplayStringTests {
         == "請輸入大於 0 且小於 10,000、最多 4 位小數的距離。")
   }
 
+  @Test("A photo over the upload limit names the limit and asks for a smaller photo")
+  func testPhotoTooLargeStrings() {
+    let error = AppError.photoTooLarge
+
+    #expect(error.title == "Photo Too Large")
+    #expect(error.message == "Photos must be under 10 MB.")
+    #expect(error.guidance == "Please choose a smaller photo.")
+    #expect(translated("Photo Too Large") == "照片過大")
+    #expect(translated("Photos must be under 10 MB.") == "照片必須小於 10 MB。")
+    #expect(translated("Please choose a smaller photo.") == "請選擇較小的照片。")
+  }
+
   @Test("An error bridged through `any Error` still reads its own message and guidance")
   func testAppErrorLocalizedDescription() {
     let error: any Error = AppError.raceFetchFailed("network down")

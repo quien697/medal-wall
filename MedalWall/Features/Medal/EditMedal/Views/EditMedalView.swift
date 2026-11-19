@@ -148,7 +148,11 @@ struct EditMedalView: View {
           }
 
           if !dataList.isEmpty {
-            viewModel.addEventPhotos(dataList)
+            do {
+              try await viewModel.addEventPhotos(dataList)
+            } catch {
+              errorWrapper = ErrorWrapper(error: error as? AppError ?? .photoDataInvalid)
+            }
           }
 
           selectedEventPhotos = []

@@ -17,8 +17,8 @@ import SwiftUI
 /// and Cancel.
 /// Choose Photo opens the photo library. Take Photo opens the camera once camera access allows
 /// it, lets iOS ask first, or says why the camera cannot open. Either photo is then framed in
-/// `cropShape`, at `outputSide` pixels when given, and the framed photo reaches `onPick`. A
-/// photo that fails to load reaches `onError`.
+/// `cropShape`, and the framed photo reaches `onPick`. A photo that fails to load, or whose
+/// framed JPEG is too large to upload, reaches `onError`.
 ///
 /// The slot wears a 2 pt ink ring while its alert is open. It is drawn at its `imageType`'s
 /// size, shrinking to the width it is given.
@@ -36,7 +36,6 @@ struct PhotoSlot: View {
   private let content: PhotoSlotContent
   private let imageType: ImageType
   private let cropShape: CropShape
-  private let outputSide: CGFloat?
   private let title: LocalizedStringKey
   private let message: LocalizedStringKey?
   private let placeholderText: LocalizedStringKey?
@@ -53,7 +52,6 @@ struct PhotoSlot: View {
     storedPhotoStatus: StoredPhotoStatus? = nil,
     imageType: ImageType,
     cropShape: CropShape,
-    outputSide: CGFloat? = nil,
     title: LocalizedStringKey,
     message: LocalizedStringKey? = nil,
     placeholderText: LocalizedStringKey? = nil,
@@ -65,7 +63,6 @@ struct PhotoSlot: View {
     self.content = PhotoSlotViewModel.content(photo: photo, storedPhotoStatus: storedPhotoStatus)
     self.imageType = imageType
     self.cropShape = cropShape
-    self.outputSide = outputSide
     self.title = title
     self.message = message
     self.placeholderText = placeholderText
@@ -197,10 +194,16 @@ struct PhotoSlot: View {
       content: { pickedPhoto in
         CropImageView(
           image: pickedPhoto.image,
-          cropShape: cropShape,
-          outputSide: outputSide
+          cropShape: cropShape
         ) { croppedImage in
-          if let croppedImage { onPick(croppedImage) }
+          guard let croppedImage else { return }
+          Task {
+            if let error = await viewModel.checkFramedPhoto(croppedImage) {
+              onError(error)
+            } else {
+              onPick(croppedImage)
+            }
+          }
         }
       }
     )

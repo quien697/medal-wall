@@ -1425,12 +1425,32 @@
         }
       }
     },
+    "Photo Too Large" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "照片過大"
+          }
+        }
+      }
+    },
     "Photos" : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "照片"
+          }
+        }
+      }
+    },
+    "Photos must be under 10 MB." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "照片必須小於 10 MB。"
           }
         }
       }
@@ -1541,6 +1561,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "請確認你的電子郵件地址後再試一次。"
+          }
+        }
+      }
+    },
+    "Please choose a smaller photo." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請選擇較小的照片。"
           }
         }
       }

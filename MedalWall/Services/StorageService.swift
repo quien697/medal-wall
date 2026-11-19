@@ -177,11 +177,11 @@ final class StorageService: PhotoStorage {
     try await reference.delete()
   }
 
-  /// Uploads `image` as a JPEG to `path` and returns its download URL.
+  /// Uploads `image` as a JPEG to `path` and returns its download URL. A JPEG of Storage's
+  /// size cap or more throws `.photoTooLarge` before anything is uploaded, since Storage's own
+  /// refusal reads as a permission error.
   private func upload(image: UIImage, to path: String) async throws -> String {
-    guard let data = image.uploadData() else {
-      throw AppError.photoDataInvalid
-    }
+    let data = try image.checkedUploadData()
 
     let metadata = StorageMetadata()
     metadata.contentType = "image/jpeg"

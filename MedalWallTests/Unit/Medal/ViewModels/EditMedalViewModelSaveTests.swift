@@ -202,7 +202,7 @@ struct EditMedalViewModelSaveTests {
     let repository = StubMedalRepository(medals: [medal])
     let viewModel = makeViewModel(mode: .edit, medal: medal, repository: repository)
     viewModel.removeEventPhoto(id: "event-start")
-    viewModel.addEventPhotos([try makePhotoData()])
+    try await viewModel.addEventPhotos([try makePhotoData()])
     let newPhotoID = try #require(viewModel.draftEventPhotos.last?.id)
 
     try await viewModel.save(by: "uid")

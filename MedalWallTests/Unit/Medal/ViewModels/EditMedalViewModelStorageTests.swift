@@ -166,7 +166,7 @@ struct EditMedalViewModelStorageTests {
       networkMonitor: StubNetworkMonitor())
     viewModel.updatePhoto(with: UIImage(), for: .front)
     viewModel.updatePhoto(with: UIImage(), for: .back)
-    viewModel.addEventPhotos([try makePhotoData()])
+    try await viewModel.addEventPhotos([try makePhotoData()])
 
     await #expect(throws: AppError.medalSaveFailed) {
       try await viewModel.save(by: "uid")
@@ -230,7 +230,7 @@ struct EditMedalViewModelStorageTests {
     let viewModel = EditMedalViewModel(
       mode: .edit, medal: medal, repository: repository, storageService: storage,
       networkMonitor: StubNetworkMonitor())
-    viewModel.addEventPhotos([try makePhotoData()])
+    try await viewModel.addEventPhotos([try makePhotoData()])
 
     await #expect(throws: AppError.medalSaveFailed) {
       try await viewModel.save(by: "uid")

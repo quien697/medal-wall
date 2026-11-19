@@ -188,21 +188,60 @@ struct EditMedalViewModelTests {
   }
 
   // MARK: - addEventPhotos / removeEventPhoto
-  @Test("addEventPhotos appends one DraftEventPhoto per data item")
-  func testAddEventPhotosAppendsAll() {
-    let viewModel = EditMedalViewModel(mode: .add)
-    let data1 = Data([0x01])
-    let data2 = Data([0x02])
+  /// JPEG data of a small plain photo, well under the upload limit.
+  private func makePhotoData() throws -> Data {
+    try #require(TestPhotos.plain(width: 40, height: 30).jpegData(compressionQuality: 0.8))
+  }
 
-    viewModel.addEventPhotos([data1, data2])
+  @Test("addEventPhotos appends one DraftEventPhoto per photo")
+  func testAddEventPhotosAppendsAll() async throws {
+    let viewModel = EditMedalViewModel(mode: .add)
+
+    try await viewModel.addEventPhotos([try makePhotoData(), try makePhotoData()])
 
     #expect(viewModel.draftEventPhotos.count == 2)
   }
 
-  @Test("removeEventPhoto removes the matching photo by id")
-  func testRemoveEventPhotoRemovesById() {
+  @Test("a large picked photo is staged as the picked bytes, unchanged")
+  func testLargeEventPhotoIsStagedAsPicked() async throws {
     let viewModel = EditMedalViewModel(mode: .add)
-    viewModel.addEventPhotos([Data([0x01]), Data([0x02])])
+    let pickedData = try #require(
+      TestPhotos.plain(width: 4000, height: 3000).jpegData(compressionQuality: 0.8))
+
+    try await viewModel.addEventPhotos([pickedData])
+
+    #expect(viewModel.draftEventPhotos.first?.data == pickedData)
+  }
+
+  @Test("a photo over the upload limit is skipped, the others are added, and it is reported")
+  func testEventPhotoOverLimitIsSkipped() async throws {
+    let viewModel = EditMedalViewModel(mode: .add)
+    let smallData = try makePhotoData()
+    let largeData = try #require(TestPhotos.noise()?.jpegData(compressionQuality: 0.8))
+
+    await #expect(throws: AppError.photoTooLarge) {
+      try await viewModel.addEventPhotos([smallData, largeData, Data("not an image".utf8)])
+    }
+
+    #expect(viewModel.draftEventPhotos.map(\.data) == [smallData])
+  }
+
+  @Test("data that is not an image is skipped, the others are added, and it is reported")
+  func testUnreadableEventPhotoIsSkipped() async throws {
+    let viewModel = EditMedalViewModel(mode: .add)
+    let smallData = try makePhotoData()
+
+    await #expect(throws: AppError.photoDataInvalid) {
+      try await viewModel.addEventPhotos([smallData, Data("not an image".utf8)])
+    }
+
+    #expect(viewModel.draftEventPhotos.map(\.data) == [smallData])
+  }
+
+  @Test("removeEventPhoto removes the matching photo by id")
+  func testRemoveEventPhotoRemovesById() async throws {
+    let viewModel = EditMedalViewModel(mode: .add)
+    try await viewModel.addEventPhotos([try makePhotoData(), try makePhotoData()])
     let idToRemove = viewModel.draftEventPhotos[0].id
 
     viewModel.removeEventPhoto(id: idToRemove)
@@ -212,9 +251,9 @@ struct EditMedalViewModelTests {
   }
 
   @Test("removeEventPhoto is a no-op when id is not found")
-  func testRemoveEventPhotoNoOpWhenNotFound() {
+  func testRemoveEventPhotoNoOpWhenNotFound() async throws {
     let viewModel = EditMedalViewModel(mode: .add)
-    viewModel.addEventPhotos([Data([0x01])])
+    try await viewModel.addEventPhotos([try makePhotoData()])
 
     viewModel.removeEventPhoto(id: "non-existent-id")
 
