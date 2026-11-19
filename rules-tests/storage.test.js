@@ -10,6 +10,9 @@ import { deleteObject, getMetadata, ref, uploadBytes } from 'firebase/storage';
 
 const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xe0]);
 const asJpeg = { contentType: 'image/jpeg' };
+const tenMegabytes = 10 * 1024 * 1024;
+const underCap = new Uint8Array(tenMegabytes - 1);
+const atCap = new Uint8Array(tenMegabytes);
 
 let testEnv;
 
@@ -17,8 +20,8 @@ function storage(uid) {
   return uid ? testEnv.authenticatedContext(uid).storage() : testEnv.unauthenticatedContext().storage();
 }
 
-function upload(uid, path, metadata = asJpeg) {
-  return uploadBytes(ref(storage(uid), path), jpeg, metadata);
+function upload(uid, path, metadata = asJpeg, data = jpeg) {
+  return uploadBytes(ref(storage(uid), path), data, metadata);
 }
 
 async function seedFile(path) {
@@ -95,6 +98,18 @@ describe("a user's own files", () => {
     }
   });
 
+  test('an upload of 10 MB is refused, and one byte less is accepted', async () => {
+    const cappedPaths = [
+      'users/alice/avatar/3F2A.jpg',
+      'users/alice/medals/medal-1/front/3F2A.jpg',
+      'users/alice/medals/medal-1/eventPhotos/photo-1.jpg',
+    ];
+    for (const path of cappedPaths) {
+      await assertFails(upload('alice', path, asJpeg, atCap));
+      await assertSucceeds(upload('alice', path, asJpeg, underCap));
+    }
+  });
+
   test('nothing else under the user is writable', async () => {
     await assertFails(upload('alice', 'users/alice/other/file.jpg'));
   });
@@ -145,6 +160,19 @@ describe('race and edition logos', () => {
   test('only JPEG logos are accepted', async () => {
     await seedRace('alice');
     await assertFails(upload('alice', paths[0], { contentType: 'image/heic' }));
+  });
+
+  test('a logo of 10 MB is refused before its race exists, and one byte less is accepted', async () => {
+    await assertFails(upload('bob', paths[0], asJpeg, atCap));
+    await assertSucceeds(upload('bob', paths[0], asJpeg, underCap));
+  });
+
+  test("a logo of 10 MB is refused for the race's creator, and one byte less is accepted", async () => {
+    await seedRace('alice');
+    for (const path of paths) {
+      await assertFails(upload('alice', path, asJpeg, atCap));
+      await assertSucceeds(upload('alice', path, asJpeg, underCap));
+    }
   });
 
   test('nothing else under a race is writable, whether or not the race exists', async () => {
