@@ -16,24 +16,23 @@ extension UIImage {
   /// JPEG bytes at the app's upload quality and the image's own pixel size, or nil if the
   /// image cannot be encoded.
   ///
-  /// The one place that quality is chosen: `StorageService` uploads these bytes, and Edit
-  /// ViewModels stage them on a draft before save. Nonisolated so a picked photo can be
-  /// encoded off the main actor.
+  /// The one place that quality is chosen: every picked or cropped photo is encoded here once,
+  /// checked, and uploaded as it is. Nonisolated so a photo can be encoded off the main actor.
   nonisolated func uploadData() -> Data? {
     jpegData(compressionQuality: 0.8)
   }
 
   /// The JPEG to upload, from `uploadData()`. Throws `.photoDataInvalid` if the image cannot
   /// be encoded, and `.photoTooLarge` if Storage would refuse the JPEG's size.
-  nonisolated func checkedUploadData() throws -> Data {
-    guard let data = uploadData() else { throw AppError.photoDataInvalid }
+  nonisolated func checkedUploadData() throws(AppError) -> Data {
+    guard let data = uploadData() else { throw .photoDataInvalid }
     return try Self.checkedUploadSize(data)
   }
 
   /// Returns `data` if it is under `maxUploadByteCount`, and otherwise throws
   /// `.photoTooLarge`.
-  nonisolated static func checkedUploadSize(_ data: Data) throws -> Data {
-    guard data.count < maxUploadByteCount else { throw AppError.photoTooLarge }
+  nonisolated static func checkedUploadSize(_ data: Data) throws(AppError) -> Data {
+    guard data.count < maxUploadByteCount else { throw .photoTooLarge }
     return data
   }
 

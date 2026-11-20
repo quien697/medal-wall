@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import ImageIO
 import Testing
 import UIKit
+import UniformTypeIdentifiers
 
 @testable import MedalWall
 
@@ -202,15 +204,20 @@ struct EditMedalViewModelTests {
     #expect(viewModel.draftEventPhotos.count == 2)
   }
 
-  @Test("a large picked photo is staged as the picked bytes, unchanged")
-  func testLargeEventPhotoIsStagedAsPicked() async throws {
+  @Test("a picked photo is staged as its checked JPEG, at the photo's own pixel size")
+  func testEventPhotoIsStagedAsCheckedJPEG() async throws {
     let viewModel = EditMedalViewModel(mode: .add)
-    let pickedData = try #require(
-      TestPhotos.plain(width: 4000, height: 3000).jpegData(compressionQuality: 0.8))
+    let pickedData = try #require(TestPhotos.plain(width: 4000, height: 3000).pngData())
 
     try await viewModel.addEventPhotos([pickedData])
 
-    #expect(viewModel.draftEventPhotos.first?.data == pickedData)
+    let stagedData = try #require(viewModel.draftEventPhotos.first?.data)
+    let source = try #require(CGImageSourceCreateWithData(stagedData as CFData, nil))
+    let properties = try #require(
+      CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any])
+    #expect(CGImageSourceGetType(source) as String? == UTType.jpeg.identifier)
+    #expect(properties[kCGImagePropertyPixelWidth] as? Int == 4000)
+    #expect(properties[kCGImagePropertyPixelHeight] as? Int == 3000)
   }
 
   @Test("a photo over the upload limit is skipped, the others are added, and it is reported")
@@ -223,7 +230,7 @@ struct EditMedalViewModelTests {
       try await viewModel.addEventPhotos([smallData, largeData, Data("not an image".utf8)])
     }
 
-    #expect(viewModel.draftEventPhotos.map(\.data) == [smallData])
+    #expect(viewModel.draftEventPhotos.count == 1)
   }
 
   @Test("data that is not an image is skipped, the others are added, and it is reported")
@@ -235,7 +242,7 @@ struct EditMedalViewModelTests {
       try await viewModel.addEventPhotos([smallData, Data("not an image".utf8)])
     }
 
-    #expect(viewModel.draftEventPhotos.map(\.data) == [smallData])
+    #expect(viewModel.draftEventPhotos.count == 1)
   }
 
   @Test("removeEventPhoto removes the matching photo by id")
@@ -359,5 +366,30 @@ struct EditMedalViewModelTests {
     viewModel.removeTag("marathon")
 
     #expect(viewModel.tags == ["taipei"])
+  }
+
+  // MARK: - canSave
+  /// A form with a name, country and city, which Save accepts.
+  private func makeValidViewModel() -> EditMedalViewModel {
+    let viewModel = EditMedalViewModel(mode: .add)
+    viewModel.name = "Taipei Marathon 2019"
+    viewModel.place.countryCode = "TW"
+    viewModel.place.city = "Taipei"
+    return viewModel
+  }
+
+  @Test("Save needs a valid form, and waits while a photo is still being checked")
+  func testCanSave() {
+    let viewModel = makeValidViewModel()
+    #expect(viewModel.canSave)
+
+    viewModel.photoChecks.changed(isChecking: true)
+    #expect(!viewModel.canSave)
+
+    viewModel.photoChecks.changed(isChecking: false)
+    #expect(viewModel.canSave)
+
+    viewModel.name = ""
+    #expect(!viewModel.canSave)
   }
 }

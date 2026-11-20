@@ -11,10 +11,9 @@ final class EditMedalViewModel {
   var name: String = ""
   var date: Date = .now
   var bibNumber: String = ""
-  /// The front as the form shows it: the stored photo once loaded, or a staged framed photo.
-  private(set) var frontPhoto: UIImage?
-  /// The back as the form shows it: the stored photo once loaded, or a staged framed photo.
-  private(set) var backPhoto: UIImage?
+  /// Each face's photo as its slot shows it and as save uploads it.
+  private var facePhotos = Dictionary(
+    uniqueKeysWithValues: MedalFace.allCases.map { ($0, DraftPhoto()) })
   var place = Place(countryCode: "", city: "")
   var distance: RaceEvent = .default
   var finishTime: TimeInterval?
@@ -30,12 +29,10 @@ final class EditMedalViewModel {
   var draftEventPhotos: [DraftEventPhoto] = []
 
   // MARK: - State
+  /// The photo checks in progress, which Save waits for.
+  var photoChecks = PhotoChecks()
   var isLoading = false
   var error: AppError?
-  /// The faces the user replaced or removed; the others keep their stored URLs on save.
-  private(set) var changedFaces: Set<MedalFace> = []
-  /// Each stored face the form is not showing: still downloading, or one that couldn't be.
-  private var storedPhotoStatuses: [MedalFace: StoredPhotoStatus] = [:]
 
   // MARK: - Dependencies
   let mode: ItemEditMode
@@ -79,20 +76,18 @@ final class EditMedalViewModel {
       self.draftEventPhotos = medal.eventPhotos
         .sorted { $0.sortOrder < $1.sortOrder }
         .map { DraftEventPhoto(id: $0.id, imageUrl: $0.imageUrl) }
-      for face in MedalFace.allCases where medal.photoUrls?[face] != nil {
-        self.storedPhotoStatuses[face] = .loading
+      for face in MedalFace.allCases {
+        self.facePhotos[face] = DraftPhoto(storedPhotoUrl: medal.photoUrls?[face])
       }
     }
   }
 
   // MARK: - Computed
-  var isFormValid: Bool {
-    let customDistanceValid: Bool = {
-      if !distance.category.isStandard { return distance.category.isValidCustom }
-      return true
-    }()
+  /// Whether Save can be tapped: the form is valid and no photo is still being checked.
+  var canSave: Bool { isFormValid && !photoChecks.isChecking }
 
-    return customDistanceValid && !trimmedName.isEmpty && place.isValid
+  var isFormValid: Bool {
+    distance.category.isValid && !trimmedName.isEmpty && place.isValid
   }
 
   private var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -107,70 +102,63 @@ final class EditMedalViewModel {
   }
 
   // MARK: - Functions
-  /// The photo the form shows for `face`.
-  func photo(for face: MedalFace) -> UIImage? {
-    switch face {
-    case .front: frontPhoto
-    case .back: backPhoto
-    }
-  }
-
-  /// The status of `face`'s stored photo while the form isn't showing it, or `nil`.
-  func storedPhotoStatus(for face: MedalFace) -> StoredPhotoStatus? {
-    storedPhotoStatuses[face]
+  /// What the slot for `face` shows.
+  func photoContent(for face: MedalFace) -> PhotoSlotContent {
+    facePhotos[face]?.content ?? .empty
   }
 
   /// Downloads the medal's stored faces so the form can show them, marking a face that can't
   /// be downloaded as failed. A face the user changed while they downloaded keeps the change.
-  func loadPhotos() async {
+  func loadStoredPhotos() async {
     async let loadedFront = UIImage.load(from: medal?.photoUrls?.front)
     async let loadedBack = UIImage.load(from: medal?.photoUrls?.back)
     let (front, back) = await (loadedFront, loadedBack)
 
-    if !changedFaces.contains(.front) { frontPhoto = front }
-    if !changedFaces.contains(.back) { backPhoto = back }
-
-    for face in MedalFace.allCases where storedPhotoStatuses[face] == .loading {
-      storedPhotoStatuses[face] = photo(for: face) == nil ? .failed : nil
-    }
+    facePhotos[.front]?.showStored(front)
+    facePhotos[.back]?.showStored(back)
   }
 
-  /// Stages a photo framed for `face`, leaving the other face as it is.
-  func updatePhoto(with photo: UIImage, for face: MedalFace) {
-    stage(photo, for: face)
+  /// Stages a photo cropped for `face`, leaving the other face as it is.
+  func updatePhoto(with photo: CroppedPhoto, for face: MedalFace) {
+    facePhotos[face]?.update(with: photo)
   }
 
   /// Removes the photo of `face`, leaving the other face as it is.
-  func clearPhoto(for face: MedalFace) {
-    stage(nil, for: face)
+  func removePhoto(for face: MedalFace) {
+    facePhotos[face]?.remove()
   }
 
-  /// Appends new event photos from the photo picker, each staged as the picked bytes, so the
-  /// save uploads the same JPEG the check measured.
+  /// Appends new event photos from the photo picker, each staged as its checked JPEG, which
+  /// save uploads as it is.
   ///
   /// An item that is not an image, or whose JPEG Storage would refuse for its size, is skipped.
   /// Once the others are added, throws `.photoTooLarge` if any item was too large, and
   /// otherwise `.photoDataInvalid` if any was not an image.
-  func addEventPhotos(_ dataList: [Data]) async throws {
-    let problems = await Self.uploadProblems(in: dataList)
-    for (data, problem) in zip(dataList, problems) where problem == nil {
-      draftEventPhotos.append(DraftEventPhoto(data: data))
+  func addEventPhotos(_ dataList: [Data]) async throws(AppError) {
+    let results = await Self.checkedJPEGs(of: dataList)
+    for case .success(let jpegData) in results {
+      draftEventPhotos.append(DraftEventPhoto(data: jpegData))
     }
-    if problems.contains(AppError.photoTooLarge) { throw AppError.photoTooLarge }
-    if problems.contains(AppError.photoDataInvalid) { throw AppError.photoDataInvalid }
+    if results.contains(.failure(.photoTooLarge)) { throw .photoTooLarge }
+    if results.contains(.failure(.photoDataInvalid)) { throw .photoDataInvalid }
   }
 
-  /// The error each picked item would meet on upload, or `nil` for one that uploads. Runs off
-  /// the main actor, since encoding a full-resolution photo takes a noticeable moment.
+  /// Each picked item's checked JPEG, or the error it meets. Runs off the main actor, since
+  /// encoding a full-resolution photo takes a noticeable moment.
   @concurrent
-  nonisolated private static func uploadProblems(in dataList: [Data]) async -> [AppError?] {
+  nonisolated private static func checkedJPEGs(of dataList: [Data]) async -> [Result<
+    Data, AppError
+  >] {
     dataList.map { data in
-      guard let image = UIImage(data: data) else { return .photoDataInvalid }
-      do {
-        _ = try image.checkedUploadData()
-        return nil
-      } catch {
-        return error as? AppError ?? .photoDataInvalid
+      // Frees each photo's decoded and encoded buffers before the next, so ten large photos are
+      // never in memory together.
+      autoreleasepool { () -> Result<Data, AppError> in
+        guard let image = UIImage(data: data) else { return .failure(.photoDataInvalid) }
+        do throws(AppError) {
+          return .success(try image.checkedUploadData())
+        } catch {
+          return .failure(error)
+        }
       }
     }
   }
@@ -195,9 +183,7 @@ final class EditMedalViewModel {
 
   /// Sets the medal's distance, throwing if a custom value is not a usable distance.
   func selectDistance(_ newDistance: RaceEvent) throws {
-    if !newDistance.category.isStandard, !newDistance.category.isValidCustom {
-      throw AppError.invalidDistance
-    }
+    guard newDistance.category.isValid else { throw AppError.invalidDistance }
     distance = newDistance
   }
 
@@ -303,27 +289,17 @@ final class EditMedalViewModel {
     }
   }
 
-  /// Stages `photo` for `face` and marks the face as changed.
-  private func stage(_ photo: UIImage?, for face: MedalFace) {
-    switch face {
-    case .front: frontPhoto = photo
-    case .back: backPhoto = photo
-    }
-    changedFaces.insert(face)
-    storedPhotoStatuses[face] = nil
-  }
-
   /// Returns the final URL of `face`: the stored one while the face is unchanged, an upload of
   /// a staged photo, or `nil` for a removed one. A removed face is deleted from Storage only
   /// after the medal saves, so a failed save never points at a deleted file.
   private func resolvedPhotoUrl(
     for face: MedalFace, userId: String, uploadedUrls: inout [String]
   ) async throws -> String? {
-    guard changedFaces.contains(face) else { return medal?.photoUrls?[face] }
-    guard let photo = photo(for: face) else { return nil }
+    guard let photo = facePhotos[face], photo.isChanged else { return medal?.photoUrls?[face] }
+    guard let croppedPhoto = photo.croppedPhoto else { return nil }
 
     let url = try await storageService.uploadMedalFace(
-      userId: userId, medalId: medalId, face: face, image: photo
+      userId: userId, medalId: medalId, face: face, jpegData: croppedPhoto.jpegData
     )
     uploadedUrls.append(url)
     return url
@@ -336,9 +312,9 @@ final class EditMedalViewModel {
   {
     var result: [EventPhoto] = []
     for (index, draft) in draftEventPhotos.enumerated() {
-      if draft.isNew, let image = draft.image {
+      if draft.isNew, let jpegData = draft.data {
         let url = try await storageService.uploadMedalEventPhoto(
-          userId: userId, medalId: medalId, photoId: draft.id, image: image)
+          userId: userId, medalId: medalId, photoId: draft.id, jpegData: jpegData)
         uploadedUrls.append(url)
         result.append(EventPhoto(id: draft.id, imageUrl: url, sortOrder: index))
       } else if var kept = medal?.eventPhotos.first(where: { $0.id == draft.id }) {

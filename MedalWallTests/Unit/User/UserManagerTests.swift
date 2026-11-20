@@ -264,7 +264,7 @@ struct UserManagerTests {
     await authService.report((uid: uid, email: email))
     let edited = try #require(manager.currentUser)
 
-    try await manager.updateUser(edited, photo: UIImage())
+    try await manager.updateUser(edited, photoData: Data([0xFF, 0xD8]))
 
     #expect(await storage.deletedURLs == ["https://example.com/avatar.jpg"])
     #expect(await storage.deletedOwners == [.user(uid: uid)])
@@ -285,7 +285,7 @@ struct UserManagerTests {
     let edited = try #require(manager.currentUser)
 
     await #expect(throws: AppError.userSaveFailed) {
-      try await manager.updateUser(edited, photo: UIImage())
+      try await manager.updateUser(edited, photoData: Data([0xFF, 0xD8]))
     }
 
     #expect(await storage.deletedURLs == ["https://example.com/uploaded.jpg"])

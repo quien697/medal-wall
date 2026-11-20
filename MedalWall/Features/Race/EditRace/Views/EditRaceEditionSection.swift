@@ -89,7 +89,7 @@ struct EditRaceEditionSection: View {
   /// One edition: its logo, year, dates and distances, leading to its editor.
   private func editionRow(_ edition: DraftRaceEdition) -> some View {
     HStack(spacing: 10) {
-      if let photo = edition.displayPhoto {
+      if let photo = edition.newPhoto?.image {
         PhotoImage(photo: photo, as: .raceThumbnail)
       } else {
         PhotoImage(urlString: edition.displayPhotoUrl, as: .raceThumbnail)

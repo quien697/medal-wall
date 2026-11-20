@@ -47,6 +47,12 @@ nonisolated struct RaceDistanceCategory: CustomStringConvertible, Hashable {
     return abs(value - rounded) < 1e-9
   }
 
+  /// Whether this distance can be saved: one of the four standard distances, or a valid custom
+  /// one.
+  var isValid: Bool {
+    isStandard || isValidCustom
+  }
+
   /// A custom distance is below this in its own unit. The longest multi-day races are about
   /// 5,000 km, so nothing real is refused, while a mistyped run of digits is.
   static let customLimit = 10_000.0

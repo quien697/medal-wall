@@ -37,23 +37,15 @@ struct EditRaceViewModelReplacedPhotoTests {
       endDate: raceDay, photoUrl: editionPhotoUrl, raceEvents: [], createdBy: "uid")
   }
 
-  private func makePhotoData() throws -> Data {
-    let image = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
-      UIColor.red.setFill()
-      context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
-    }
-    return try #require(image.pngData())
-  }
-
   @Test("a replaced race logo is deleted from Storage once the race saves")
-  func testReplacedLogoDeletedAfterSave() async {
+  func testReplacedLogoDeletedAfterSave() async throws {
     let race = makeRace()
     let repository = StubRaceRepository(races: [race])
     let storage = StubPhotoStorage()
     let viewModel = EditRaceViewModel(
       mode: .edit, race: race, repository: repository, storageService: storage,
       networkMonitor: StubNetworkMonitor())
-    viewModel.updatePhoto(with: UIImage())
+    viewModel.photo.update(with: try TestPhotos.cropped())
 
     await viewModel.save(by: "uid")
 
@@ -62,14 +54,14 @@ struct EditRaceViewModelReplacedPhotoTests {
   }
 
   @Test("a replaced race logo stays in Storage and the new upload is deleted when the save fails")
-  func testReplacedLogoKeptWhenSaveFails() async {
+  func testReplacedLogoKeptWhenSaveFails() async throws {
     let race = makeRace()
     let repository = StubRaceRepository(races: [race], writeOutcome: .failure(.raceSaveFailed))
     let storage = StubPhotoStorage()
     let viewModel = EditRaceViewModel(
       mode: .edit, race: race, repository: repository, storageService: storage,
       networkMonitor: StubNetworkMonitor())
-    viewModel.updatePhoto(with: UIImage())
+    viewModel.photo.update(with: try TestPhotos.cropped())
 
     await viewModel.save(by: "uid")
 
@@ -78,13 +70,13 @@ struct EditRaceViewModelReplacedPhotoTests {
   }
 
   @Test("a logo uploaded for a new race is deleted when the race fails to save")
-  func testNewRaceLogoDeletedWhenCreateFails() async {
+  func testNewRaceLogoDeletedWhenCreateFails() async throws {
     let repository = StubRaceRepository(writeOutcome: .failure(.raceSaveFailed))
     let storage = StubPhotoStorage()
     let viewModel = EditRaceViewModel(
       mode: .add, race: nil, repository: repository, storageService: storage,
       networkMonitor: StubNetworkMonitor())
-    viewModel.updatePhoto(with: UIImage())
+    viewModel.photo.update(with: try TestPhotos.cropped())
 
     await viewModel.save(by: "uid")
 
@@ -103,7 +95,7 @@ struct EditRaceViewModelReplacedPhotoTests {
       networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     var draft = DraftRaceEdition(from: edition)
-    draft.newPhotoData = try makePhotoData()
+    draft.newPhoto = try TestPhotos.cropped()
     draft.isModified = true
     viewModel.stageUpdateEdition(draft)
 
@@ -126,7 +118,7 @@ struct EditRaceViewModelReplacedPhotoTests {
       networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     var draft = DraftRaceEdition(from: edition)
-    draft.newPhotoData = try makePhotoData()
+    draft.newPhoto = try TestPhotos.cropped()
     draft.isModified = true
     viewModel.stageUpdateEdition(draft)
 
@@ -143,7 +135,7 @@ struct EditRaceViewModelReplacedPhotoTests {
     var draft = DraftRaceEdition(
       year: edition.year, isOneDay: true, startDate: edition.startDate,
       endDate: edition.endDate, distances: [], createdBy: "uid")
-    draft.newPhotoData = try makePhotoData()
+    draft.newPhoto = try TestPhotos.cropped()
     let repository = StubRaceRepository(races: [race], failingEditionCreateIDs: [draft.id])
     let storage = StubPhotoStorage()
     let viewModel = EditRaceViewModel(

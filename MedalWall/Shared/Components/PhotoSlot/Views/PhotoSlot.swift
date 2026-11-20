@@ -16,9 +16,11 @@ import SwiftUI
 /// Take Photo while `offersCamera` is true, Remove Photo while it holds a photo, shown or not,
 /// and Cancel.
 /// Choose Photo opens the photo library. Take Photo opens the camera once camera access allows
-/// it, lets iOS ask first, or says why the camera cannot open. Either photo is then framed in
-/// `cropShape`, and the framed photo reaches `onPick`. A photo that fails to load, or whose
-/// framed JPEG is too large to upload, reaches `onError`.
+/// it, lets iOS ask first, or says why the camera cannot open. Either photo is then cropped to
+/// `cropShape`, and the cropped photo reaches `onPick` once its size is checked. A photo that
+/// fails to load, or whose cropped JPEG is too large to upload, reaches `onError`.
+/// `onCheckingChange` is told when a check starts (`true`) and ends (`false`), so the form can
+/// hold Save until it ends; only the newest crop's photo is used.
 ///
 /// The slot wears a 2 pt ink ring while its alert is open. It is drawn at its `imageType`'s
 /// size, shrinking to the width it is given.
@@ -40,27 +42,28 @@ struct PhotoSlot: View {
   private let message: LocalizedStringKey?
   private let placeholderText: LocalizedStringKey?
   private let offersCamera: Bool
-  private let onPick: (UIImage) -> Void
+  private let onPick: (CroppedPhoto) -> Void
   private let onRemove: () -> Void
   private let onError: (AppError) -> Void
+  private let onCheckingChange: (Bool) -> Void
 
   // MARK: - Init
-  /// Creates a slot showing `photo`; without one, the `storedPhotoStatus` of the form's stored
-  /// photo, or the dashed slot reading `placeholderText` beneath a plus.
+  /// Creates a slot showing `content`: the form's photo, its stored photo's status, or the
+  /// dashed slot reading `placeholderText` beneath a plus.
   init(
-    photo: UIImage?,
-    storedPhotoStatus: StoredPhotoStatus? = nil,
+    content: PhotoSlotContent,
     imageType: ImageType,
     cropShape: CropShape,
     title: LocalizedStringKey,
     message: LocalizedStringKey? = nil,
     placeholderText: LocalizedStringKey? = nil,
     offersCamera: Bool = true,
-    onPick: @escaping (UIImage) -> Void,
+    onPick: @escaping (CroppedPhoto) -> Void,
     onRemove: @escaping () -> Void,
-    onError: @escaping (AppError) -> Void
+    onError: @escaping (AppError) -> Void,
+    onCheckingChange: @escaping (Bool) -> Void
   ) {
-    self.content = PhotoSlotViewModel.content(photo: photo, storedPhotoStatus: storedPhotoStatus)
+    self.content = content
     self.imageType = imageType
     self.cropShape = cropShape
     self.title = title
@@ -70,6 +73,7 @@ struct PhotoSlot: View {
     self.onPick = onPick
     self.onRemove = onRemove
     self.onError = onError
+    self.onCheckingChange = onCheckingChange
   }
 
   // MARK: - Body
@@ -170,7 +174,7 @@ struct PhotoSlot: View {
 
       Task {
         let data = try? await newItem.loadTransferable(type: Data.self)
-        if let error = viewModel.framePickedPhoto(data) {
+        if let error = viewModel.cropPickedPhoto(data) {
           selectedPhoto = nil
           onError(error)
         }
@@ -197,12 +201,15 @@ struct PhotoSlot: View {
           cropShape: cropShape
         ) { croppedImage in
           guard let croppedImage else { return }
+          let crop = viewModel.beginCrop()
+          onCheckingChange(true)
           Task {
-            if let error = await viewModel.checkFramedPhoto(croppedImage) {
-              onError(error)
-            } else {
-              onPick(croppedImage)
+            switch await viewModel.checkCroppedPhoto(croppedImage, crop: crop) {
+            case .usable(let photo): onPick(photo)
+            case .refused(let error): onError(error)
+            case .superseded: break
             }
+            onCheckingChange(false)
           }
         }
       }
@@ -211,13 +218,14 @@ struct PhotoSlot: View {
 }
 
 #Preview("Empty and filled") {
-  @Previewable @State var backPhoto = UIImage(systemName: "medal.fill")?
-    .withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
+  @Previewable @State var backContent = PhotoSlotContent.photo(
+    UIImage(systemName: "medal.fill")?
+      .withTintColor(.systemYellow, renderingMode: .alwaysOriginal) ?? UIImage())
 
   Form {
     HStack(alignment: .top, spacing: .Space.row) {
       PhotoSlot(
-        photo: nil,
+        content: .empty,
         imageType: .medal,
         cropShape: .square,
         title: "Front photo",
@@ -228,17 +236,19 @@ struct PhotoSlot: View {
         placeholderText: "Add front",
         onPick: { _ in },
         onRemove: {},
-        onError: { _ in }
+        onError: { _ in },
+        onCheckingChange: { _ in }
       )  // PhotoSlot
 
       PhotoSlot(
-        photo: backPhoto,
+        content: backContent,
         imageType: .medal,
         cropShape: .square,
         title: "Back photo",
-        onPick: { backPhoto = $0 },
-        onRemove: { backPhoto = nil },
-        onError: { _ in }
+        onPick: { backContent = .photo($0.image) },
+        onRemove: { backContent = .empty },
+        onError: { _ in },
+        onCheckingChange: { _ in }
       )  // PhotoSlot
     }  // HStack
     .listRowBackground(Color.clear)
@@ -248,14 +258,15 @@ struct PhotoSlot: View {
 #Preview("Without the camera") {
   Form {
     PhotoSlot(
-      photo: nil,
+      content: .empty,
       imageType: .avatar,
       cropShape: .circle,
       title: "Front photo",
       offersCamera: false,
       onPick: { _ in },
       onRemove: {},
-      onError: { _ in }
+      onError: { _ in },
+      onCheckingChange: { _ in }
     )  // PhotoSlot
     .frame(maxWidth: .infinity)
     .listRowBackground(Color.clear)
@@ -266,40 +277,40 @@ struct PhotoSlot: View {
   Form {
     HStack(alignment: .top, spacing: .Space.row) {
       PhotoSlot(
-        photo: nil,
-        storedPhotoStatus: .loading,
+        content: .loading,
         imageType: .medal,
         cropShape: .square,
         title: "Front photo",
         placeholderText: "Add front",
         onPick: { _ in },
         onRemove: {},
-        onError: { _ in }
+        onError: { _ in },
+        onCheckingChange: { _ in }
       )  // PhotoSlot
 
       PhotoSlot(
-        photo: nil,
-        storedPhotoStatus: .failed,
+        content: .failed,
         imageType: .medal,
         cropShape: .square,
         title: "Back photo",
         placeholderText: "Add back",
         onPick: { _ in },
         onRemove: {},
-        onError: { _ in }
+        onError: { _ in },
+        onCheckingChange: { _ in }
       )  // PhotoSlot
     }  // HStack
     .listRowBackground(Color.clear)
 
     PhotoSlot(
-      photo: nil,
-      storedPhotoStatus: .failed,
+      content: .failed,
       imageType: .avatar,
       cropShape: .circle,
       title: "Profile photo",
       onPick: { _ in },
       onRemove: {},
-      onError: { _ in }
+      onError: { _ in },
+      onCheckingChange: { _ in }
     )  // PhotoSlot
     .frame(maxWidth: .infinity)
     .listRowBackground(Color.clear)

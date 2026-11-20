@@ -32,11 +32,11 @@ struct EditMedalView: View {
     NavigationStack {
       Form {
         EditMedalPhotosSection(
-          photo: { viewModel.photo(for: $0) },
-          storedPhotoStatus: { viewModel.storedPhotoStatus(for: $0) },
+          content: { viewModel.photoContent(for: $0) },
           onPick: { viewModel.updatePhoto(with: $0, for: $1) },
-          onRemove: { viewModel.clearPhoto(for: $0) },
-          onError: { errorWrapper = ErrorWrapper(error: $0) }
+          onRemove: { viewModel.removePhoto(for: $0) },
+          onError: { errorWrapper = ErrorWrapper(error: $0) },
+          onCheckingChange: { viewModel.photoChecks.changed(isChecking: $0) }
         )
 
         EditMedalAutoFillSection {
@@ -119,13 +119,13 @@ struct EditMedalView: View {
                 }
               }
             }  // Button
-            .disabled(!viewModel.isFormValid)
+            .disabled(!viewModel.canSave)
           }
         }  // ToolbarItem
       }  // toolbar
       .interactiveDismissDisabled()
       .task {
-        await viewModel.loadPhotos()
+        await viewModel.loadStoredPhotos()
       }
       .photosPicker(
         isPresented: $isPresentingEventPhotosPicker,
@@ -137,6 +137,8 @@ struct EditMedalView: View {
         guard !newItems.isEmpty else { return }
 
         Task {
+          viewModel.photoChecks.changed(isChecking: true)
+          defer { viewModel.photoChecks.changed(isChecking: false) }
           var dataList: [Data] = []
 
           for item in newItems {
@@ -148,10 +150,10 @@ struct EditMedalView: View {
           }
 
           if !dataList.isEmpty {
-            do {
+            do throws(AppError) {
               try await viewModel.addEventPhotos(dataList)
             } catch {
-              errorWrapper = ErrorWrapper(error: error as? AppError ?? .photoDataInvalid)
+              errorWrapper = ErrorWrapper(error: error)
             }
           }
 

@@ -13,23 +13,23 @@ import UIKit
 /// Callers take this as `(any PhotoStorage)? = nil` and resolve it with `?? StorageService()`
 /// inside `init`, for the same reason the repositories do.
 protocol PhotoStorage {
-  /// Uploads a user avatar and returns its download URL.
-  func uploadUserAvatar(uid: String, image: UIImage) async throws -> String
+  /// Uploads a user avatar's checked JPEG and returns its download URL.
+  func uploadUserAvatar(uid: String, jpegData: Data) async throws -> String
 
-  /// Uploads a race logo and returns its download URL.
-  func uploadRaceLogo(raceId: String, image: UIImage) async throws -> String
+  /// Uploads a race logo's checked JPEG and returns its download URL.
+  func uploadRaceLogo(raceId: String, jpegData: Data) async throws -> String
 
-  /// Uploads a race edition logo and returns its download URL.
-  func uploadRaceEditionLogo(raceId: String, editionId: String, image: UIImage) async throws
+  /// Uploads a race edition photo's checked JPEG and returns its download URL.
+  func uploadRaceEditionPhoto(raceId: String, editionId: String, jpegData: Data) async throws
     -> String
 
-  /// Uploads one face of a medal and returns its download URL.
-  func uploadMedalFace(userId: String, medalId: String, face: MedalFace, image: UIImage)
+  /// Uploads one medal face's checked JPEG and returns its download URL.
+  func uploadMedalFace(userId: String, medalId: String, face: MedalFace, jpegData: Data)
     async throws -> String
 
-  /// Uploads a medal event photo and returns its download URL.
+  /// Uploads a medal event photo's checked JPEG and returns its download URL.
   func uploadMedalEventPhoto(
-    userId: String, medalId: String, photoId: String, image: UIImage
+    userId: String, medalId: String, photoId: String, jpegData: Data
   ) async throws -> String
 
   /// Deletes the photo stored at a download URL, if it lies in its owner's folders.
@@ -106,6 +106,7 @@ final class StorageService: PhotoStorage {
       "races/\(raceId)/raceLogo/\(UUID().uuidString).jpg"
     }
 
+    /// An edition photo's path. The folder keeps its stored name, which `storage.rules` matches.
     static func raceEditionLogo(raceId: String, editionId: String) -> String {
       "races/\(raceId)/editions/\(editionId)/editionLogo/\(UUID().uuidString).jpg"
     }
@@ -130,37 +131,37 @@ final class StorageService: PhotoStorage {
 
   // MARK: - Functions -> User
   /// Uploads a user avatar to Firebase Storage and returns the download URL.
-  func uploadUserAvatar(uid: String, image: UIImage) async throws -> String {
-    try await upload(image: image, to: Path.userAvatar(uid: uid))
+  func uploadUserAvatar(uid: String, jpegData: Data) async throws -> String {
+    try await upload(jpegData, to: Path.userAvatar(uid: uid))
   }
 
   // MARK: - Functions -> Race
   /// Uploads a race logo to Firebase Storage and returns the download URL.
-  func uploadRaceLogo(raceId: String, image: UIImage) async throws -> String {
-    try await upload(image: image, to: Path.raceLogo(raceId: raceId))
+  func uploadRaceLogo(raceId: String, jpegData: Data) async throws -> String {
+    try await upload(jpegData, to: Path.raceLogo(raceId: raceId))
   }
 
-  /// Uploads a race edition logo to Firebase Storage and returns the download URL.
-  func uploadRaceEditionLogo(raceId: String, editionId: String, image: UIImage) async throws
+  /// Uploads a race edition photo to Firebase Storage and returns the download URL.
+  func uploadRaceEditionPhoto(raceId: String, editionId: String, jpegData: Data) async throws
     -> String
   {
-    try await upload(image: image, to: Path.raceEditionLogo(raceId: raceId, editionId: editionId))
+    try await upload(jpegData, to: Path.raceEditionLogo(raceId: raceId, editionId: editionId))
   }
 
   // MARK: - Functions -> Medal
   /// Uploads one face of a medal and returns the download URL.
-  func uploadMedalFace(userId: String, medalId: String, face: MedalFace, image: UIImage)
+  func uploadMedalFace(userId: String, medalId: String, face: MedalFace, jpegData: Data)
     async throws -> String
   {
-    try await upload(image: image, to: Path.medalFace(userId: userId, medalId: medalId, face: face))
+    try await upload(jpegData, to: Path.medalFace(userId: userId, medalId: medalId, face: face))
   }
 
   /// Uploads a medal event photo and returns the download URL.
   func uploadMedalEventPhoto(
-    userId: String, medalId: String, photoId: String, image: UIImage
+    userId: String, medalId: String, photoId: String, jpegData: Data
   ) async throws -> String {
     try await upload(
-      image: image,
+      jpegData,
       to: Path.medalEventPhoto(userId: userId, medalId: medalId, photoId: photoId)
     )
   }
@@ -177,11 +178,11 @@ final class StorageService: PhotoStorage {
     try await reference.delete()
   }
 
-  /// Uploads `image` as a JPEG to `path` and returns its download URL. A JPEG of Storage's
-  /// size cap or more throws `.photoTooLarge` before anything is uploaded, since Storage's own
-  /// refusal reads as a permission error.
-  private func upload(image: UIImage, to path: String) async throws -> String {
-    let data = try image.checkedUploadData()
+  /// Uploads a checked JPEG to `path` as it is, and returns its download URL. A JPEG of
+  /// Storage's size cap or more throws `.photoTooLarge` before anything is uploaded, since
+  /// Storage's own refusal reads as a permission error.
+  private func upload(_ jpegData: Data, to path: String) async throws -> String {
+    let data = try UIImage.checkedUploadSize(jpegData)
 
     let metadata = StorageMetadata()
     metadata.contentType = "image/jpeg"

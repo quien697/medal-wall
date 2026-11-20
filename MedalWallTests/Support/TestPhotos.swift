@@ -20,6 +20,11 @@ enum TestPhotos {
     }
   }
 
+  /// A plain photo cropped and checked, as a `PhotoSlot` hands it to a form.
+  static func cropped(width: CGFloat = 1, height: CGFloat = 1) throws -> CroppedPhoto {
+    try CroppedPhoto(checking: plain(width: width, height: height))
+  }
+
   /// An opaque image of `width` × `height` pixels of seeded random noise, which JPEG cannot
   /// compress: at the default 3840 × 2880 it encodes to a JPEG over 10 MB.
   static func noise(width: Int = 3840, height: Int = 2880) -> UIImage? {

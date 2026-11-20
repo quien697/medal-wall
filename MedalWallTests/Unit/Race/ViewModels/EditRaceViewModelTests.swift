@@ -236,17 +236,17 @@ struct EditRaceViewModelTests {
   }
 
   // MARK: - Photo
-  @Test("a photo picked while the existing logo loads is kept")
-  func testPickedPhotoSurvivesExistingPhotoLoad() async {
+  @Test("a photo picked while the stored logo loads is kept")
+  func testPickedPhotoSurvivesStoredPhotoLoad() async throws {
     var race = Race(name: "Vancouver Marathon", place: place, createdBy: "user-1")
     race.photoUrl = "file:///nonexistent/logo.jpg"
     let viewModel = EditRaceViewModel(mode: .edit, race: race)
-    let pickedPhoto = UIImage()
-    viewModel.updatePhoto(with: pickedPhoto)
+    let pickedPhoto = TestPhotos.plain(width: 1, height: 1)
+    viewModel.photo.update(with: try CroppedPhoto(checking: pickedPhoto))
 
-    await viewModel.loadExistingPhoto()
+    await viewModel.loadStoredPhoto()
 
-    #expect(viewModel.photo === pickedPhoto)
+    #expect(viewModel.photo.content.shownPhoto === pickedPhoto)
   }
 
   // MARK: - Stored photo status
@@ -260,12 +260,11 @@ struct EditRaceViewModelTests {
   func testStoredLogoLoads() async throws {
     let race = makeRace(photoUrl: try makeStoredPhotoFile())
     let viewModel = EditRaceViewModel(mode: .edit, race: race)
-    #expect(viewModel.storedPhotoStatus == .loading)
+    #expect(viewModel.photo.content == .loading)
 
-    await viewModel.loadExistingPhoto()
+    await viewModel.loadStoredPhoto()
 
-    #expect(viewModel.storedPhotoStatus == nil)
-    #expect(viewModel.photo != nil)
+    #expect(viewModel.photo.content.shownPhoto != nil)
   }
 
   @Test("a stored logo that can't be downloaded is marked failed")
@@ -273,31 +272,31 @@ struct EditRaceViewModelTests {
     let viewModel = EditRaceViewModel(
       mode: .edit, race: makeRace(photoUrl: "file:///nonexistent/stored-photo.jpg"))
 
-    await viewModel.loadExistingPhoto()
+    await viewModel.loadStoredPhoto()
 
-    #expect(viewModel.storedPhotoStatus == .failed)
+    #expect(viewModel.photo.content == .failed)
   }
 
-  @Test("a race with no stored logo has no status")
+  @Test("a race with no stored logo shows an empty slot")
   func testNoStoredLogo() {
     let viewModel = EditRaceViewModel(mode: .edit, race: makeRace(photoUrl: nil))
 
-    #expect(viewModel.storedPhotoStatus == nil)
+    #expect(viewModel.photo.content == .empty)
   }
 
   @Test("picking or removing a logo ends the stored logo's status", arguments: [true, false])
-  func testChangingLogoEndsStatus(picks: Bool) async {
+  func testChangingLogoEndsStatus(picks: Bool) async throws {
     let viewModel = EditRaceViewModel(
       mode: .edit, race: makeRace(photoUrl: "file:///nonexistent/stored-photo.jpg"))
-    await viewModel.loadExistingPhoto()
+    await viewModel.loadStoredPhoto()
 
     if picks {
-      viewModel.updatePhoto(with: UIImage())
+      viewModel.photo.update(with: try TestPhotos.cropped())
     } else {
-      viewModel.clearPhoto()
+      viewModel.photo.remove()
     }
 
-    #expect(viewModel.storedPhotoStatus == nil)
+    #expect(picks ? viewModel.photo.content.shownPhoto != nil : viewModel.photo.content == .empty)
   }
 
   /// A file URL holding a 1 × 1 PNG, for the form to download as its stored photo.
@@ -307,5 +306,30 @@ struct EditRaceViewModelTests {
       .appendingPathComponent("\(UUID().uuidString).png")
     try #require(image.pngData()).write(to: url)
     return url.absoluteString
+  }
+
+  // MARK: - canSave
+  /// A form with a name, country and city, which Save accepts.
+  private func makeValidViewModel() -> EditRaceViewModel {
+    let viewModel = EditRaceViewModel(mode: .add, race: nil)
+    viewModel.name = "Boston Marathon"
+    viewModel.place.countryCode = "CA"
+    viewModel.place.city = "Vancouver"
+    return viewModel
+  }
+
+  @Test("Save needs a valid form, and waits while a photo is still being checked")
+  func testCanSave() {
+    let viewModel = makeValidViewModel()
+    #expect(viewModel.canSave)
+
+    viewModel.photoChecks.changed(isChecking: true)
+    #expect(!viewModel.canSave)
+
+    viewModel.photoChecks.changed(isChecking: false)
+    #expect(viewModel.canSave)
+
+    viewModel.name = ""
+    #expect(!viewModel.canSave)
   }
 }

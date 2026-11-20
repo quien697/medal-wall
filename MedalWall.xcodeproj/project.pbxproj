@@ -128,10 +128,13 @@
 				"Shared/Extensions/Date+Extensions.swift",
 				"Shared/Extensions/TimeInterval+Extensions.swift",
 				"Shared/Extensions/UIImage+Extensions.swift",
+				Shared/UIModels/CroppedPhoto.swift,
 				Shared/UIModels/DeletePrompt.swift,
+				Shared/UIModels/DraftPhoto.swift,
 				Shared/UIModels/ItemEditMode.swift,
 				Shared/UIModels/LoadSequence.swift,
-				Shared/UIModels/StoredPhotoStatus.swift,
+				Shared/UIModels/PhotoChecks.swift,
+				Shared/UIModels/PhotoSlotContent.swift,
 			);
 			target = 60B570BE2EA616CA000B3FDE /* MedalWallTests */;
 		};

@@ -48,15 +48,15 @@ struct EditRaceEditionView: View {
     NavigationStack {
       VStack {
         PhotoSlot(
-          photo: viewModel.photo,
-          storedPhotoStatus: viewModel.storedPhotoStatus,
+          content: viewModel.photo.content,
           imageType: .raceHero,
           cropShape: .square,
           title: "Edition photo",
           message: "Leave it empty to use the race logo.",
-          onPick: { viewModel.updatePhoto(with: $0) },
-          onRemove: { viewModel.clearPhoto() },
-          onError: { errorWrapper = ErrorWrapper(error: $0) }
+          onPick: { viewModel.photo.update(with: $0) },
+          onRemove: { viewModel.photo.remove() },
+          onError: { errorWrapper = ErrorWrapper(error: $0) },
+          onCheckingChange: { viewModel.photoChecks.changed(isChecking: $0) }
         )  // PhotoSlot
 
         Form {
@@ -115,12 +115,12 @@ struct EditRaceEditionView: View {
             onCommit(draft)
             dismiss()
           }  // Button
-          .disabled(!viewModel.isFormValid)
+          .disabled(!viewModel.canSave)
         }  // ToolbarItem
       }  // toolbar
       .interactiveDismissDisabled()
       .task {
-        await viewModel.loadExistingPhoto()
+        await viewModel.loadStoredPhoto()
       }
       .alert(isPresented: $isPresentingDeleteConfirm) {
         .deleteConfirmation(.edition(year: viewModel.originalYear)) {

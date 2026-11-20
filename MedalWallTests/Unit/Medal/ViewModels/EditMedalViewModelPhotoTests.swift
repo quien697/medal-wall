@@ -12,11 +12,11 @@ import UIKit
 @testable import MedalWall
 
 /// Covers how the medal form stages its front and back: loading the stored faces and staging
-/// framed photos.
+/// cropped photos.
 @MainActor
 struct EditMedalViewModelPhotoTests {
 
-  private let framedPhoto = UIImage()
+  private let croppedPhoto = TestPhotos.plain(width: 1, height: 1)
 
   private func makeMedal(frontPhotoUrl: String? = nil, backPhotoUrl: String? = nil) -> Medal {
     Medal(
@@ -59,67 +59,67 @@ struct EditMedalViewModelPhotoTests {
       frontPhotoUrl: try makeStoredPhoto(.red), backPhotoUrl: try makeStoredPhoto(.blue))
     let viewModel = makeViewModel(medal: medal)
 
-    await viewModel.loadPhotos()
+    await viewModel.loadStoredPhotos()
 
-    #expect(viewModel.photo(for: .front) != nil)
-    #expect(viewModel.photo(for: .back) != nil)
+    #expect(viewModel.photoContent(for: .front).shownPhoto != nil)
+    #expect(viewModel.photoContent(for: .back).shownPhoto != nil)
   }
 
-  @Test("a face framed while the stored faces load is kept")
-  func testFramedFaceSurvivesLoad() async throws {
+  @Test("a face cropped while the stored faces load is kept")
+  func testCroppedFaceSurvivesLoad() async throws {
     let medal = makeMedal(frontPhotoUrl: try makeStoredPhoto(.red))
     let viewModel = makeViewModel(medal: medal)
-    viewModel.updatePhoto(with: framedPhoto, for: .front)
+    viewModel.updatePhoto(with: try CroppedPhoto(checking: croppedPhoto), for: .front)
 
-    await viewModel.loadPhotos()
+    await viewModel.loadStoredPhotos()
 
-    #expect(viewModel.photo(for: .front) === framedPhoto)
+    #expect(viewModel.photoContent(for: .front).shownPhoto === croppedPhoto)
   }
 
-  @Test("a framed photo is staged for its own face only")
-  func testFramedPhotoStagedForItsFace() {
+  @Test("a cropped photo is staged for its own face only")
+  func testCroppedPhotoStagedForItsFace() throws {
     let viewModel = makeViewModel()
 
-    viewModel.updatePhoto(with: framedPhoto, for: .back)
+    viewModel.updatePhoto(with: try CroppedPhoto(checking: croppedPhoto), for: .back)
 
-    #expect(viewModel.photo(for: .back) === framedPhoto)
-    #expect(viewModel.photo(for: .front) == nil)
+    #expect(viewModel.photoContent(for: .back).shownPhoto === croppedPhoto)
+    #expect(viewModel.photoContent(for: .front) == .empty)
   }
 
-  @Test("a framed photo replaces the face's stored photo")
-  func testFramedPhotoReplacesStoredFace() async throws {
+  @Test("a cropped photo replaces the face's stored photo")
+  func testCroppedPhotoReplacesStoredFace() async throws {
     let medal = makeMedal(frontPhotoUrl: try makeStoredPhoto(.red))
     let viewModel = makeViewModel(medal: medal)
-    await viewModel.loadPhotos()
-    let storedFront = try #require(viewModel.photo(for: .front))
+    await viewModel.loadStoredPhotos()
+    let storedFront = try #require(viewModel.photoContent(for: .front).shownPhoto)
 
-    viewModel.updatePhoto(with: framedPhoto, for: .front)
+    viewModel.updatePhoto(with: try CroppedPhoto(checking: croppedPhoto), for: .front)
 
-    #expect(viewModel.photo(for: .front) === framedPhoto)
-    #expect(viewModel.photo(for: .front) !== storedFront)
+    #expect(viewModel.photoContent(for: .front).shownPhoto === croppedPhoto)
+    #expect(viewModel.photoContent(for: .front).shownPhoto !== storedFront)
   }
 
   @Test("removing a face leaves the other face staged")
-  func testRemovingAFaceKeepsTheOther() {
+  func testRemovingAFaceKeepsTheOther() throws {
     let viewModel = makeViewModel()
-    viewModel.updatePhoto(with: UIImage(), for: .front)
-    viewModel.updatePhoto(with: framedPhoto, for: .back)
+    viewModel.updatePhoto(with: try TestPhotos.cropped(), for: .front)
+    viewModel.updatePhoto(with: try CroppedPhoto(checking: croppedPhoto), for: .back)
 
-    viewModel.clearPhoto(for: .front)
+    viewModel.removePhoto(for: .front)
 
-    #expect(viewModel.photo(for: .front) == nil)
-    #expect(viewModel.photo(for: .back) === framedPhoto)
+    #expect(viewModel.photoContent(for: .front) == .empty)
+    #expect(viewModel.photoContent(for: .back).shownPhoto === croppedPhoto)
   }
 
   // MARK: - Stored photo status
   @Test("a stored face is loading until it downloads")
   func testStoredFaceLoads() async throws {
     let viewModel = makeViewModel(medal: makeMedal(frontPhotoUrl: try makeStoredPhoto(.red)))
-    #expect(viewModel.storedPhotoStatus(for: .front) == .loading)
+    #expect(viewModel.photoContent(for: .front) == .loading)
 
-    await viewModel.loadPhotos()
+    await viewModel.loadStoredPhotos()
 
-    #expect(viewModel.storedPhotoStatus(for: .front) == nil)
+    #expect(viewModel.photoContent(for: .front).shownPhoto != nil)
   }
 
   @Test("a stored face that can't be downloaded is marked failed")
@@ -127,34 +127,36 @@ struct EditMedalViewModelPhotoTests {
     let viewModel = makeViewModel(
       medal: makeMedal(frontPhotoUrl: "file:///nonexistent/stored-photo.jpg"))
 
-    await viewModel.loadPhotos()
+    await viewModel.loadStoredPhotos()
 
-    #expect(viewModel.storedPhotoStatus(for: .front) == .failed)
-    #expect(viewModel.photo(for: .front) == nil)
+    #expect(viewModel.photoContent(for: .front) == .failed)
   }
 
-  @Test("a face with no stored photo has no status")
+  @Test("a face with no stored photo stays empty")
   func testFaceWithoutStoredPhoto() async throws {
     let viewModel = makeViewModel(medal: makeMedal(frontPhotoUrl: try makeStoredPhoto(.red)))
-    #expect(viewModel.storedPhotoStatus(for: .back) == nil)
+    #expect(viewModel.photoContent(for: .back) == .empty)
 
-    await viewModel.loadPhotos()
+    await viewModel.loadStoredPhotos()
 
-    #expect(viewModel.storedPhotoStatus(for: .back) == nil)
+    #expect(viewModel.photoContent(for: .back) == .empty)
   }
 
-  @Test("framing or removing a face ends its stored photo's status", arguments: [true, false])
-  func testChangingFaceEndsStatus(frames: Bool) async {
+  @Test("cropping or removing a face ends its stored photo's status", arguments: [true, false])
+  func testChangingFaceEndsStatus(crops: Bool) async throws {
     let viewModel = makeViewModel(
       medal: makeMedal(frontPhotoUrl: "file:///nonexistent/stored-photo.jpg"))
-    await viewModel.loadPhotos()
+    await viewModel.loadStoredPhotos()
 
-    if frames {
-      viewModel.updatePhoto(with: framedPhoto, for: .front)
+    if crops {
+      viewModel.updatePhoto(with: try CroppedPhoto(checking: croppedPhoto), for: .front)
     } else {
-      viewModel.clearPhoto(for: .front)
+      viewModel.removePhoto(for: .front)
     }
 
-    #expect(viewModel.storedPhotoStatus(for: .front) == nil)
+    #expect(
+      crops
+        ? viewModel.photoContent(for: .front).shownPhoto === croppedPhoto
+        : viewModel.photoContent(for: .front) == .empty)
   }
 }

@@ -68,15 +68,15 @@ struct EditProfileViewModelTests {
     #expect(viewModel.makeUpdatedUser().bio == nil)
   }
 
-  @Test("a photo picked while the existing one loads is kept")
-  func testPickedPhotoSurvivesExistingPhotoLoad() async {
+  @Test("a photo picked while the stored one loads is kept")
+  func testPickedPhotoSurvivesStoredPhotoLoad() async throws {
     let viewModel = EditProfileViewModel(profile: makeProfile())
-    let pickedPhoto = UIImage()
-    viewModel.updatePhoto(with: pickedPhoto)
+    let pickedPhoto = TestPhotos.plain(width: 1, height: 1)
+    viewModel.photo.update(with: try CroppedPhoto(checking: pickedPhoto))
 
-    await viewModel.loadExistingPhoto()
+    await viewModel.loadStoredPhoto()
 
-    #expect(viewModel.photo === pickedPhoto)
+    #expect(viewModel.photo.content.shownPhoto === pickedPhoto)
   }
 
   @Test("an untouched photo keeps its URL and is not re-uploaded")
@@ -91,24 +91,24 @@ struct EditProfileViewModelTests {
   func testRemovedPhotoClearsURL() {
     let viewModel = EditProfileViewModel(profile: makeProfile(photoUrl: avatarUrl))
 
-    viewModel.clearPhoto()
+    viewModel.photo.remove()
 
     #expect(viewModel.makeUpdatedUser().photoUrl == nil)
     #expect(viewModel.photoToUpload == nil)
   }
 
   @Test("a newly picked photo is the one uploaded")
-  func testPickedPhotoIsUploaded() {
+  func testPickedPhotoIsUploaded() throws {
     let viewModel = EditProfileViewModel(profile: makeProfile(photoUrl: avatarUrl))
-    let pickedPhoto = UIImage()
+    let croppedPhoto = try TestPhotos.cropped()
 
-    viewModel.updatePhoto(with: pickedPhoto)
+    viewModel.photo.update(with: croppedPhoto)
 
-    #expect(viewModel.photoToUpload === pickedPhoto)
+    #expect(viewModel.photoToUpload == croppedPhoto.jpegData)
   }
 
   @Test("saving offline is refused before anything is uploaded or written")
-  func testOfflineSaveIsRefused() async {
+  func testOfflineSaveIsRefused() async throws {
     let repository = StubUserRepository(user: makeProfile(photoUrl: avatarUrl))
     let storage = StubPhotoStorage()
     let manager = UserManager(
@@ -118,7 +118,7 @@ struct EditProfileViewModelTests {
     networkMonitor.isConnectedNow = false
     let viewModel = EditProfileViewModel(
       profile: makeProfile(photoUrl: avatarUrl), networkMonitor: networkMonitor)
-    viewModel.updatePhoto(with: UIImage())
+    viewModel.photo.update(with: try TestPhotos.cropped())
 
     await #expect(throws: AppError.noInternetConnection) {
       try await viewModel.save(userManager: manager)
@@ -132,12 +132,11 @@ struct EditProfileViewModelTests {
   @Test("a stored photo is loading until it downloads")
   func testStoredPhotoLoads() async throws {
     let viewModel = EditProfileViewModel(profile: makeProfile(photoUrl: try makeStoredPhotoFile()))
-    #expect(viewModel.storedPhotoStatus == .loading)
+    #expect(viewModel.photo.content == .loading)
 
-    await viewModel.loadExistingPhoto()
+    await viewModel.loadStoredPhoto()
 
-    #expect(viewModel.storedPhotoStatus == nil)
-    #expect(viewModel.photo != nil)
+    #expect(viewModel.photo.content.shownPhoto != nil)
   }
 
   @Test("a stored photo that can't be downloaded is marked failed")
@@ -145,36 +144,36 @@ struct EditProfileViewModelTests {
     let viewModel = EditProfileViewModel(
       profile: makeProfile(photoUrl: "file:///nonexistent/stored-photo.jpg"))
 
-    await viewModel.loadExistingPhoto()
+    await viewModel.loadStoredPhoto()
 
-    #expect(viewModel.storedPhotoStatus == .failed)
+    #expect(viewModel.photo.content == .failed)
   }
 
-  @Test("a profile with no stored photo has no status")
+  @Test("a profile with no stored photo shows an empty slot")
   func testNoStoredPhoto() {
-    #expect(EditProfileViewModel(profile: makeProfile()).storedPhotoStatus == nil)
+    #expect(EditProfileViewModel(profile: makeProfile()).photo.content == .empty)
   }
 
   @Test("picking or removing a photo ends the stored photo's status", arguments: [true, false])
-  func testChangingPhotoEndsStatus(picks: Bool) async {
+  func testChangingPhotoEndsStatus(picks: Bool) async throws {
     let viewModel = EditProfileViewModel(
       profile: makeProfile(photoUrl: "file:///nonexistent/stored-photo.jpg"))
-    await viewModel.loadExistingPhoto()
+    await viewModel.loadStoredPhoto()
 
     if picks {
-      viewModel.updatePhoto(with: UIImage())
+      viewModel.photo.update(with: try TestPhotos.cropped())
     } else {
-      viewModel.clearPhoto()
+      viewModel.photo.remove()
     }
 
-    #expect(viewModel.storedPhotoStatus == nil)
+    #expect(picks ? viewModel.photo.content.shownPhoto != nil : viewModel.photo.content == .empty)
   }
 
   @Test("a stored photo that couldn't load keeps its URL on save")
   func testFailedStoredPhotoKept() async {
     let viewModel = EditProfileViewModel(
       profile: makeProfile(photoUrl: "file:///nonexistent/stored-photo.jpg"))
-    await viewModel.loadExistingPhoto()
+    await viewModel.loadStoredPhoto()
 
     #expect(viewModel.makeUpdatedUser().photoUrl == "file:///nonexistent/stored-photo.jpg")
   }
@@ -183,9 +182,9 @@ struct EditProfileViewModelTests {
   func testFailedStoredPhotoRemoved() async {
     let viewModel = EditProfileViewModel(
       profile: makeProfile(photoUrl: "file:///nonexistent/stored-photo.jpg"))
-    await viewModel.loadExistingPhoto()
+    await viewModel.loadStoredPhoto()
 
-    viewModel.clearPhoto()
+    viewModel.photo.remove()
 
     #expect(viewModel.makeUpdatedUser().photoUrl == nil)
   }
@@ -197,5 +196,21 @@ struct EditProfileViewModelTests {
       .appendingPathComponent("\(UUID().uuidString).png")
     try #require(image.pngData()).write(to: url)
     return url.absoluteString
+  }
+
+  // MARK: - canSave
+  @Test("Save needs a valid form, and waits while a photo is still being checked")
+  func testCanSave() {
+    let viewModel = EditProfileViewModel(profile: makeProfile())
+    #expect(viewModel.canSave)
+
+    viewModel.photoChecks.changed(isChecking: true)
+    #expect(!viewModel.canSave)
+
+    viewModel.photoChecks.changed(isChecking: false)
+    #expect(viewModel.canSave)
+
+    viewModel.userName.firstName = ""
+    #expect(!viewModel.canSave)
   }
 }

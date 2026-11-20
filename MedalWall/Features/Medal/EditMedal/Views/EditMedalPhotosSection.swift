@@ -12,13 +12,13 @@ import SwiftUI
 /// They never change places, whichever is filled.
 ///
 /// Each slot's options say how to shoot the medal against a clear background, and the photo
-/// is framed as an 840 × 840 square.
+/// is cropped to a square, kept at the photo's own pixels.
 struct EditMedalPhotosSection: View {
-  let photo: (MedalFace) -> UIImage?
-  let storedPhotoStatus: (MedalFace) -> StoredPhotoStatus?
-  let onPick: (UIImage, MedalFace) -> Void
+  let content: (MedalFace) -> PhotoSlotContent
+  let onPick: (CroppedPhoto, MedalFace) -> Void
   let onRemove: (MedalFace) -> Void
   let onError: (AppError) -> Void
+  let onCheckingChange: (Bool) -> Void
 
   var body: some View {
     Section {
@@ -26,8 +26,7 @@ struct EditMedalPhotosSection: View {
         ForEach(MedalFace.allCases, id: \.self) { face in
           VStack(spacing: .Space.stack) {
             PhotoSlot(
-              photo: photo(face),
-              storedPhotoStatus: storedPhotoStatus(face),
+              content: content(face),
               imageType: .medal,
               cropShape: .square,
               title: face.photoTitle,
@@ -39,7 +38,8 @@ struct EditMedalPhotosSection: View {
               placeholderText: face.addTitle,
               onPick: { onPick($0, face) },
               onRemove: { onRemove(face) },
-              onError: onError
+              onError: onError,
+              onCheckingChange: onCheckingChange
             )  // PhotoSlot
 
             Text(face.title)
@@ -63,16 +63,17 @@ struct EditMedalPhotosSection: View {
 }
 
 #Preview {
-  @Previewable @State var frontPhoto = UIImage(systemName: "medal.fill")?
-    .withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
+  @Previewable @State var frontContent = PhotoSlotContent.photo(
+    UIImage(systemName: "medal.fill")?
+      .withTintColor(.systemYellow, renderingMode: .alwaysOriginal) ?? UIImage())
 
   Form {
     EditMedalPhotosSection(
-      photo: { $0 == .front ? frontPhoto : nil },
-      storedPhotoStatus: { $0 == .back ? .failed : nil },
-      onPick: { photo, face in if face == .front { frontPhoto = photo } },
-      onRemove: { face in if face == .front { frontPhoto = nil } },
-      onError: { _ in }
+      content: { $0 == .front ? frontContent : .failed },
+      onPick: { photo, face in if face == .front { frontContent = .photo(photo.image) } },
+      onRemove: { face in if face == .front { frontContent = .empty } },
+      onError: { _ in },
+      onCheckingChange: { _ in }
     )
   }  // Form
 }

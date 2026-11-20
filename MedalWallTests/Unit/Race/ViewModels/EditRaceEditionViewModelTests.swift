@@ -187,6 +187,22 @@ struct EditRaceEditionViewModelTests {
 
     #expect(viewModel.distances.isEmpty)
   }
+
+  // MARK: - canSave
+  @Test("Save needs a valid form, and waits while a photo is still being checked")
+  func testCanSave() {
+    let viewModel = makeViewModel()
+    #expect(viewModel.canSave)
+
+    viewModel.photoChecks.changed(isChecking: true)
+    #expect(!viewModel.canSave)
+
+    viewModel.photoChecks.changed(isChecking: false)
+    #expect(viewModel.canSave)
+
+    viewModel.year = viewModel.minYear - 1
+    #expect(!viewModel.canSave)
+  }
 }
 
 // MARK: - addDistance validation
@@ -373,58 +389,66 @@ extension EditRaceEditionViewModelTests {
     #expect(rebuilt.sourceEditionId == nil)
   }
 
+  @Test("a cropped photo is staged as the cropped photo itself, so save encodes it only once")
+  func testCroppedPhotoIsStagedAsItself() throws {
+    let viewModel = EditRaceEditionViewModel(mode: .add, draft: nil)
+    let logo = TestPhotos.plain(width: 40, height: 40)
+    viewModel.photo.update(with: try CroppedPhoto(checking: logo))
+
+    let draft = viewModel.buildDraft(userId: "uid")
+
+    #expect(draft.newPhoto?.image === logo)
+  }
+
   @Test("re-editing a staged edition keeps its newly picked photo")
   func testReEditedEditionKeepsNewPhoto() throws {
     var staged = try makeStagedDraft()
-    staged.newPhotoData = Data([0x01, 0x02])
+    let logo = TestPhotos.plain(width: 40, height: 40)
+    staged.newPhoto = try CroppedPhoto(checking: logo)
     let viewModel = EditRaceEditionViewModel(
       mode: .edit, draft: staged)
 
     let rebuilt = viewModel.buildDraft(userId: "uid")
 
-    #expect(rebuilt.newPhotoData == staged.newPhotoData)
+    #expect(rebuilt.newPhoto?.image === logo)
   }
 
   @Test("re-editing a staged edition keeps its photo removal")
   func testReEditedEditionKeepsPhotoRemoval() {
     var staged = DraftRaceEdition(from: .taipei2025)
-    staged.isPhotoCleared = true
+    staged.isPhotoRemoved = true
     let viewModel = EditRaceEditionViewModel(
       mode: .edit, draft: staged)
 
     let rebuilt = viewModel.buildDraft(userId: "uid")
 
-    #expect(rebuilt.isPhotoCleared)
+    #expect(rebuilt.isPhotoRemoved)
   }
 
   @Test("a re-opened staged edition still shows its newly picked photo")
   func testReopenedEditionShowsNewPhoto() async throws {
-    let image = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
-      UIColor.red.setFill()
-      context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
-    }
     var staged = try makeStagedDraft()
-    staged.newPhotoData = image.pngData()
+    staged.newPhoto = try TestPhotos.cropped()
     let viewModel = EditRaceEditionViewModel(
       mode: .edit, draft: staged)
 
-    await viewModel.loadExistingPhoto()
+    await viewModel.loadStoredPhoto()
 
-    #expect(viewModel.photo != nil)
+    #expect(viewModel.photo.content.shownPhoto != nil)
   }
 
-  @Test("a photo picked while the existing one loads is kept")
-  func testPickedPhotoSurvivesExistingPhotoLoad() async {
+  @Test("a photo picked while the stored one loads is kept")
+  func testPickedPhotoSurvivesStoredPhotoLoad() async throws {
     var staged = DraftRaceEdition(from: .taipei2025)
-    staged.existingPhotoUrl = "file:///nonexistent/edition.jpg"
+    staged.storedPhotoUrl = "file:///nonexistent/edition.jpg"
     let viewModel = EditRaceEditionViewModel(
       mode: .edit, draft: staged)
-    let pickedPhoto = UIImage()
-    viewModel.updatePhoto(with: pickedPhoto)
+    let pickedPhoto = TestPhotos.plain(width: 1, height: 1)
+    viewModel.photo.update(with: try CroppedPhoto(checking: pickedPhoto))
 
-    await viewModel.loadExistingPhoto()
+    await viewModel.loadStoredPhoto()
 
-    #expect(viewModel.photo === pickedPhoto)
+    #expect(viewModel.photo.content.shownPhoto === pickedPhoto)
   }
 
   @Test("re-editing a staged multi-day edition keeps it multi-day")

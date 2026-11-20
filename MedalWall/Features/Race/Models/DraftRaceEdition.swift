@@ -26,11 +26,11 @@ struct DraftRaceEdition: Identifiable {
 
   // MARK: - Photo
   /// The current Firestore URL, carried forward until save resolves a new one.
-  var existingPhotoUrl: String?
-  /// Raw data for a new photo chosen this session; `nil` if unchanged.
-  var newPhotoData: Data?
+  var storedPhotoUrl: String?
+  /// A new photo cropped this session, which save uploads as it is; `nil` if unchanged.
+  var newPhoto: CroppedPhoto?
   /// `true` when the user explicitly removed the photo this session.
-  var isPhotoCleared: Bool
+  var isPhotoRemoved: Bool
 
   // MARK: - Tracking
   /// `true` when any field was changed this session. Only checked for existing editions.
@@ -47,9 +47,9 @@ struct DraftRaceEdition: Identifiable {
     self.endDate = edition.endDate
     self.distances = edition.raceEvents
     self.createdBy = edition.createdBy
-    self.existingPhotoUrl = edition.photoUrl
-    self.newPhotoData = nil
-    self.isPhotoCleared = false
+    self.storedPhotoUrl = edition.photoUrl
+    self.newPhoto = nil
+    self.isPhotoRemoved = false
     self.isModified = false
   }
 
@@ -70,20 +70,16 @@ struct DraftRaceEdition: Identifiable {
     self.endDate = endDate
     self.distances = distances
     self.createdBy = createdBy
-    self.existingPhotoUrl = nil
-    self.newPhotoData = nil
-    self.isPhotoCleared = false
+    self.storedPhotoUrl = nil
+    self.newPhoto = nil
+    self.isPhotoRemoved = false
     self.isModified = false
   }
 
   // MARK: - Computed
-  var displayPhoto: UIImage? {
-    newPhotoData.flatMap { UIImage(data: $0) }
-  }
-
   var displayPhotoUrl: String? {
-    guard newPhotoData == nil, !isPhotoCleared else { return nil }
-    return existingPhotoUrl
+    guard newPhoto == nil, !isPhotoRemoved else { return nil }
+    return storedPhotoUrl
   }
 
   var dateDisplayLabel: String {

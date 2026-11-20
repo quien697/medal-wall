@@ -16,13 +16,13 @@ final class EditRaceEditionViewModel {
   var isOneDay: Bool
   var startDate: Date
   var endDate: Date
-  var photo: UIImage?
+  /// The edition photo as its slot shows it and as save stages it.
+  var photo = DraftPhoto()
   var distances: [RaceEvent] = []
 
   // MARK: - State
-  var isPhotoChanged = false
-  /// The stored photo while the form isn't showing it: still downloading, or one that couldn't be.
-  private(set) var storedPhotoStatus: StoredPhotoStatus?
+  /// The photo checks in progress, which Save waits for.
+  var photoChecks = PhotoChecks()
 
   // MARK: - Dependencies
   let mode: ItemEditMode
@@ -40,8 +40,7 @@ final class EditRaceEditionViewModel {
       self.startDate = draft.startDate
       self.endDate = draft.endDate
       self.distances = draft.distances
-      self.photo = draft.displayPhoto
-      self.storedPhotoStatus = draft.displayPhotoUrl == nil ? nil : .loading
+      self.photo = DraftPhoto(storedPhotoUrl: draft.displayPhotoUrl, staged: draft.newPhoto)
     } else {
       let currentYear = Date.now.year
       self.year = currentYear
@@ -54,6 +53,9 @@ final class EditRaceEditionViewModel {
   }
 
   // MARK: - Computed
+  /// Whether Save can be tapped: the form is valid and no photo is still being checked.
+  var canSave: Bool { isFormValid && !photoChecks.isChecking }
+
   var isFormValid: Bool {
     year >= minYear && year <= maxYear && startDate <= endDate
   }
@@ -75,32 +77,13 @@ final class EditRaceEditionViewModel {
   }
 
   // MARK: - Functions
-  /// Downloads the existing edition photo into `photo` so the slot shows the current image,
+  /// Downloads the stored edition photo into `photo` so the slot shows the current image,
   /// marking it as failed when it can't be downloaded.
-  func loadExistingPhoto() async {
+  func loadStoredPhoto() async {
     guard let photoUrl = draft?.displayPhotoUrl else { return }
 
-    let existingPhoto = await UIImage.load(from: photoUrl)
-    guard !isPhotoChanged else { return }
-
-    photo = existingPhoto
-    if storedPhotoStatus == .loading {
-      storedPhotoStatus = existingPhoto == nil ? .failed : nil
-    }
-  }
-
-  /// Replaces the current photo and marks it as changed.
-  func updatePhoto(with uiImage: UIImage) {
-    photo = uiImage
-    isPhotoChanged = true
-    storedPhotoStatus = nil
-  }
-
-  /// Clears the current photo and marks it as changed.
-  func clearPhoto() {
-    photo = nil
-    isPhotoChanged = true
-    storedPhotoStatus = nil
+    let storedPhoto = await UIImage.load(from: photoUrl)
+    photo.showStored(storedPhoto)
   }
 
   /// Toggles the one-day flag and aligns the end date with start date when enabled.
@@ -130,9 +113,7 @@ final class EditRaceEditionViewModel {
 
   /// Appends a distance to the list, throwing if a custom value is not a usable distance or if it is already present.
   func addDistance(_ distance: RaceEvent) throws {
-    if !distance.category.isStandard, !distance.category.isValidCustom {
-      throw AppError.invalidDistance
-    }
+    guard distance.category.isValid else { throw AppError.invalidDistance }
     guard !distances.contains(distance) else { throw AppError.duplicateDistance }
     distances.append(distance)
   }
@@ -154,9 +135,7 @@ final class EditRaceEditionViewModel {
         distances: distances,
         createdBy: userId
       )
-      if let photo, let data = photo.uploadData() {
-        draft.newPhotoData = data
-      }
+      draft.newPhoto = photo.croppedPhoto
       return draft
 
     case .edit:
@@ -172,13 +151,13 @@ final class EditRaceEditionViewModel {
       updated.endDate = endDate
       updated.distances = distances
       updated.isModified = true
-      if isPhotoChanged {
-        if let photo, let data = photo.uploadData() {
-          updated.newPhotoData = data
-          updated.isPhotoCleared = false
+      if photo.isChanged {
+        if let croppedPhoto = photo.croppedPhoto {
+          updated.newPhoto = croppedPhoto
+          updated.isPhotoRemoved = false
         } else {
-          updated.newPhotoData = nil
-          updated.isPhotoCleared = true
+          updated.newPhoto = nil
+          updated.isPhotoRemoved = true
         }
       }
       return updated

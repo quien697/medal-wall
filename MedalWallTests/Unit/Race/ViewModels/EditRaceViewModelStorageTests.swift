@@ -37,23 +37,15 @@ struct EditRaceViewModelStorageTests {
       endDate: raceDay, photoUrl: editionPhotoUrl, raceEvents: [], createdBy: "uid")
   }
 
-  private func makePhotoData() throws -> Data {
-    let image = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
-      UIColor.red.setFill()
-      context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
-    }
-    return try #require(image.pngData())
-  }
-
   @Test("a failed logo upload keeps the race's logo and fails the save")
-  func testFailedLogoUploadKeepsLogo() async {
+  func testFailedLogoUploadKeepsLogo() async throws {
     let race = makeRace()
     let repository = StubRaceRepository(races: [race])
     let storage = StubPhotoStorage(uploadOutcome: .failure(.photoDataInvalid))
     let viewModel = EditRaceViewModel(
       mode: .edit, race: race, repository: repository, storageService: storage,
       networkMonitor: StubNetworkMonitor())
-    viewModel.updatePhoto(with: UIImage())
+    viewModel.photo.update(with: try TestPhotos.cropped())
 
     await viewModel.save(by: "uid")
 
@@ -69,7 +61,7 @@ struct EditRaceViewModelStorageTests {
     let viewModel = EditRaceViewModel(
       mode: .edit, race: race, repository: repository, storageService: storage,
       networkMonitor: StubNetworkMonitor())
-    viewModel.clearPhoto()
+    viewModel.photo.remove()
 
     await viewModel.save(by: "uid")
 
@@ -85,7 +77,7 @@ struct EditRaceViewModelStorageTests {
     let viewModel = EditRaceViewModel(
       mode: .edit, race: race, repository: repository, storageService: storage,
       networkMonitor: StubNetworkMonitor())
-    viewModel.clearPhoto()
+    viewModel.photo.remove()
 
     await viewModel.save(by: "uid")
 
@@ -141,7 +133,7 @@ struct EditRaceViewModelStorageTests {
       networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     var draft = DraftRaceEdition(from: edition)
-    draft.isPhotoCleared = true
+    draft.isPhotoRemoved = true
     draft.isModified = true
     viewModel.stageUpdateEdition(draft)
 
@@ -163,7 +155,7 @@ struct EditRaceViewModelStorageTests {
       networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     var draft = DraftRaceEdition(from: edition)
-    draft.isPhotoCleared = true
+    draft.isPhotoRemoved = true
     draft.isModified = true
     viewModel.stageUpdateEdition(draft)
 
@@ -184,7 +176,7 @@ struct EditRaceViewModelStorageTests {
       networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
     var draft = DraftRaceEdition(from: edition)
-    draft.newPhotoData = try makePhotoData()
+    draft.newPhoto = try TestPhotos.cropped()
     draft.isModified = true
     viewModel.stageUpdateEdition(draft)
 
@@ -206,13 +198,13 @@ struct EditRaceViewModelStorageTests {
     var draft = DraftRaceEdition(
       year: edition.year, isOneDay: true, startDate: edition.startDate,
       endDate: edition.endDate, distances: [], createdBy: "uid")
-    draft.newPhotoData = try makePhotoData()
+    draft.newPhoto = try TestPhotos.cropped()
     viewModel.stageAddEdition(draft)
 
     await viewModel.save(by: "uid")
 
     #expect(viewModel.error == nil)
-    #expect(await storage.uploadedEditionLogoIDs == [draft.id])
+    #expect(await storage.uploadedEditionPhotoIDs == [draft.id])
     #expect(await repository.createdEditions.first?.photoUrl == "https://example.com/uploaded.jpg")
   }
 
@@ -228,7 +220,7 @@ struct EditRaceViewModelStorageTests {
     var draft = DraftRaceEdition(
       year: edition.year, isOneDay: true, startDate: edition.startDate,
       endDate: edition.endDate, distances: [], createdBy: "uid")
-    draft.newPhotoData = try makePhotoData()
+    draft.newPhoto = try TestPhotos.cropped()
     viewModel.stageAddEdition(draft)
 
     await viewModel.save(by: "uid")
@@ -249,7 +241,7 @@ struct EditRaceViewModelStorageTests {
       mode: .edit, race: race, repository: repository, storageService: storage,
       networkMonitor: StubNetworkMonitor())
     await viewModel.loadEditions()
-    viewModel.updatePhoto(with: UIImage())
+    viewModel.photo.update(with: try TestPhotos.cropped())
     var draft = DraftRaceEdition(from: edition)
     draft.isModified = true
     viewModel.stageUpdateEdition(draft)
@@ -290,17 +282,17 @@ struct EditRaceViewModelStorageTests {
   @Test("retrying a save after a failed update does not upload a saved edition's photo twice")
   func testRetryDoesNotReuploadEditionPhoto() async throws {
     let edition = try makeEdition()
-    let photoData = try makePhotoData()
+    let photo = try TestPhotos.cropped()
     let storage = StubPhotoStorage()
     let viewModel = await makeViewModelWithFailingSibling(of: edition, storage: storage) {
-      $0.newPhotoData = photoData
+      $0.newPhoto = photo
     }
 
     await viewModel.save(by: "uid")
     viewModel.error = nil  // what dismissing the error sheet does
     await viewModel.save(by: "uid")
 
-    #expect(await storage.uploadedEditionLogoIDs == [edition.id])
+    #expect(await storage.uploadedEditionPhotoIDs == [edition.id])
   }
 
   @Test("retrying a save after a failed update does not delete a saved edition's photo twice")
@@ -308,7 +300,7 @@ struct EditRaceViewModelStorageTests {
     let edition = try makeEdition()
     let storage = StubPhotoStorage()
     let viewModel = await makeViewModelWithFailingSibling(of: edition, storage: storage) {
-      $0.isPhotoCleared = true
+      $0.isPhotoRemoved = true
     }
 
     await viewModel.save(by: "uid")
@@ -320,7 +312,7 @@ struct EditRaceViewModelStorageTests {
 
   // MARK: - Offline
   @Test("saving offline is refused before anything is uploaded or written")
-  func testOfflineSaveIsRefused() async {
+  func testOfflineSaveIsRefused() async throws {
     let race = makeRace()
     let repository = StubRaceRepository(races: [race])
     let storage = StubPhotoStorage()
@@ -329,7 +321,7 @@ struct EditRaceViewModelStorageTests {
     let viewModel = EditRaceViewModel(
       mode: .edit, race: race, repository: repository, storageService: storage,
       networkMonitor: networkMonitor)
-    viewModel.updatePhoto(with: UIImage())
+    viewModel.photo.update(with: try TestPhotos.cropped())
 
     await viewModel.save(by: "uid")
 

@@ -27,14 +27,14 @@ struct EditProfileView: View {
     NavigationStack {
       Form {
         PhotoSlot(
-          photo: viewModel.photo,
-          storedPhotoStatus: viewModel.storedPhotoStatus,
+          content: viewModel.photo.content,
           imageType: .avatar,
           cropShape: .circle,
           title: "Profile photo",
-          onPick: { viewModel.updatePhoto(with: $0) },
-          onRemove: { viewModel.clearPhoto() },
-          onError: { errorWrapper = ErrorWrapper(error: $0) }
+          onPick: { viewModel.photo.update(with: $0) },
+          onRemove: { viewModel.photo.remove() },
+          onError: { errorWrapper = ErrorWrapper(error: $0) },
+          onCheckingChange: { viewModel.photoChecks.changed(isChecking: $0) }
         )  // PhotoSlot
         .frame(maxWidth: .infinity)
         .listRowBackground(Color.clear)
@@ -54,7 +54,7 @@ struct EditProfileView: View {
       .background(Color.Background.primary)
       .disabled(viewModel.isLoading)
       .task {
-        await viewModel.loadExistingPhoto()
+        await viewModel.loadStoredPhoto()
       }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
@@ -78,7 +78,7 @@ struct EditProfileView: View {
                 }
               }
             }  // Button
-            .disabled(!viewModel.isFormValid)
+            .disabled(!viewModel.canSave)
           }
         }  // ToolbarItem
       }  // toolbar
