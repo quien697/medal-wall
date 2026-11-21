@@ -62,7 +62,7 @@
 - [x] 6.2 On a device, with a 4000 × 4000 noise image (a JPEG over 10 MB): cropping all of it
       shows Photo Too Large once the crop sheet closes, and the slot is unchanged; picking it as
       an event photo with valid photos adds the valid ones and shows Photo Too Large
-- [ ] 6.3 On a device, watch memory while cropping a 48 MP photo
+- [x] 6.3 On a device, watch memory while cropping a 48 MP photo
 - [x] 6.4 Walk through each change and show the diff summary, then ask before committing
 - [x] 6.5 Ask before deploying the rules, then deploy with `cd rules-tests && npm run deploy`
 
