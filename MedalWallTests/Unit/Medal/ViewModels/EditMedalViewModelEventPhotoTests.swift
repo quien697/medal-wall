@@ -19,8 +19,9 @@ struct EditMedalViewModelEventPhotoTests {
 
   // MARK: - Helpers
   /// What a loader saw while it ran: whether Save could be tapped and the photos were checking.
+  /// It holds the view model weakly: the view model holds the loader, which holds the recorder.
   private final class LoadRecorder {
-    var viewModel: EditMedalViewModel?
+    weak var viewModel: EditMedalViewModel?
     var canSaveWhileLoading: Bool?
     var isCheckingWhileLoading: Bool?
   }
