@@ -61,7 +61,8 @@ not an image. `canSave` is `isFormValid && !isCheckingEventPhotos`.
 `EditMedalView` clears the picker selection as soon as it takes the items, then calls
 `addEventPhotos(from:)`. `EditMedalEventPhotosSection` takes `isChecking`: while it is true,
 the add tile becomes a checking tile that can't be tapped: a `ProgressView` at the event
-thumbnail size, ringed with the 1 pt `Color.Border.primary` edge of a loading `PhotoSlot`. The picker can't be reopened, so one
+thumbnail size, ringed with the 1 pt `Color.Border.primary` edge of a loading `PhotoSlot`, which
+VoiceOver reads as "Checking event photos" (zh-TW 「正在檢查賽事照片」). The picker can't be reopened, so one
 check runs at a time and no photo is added twice.
 
 ### Race and edition saves report Photo Too Large

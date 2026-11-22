@@ -63,3 +63,12 @@
       (Photo Too Large over the crop screen, then crop closer and confirm); 10 event photos
       (the add tile shows a spinner, Save waits, no photo twice)
 - [x] 7.4 Walk through each change and show the diff summary, then ask before committing
+
+## 8. Final review
+
+- [x] 8.1 Add "Checking event photos" to the medal photos' `StringCatalogTests` keys, watch it
+      fail, then add its zh-TW and label the checking tile with it for VoiceOver
+- [x] 8.2 Hold the view model weakly in `EditMedalViewModelEventPhotoTests`' `LoadRecorder`, so
+      the view model, its loader and the recorder don't keep each other alive
+- [x] 8.3 Draw the checking tile as a bare `ProgressView`, without a one-child stack
+- [x] 8.4 Run the full test suite, swift-format lint and SwiftLint

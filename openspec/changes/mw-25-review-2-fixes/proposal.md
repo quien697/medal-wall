@@ -45,4 +45,5 @@ for a photo's size reports a generic save failure, not the Photo Too Large the s
   `EditMedalView`, `EditMedalEventPhotosSection`, `EditMedalPhotosSection`, and the profile,
   race and edition forms and view models (`onCheckingChange` and `canSave` removed; Save follows
   `isFormValid` again). `PhotoChecks` and its tests are deleted.
-- **Strings:** "Crop closer or choose a smaller photo.", with zh-TW.
+- **Strings:** "Crop closer or choose a smaller photo." and the VoiceOver label "Checking event
+  photos", each with zh-TW.
