@@ -328,6 +328,16 @@
         }
       }
     },
+    "Checking event photos" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在檢查賽事照片"
+          }
+        }
+      }
+    },
     "Choose a place" : {
       "localizations" : {
         "zh-TW" : {

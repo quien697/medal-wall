@@ -9,8 +9,8 @@ import SwiftUI
 
 /// The medal form's event photos in a row, then a tile to add more from the photo library.
 ///
-/// While picked photos are still being checked, the add tile shows a spinner and can't be
-/// tapped.
+/// While picked photos are still being checked, the add tile shows a spinner, which VoiceOver
+/// reads as "Checking event photos", and can't be tapped.
 struct EditMedalEventPhotosSection: View {
   let photos: [DraftEventPhoto]
   let isChecking: Bool
@@ -43,17 +43,15 @@ struct EditMedalEventPhotosSection: View {
           }  // ForEach
 
           if isChecking {
-            VStack(spacing: .Space.inline) {
-              ProgressView()
-            }  // VStack
-            .frame(
-              width: ImageType.eventThumbnail.size.width,
-              height: ImageType.eventThumbnail.size.height
-            )
-            .overlay {
-              ImageType.eventThumbnail.shape.stroke(Color.Border.primary, lineWidth: 1)
-            }
-            .accessibilityElement(children: .combine)
+            ProgressView()
+              .frame(
+                width: ImageType.eventThumbnail.size.width,
+                height: ImageType.eventThumbnail.size.height
+              )
+              .overlay {
+                ImageType.eventThumbnail.shape.stroke(Color.Border.primary, lineWidth: 1)
+              }
+              .accessibilityLabel("Checking event photos")
           } else {
             Button {
               onChooseFromLibrary()
