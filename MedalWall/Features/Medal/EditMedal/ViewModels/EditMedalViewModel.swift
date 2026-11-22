@@ -179,11 +179,7 @@ final class EditMedalViewModel {
       // never in memory together.
       autoreleasepool { () -> Result<Data, AppError> in
         guard let image = UIImage(data: data) else { return .failure(.photoDataInvalid) }
-        do throws(AppError) {
-          return .success(try image.checkedUploadData())
-        } catch {
-          return .failure(error)
-        }
+        return Result { () throws(AppError) in try image.checkedUploadData() }
       }
     }
   }
