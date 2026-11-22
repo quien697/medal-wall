@@ -192,7 +192,7 @@ final class EditRaceViewModel {
         try await repository.createRace(newRace)
       } catch {
         await deletePhoto(newRace.photoUrl, ownedBy: .race(raceId: newRace.id))
-        self.error = .raceSaveFailed
+        self.error = Self.saveError(for: error, otherwise: .raceSaveFailed)
       }
 
     case .edit:
@@ -209,7 +209,7 @@ final class EditRaceViewModel {
               raceId: race.id, jpegData: croppedPhoto.jpegData)
             race.photoUrl = uploadedPhotoUrl
           } catch {
-            self.error = .raceSaveFailed
+            self.error = Self.saveError(for: error, otherwise: .raceSaveFailed)
             return
           }
         } else {
@@ -236,12 +236,13 @@ final class EditRaceViewModel {
   ///
   /// Each delete, create and update that succeeds is recorded in the staged state, so saving
   /// again after a partial failure retries only what failed: repeating one would move the race's
-  /// edition count a second time, or upload or delete an edition's photo twice. A failed create
-  /// or update is reported over a failed delete. An edition's removed or replaced photo is deleted
+  /// edition count a second time, or upload or delete an edition's photo twice. A photo Storage
+  /// refuses as too large is reported over any other failed create or update, and a failed create
+  /// or update over a failed delete. An edition's removed or replaced photo is deleted
   /// from Storage only after its write succeeds; a photo uploaded for a failed write is deleted.
   private func commitPendingEditions(raceId: String) async {
     var anyDeleteFailed = false
-    var anySaveFailed = false
+    var saveFailure: AppError?
 
     // Deletes
     for id in editionIdsToDelete where originalEditionIds.contains(id) {
@@ -274,7 +275,7 @@ final class EditRaceViewModel {
       } catch {
         await deletePhoto(
           newEdition.photoUrl, ownedBy: .edition(raceId: raceId, editionId: newEdition.id))
-        anySaveFailed = true
+        saveFailure = Self.saveError(for: error, otherwise: saveFailure ?? .editionSaveFailed)
       }
     }
 
@@ -306,15 +307,21 @@ final class EditRaceViewModel {
         }
       } catch {
         await deletePhoto(uploadedPhotoUrl, ownedBy: owner)
-        anySaveFailed = true
+        saveFailure = Self.saveError(for: error, otherwise: saveFailure ?? .editionSaveFailed)
       }
     }
 
-    if anySaveFailed {
-      error = .editionSaveFailed
+    if let saveFailure {
+      error = saveFailure
     } else if anyDeleteFailed {
       error = .editionDeleteFailed
     }
+  }
+
+  /// The error a failed save reports: Photo Too Large when Storage refused a photo as too large,
+  /// which the user can act on, and otherwise `failure`.
+  private static func saveError(for error: any Error, otherwise failure: AppError) -> AppError {
+    (error as? AppError) == .photoTooLarge ? .photoTooLarge : failure
   }
 
   /// Records an edition that reached Firestore as the new original, so a later save starts

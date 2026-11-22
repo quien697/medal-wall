@@ -330,3 +330,60 @@ struct EditRaceViewModelStorageTests {
     #expect(await repository.updatedRaces.isEmpty)
   }
 }
+
+// MARK: - Photo Too Large
+extension EditRaceViewModelStorageTests {
+  @Test("a new race whose logo Storage refuses as too large fails with Photo Too Large")
+  func testNewRaceLogoTooLarge() async throws {
+    let repository = StubRaceRepository()
+    let storage = StubPhotoStorage(uploadOutcome: .failure(.photoTooLarge))
+    let viewModel = EditRaceViewModel(
+      mode: .add, race: nil, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
+    viewModel.name = "Taipei Marathon"
+    viewModel.place = Place(countryCode: "TW", city: "Taipei City")
+    viewModel.photo.update(with: try TestPhotos.cropped())
+
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .photoTooLarge)
+    #expect(await repository.races.isEmpty)
+  }
+
+  @Test("a race logo Storage refuses as too large fails the save with Photo Too Large")
+  func testLogoTooLarge() async throws {
+    let race = makeRace()
+    let repository = StubRaceRepository(races: [race])
+    let storage = StubPhotoStorage(uploadOutcome: .failure(.photoTooLarge))
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
+    viewModel.photo.update(with: try TestPhotos.cropped())
+
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .photoTooLarge)
+    #expect(await repository.races.first?.photoUrl == logoUrl)
+  }
+
+  @Test("an edition photo Storage refuses as too large fails the save with Photo Too Large")
+  func testEditionPhotoTooLarge() async throws {
+    let race = makeRace()
+    let edition = try makeEdition()
+    let repository = StubRaceRepository(races: [race], editions: [race.id: [edition]])
+    let storage = StubPhotoStorage(uploadOutcome: .failure(.photoTooLarge))
+    let viewModel = EditRaceViewModel(
+      mode: .edit, race: race, repository: repository, storageService: storage,
+      networkMonitor: StubNetworkMonitor())
+    await viewModel.loadEditions()
+    var draft = DraftRaceEdition(from: edition)
+    draft.newPhoto = try TestPhotos.cropped()
+    draft.isModified = true
+    viewModel.stageUpdateEdition(draft)
+
+    await viewModel.save(by: "uid")
+
+    #expect(viewModel.error == .photoTooLarge)
+    #expect(await repository.editions[race.id]?.first?.photoUrl == editionPhotoUrl)
+  }
+}
