@@ -41,11 +41,6 @@ struct SearchView: View {
       .background(Color.Background.primary)
       .toolbarTitleDisplayMode(.inlineLarge)
       .toolbarRole(.editor)
-      .toolbar {
-        ToolbarItem(placement: .title) {
-          ExpandedNavigationTitle(title: "Search")
-        }  // ToolbarItem
-      }  // toolbar
       .searchable(text: $viewModel.searchText, prompt: "Search races and medals")
       .autocorrectionDisabled()
       .onAppear {

@@ -37,10 +37,6 @@ struct MedalsView: View {
         .toolbarTitleDisplayMode(.inlineLarge)
         .toolbarRole(.editor)
         .toolbar {
-          ToolbarItem(placement: .title) {
-            ExpandedNavigationTitle(title: "Your Collection")
-          }  // ToolbarItem
-
           ToolbarItem(placement: .topBarTrailing) {
             Button {
               isPresentingAddMedal = true

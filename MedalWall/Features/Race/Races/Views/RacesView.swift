@@ -31,10 +31,6 @@ struct RacesView: View {
           await viewModel.loadRaces()
         }
         .toolbar {
-          ToolbarItem(placement: .title) {
-            ExpandedNavigationTitle(title: "Races")
-          }  // ToolbarItem
-
           ToolbarItem(placement: .topBarTrailing) {
             Button {
               isPresentingAddRace = true

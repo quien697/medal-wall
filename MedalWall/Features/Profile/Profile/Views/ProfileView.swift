@@ -61,10 +61,6 @@ struct ProfileView: View {
         Task { await viewModel.loadMedals(userId: userId) }
       }
       .toolbar {
-        ToolbarItem(placement: .title) {
-          ExpandedNavigationTitle(title: "Profile")
-        }  // ToolbarItem
-
         ToolbarItem(placement: .topBarTrailing) {
           NavigationLink {
             SettingsView()
