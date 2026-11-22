@@ -47,12 +47,19 @@
 - [x] 5.4 Give `EditMedalEventPhotosSection` `isChecking` and the checking tile from design.md,
       add a checking `#Preview`
 
-## 6. Verify
+## 6. Race and edition saves
 
-- [x] 6.1 Build, then run the full test suite and confirm the new test names appear in the run
+- [x] 6.1 Write failing `EditRaceViewModelStorageTests` cases: a new race's logo, an existing
+      race's logo and an edition photo that Storage refuses as too large each fail the save with
+      `.photoTooLarge`; then pass it through in `EditRaceViewModel`
+- [x] 6.2 Build `checkedJPEGs`' result with `Result`'s typed `init(catching:)`
+
+## 7. Verify
+
+- [x] 7.1 Build, then run the full test suite and confirm the new test names appear in the run
       (memory: xcodebuild can run stale tests); run swift-format lint and SwiftLint
-- [x] 6.2 Check the previews: the checking tile in light and dark
-- [ ] 6.3 On a device: confirm a 48 MP crop (progress, then the slot fills); a crop over 10 MB
+- [x] 7.2 Check the previews: the checking tile in light and dark
+- [x] 7.3 On a device: confirm a 48 MP crop (progress, then the slot fills); a crop over 10 MB
       (Photo Too Large over the crop screen, then crop closer and confirm); 10 event photos
       (the add tile shows a spinner, Save waits, no photo twice)
-- [ ] 6.4 Walk through each change and show the diff summary, then ask before committing
+- [x] 7.4 Walk through each change and show the diff summary, then ask before committing

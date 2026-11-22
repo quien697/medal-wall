@@ -64,6 +64,11 @@ the add tile becomes a checking tile that can't be tapped: a `ProgressView` at t
 thumbnail size, ringed with the 1 pt `Color.Border.primary` edge of a loading `PhotoSlot`. The picker can't be reopened, so one
 check runs at a time and no photo is added twice.
 
+### Race and edition saves report Photo Too Large
+`EditRaceViewModel` maps every other failed write or upload to `.raceSaveFailed` or
+`.editionSaveFailed`, as the race repository asks, but passes `.photoTooLarge` through: the user
+can act on it. When several editions fail, Photo Too Large is reported over the others.
+
 ### CropImage 2.1.0
 The project's CropImage requirement moves to 2.1.0 (up to the next major).
 

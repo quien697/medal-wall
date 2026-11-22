@@ -5,7 +5,8 @@ form stays usable, so Remove Photo tapped during a crop's check is undone when t
 (#1), and the event photo picker can be reopened mid-check, adding the same photos twice (#2).
 The crop flow that numbers crops and reports each check to the form also lives in `PhotoSlot`'s
 closure, where it can't be tested (#5). Making the user wait for the check, visibly, closes the
-gap instead of guarding against it.
+gap instead of guarding against it. The review also found that a race or edition save refused
+for a photo's size reports a generic save failure, not the Photo Too Large the spec names (#10).
 
 ## What Changes
 
@@ -20,6 +21,8 @@ gap instead of guarding against it.
 - **The crop flow moves into `PhotoSlotViewModel.confirmCrop(_:)`.** The crop numbering,
   `CropOutcome`, `PhotoSlot`'s `onCheckingChange` and `PhotoChecks` are removed: no form can
   be used while a crop is checked, and the medal form waits for one event photo check at a time.
+- **Race and edition saves report Photo Too Large** when Storage's size check refuses their
+  photo, as medal and profile saves already do.
 - **Removed scenario:** Photo Size Check's "Cropping again during a check", since a crop can no
   longer be confirmed while another is checked. OpenSpec's archive refuses a modified
   requirement that drops a scenario, so archiving merges the Photo Size Check block into
