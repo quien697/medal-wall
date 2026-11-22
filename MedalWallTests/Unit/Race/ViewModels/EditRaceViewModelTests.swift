@@ -307,29 +307,4 @@ struct EditRaceViewModelTests {
     try #require(image.pngData()).write(to: url)
     return url.absoluteString
   }
-
-  // MARK: - canSave
-  /// A form with a name, country and city, which Save accepts.
-  private func makeValidViewModel() -> EditRaceViewModel {
-    let viewModel = EditRaceViewModel(mode: .add, race: nil)
-    viewModel.name = "Boston Marathon"
-    viewModel.place.countryCode = "CA"
-    viewModel.place.city = "Vancouver"
-    return viewModel
-  }
-
-  @Test("Save needs a valid form, and waits while a photo is still being checked")
-  func testCanSave() {
-    let viewModel = makeValidViewModel()
-    #expect(viewModel.canSave)
-
-    viewModel.photoChecks.changed(isChecking: true)
-    #expect(!viewModel.canSave)
-
-    viewModel.photoChecks.changed(isChecking: false)
-    #expect(viewModel.canSave)
-
-    viewModel.name = ""
-    #expect(!viewModel.canSave)
-  }
 }

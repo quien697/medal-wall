@@ -197,20 +197,4 @@ struct EditProfileViewModelTests {
     try #require(image.pngData()).write(to: url)
     return url.absoluteString
   }
-
-  // MARK: - canSave
-  @Test("Save needs a valid form, and waits while a photo is still being checked")
-  func testCanSave() {
-    let viewModel = EditProfileViewModel(profile: makeProfile())
-    #expect(viewModel.canSave)
-
-    viewModel.photoChecks.changed(isChecking: true)
-    #expect(!viewModel.canSave)
-
-    viewModel.photoChecks.changed(isChecking: false)
-    #expect(viewModel.canSave)
-
-    viewModel.userName.firstName = ""
-    #expect(!viewModel.canSave)
-  }
 }

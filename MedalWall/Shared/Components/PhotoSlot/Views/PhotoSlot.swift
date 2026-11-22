@@ -17,10 +17,10 @@ import SwiftUI
 /// and Cancel.
 /// Choose Photo opens the photo library. Take Photo opens the camera once camera access allows
 /// it, lets iOS ask first, or says why the camera cannot open. Either photo is then cropped to
-/// `cropShape`, and the cropped photo reaches `onPick` once its size is checked. A photo that
-/// fails to load, or whose cropped JPEG is too large to upload, reaches `onError`.
-/// `onCheckingChange` is told when a check starts (`true`) and ends (`false`), so the form can
-/// hold Save until it ends; only the newest crop's photo is used.
+/// `cropShape`. The crop screen stays open, showing progress, while the cropped photo's size is
+/// checked: a photo under the limit then reaches `onPick` and the crop screen closes, and one
+/// too large to upload is refused over the crop screen, which stays open so the user can crop
+/// closer. A picked photo that fails to load reaches `onError`.
 ///
 /// The slot wears a 2 pt ink ring while its alert is open. It is drawn at its `imageType`'s
 /// size, shrinking to the width it is given.
@@ -32,6 +32,7 @@ struct PhotoSlot: View {
   @State private var isPresentingOptions = false
   @State private var isPresentingPhotoPicker = false
   @State private var selectedPhoto: PhotosPickerItem?
+  @State private var cropErrorWrapper: ErrorWrapper?
   @State private var viewModel = PhotoSlotViewModel()
 
   // MARK: - Properties
@@ -45,7 +46,6 @@ struct PhotoSlot: View {
   private let onPick: (CroppedPhoto) -> Void
   private let onRemove: () -> Void
   private let onError: (AppError) -> Void
-  private let onCheckingChange: (Bool) -> Void
 
   // MARK: - Init
   /// Creates a slot showing `content`: the form's photo, its stored photo's status, or the
@@ -60,8 +60,7 @@ struct PhotoSlot: View {
     offersCamera: Bool = true,
     onPick: @escaping (CroppedPhoto) -> Void,
     onRemove: @escaping () -> Void,
-    onError: @escaping (AppError) -> Void,
-    onCheckingChange: @escaping (Bool) -> Void
+    onError: @escaping (AppError) -> Void
   ) {
     self.content = content
     self.imageType = imageType
@@ -73,7 +72,6 @@ struct PhotoSlot: View {
     self.onPick = onPick
     self.onRemove = onRemove
     self.onError = onError
-    self.onCheckingChange = onCheckingChange
   }
 
   // MARK: - Body
@@ -200,18 +198,20 @@ struct PhotoSlot: View {
           image: pickedPhoto.image,
           cropShape: cropShape
         ) { croppedImage in
-          guard let croppedImage else { return }
-          let crop = viewModel.beginCrop()
-          onCheckingChange(true)
-          Task {
-            switch await viewModel.checkCroppedPhoto(croppedImage, crop: crop) {
-            case .usable(let photo): onPick(photo)
-            case .refused(let error): onError(error)
-            case .superseded: break
-            }
-            onCheckingChange(false)
+          onPick(try await viewModel.confirmCrop(croppedImage))
+        }  // CropImageView
+        .onChange(of: viewModel.error) { _, error in
+          if let error {
+            cropErrorWrapper = ErrorWrapper(error: error)
           }
         }
+        .sheet(
+          item: $cropErrorWrapper,
+          onDismiss: { viewModel.error = nil },
+          content: { wrapper in
+            ErrorView(errorWrapper: wrapper)
+          }
+        )  // sheet
       }
     )
   }
@@ -236,8 +236,7 @@ struct PhotoSlot: View {
         placeholderText: "Add front",
         onPick: { _ in },
         onRemove: {},
-        onError: { _ in },
-        onCheckingChange: { _ in }
+        onError: { _ in }
       )  // PhotoSlot
 
       PhotoSlot(
@@ -247,8 +246,7 @@ struct PhotoSlot: View {
         title: "Back photo",
         onPick: { backContent = .photo($0.image) },
         onRemove: { backContent = .empty },
-        onError: { _ in },
-        onCheckingChange: { _ in }
+        onError: { _ in }
       )  // PhotoSlot
     }  // HStack
     .listRowBackground(Color.clear)
@@ -265,8 +263,7 @@ struct PhotoSlot: View {
       offersCamera: false,
       onPick: { _ in },
       onRemove: {},
-      onError: { _ in },
-      onCheckingChange: { _ in }
+      onError: { _ in }
     )  // PhotoSlot
     .frame(maxWidth: .infinity)
     .listRowBackground(Color.clear)
@@ -284,8 +281,7 @@ struct PhotoSlot: View {
         placeholderText: "Add front",
         onPick: { _ in },
         onRemove: {},
-        onError: { _ in },
-        onCheckingChange: { _ in }
+        onError: { _ in }
       )  // PhotoSlot
 
       PhotoSlot(
@@ -296,8 +292,7 @@ struct PhotoSlot: View {
         placeholderText: "Add back",
         onPick: { _ in },
         onRemove: {},
-        onError: { _ in },
-        onCheckingChange: { _ in }
+        onError: { _ in }
       )  // PhotoSlot
     }  // HStack
     .listRowBackground(Color.clear)
@@ -309,8 +304,7 @@ struct PhotoSlot: View {
       title: "Profile photo",
       onPick: { _ in },
       onRemove: {},
-      onError: { _ in },
-      onCheckingChange: { _ in }
+      onError: { _ in }
     )  // PhotoSlot
     .frame(maxWidth: .infinity)
     .listRowBackground(Color.clear)

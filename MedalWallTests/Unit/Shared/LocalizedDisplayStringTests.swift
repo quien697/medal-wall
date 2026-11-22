@@ -228,6 +228,16 @@ struct LocalizedDisplayStringTests {
     #expect(translated("Please choose a smaller photo.") == "請選擇較小的照片。")
   }
 
+  @Test("A crop over the upload limit names the limit and asks for a closer crop")
+  func testCroppedPhotoTooLargeStrings() {
+    let error = AppError.croppedPhotoTooLarge
+
+    #expect(error.title == "Photo Too Large")
+    #expect(error.message == "Photos must be under 10 MB.")
+    #expect(error.guidance == "Crop closer or choose a smaller photo.")
+    #expect(translated("Crop closer or choose a smaller photo.") == "請縮小裁切範圍，或選擇較小的照片。")
+  }
+
   @Test("An error bridged through `any Error` still reads its own message and guidance")
   func testAppErrorLocalizedDescription() {
     let error: any Error = AppError.raceFetchFailed("network down")

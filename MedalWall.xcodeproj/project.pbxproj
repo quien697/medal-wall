@@ -133,7 +133,6 @@
 				Shared/UIModels/DraftPhoto.swift,
 				Shared/UIModels/ItemEditMode.swift,
 				Shared/UIModels/LoadSequence.swift,
-				Shared/UIModels/PhotoChecks.swift,
 				Shared/UIModels/PhotoSlotContent.swift,
 			);
 			target = 60B570BE2EA616CA000B3FDE /* MedalWallTests */;
@@ -723,7 +722,7 @@
 			repositoryURL = "https://github.com/quien697/CropImage";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.1;
+				minimumVersion = 2.1.0;
 			};
 		};
 		60D4C5462FD6C40E008DFA1D /* XCRemoteSwiftPackageReference "TimePicker" */ = {

@@ -35,8 +35,7 @@ struct EditMedalView: View {
           content: { viewModel.photoContent(for: $0) },
           onPick: { viewModel.updatePhoto(with: $0, for: $1) },
           onRemove: { viewModel.removePhoto(for: $0) },
-          onError: { errorWrapper = ErrorWrapper(error: $0) },
-          onCheckingChange: { viewModel.photoChecks.changed(isChecking: $0) }
+          onError: { errorWrapper = ErrorWrapper(error: $0) }
         )
 
         EditMedalAutoFillSection {
@@ -73,6 +72,7 @@ struct EditMedalView: View {
 
         EditMedalEventPhotosSection(
           photos: viewModel.draftEventPhotos,
+          isChecking: viewModel.isCheckingEventPhotos,
           onChooseFromLibrary: {
             isPresentingEventPhotosPicker = true
           },
@@ -135,29 +135,14 @@ struct EditMedalView: View {
       )
       .onChange(of: selectedEventPhotos) { _, newItems in
         guard !newItems.isEmpty else { return }
+        selectedEventPhotos = []
 
         Task {
-          viewModel.photoChecks.changed(isChecking: true)
-          defer { viewModel.photoChecks.changed(isChecking: false) }
-          var dataList: [Data] = []
-
-          for item in newItems {
-            if let data = try? await item.loadTransferable(type: Data.self) {
-              dataList.append(data)
-            } else {
-              errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
-            }
+          do throws(AppError) {
+            try await viewModel.addEventPhotos(from: newItems)
+          } catch {
+            errorWrapper = ErrorWrapper(error: error)
           }
-
-          if !dataList.isEmpty {
-            do throws(AppError) {
-              try await viewModel.addEventPhotos(dataList)
-            } catch {
-              errorWrapper = ErrorWrapper(error: error)
-            }
-          }
-
-          selectedEventPhotos = []
         }
       }
       .sheet(isPresented: $isPresentingDistancePicker) {

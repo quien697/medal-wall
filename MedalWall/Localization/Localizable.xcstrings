@@ -408,6 +408,16 @@
         }
       }
     },
+    "Crop closer or choose a smaller photo." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請縮小裁切範圍，或選擇較小的照片。"
+          }
+        }
+      }
+    },
     "Custom" : {
       "localizations" : {
         "zh-TW" : {

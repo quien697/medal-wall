@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/quien697/CropImage",
       "state" : {
-        "revision" : "c9a7825793d99fbfab3900f9a47cd23f3c07900e",
-        "version" : "2.0.1"
+        "revision" : "6f9b948bd6887bb34b9bd6b2f48789adff8d9d01",
+        "version" : "2.1.0"
       }
     },
     {

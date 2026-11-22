@@ -15,9 +15,13 @@ nonisolated struct CroppedPhoto {
   let jpegData: Data
 
   /// Encodes `image` as the JPEG to upload. Throws `.photoDataInvalid` if it cannot be
-  /// encoded, and `.photoTooLarge` if Storage would refuse the JPEG's size.
+  /// encoded, and `.croppedPhotoTooLarge` if Storage would refuse the JPEG's size.
   init(checking image: UIImage) throws(AppError) {
     self.image = image
-    self.jpegData = try image.checkedUploadData()
+    do {
+      self.jpegData = try image.checkedUploadData()
+    } catch .photoTooLarge {
+      throw .croppedPhotoTooLarge
+    }
   }
 }

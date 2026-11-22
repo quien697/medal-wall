@@ -20,10 +20,6 @@ final class EditRaceEditionViewModel {
   var photo = DraftPhoto()
   var distances: [RaceEvent] = []
 
-  // MARK: - State
-  /// The photo checks in progress, which Save waits for.
-  var photoChecks = PhotoChecks()
-
   // MARK: - Dependencies
   let mode: ItemEditMode
   /// The staged edition being re-edited, carrying changes the race save hasn't written yet.
@@ -53,9 +49,6 @@ final class EditRaceEditionViewModel {
   }
 
   // MARK: - Computed
-  /// Whether Save can be tapped: the form is valid and no photo is still being checked.
-  var canSave: Bool { isFormValid && !photoChecks.isChecking }
-
   var isFormValid: Bool {
     year >= minYear && year <= maxYear && startDate <= endDate
   }

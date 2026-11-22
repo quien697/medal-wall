@@ -367,29 +367,4 @@ struct EditMedalViewModelTests {
 
     #expect(viewModel.tags == ["taipei"])
   }
-
-  // MARK: - canSave
-  /// A form with a name, country and city, which Save accepts.
-  private func makeValidViewModel() -> EditMedalViewModel {
-    let viewModel = EditMedalViewModel(mode: .add)
-    viewModel.name = "Taipei Marathon 2019"
-    viewModel.place.countryCode = "TW"
-    viewModel.place.city = "Taipei"
-    return viewModel
-  }
-
-  @Test("Save needs a valid form, and waits while a photo is still being checked")
-  func testCanSave() {
-    let viewModel = makeValidViewModel()
-    #expect(viewModel.canSave)
-
-    viewModel.photoChecks.changed(isChecking: true)
-    #expect(!viewModel.canSave)
-
-    viewModel.photoChecks.changed(isChecking: false)
-    #expect(viewModel.canSave)
-
-    viewModel.name = ""
-    #expect(!viewModel.canSave)
-  }
 }

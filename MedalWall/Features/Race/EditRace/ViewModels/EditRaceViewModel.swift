@@ -18,8 +18,6 @@ final class EditRaceViewModel {
   var websiteUrl: String = ""
 
   // MARK: - State
-  /// The photo checks in progress, which Save waits for.
-  var photoChecks = PhotoChecks()
   var isLoading = false
   var isEditionsLoading = false
   /// Whether the race's editions have loaded, so a reload keeps them on screen.
@@ -66,9 +64,6 @@ final class EditRaceViewModel {
   }
 
   // MARK: - Computed
-  /// Whether Save can be tapped: the form is valid and no photo is still being checked.
-  var canSave: Bool { isFormValid && !photoChecks.isChecking }
-
   /// Bones stand in for an existing race's editions while they load, until a load first
   /// succeeds.
   var isShowingEditionsSkeleton: Bool {

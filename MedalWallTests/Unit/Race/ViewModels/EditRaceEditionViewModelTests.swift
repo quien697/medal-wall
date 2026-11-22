@@ -187,22 +187,6 @@ struct EditRaceEditionViewModelTests {
 
     #expect(viewModel.distances.isEmpty)
   }
-
-  // MARK: - canSave
-  @Test("Save needs a valid form, and waits while a photo is still being checked")
-  func testCanSave() {
-    let viewModel = makeViewModel()
-    #expect(viewModel.canSave)
-
-    viewModel.photoChecks.changed(isChecking: true)
-    #expect(!viewModel.canSave)
-
-    viewModel.photoChecks.changed(isChecking: false)
-    #expect(viewModel.canSave)
-
-    viewModel.year = viewModel.minYear - 1
-    #expect(!viewModel.canSave)
-  }
 }
 
 // MARK: - addDistance validation

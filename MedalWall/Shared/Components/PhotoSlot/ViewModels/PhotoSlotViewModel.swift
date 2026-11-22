@@ -19,9 +19,8 @@ final class PhotoSlotViewModel {
   var takenPhoto: UIImage?
   /// The photo picked or taken, waiting in the crop sheet.
   var photoToCrop: PickedPhoto?
-
-  /// Numbers each confirmed crop, so a check that ends after a newer crop is ignored.
-  @ObservationIgnored private var crops = LoadSequence()
+  /// Why the crop just confirmed was refused, shown over the crop screen.
+  var error: AppError?
 
   /// iOS's camera access prompt while it is up. Exposed so tests can await it.
   @ObservationIgnored private(set) var cameraAccessRequest: Task<Void, Never>?
@@ -71,42 +70,27 @@ final class PhotoSlotViewModel {
     return nil
   }
 
-  /// What to do with a cropped photo once its size check ends.
-  enum CropOutcome {
-    /// The photo, checked, ready to hand to the form.
-    case usable(CroppedPhoto)
-    /// Storage would refuse the photo; show the error and leave the slot as it is.
-    case refused(AppError)
-    /// A newer crop was confirmed during the check, so this photo is not used.
-    case superseded
-  }
-
-  /// Numbers a crop the user has just confirmed, so only the newest one is used.
-  func beginCrop() -> Int {
-    crops.begin()
-  }
-
-  /// Encodes and checks the image of `crop`.
-  func checkCroppedPhoto(_ image: UIImage, crop: Int) async -> CropOutcome {
-    let result = await Self.croppedPhoto(from: image)
-    guard crops.isNewest(crop) else { return .superseded }
-    switch result {
-    case .success(let photo): return .usable(photo)
-    case .failure(let error): return .refused(error)
-    }
-  }
-
-  /// `image` encoded and checked as a `CroppedPhoto`. Runs off the main actor, since encoding a
-  /// full-resolution crop takes a noticeable moment.
-  @concurrent
-  nonisolated private static func croppedPhoto(from image: UIImage) async -> Result<
-    CroppedPhoto, AppError
-  > {
+  /// The crop the user confirmed, encoded once as the JPEG to upload and checked. A crop the
+  /// crop screen couldn't render (`.photoDataInvalid`), or whose JPEG Storage would refuse
+  /// (`.croppedPhotoTooLarge`), is refused: the error is kept to show over the crop screen,
+  /// and thrown so the crop screen stays open.
+  func confirmCrop(_ croppedImage: UIImage?) async throws(AppError) -> CroppedPhoto {
     do throws(AppError) {
-      return .success(try CroppedPhoto(checking: image))
+      guard let croppedImage else { throw .photoDataInvalid }
+      return try await Self.croppedPhoto(from: croppedImage)
     } catch {
-      return .failure(error)
+      self.error = error
+      throw error
     }
+  }
+
+  /// `image` encoded and checked as a `CroppedPhoto`. Runs off the main actor, so the crop
+  /// screen's progress keeps turning while a full-resolution crop is encoded.
+  @concurrent
+  nonisolated private static func croppedPhoto(from image: UIImage) async throws(AppError)
+    -> CroppedPhoto
+  {
+    try CroppedPhoto(checking: image)
   }
 
   /// Hands the photo taken to the crop sheet once the camera has closed; closing it without one

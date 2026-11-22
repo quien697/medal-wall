@@ -18,8 +18,6 @@ final class EditProfileViewModel {
   var birthday: Date?
 
   // MARK: - State
-  /// The photo checks in progress, which Save waits for.
-  var photoChecks = PhotoChecks()
   private(set) var isLoading = false
 
   // MARK: - Dependencies
@@ -41,9 +39,6 @@ final class EditProfileViewModel {
   }
 
   // MARK: - Computed
-  /// Whether Save can be tapped: the form is valid and no photo is still being checked.
-  var canSave: Bool { isFormValid && !photoChecks.isChecking }
-
   var isFormValid: Bool {
     !userName.trimmedFirstName.isEmpty && !userName.trimmedLastName.isEmpty
   }

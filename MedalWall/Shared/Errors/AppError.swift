@@ -45,6 +45,7 @@ nonisolated enum AppError: LocalizedError, Equatable {
   // Media Errors
   case photoDataInvalid
   case photoTooLarge
+  case croppedPhotoTooLarge
 
   // Place Errors
   case placeSearchFailed(String)
@@ -88,7 +89,7 @@ nonisolated enum AppError: LocalizedError, Equatable {
       .appLocalized("Invalid Distance")
     case .photoDataInvalid:
       .appLocalized("Photo Data Invalid")
-    case .photoTooLarge:
+    case .photoTooLarge, .croppedPhotoTooLarge:
       .appLocalized("Photo Too Large")
     case .placeSearchFailed:
       .appLocalized("Place Search Failed")
@@ -141,7 +142,7 @@ nonisolated enum AppError: LocalizedError, Equatable {
         "Distance must be greater than zero and less than 10,000, with at most 4 decimal places.")
     case .photoDataInvalid:
       .appLocalized("We couldn't process the selected image.")
-    case .photoTooLarge:
+    case .photoTooLarge, .croppedPhotoTooLarge:
       .appLocalized("Photos must be under 10 MB.")
     case .placeSearchFailed(let description):
       .appLocalized("We couldn't search for places. \(description)")
@@ -190,6 +191,8 @@ nonisolated enum AppError: LocalizedError, Equatable {
       .appLocalized("Please try choosing a different image.")
     case .photoTooLarge:
       .appLocalized("Please choose a smaller photo.")
+    case .croppedPhotoTooLarge:
+      .appLocalized("Crop closer or choose a smaller photo.")
     case .sendEmailSignInLinkFailed:
       .appLocalized("Please check your email address and try again.")
     case .emailLinkSignInFailed:

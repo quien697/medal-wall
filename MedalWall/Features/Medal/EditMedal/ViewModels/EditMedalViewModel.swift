@@ -3,6 +3,7 @@
 //  MedalWall
 //
 
+import PhotosUI
 import SwiftUI
 
 @Observable
@@ -29,8 +30,8 @@ final class EditMedalViewModel {
   var draftEventPhotos: [DraftEventPhoto] = []
 
   // MARK: - State
-  /// The photo checks in progress, which Save waits for.
-  var photoChecks = PhotoChecks()
+  /// Whether picked event photos are still being loaded and checked, which Save waits for.
+  private(set) var isCheckingEventPhotos = false
   var isLoading = false
   var error: AppError?
 
@@ -41,6 +42,8 @@ final class EditMedalViewModel {
   private let repository: any MedalRepository
   private let storageService: any PhotoStorage
   private let networkMonitor: any NetworkMonitor
+  /// Loads a photo picked in the photo library as its file's data, or nil if it can't be.
+  private let loadPickedPhoto: (PhotosPickerItem) async -> Data?
 
   // MARK: - Init
   init(
@@ -48,7 +51,8 @@ final class EditMedalViewModel {
     medal: Medal? = nil,
     repository: (any MedalRepository)? = nil,
     storageService: (any PhotoStorage)? = nil,
-    networkMonitor: (any NetworkMonitor)? = nil
+    networkMonitor: (any NetworkMonitor)? = nil,
+    loadPickedPhoto: ((PhotosPickerItem) async -> Data?)? = nil
   ) {
     self.mode = mode
     self.medal = medal
@@ -56,6 +60,7 @@ final class EditMedalViewModel {
     self.repository = repository ?? MedalFirestoreRepository()
     self.storageService = storageService ?? StorageService()
     self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
+    self.loadPickedPhoto = loadPickedPhoto ?? { try? await $0.loadTransferable(type: Data.self) }
 
     if let medal, mode == .edit {
       self.name = medal.name
@@ -83,8 +88,8 @@ final class EditMedalViewModel {
   }
 
   // MARK: - Computed
-  /// Whether Save can be tapped: the form is valid and no photo is still being checked.
-  var canSave: Bool { isFormValid && !photoChecks.isChecking }
+  /// Whether Save can be tapped: the form is valid and no event photo is still being checked.
+  var canSave: Bool { isFormValid && !isCheckingEventPhotos }
 
   var isFormValid: Bool {
     distance.category.isValid && !trimmedName.isEmpty && place.isValid
@@ -126,6 +131,26 @@ final class EditMedalViewModel {
   /// Removes the photo of `face`, leaving the other face as it is.
   func removePhoto(for face: MedalFace) {
     facePhotos[face]?.remove()
+  }
+
+  /// Loads the event photos picked in the photo library and stages them as `addEventPhotos(_:)`
+  /// does, holding Save from the start of loading to the end of the check.
+  ///
+  /// An item that can't be loaded is skipped and counts as not an image. Once the others are
+  /// added, throws `.photoTooLarge` if any item was too large, and otherwise
+  /// `.photoDataInvalid` if any was not an image.
+  func addEventPhotos(from items: [PhotosPickerItem]) async throws(AppError) {
+    isCheckingEventPhotos = true
+    defer { isCheckingEventPhotos = false }
+
+    var dataList: [Data] = []
+    for item in items {
+      if let data = await loadPickedPhoto(item) {
+        dataList.append(data)
+      }
+    }
+    try await addEventPhotos(dataList)
+    if dataList.count < items.count { throw .photoDataInvalid }
   }
 
   /// Appends new event photos from the photo picker, each staged as its checked JPEG, which

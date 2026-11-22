@@ -146,56 +146,40 @@ struct PhotoSlotViewModelTests {
     #expect(viewModel.photoToCrop == nil)
   }
 
-  @Test("a cropped photo whose JPEG is over the upload limit is refused as too large")
-  func testCroppedPhotoOverLimitIsRefused() async throws {
+  @Test("a confirmed crop under the upload limit is returned with its checked JPEG")
+  func testConfirmedCropUnderLimitIsReturned() async throws {
     let viewModel = makeViewModel(access: .granted)
-    let crop = viewModel.beginCrop()
-    let croppedPhoto = try #require(TestPhotos.noise())
+    let croppedImage = TestPhotos.plain(width: 400, height: 400)
 
-    let outcome = await viewModel.checkCroppedPhoto(croppedPhoto, crop: crop)
+    let photo = try await viewModel.confirmCrop(croppedImage)
 
-    guard case .refused(let error) = outcome else {
-      Issue.record("expected the photo to be refused, got \(outcome)")
-      return
-    }
-    #expect(error == .photoTooLarge)
-  }
-
-  @Test("a cropped photo under the upload limit is handed over with its checked JPEG")
-  func testCroppedPhotoUnderLimitIsUsable() async throws {
-    let viewModel = makeViewModel(access: .granted)
-    let crop = viewModel.beginCrop()
-    let croppedPhoto = TestPhotos.plain(width: 400, height: 400)
-
-    let outcome = await viewModel.checkCroppedPhoto(croppedPhoto, crop: crop)
-
-    guard case .usable(let photo) = outcome else {
-      Issue.record("expected the photo to be usable, got \(outcome)")
-      return
-    }
-    #expect(photo.image === croppedPhoto)
+    #expect(photo.image === croppedImage)
     let source = try #require(CGImageSourceCreateWithData(photo.jpegData as CFData, nil))
     #expect(CGImageSourceGetType(source) as String? == UTType.jpeg.identifier)
+    #expect(viewModel.error == nil)
   }
 
-  @Test("a crop confirmed before a newer one is never applied, whichever check ends first")
-  func testOlderCropIsSuperseded() async {
+  // `MedalWall.` names the app's `AppError`, which the app's `PhotoSlotViewModel` throws: the
+  // test target compiles its own copy for the files on its include list.
+  @Test("a confirmed crop over the upload limit is refused, keeping the crop screen open")
+  func testConfirmedCropOverLimitIsRefused() async throws {
     let viewModel = makeViewModel(access: .granted)
-    let older = viewModel.beginCrop()
-    let newer = viewModel.beginCrop()
-    let croppedPhoto = TestPhotos.plain(width: 400, height: 400)
+    let croppedImage = try #require(TestPhotos.noise())
 
-    let newerOutcome = await viewModel.checkCroppedPhoto(croppedPhoto, crop: newer)
-    let olderOutcome = await viewModel.checkCroppedPhoto(croppedPhoto, crop: older)
+    await #expect(throws: MedalWall.AppError.croppedPhotoTooLarge) {
+      try await viewModel.confirmCrop(croppedImage)
+    }
+    #expect(viewModel.error == .croppedPhotoTooLarge)
+  }
 
-    guard case .usable = newerOutcome else {
-      Issue.record("expected the newer crop to be used, got \(newerOutcome)")
-      return
+  @Test("a crop the crop screen couldn't render is refused as invalid photo data")
+  func testMissingCropIsRefused() async {
+    let viewModel = makeViewModel(access: .granted)
+
+    await #expect(throws: MedalWall.AppError.photoDataInvalid) {
+      try await viewModel.confirmCrop(nil)
     }
-    guard case .superseded = olderOutcome else {
-      Issue.record("expected the older crop to be superseded, got \(olderOutcome)")
-      return
-    }
+    #expect(viewModel.error == .photoDataInvalid)
   }
 
   @Test("a photo taken reaches the crop sheet once the camera closes")

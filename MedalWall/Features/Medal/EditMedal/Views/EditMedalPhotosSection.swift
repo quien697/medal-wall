@@ -18,7 +18,6 @@ struct EditMedalPhotosSection: View {
   let onPick: (CroppedPhoto, MedalFace) -> Void
   let onRemove: (MedalFace) -> Void
   let onError: (AppError) -> Void
-  let onCheckingChange: (Bool) -> Void
 
   var body: some View {
     Section {
@@ -38,8 +37,7 @@ struct EditMedalPhotosSection: View {
               placeholderText: face.addTitle,
               onPick: { onPick($0, face) },
               onRemove: { onRemove(face) },
-              onError: onError,
-              onCheckingChange: onCheckingChange
+              onError: onError
             )  // PhotoSlot
 
             Text(face.title)
@@ -72,8 +70,7 @@ struct EditMedalPhotosSection: View {
       content: { $0 == .front ? frontContent : .failed },
       onPick: { photo, face in if face == .front { frontContent = .photo(photo.image) } },
       onRemove: { face in if face == .front { frontContent = .empty } },
-      onError: { _ in },
-      onCheckingChange: { _ in }
+      onError: { _ in }
     )
   }  // Form
 }
