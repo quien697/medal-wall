@@ -12,7 +12,8 @@ import SwiftUI
 final class EditRaceViewModel {
   // MARK: - Data
   var name: String = ""
-  var photo: UIImage?
+  /// The race logo as its slot shows it and as save uploads it.
+  var photo = DraftPhoto()
   var place = Place(countryCode: "", city: "")
   var websiteUrl: String = ""
 
@@ -22,9 +23,6 @@ final class EditRaceViewModel {
   /// Whether the race's editions have loaded, so a reload keeps them on screen.
   private(set) var hasLoadedEditions = false
   var error: AppError?
-  private(set) var isPhotoChanged = false
-  /// The stored logo while the form isn't showing it: still downloading, or one that couldn't be.
-  private(set) var storedPhotoStatus: StoredPhotoStatus?
 
   // MARK: - Edition Staging
   private var originalEditions: [RaceEdition] = []
@@ -61,7 +59,7 @@ final class EditRaceViewModel {
       self.place = race.place
       self.websiteUrl = race.websiteUrl ?? ""
       self.isEditionsLoading = true
-      self.storedPhotoStatus = race.photoUrl == nil ? nil : .loading
+      self.photo = DraftPhoto(storedPhotoUrl: race.photoUrl)
     }
   }
 
@@ -106,10 +104,10 @@ final class EditRaceViewModel {
   }
 
   // MARK: - Functions
-  /// Loads the existing logo and the editions side by side, so a slow logo download never
+  /// Loads the stored logo and the editions side by side, so a slow logo download never
   /// holds the edition list back.
   func load() async {
-    async let photo: Void = loadExistingPhoto()
+    async let photo: Void = loadStoredPhoto()
     await loadEditions()
     await photo
   }
@@ -155,30 +153,11 @@ final class EditRaceViewModel {
     }
   }
 
-  /// Downloads the existing race photo into `photo` so the slot shows the current image,
+  /// Downloads the stored logo into `photo` so the slot shows the current image,
   /// marking it as failed when it can't be downloaded.
-  func loadExistingPhoto() async {
-    let existingPhoto = await loadImage(race?.photoUrl)
-    guard !isPhotoChanged else { return }
-
-    photo = existingPhoto
-    if storedPhotoStatus == .loading {
-      storedPhotoStatus = existingPhoto == nil ? .failed : nil
-    }
-  }
-
-  /// Replaces the current photo and marks it as changed.
-  func updatePhoto(with uiImage: UIImage) {
-    photo = uiImage
-    isPhotoChanged = true
-    storedPhotoStatus = nil
-  }
-
-  /// Clears the current photo and marks it as changed.
-  func clearPhoto() {
-    photo = nil
-    isPhotoChanged = true
-    storedPhotoStatus = nil
+  func loadStoredPhoto() async {
+    let storedPhoto = await loadImage(race?.photoUrl)
+    photo.showStored(storedPhoto)
   }
 
   /// Creates or updates the race in Firestore, uploading the logo only when the photo was changed.
@@ -206,14 +185,14 @@ final class EditRaceViewModel {
         createdBy: userID
       )
       do {
-        if let photo {
+        if let croppedPhoto = photo.croppedPhoto {
           newRace.photoUrl = try await storageService.uploadRaceLogo(
-            raceId: newRace.id, image: photo)
+            raceId: newRace.id, jpegData: croppedPhoto.jpegData)
         }
         try await repository.createRace(newRace)
       } catch {
         await deletePhoto(newRace.photoUrl, ownedBy: .race(raceId: newRace.id))
-        self.error = .raceSaveFailed
+        self.error = Self.saveError(for: error, otherwise: .raceSaveFailed)
       }
 
     case .edit:
@@ -223,14 +202,14 @@ final class EditRaceViewModel {
       race.name = trimmedName
       race.place = place
       race.websiteUrl = trimmedWebsiteUrl
-      if isPhotoChanged {
-        if let photo {
+      if photo.isChanged {
+        if let croppedPhoto = photo.croppedPhoto {
           do {
             uploadedPhotoUrl = try await storageService.uploadRaceLogo(
-              raceId: race.id, image: photo)
+              raceId: race.id, jpegData: croppedPhoto.jpegData)
             race.photoUrl = uploadedPhotoUrl
           } catch {
-            self.error = .raceSaveFailed
+            self.error = Self.saveError(for: error, otherwise: .raceSaveFailed)
             return
           }
         } else {
@@ -245,7 +224,7 @@ final class EditRaceViewModel {
         return
       }
       self.race = race
-      isPhotoChanged = false
+      photo.markSaved()
       if previousPhotoUrl != race.photoUrl {
         await deletePhoto(previousPhotoUrl, ownedBy: .race(raceId: race.id))
       }
@@ -257,12 +236,13 @@ final class EditRaceViewModel {
   ///
   /// Each delete, create and update that succeeds is recorded in the staged state, so saving
   /// again after a partial failure retries only what failed: repeating one would move the race's
-  /// edition count a second time, or upload or delete an edition's photo twice. A failed create
-  /// or update is reported over a failed delete. An edition's removed or replaced photo is deleted
+  /// edition count a second time, or upload or delete an edition's photo twice. A photo Storage
+  /// refuses as too large is reported over any other failed create or update, and a failed create
+  /// or update over a failed delete. An edition's removed or replaced photo is deleted
   /// from Storage only after its write succeeds; a photo uploaded for a failed write is deleted.
   private func commitPendingEditions(raceId: String) async {
     var anyDeleteFailed = false
-    var anySaveFailed = false
+    var saveFailure: AppError?
 
     // Deletes
     for id in editionIdsToDelete where originalEditionIds.contains(id) {
@@ -295,7 +275,7 @@ final class EditRaceViewModel {
       } catch {
         await deletePhoto(
           newEdition.photoUrl, ownedBy: .edition(raceId: raceId, editionId: newEdition.id))
-        anySaveFailed = true
+        saveFailure = Self.saveError(for: error, otherwise: saveFailure ?? .editionSaveFailed)
       }
     }
 
@@ -317,7 +297,7 @@ final class EditRaceViewModel {
         uploadedPhotoUrl = try await uploadNewPhoto(of: draft, raceId: raceId)
         if let uploadedPhotoUrl {
           edition.photoUrl = uploadedPhotoUrl
-        } else if draft.isPhotoCleared {
+        } else if draft.isPhotoRemoved {
           edition.photoUrl = nil
         }
         try await repository.updateEdition(edition)
@@ -327,15 +307,21 @@ final class EditRaceViewModel {
         }
       } catch {
         await deletePhoto(uploadedPhotoUrl, ownedBy: owner)
-        anySaveFailed = true
+        saveFailure = Self.saveError(for: error, otherwise: saveFailure ?? .editionSaveFailed)
       }
     }
 
-    if anySaveFailed {
-      error = .editionSaveFailed
+    if let saveFailure {
+      error = saveFailure
     } else if anyDeleteFailed {
       error = .editionDeleteFailed
     }
+  }
+
+  /// The error a failed save reports: Photo Too Large when Storage refused a photo as too large,
+  /// which the user can act on, and otherwise `failure`.
+  private static func saveError(for error: any Error, otherwise failure: AppError) -> AppError {
+    (error as? AppError) == .photoTooLarge ? .photoTooLarge : failure
   }
 
   /// Records an edition that reached Firestore as the new original, so a later save starts
@@ -361,11 +347,9 @@ final class EditRaceViewModel {
 
   /// Uploads the photo newly picked for a draft and returns its URL, or `nil` when it has none.
   private func uploadNewPhoto(of draft: DraftRaceEdition, raceId: String) async throws -> String? {
-    guard let photoData = draft.newPhotoData, let photo = UIImage(data: photoData) else {
-      return nil
-    }
+    guard let photo = draft.newPhoto else { return nil }
 
-    return try await storageService.uploadRaceEditionLogo(
-      raceId: raceId, editionId: draft.id, image: photo)
+    return try await storageService.uploadRaceEditionPhoto(
+      raceId: raceId, editionId: draft.id, jpegData: photo.jpegData)
   }
 }

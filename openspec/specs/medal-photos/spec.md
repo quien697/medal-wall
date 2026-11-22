@@ -1,9 +1,8 @@
 # medal-photos Specification
 
 ## Purpose
-A medal's front and back photos: how each face is chosen or taken and framed as a
-square, how it is stored, how the edit form's photo slots behave, and how a medal image
-is shown across the app.
+A medal's front and back photos: how each face is chosen or taken and cropped to a square,
+how the edit form's photo slots behave, and how a medal image is shown across the app.
 ## Requirements
 ### Requirement: Front And Back Photos
 A medal SHALL hold up to two photos of itself, a front and a back. Each SHALL be optional and
@@ -63,32 +62,25 @@ device has no camera. Choose a photo instead." Neither SHALL change the slot.
 - **WHEN** a user cancels without choosing or taking a photo
 - **THEN** the slot is unchanged
 
-### Requirement: Square Framing
-After a photo is chosen or taken, the user SHALL frame the medal in a square on the original
+### Requirement: Square Crop
+After a photo is chosen or taken, the user SHALL crop the medal to a square on the original
 photo, by pinching and dragging. Whatever lies outside the square SHALL be cut off, so the
 square's top edge is where the ribbon is trimmed. Medal photos SHALL NOT be cropped to a
-circle. Once framed, the photo SHALL appear in the slot with no further step; choosing or
-taking another photo is the way to replace it. Cancelling the framing SHALL leave the slot
+circle. Once cropped, the photo SHALL appear in the slot with no further step; choosing or
+taking another photo is the way to replace it. Cancelling the crop SHALL leave the slot
 unchanged.
 
-#### Scenario: Framing cuts off the surroundings
-- **WHEN** a photo shows the medal with a hand and a table edge outside the framed square
+#### Scenario: The crop cuts off the surroundings
+- **WHEN** a photo shows the medal with a hand and a table edge outside the cropped square
 - **THEN** the saved photo holds only what lies inside the square
 
-#### Scenario: The framed photo drops into the slot
-- **WHEN** a user confirms a framed square
-- **THEN** the slot shows the framed photo, with no confirmation step
+#### Scenario: The cropped photo drops into the slot
+- **WHEN** a user confirms a cropped square
+- **THEN** the slot shows the cropped photo, with no confirmation step
 
-#### Scenario: Cancelling the framing
-- **WHEN** a user cancels the framing
+#### Scenario: Cancelling the crop
+- **WHEN** a user cancels the crop
 - **THEN** the slot is unchanged, and the photo is not used
-
-### Requirement: Stored Medal Photo
-Each face SHALL be stored as an 840 × 840 JPEG of the framed square.
-
-#### Scenario: A face is stored at 840 × 840
-- **WHEN** a framed face is saved
-- **THEN** the stored image is an 840 × 840 JPEG
 
 ### Requirement: Edit Form Photo Slots
 The medal form SHALL show two square slots side by side, Front then Back, each labelled with

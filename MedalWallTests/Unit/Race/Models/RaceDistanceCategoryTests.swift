@@ -154,6 +154,19 @@ struct RaceDistanceCategoryTests {
     #expect(RaceDistanceCategory(value: 9_999.9999, unit: .kilometers).isValidCustom)
   }
 
+  // MARK: - isValid
+  @Test("every standard distance is valid", arguments: RaceDistanceCategory.standardCases)
+  func testStandardIsValid(category: RaceDistanceCategory) {
+    #expect(category.isValid)
+  }
+
+  @Test("a custom distance is valid only when it is a valid custom distance")
+  func testCustomIsValid() {
+    #expect(RaceDistanceCategory(value: 7.5, unit: .miles).isValid)
+    #expect(!RaceDistanceCategory(value: 0, unit: .kilometers).isValid)
+    #expect(!RaceDistanceCategory(value: 10.12345, unit: .kilometers).isValid)
+  }
+
   // MARK: - standardCases
   @Test("standardCases lists the picker's presets longest first")
   func testStandardCases() {

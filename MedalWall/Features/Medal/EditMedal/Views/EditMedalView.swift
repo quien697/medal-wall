@@ -32,10 +32,9 @@ struct EditMedalView: View {
     NavigationStack {
       Form {
         EditMedalPhotosSection(
-          photo: { viewModel.photo(for: $0) },
-          storedPhotoStatus: { viewModel.storedPhotoStatus(for: $0) },
+          content: { viewModel.photoContent(for: $0) },
           onPick: { viewModel.updatePhoto(with: $0, for: $1) },
-          onRemove: { viewModel.clearPhoto(for: $0) },
+          onRemove: { viewModel.removePhoto(for: $0) },
           onError: { errorWrapper = ErrorWrapper(error: $0) }
         )
 
@@ -73,6 +72,7 @@ struct EditMedalView: View {
 
         EditMedalEventPhotosSection(
           photos: viewModel.draftEventPhotos,
+          isChecking: viewModel.isCheckingEventPhotos,
           onChooseFromLibrary: {
             isPresentingEventPhotosPicker = true
           },
@@ -119,13 +119,13 @@ struct EditMedalView: View {
                 }
               }
             }  // Button
-            .disabled(!viewModel.isFormValid)
+            .disabled(!viewModel.canSave)
           }
         }  // ToolbarItem
       }  // toolbar
       .interactiveDismissDisabled()
       .task {
-        await viewModel.loadPhotos()
+        await viewModel.loadStoredPhotos()
       }
       .photosPicker(
         isPresented: $isPresentingEventPhotosPicker,
@@ -135,23 +135,14 @@ struct EditMedalView: View {
       )
       .onChange(of: selectedEventPhotos) { _, newItems in
         guard !newItems.isEmpty else { return }
+        selectedEventPhotos = []
 
         Task {
-          var dataList: [Data] = []
-
-          for item in newItems {
-            if let data = try? await item.loadTransferable(type: Data.self) {
-              dataList.append(data)
-            } else {
-              errorWrapper = ErrorWrapper(error: AppError.photoDataInvalid)
-            }
+          do throws(AppError) {
+            try await viewModel.addEventPhotos(from: newItems)
+          } catch {
+            errorWrapper = ErrorWrapper(error: error)
           }
-
-          if !dataList.isEmpty {
-            viewModel.addEventPhotos(dataList)
-          }
-
-          selectedEventPhotos = []
         }
       }
       .sheet(isPresented: $isPresentingDistancePicker) {

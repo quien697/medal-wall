@@ -7,13 +7,13 @@
 
 import UIKit
 
-/// What a photo slot shows.
+/// What a photo slot shows: the form's photo, or while it has none, where its stored photo is.
 enum PhotoSlotContent: Equatable {
   /// The photo the form holds.
   case photo(UIImage)
   /// A stored photo that is still downloading.
   case loading
-  /// A stored photo that could not be downloaded.
+  /// A stored photo that could not be downloaded; it stays stored unless the user changes it.
   case failed
   /// No photo: the slot invites one.
   case empty

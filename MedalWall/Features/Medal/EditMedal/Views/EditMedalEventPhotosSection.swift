@@ -7,8 +7,13 @@
 
 import SwiftUI
 
+/// The medal form's event photos in a row, then a tile to add more from the photo library.
+///
+/// While picked photos are still being checked, the add tile shows a spinner, which VoiceOver
+/// reads as "Checking event photos", and can't be tapped.
 struct EditMedalEventPhotosSection: View {
   let photos: [DraftEventPhoto]
+  let isChecking: Bool
   let onChooseFromLibrary: () -> Void
   let onRemove: (String) -> Void
 
@@ -37,12 +42,24 @@ struct EditMedalEventPhotosSection: View {
             }  // ZStack
           }  // ForEach
 
-          Button {
-            onChooseFromLibrary()
-          } label: {
-            EmptyPhotoSlot(as: .eventThumbnail)
-          }  // Button
-          .buttonStyle(.plain)
+          if isChecking {
+            ProgressView()
+              .frame(
+                width: ImageType.eventThumbnail.size.width,
+                height: ImageType.eventThumbnail.size.height
+              )
+              .overlay {
+                ImageType.eventThumbnail.shape.stroke(Color.Border.primary, lineWidth: 1)
+              }
+              .accessibilityLabel("Checking event photos")
+          } else {
+            Button {
+              onChooseFromLibrary()
+            } label: {
+              EmptyPhotoSlot(as: .eventThumbnail)
+            }  // Button
+            .buttonStyle(.plain)
+          }
         }  // HStack
         .padding()
       }  // ScrollView
@@ -58,6 +75,18 @@ struct EditMedalEventPhotosSection: View {
   Form {
     EditMedalEventPhotosSection(
       photos: [],
+      isChecking: false,
+      onChooseFromLibrary: {},
+      onRemove: { _ in }
+    )
+  }
+}
+
+#Preview("Checking") {
+  Form {
+    EditMedalEventPhotosSection(
+      photos: [],
+      isChecking: true,
       onChooseFromLibrary: {},
       onRemove: { _ in }
     )

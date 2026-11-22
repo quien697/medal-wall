@@ -107,15 +107,17 @@ final class UserManager {
     try authService.signOut()
   }
 
-  /// Persists an updated profile to Firestore, uploading a new photo to Storage first if provided.
-  /// A cleared or replaced photo is deleted only once the save succeeds, so a failed save never
+  /// Persists an updated profile to Firestore, uploading a new photo's checked JPEG to Storage
+  /// first if provided.
+  /// A removed or replaced photo is deleted only once the save succeeds, so a failed save never
   /// leaves the profile pointing at a deleted file; a photo uploaded for a failed save is deleted.
-  func updateUser(_ user: User, photo: UIImage? = nil) async throws {
+  func updateUser(_ user: User, photoData: Data? = nil) async throws {
     var updatedUser = user
     let previousPhotoUrl = currentUser?.photoUrl
     var uploadedPhotoUrl: String?
-    if let photo {
-      uploadedPhotoUrl = try await storageService.uploadUserAvatar(uid: user.uid, image: photo)
+    if let photoData {
+      uploadedPhotoUrl = try await storageService.uploadUserAvatar(
+        uid: user.uid, jpegData: photoData)
       updatedUser.photoUrl = uploadedPhotoUrl
     }
     do {

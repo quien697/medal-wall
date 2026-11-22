@@ -328,6 +328,16 @@
         }
       }
     },
+    "Checking event photos" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在檢查賽事照片"
+          }
+        }
+      }
+    },
     "Choose a place" : {
       "localizations" : {
         "zh-TW" : {
@@ -404,6 +414,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無法載入"
+          }
+        }
+      }
+    },
+    "Crop closer or choose a smaller photo." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請縮小裁切範圍，或選擇較小的照片。"
           }
         }
       }
@@ -1425,12 +1445,32 @@
         }
       }
     },
+    "Photo Too Large" : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "照片過大"
+          }
+        }
+      }
+    },
     "Photos" : {
       "localizations" : {
         "zh-TW" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "照片"
+          }
+        }
+      }
+    },
+    "Photos must be under 10 MB." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "照片必須小於 10 MB。"
           }
         }
       }
@@ -1541,6 +1581,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "請確認你的電子郵件地址後再試一次。"
+          }
+        }
+      }
+    },
+    "Please choose a smaller photo." : {
+      "localizations" : {
+        "zh-TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請選擇較小的照片。"
           }
         }
       }

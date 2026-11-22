@@ -21,7 +21,7 @@ actor StubPhotoStorage: PhotoStorage {
 
   // MARK: - Recorded calls
   private(set) var uploadCallCount = 0
-  private(set) var uploadedEditionLogoIDs: [String] = []
+  private(set) var uploadedEditionPhotoIDs: [String] = []
   private(set) var uploadedFaces: [MedalFace] = []
   private(set) var deletedURLs: [String] = []
   private(set) var deletedOwners: [PhotoOwner] = []
@@ -32,22 +32,22 @@ actor StubPhotoStorage: PhotoStorage {
   }
 
   // MARK: - PhotoStorage
-  func uploadUserAvatar(uid: String, image: UIImage) async throws -> String {
+  func uploadUserAvatar(uid: String, jpegData: Data) async throws -> String {
     try recordUpload()
   }
 
-  func uploadRaceLogo(raceId: String, image: UIImage) async throws -> String {
+  func uploadRaceLogo(raceId: String, jpegData: Data) async throws -> String {
     try recordUpload()
   }
 
-  func uploadRaceEditionLogo(raceId: String, editionId: String, image: UIImage) async throws
+  func uploadRaceEditionPhoto(raceId: String, editionId: String, jpegData: Data) async throws
     -> String
   {
-    uploadedEditionLogoIDs.append(editionId)
+    uploadedEditionPhotoIDs.append(editionId)
     return try recordUpload()
   }
 
-  func uploadMedalFace(userId: String, medalId: String, face: MedalFace, image: UIImage)
+  func uploadMedalFace(userId: String, medalId: String, face: MedalFace, jpegData: Data)
     async throws -> String
   {
     uploadedFaces.append(face)
@@ -55,7 +55,7 @@ actor StubPhotoStorage: PhotoStorage {
   }
 
   func uploadMedalEventPhoto(
-    userId: String, medalId: String, photoId: String, image: UIImage
+    userId: String, medalId: String, photoId: String, jpegData: Data
   ) async throws -> String {
     try recordUpload()
   }

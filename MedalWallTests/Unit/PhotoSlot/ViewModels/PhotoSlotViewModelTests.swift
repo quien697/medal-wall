@@ -5,8 +5,10 @@
 //  Created by Quien on 2026-11-14.
 //
 
+import ImageIO
 import SwiftUI
 import Testing
+import UniformTypeIdentifiers
 
 @testable import MedalWall
 
@@ -107,32 +109,81 @@ struct PhotoSlotViewModelTests {
     #expect(!recorder.wasAsked)
   }
 
-  // MARK: - Framing
-  @Test("a picked photo's data becomes the photo to frame")
-  func testPickedPhotoIsFramed() throws {
+  // MARK: - Crop
+  @Test("a picked photo's data becomes the photo to crop")
+  func testPickedPhotoIsCropped() throws {
     let viewModel = makeViewModel(access: .granted)
     let data = try #require(UIImage(systemName: "medal.fill")?.pngData())
 
-    let error = viewModel.framePickedPhoto(data)
+    let error = viewModel.cropPickedPhoto(data)
 
     #expect(error == nil)
     #expect(viewModel.photoToCrop != nil)
   }
 
+  @Test("a large picked photo reaches the crop sheet at its own pixel size, never shrunk")
+  func testLargePickedPhotoKeepsPixelSize() throws {
+    let viewModel = makeViewModel(access: .granted)
+    let data = try #require(
+      TestPhotos.plain(width: 4000, height: 3000).jpegData(compressionQuality: 0.8))
+
+    _ = viewModel.cropPickedPhoto(data)
+
+    let photo = try #require(viewModel.photoToCrop?.image)
+    #expect(photo.size.width * photo.scale == 4000)
+    #expect(photo.size.height * photo.scale == 3000)
+  }
+
   @Test(
-    "a picked photo that is not an image frames nothing and is reported",
+    "a picked photo that is not an image crops nothing and is reported",
     arguments: [nil, Data("not an image".utf8)])
   func testUnreadablePickedPhoto(data: Data?) {
     let viewModel = makeViewModel(access: .granted)
 
-    let error = viewModel.framePickedPhoto(data)
+    let error = viewModel.cropPickedPhoto(data)
 
     #expect(error == .photoDataInvalid)
     #expect(viewModel.photoToCrop == nil)
   }
 
-  @Test("a photo taken is framed once the camera closes")
-  func testTakenPhotoIsFramedWhenCameraCloses() {
+  @Test("a confirmed crop under the upload limit is returned with its checked JPEG")
+  func testConfirmedCropUnderLimitIsReturned() async throws {
+    let viewModel = makeViewModel(access: .granted)
+    let croppedImage = TestPhotos.plain(width: 400, height: 400)
+
+    let photo = try await viewModel.confirmCrop(croppedImage)
+
+    #expect(photo.image === croppedImage)
+    let source = try #require(CGImageSourceCreateWithData(photo.jpegData as CFData, nil))
+    #expect(CGImageSourceGetType(source) as String? == UTType.jpeg.identifier)
+    #expect(viewModel.error == nil)
+  }
+
+  // `MedalWall.` names the app's `AppError`, which the app's `PhotoSlotViewModel` throws: the
+  // test target compiles its own copy for the files on its include list.
+  @Test("a confirmed crop over the upload limit is refused, keeping the crop screen open")
+  func testConfirmedCropOverLimitIsRefused() async throws {
+    let viewModel = makeViewModel(access: .granted)
+    let croppedImage = try #require(TestPhotos.noise())
+
+    await #expect(throws: MedalWall.AppError.croppedPhotoTooLarge) {
+      try await viewModel.confirmCrop(croppedImage)
+    }
+    #expect(viewModel.error == .croppedPhotoTooLarge)
+  }
+
+  @Test("a crop the crop screen couldn't render is refused as invalid photo data")
+  func testMissingCropIsRefused() async {
+    let viewModel = makeViewModel(access: .granted)
+
+    await #expect(throws: MedalWall.AppError.photoDataInvalid) {
+      try await viewModel.confirmCrop(nil)
+    }
+    #expect(viewModel.error == .photoDataInvalid)
+  }
+
+  @Test("a photo taken reaches the crop sheet once the camera closes")
+  func testTakenPhotoIsCroppedWhenCameraCloses() {
     let viewModel = makeViewModel(access: .granted)
     let takenPhoto = UIImage()
     viewModel.takenPhoto = takenPhoto
@@ -143,8 +194,8 @@ struct PhotoSlotViewModelTests {
     #expect(viewModel.takenPhoto == nil)
   }
 
-  @Test("closing the camera without taking a photo frames nothing")
-  func testClosingCameraWithoutPhotoFramesNothing() {
+  @Test("closing the camera without taking a photo crops nothing")
+  func testClosingCameraWithoutPhotoCropsNothing() {
     let viewModel = makeViewModel(access: .granted)
 
     viewModel.cameraDidClose()
@@ -153,34 +204,6 @@ struct PhotoSlotViewModelTests {
   }
 
   // MARK: - Content
-  // `MedalWall.` names the app's `StoredPhotoStatus`, which `PhotoSlotViewModel` takes: the test
-  // target compiles its own copy for the view models on its include list.
-  @Test(
-    "a slot with a photo shows it, whatever its stored photo's status",
-    arguments: [nil, MedalWall.StoredPhotoStatus.loading, .failed])
-  func testPhotoIsShown(status: MedalWall.StoredPhotoStatus?) {
-    let photo = UIImage()
-
-    let content = PhotoSlotViewModel.content(photo: photo, storedPhotoStatus: status)
-
-    #expect(content == .photo(photo))
-  }
-
-  @Test("a slot whose stored photo is downloading shows it is loading")
-  func testLoadingStoredPhoto() {
-    #expect(PhotoSlotViewModel.content(photo: nil, storedPhotoStatus: .loading) == .loading)
-  }
-
-  @Test("a slot whose stored photo couldn't download says so")
-  func testFailedStoredPhoto() {
-    #expect(PhotoSlotViewModel.content(photo: nil, storedPhotoStatus: .failed) == .failed)
-  }
-
-  @Test("a slot with no photo and no stored photo is empty")
-  func testEmptySlot() {
-    #expect(PhotoSlotViewModel.content(photo: nil, storedPhotoStatus: nil) == .empty)
-  }
-
   @Test(
     "every slot but an empty one offers Remove Photo",
     arguments: [
@@ -192,6 +215,8 @@ struct PhotoSlotViewModelTests {
   }
 
   // MARK: - Accessibility label
+  // `MedalWall.` names the app's `PhotoSlotContent`, which `PhotoSlotViewModel` takes: the test
+  // target compiles its own copy for the view models on its include list.
   @Test("an empty slot reads its placeholder text")
   func testEmptySlotReadsPlaceholderText() {
     let label = PhotoSlotViewModel.accessibilityLabel(
@@ -210,8 +235,8 @@ struct PhotoSlotViewModelTests {
 
   @Test(
     "a slot holding a photo, shown or not, reads its title",
-    arguments: [PhotoSlotContent.photo(UIImage()), .loading, .failed])
-  func testSlotHoldingPhotoReadsTitle(content: PhotoSlotContent) {
+    arguments: [MedalWall.PhotoSlotContent.photo(UIImage()), .loading, .failed])
+  func testSlotHoldingPhotoReadsTitle(content: MedalWall.PhotoSlotContent) {
     let label = PhotoSlotViewModel.accessibilityLabel(
       content: content, title: "Front photo", placeholderText: "Add front")
 

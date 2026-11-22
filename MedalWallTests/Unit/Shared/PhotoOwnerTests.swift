@@ -55,7 +55,7 @@ struct PhotoOwnerTests {
     #expect(owner.owns(path: "races/race-a/editions/edition-a/logo.jpg"))
   }
 
-  @Test("an edition does not own another edition's logo or its race's logo")
+  @Test("an edition does not own another edition's photo or its race's logo")
   func testEditionDoesNotOwnOthers() {
     let owner = PhotoOwner.edition(raceId: "race-a", editionId: "edition-a")
 

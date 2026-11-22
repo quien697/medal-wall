@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import ImageIO
 import Testing
 import UIKit
+import UniformTypeIdentifiers
 
 @testable import MedalWall
 
@@ -188,21 +190,65 @@ struct EditMedalViewModelTests {
   }
 
   // MARK: - addEventPhotos / removeEventPhoto
-  @Test("addEventPhotos appends one DraftEventPhoto per data item")
-  func testAddEventPhotosAppendsAll() {
-    let viewModel = EditMedalViewModel(mode: .add)
-    let data1 = Data([0x01])
-    let data2 = Data([0x02])
+  /// JPEG data of a small plain photo, well under the upload limit.
+  private func makePhotoData() throws -> Data {
+    try #require(TestPhotos.plain(width: 40, height: 30).jpegData(compressionQuality: 0.8))
+  }
 
-    viewModel.addEventPhotos([data1, data2])
+  @Test("addEventPhotos appends one DraftEventPhoto per photo")
+  func testAddEventPhotosAppendsAll() async throws {
+    let viewModel = EditMedalViewModel(mode: .add)
+
+    try await viewModel.addEventPhotos([try makePhotoData(), try makePhotoData()])
 
     #expect(viewModel.draftEventPhotos.count == 2)
   }
 
-  @Test("removeEventPhoto removes the matching photo by id")
-  func testRemoveEventPhotoRemovesById() {
+  @Test("a picked photo is staged as its checked JPEG, at the photo's own pixel size")
+  func testEventPhotoIsStagedAsCheckedJPEG() async throws {
     let viewModel = EditMedalViewModel(mode: .add)
-    viewModel.addEventPhotos([Data([0x01]), Data([0x02])])
+    let pickedData = try #require(TestPhotos.plain(width: 4000, height: 3000).pngData())
+
+    try await viewModel.addEventPhotos([pickedData])
+
+    let stagedData = try #require(viewModel.draftEventPhotos.first?.data)
+    let source = try #require(CGImageSourceCreateWithData(stagedData as CFData, nil))
+    let properties = try #require(
+      CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any])
+    #expect(CGImageSourceGetType(source) as String? == UTType.jpeg.identifier)
+    #expect(properties[kCGImagePropertyPixelWidth] as? Int == 4000)
+    #expect(properties[kCGImagePropertyPixelHeight] as? Int == 3000)
+  }
+
+  @Test("a photo over the upload limit is skipped, the others are added, and it is reported")
+  func testEventPhotoOverLimitIsSkipped() async throws {
+    let viewModel = EditMedalViewModel(mode: .add)
+    let smallData = try makePhotoData()
+    let largeData = try #require(TestPhotos.noise()?.jpegData(compressionQuality: 0.8))
+
+    await #expect(throws: AppError.photoTooLarge) {
+      try await viewModel.addEventPhotos([smallData, largeData, Data("not an image".utf8)])
+    }
+
+    #expect(viewModel.draftEventPhotos.count == 1)
+  }
+
+  @Test("data that is not an image is skipped, the others are added, and it is reported")
+  func testUnreadableEventPhotoIsSkipped() async throws {
+    let viewModel = EditMedalViewModel(mode: .add)
+    let smallData = try makePhotoData()
+
+    await #expect(throws: AppError.photoDataInvalid) {
+      try await viewModel.addEventPhotos([smallData, Data("not an image".utf8)])
+    }
+
+    #expect(viewModel.draftEventPhotos.count == 1)
+  }
+
+  @Test("removeEventPhoto removes the matching photo by id")
+  func testRemoveEventPhotoRemovesById() async throws {
+    let viewModel = EditMedalViewModel(mode: .add)
+    try await viewModel.addEventPhotos([try makePhotoData(), try makePhotoData()])
     let idToRemove = viewModel.draftEventPhotos[0].id
 
     viewModel.removeEventPhoto(id: idToRemove)
@@ -212,9 +258,9 @@ struct EditMedalViewModelTests {
   }
 
   @Test("removeEventPhoto is a no-op when id is not found")
-  func testRemoveEventPhotoNoOpWhenNotFound() {
+  func testRemoveEventPhotoNoOpWhenNotFound() async throws {
     let viewModel = EditMedalViewModel(mode: .add)
-    viewModel.addEventPhotos([Data([0x01])])
+    try await viewModel.addEventPhotos([try makePhotoData()])
 
     viewModel.removeEventPhoto(id: "non-existent-id")
 

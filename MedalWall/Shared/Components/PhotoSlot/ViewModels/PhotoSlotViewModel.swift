@@ -15,10 +15,12 @@ final class PhotoSlotViewModel {
   var isPresentingCamera = false
   var isPresentingCameraSettings = false
   var isPresentingNoCamera = false
-  /// The photo the camera handed back, framed once the camera has closed.
+  /// The photo the camera handed back, sent to the crop sheet once the camera has closed.
   var takenPhoto: UIImage?
-  /// The photo picked or taken, waiting in the crop sheet to be framed.
+  /// The photo picked or taken, waiting in the crop sheet.
   var photoToCrop: PickedPhoto?
+  /// Why the crop just confirmed was refused, shown over the crop screen.
+  var error: AppError?
 
   /// iOS's camera access prompt while it is up. Exposed so tests can await it.
   @ObservationIgnored private(set) var cameraAccessRequest: Task<Void, Never>?
@@ -62,31 +64,42 @@ final class PhotoSlotViewModel {
 
   /// Hands a photo picked from the library to the crop sheet, or returns the error to show when
   /// its data is not an image.
-  func framePickedPhoto(_ data: Data?) -> AppError? {
+  func cropPickedPhoto(_ data: Data?) -> AppError? {
     guard let data, let image = UIImage(data: data) else { return .photoDataInvalid }
     photoToCrop = PickedPhoto(image: image)
     return nil
   }
 
+  /// The crop the user confirmed, encoded once as the JPEG to upload and checked. A crop the
+  /// crop screen couldn't render (`.photoDataInvalid`), or whose JPEG Storage would refuse
+  /// (`.croppedPhotoTooLarge`), is refused: the error is kept to show over the crop screen,
+  /// and thrown so the crop screen stays open.
+  func confirmCrop(_ croppedImage: UIImage?) async throws(AppError) -> CroppedPhoto {
+    do throws(AppError) {
+      guard let croppedImage else { throw .photoDataInvalid }
+      return try await Self.croppedPhoto(from: croppedImage)
+    } catch {
+      self.error = error
+      throw error
+    }
+  }
+
+  /// `image` encoded and checked as a `CroppedPhoto`. Runs off the main actor, so the crop
+  /// screen's progress keeps turning while a full-resolution crop is encoded.
+  @concurrent
+  nonisolated private static func croppedPhoto(from image: UIImage) async throws(AppError)
+    -> CroppedPhoto
+  {
+    try CroppedPhoto(checking: image)
+  }
+
   /// Hands the photo taken to the crop sheet once the camera has closed; closing it without one
-  /// frames nothing.
+  /// crops nothing.
   func cameraDidClose() {
     if let takenPhoto {
       photoToCrop = PickedPhoto(image: takenPhoto)
     }
     takenPhoto = nil
-  }
-
-  /// What a slot shows: the form's photo when it has one, and otherwise its stored photo's
-  /// status, or nothing.
-  static func content(photo: UIImage?, storedPhotoStatus: StoredPhotoStatus?) -> PhotoSlotContent {
-    if let photo { return .photo(photo) }
-
-    switch storedPhotoStatus {
-    case .loading: return .loading
-    case .failed: return .failed
-    case nil: return .empty
-    }
   }
 
   /// What VoiceOver reads for a slot: its placeholder text while it is empty, if it has one,

@@ -55,7 +55,7 @@ internal-consistency report below.
 | `component` | `ActionStyle` (and the pressed and disabled states it draws), `ActionShape`, `ChipStyle`, `TagStyle` in `MedalWall/Shared/Modifiers/`; the `TierBadge`, `Progress` and `Skeleton` colour roles in `Color+Extensions.swift`; `ProgressBar`'s height and `CGFloat.Radius.progressTrack`; `BoneSize` in `SkeletonViewModifier.swift` |
 | `component.Tracking` | `CGFloat.Tracking` in `CGFloat+Extensions.swift` |
 | `component.MedalImage` | the sizes and shape of `ImageType`'s `.medal`, `.medalThumbnail` and `.medalSearchThumbnail` in `MedalWall/Shared/UIModels/ImageType.swift` |
-| `component.PhotoSlot` | the cases of `PhotoSlotContent` and the edges `PhotoSlot` draws for them, in `MedalWall/Shared/Components/PhotoSlot/` |
+| `component.PhotoSlot` | the cases of `PhotoSlotContent`, in `MedalWall/Shared/UIModels/`, and the edges `PhotoSlot` draws for them, in `MedalWall/Shared/Components/PhotoSlot/` |
 
 Colour components are `"red"`/`"green"`/`"blue"` strings that are **either** floats (`"0.788"`)
 **or** hex (`"0x0F"`) — handle both. Converting 17 colour sets by hand is error-prone; write a

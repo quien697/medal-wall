@@ -72,7 +72,8 @@ struct StringCatalogTests {
       "Lay it flat on a plain surface and shoot from straight above, or hang it on a plain wall. "
         + "Keep everything else out of the shot, and use even light with no flash.",
       "Shows the back",
-      "Shows the front"
+      "Shows the front",
+      "Checking event photos"
     ]
 
     for key in keys {

@@ -34,13 +34,12 @@ struct EditRaceView: View {
     NavigationStack {
       Form {
         PhotoSlot(
-          photo: viewModel.photo,
-          storedPhotoStatus: viewModel.storedPhotoStatus,
+          content: viewModel.photo.content,
           imageType: .raceHero,
           cropShape: .square,
           title: "Race logo",
-          onPick: { viewModel.updatePhoto(with: $0) },
-          onRemove: { viewModel.clearPhoto() },
+          onPick: { viewModel.photo.update(with: $0) },
+          onRemove: { viewModel.photo.remove() },
           onError: { errorWrapper = ErrorWrapper(error: $0) }
         )  // PhotoSlot
         .frame(maxWidth: .infinity)

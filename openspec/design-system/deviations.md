@@ -17,3 +17,4 @@ it as superseded and asks for a decision rather than choosing.
 
 | Token | Code | Design system | Why | Status | Since | Ticket |
 |---|---|---|---|---|---|---|
+| `component.MedalImage.saved` | the cropped square at the photo's own pixels, a JPEG under 10 MB | saved as an 840 × 840 JPEG | A stored photo can be made smaller later but never sharper, so a face keeps the pixels the user cropped, for large web screens, share images and later effects such as background removal. Storage refuses any upload of 10 MB or more, and the app says so when the crop is confirmed | unreported | 2026-11-19 | MW-25 |

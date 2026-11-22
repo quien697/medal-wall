@@ -66,7 +66,7 @@ struct EditMedalViewModelStorageTests {
     let repository = StubMedalRepository(medals: [makeMedal()])
     let storage = StubPhotoStorage()
     let viewModel = makeViewModel(repository: repository, storage: storage)
-    viewModel.updatePhoto(with: UIImage(), for: .back)
+    viewModel.updatePhoto(with: try TestPhotos.cropped(), for: .back)
 
     try await viewModel.save(by: "uid")
 
@@ -80,7 +80,7 @@ struct EditMedalViewModelStorageTests {
     let repository = StubMedalRepository(medals: [makeMedal()])
     let storage = StubPhotoStorage()
     let viewModel = makeViewModel(repository: repository, storage: storage)
-    viewModel.clearPhoto(for: .front)
+    viewModel.removePhoto(for: .front)
 
     try await viewModel.save(by: "uid")
 
@@ -93,8 +93,8 @@ struct EditMedalViewModelStorageTests {
     let repository = StubMedalRepository(medals: [makeMedal()])
     let storage = StubPhotoStorage()
     let viewModel = makeViewModel(repository: repository, storage: storage)
-    viewModel.clearPhoto(for: .front)
-    viewModel.clearPhoto(for: .back)
+    viewModel.removePhoto(for: .front)
+    viewModel.removePhoto(for: .back)
 
     try await viewModel.save(by: "uid")
 
@@ -107,7 +107,7 @@ struct EditMedalViewModelStorageTests {
     let repository = StubMedalRepository(medals: [makeMedal()])
     let storage = StubPhotoStorage()
     let viewModel = makeViewModel(repository: repository, storage: storage)
-    viewModel.clearPhoto(for: .front)
+    viewModel.removePhoto(for: .front)
 
     try await viewModel.save(by: "uid")
 
@@ -120,7 +120,7 @@ struct EditMedalViewModelStorageTests {
       medals: [makeMedal()], writeOutcome: .failure(.medalSaveFailed))
     let storage = StubPhotoStorage()
     let viewModel = makeViewModel(repository: repository, storage: storage)
-    viewModel.clearPhoto(for: .back)
+    viewModel.removePhoto(for: .back)
 
     await #expect(throws: AppError.medalSaveFailed) {
       try await viewModel.save(by: "uid")
@@ -134,7 +134,7 @@ struct EditMedalViewModelStorageTests {
     let repository = StubMedalRepository(medals: [makeMedal()])
     let storage = StubPhotoStorage()
     let viewModel = makeViewModel(repository: repository, storage: storage)
-    viewModel.updatePhoto(with: UIImage(), for: .front)
+    viewModel.updatePhoto(with: try TestPhotos.cropped(), for: .front)
 
     try await viewModel.save(by: "uid")
 
@@ -143,12 +143,12 @@ struct EditMedalViewModelStorageTests {
   }
 
   @Test("a replaced face stays in Storage and the new upload is deleted when the save fails")
-  func testReplacedFaceKeptWhenSaveFails() async {
+  func testReplacedFaceKeptWhenSaveFails() async throws {
     let repository = StubMedalRepository(
       medals: [makeMedal()], writeOutcome: .failure(.medalSaveFailed))
     let storage = StubPhotoStorage()
     let viewModel = makeViewModel(repository: repository, storage: storage)
-    viewModel.updatePhoto(with: UIImage(), for: .front)
+    viewModel.updatePhoto(with: try TestPhotos.cropped(), for: .front)
 
     await #expect(throws: AppError.medalSaveFailed) {
       try await viewModel.save(by: "uid")
@@ -164,9 +164,9 @@ struct EditMedalViewModelStorageTests {
     let viewModel = EditMedalViewModel(
       mode: .add, repository: repository, storageService: storage,
       networkMonitor: StubNetworkMonitor())
-    viewModel.updatePhoto(with: UIImage(), for: .front)
-    viewModel.updatePhoto(with: UIImage(), for: .back)
-    viewModel.addEventPhotos([try makePhotoData()])
+    viewModel.updatePhoto(with: try TestPhotos.cropped(), for: .front)
+    viewModel.updatePhoto(with: try TestPhotos.cropped(), for: .back)
+    try await viewModel.addEventPhotos([try makePhotoData()])
 
     await #expect(throws: AppError.medalSaveFailed) {
       try await viewModel.save(by: "uid")
@@ -230,7 +230,7 @@ struct EditMedalViewModelStorageTests {
     let viewModel = EditMedalViewModel(
       mode: .edit, medal: medal, repository: repository, storageService: storage,
       networkMonitor: StubNetworkMonitor())
-    viewModel.addEventPhotos([try makePhotoData()])
+    try await viewModel.addEventPhotos([try makePhotoData()])
 
     await #expect(throws: AppError.medalSaveFailed) {
       try await viewModel.save(by: "uid")
@@ -241,7 +241,7 @@ struct EditMedalViewModelStorageTests {
 
   // MARK: - Offline
   @Test("saving offline is refused before anything is uploaded or written")
-  func testOfflineSaveIsRefused() async {
+  func testOfflineSaveIsRefused() async throws {
     let repository = StubMedalRepository(medals: [makeMedal()])
     let storage = StubPhotoStorage()
     let networkMonitor = StubNetworkMonitor()
@@ -249,7 +249,7 @@ struct EditMedalViewModelStorageTests {
     let viewModel = EditMedalViewModel(
       mode: .edit, medal: makeMedal(), repository: repository, storageService: storage,
       networkMonitor: networkMonitor)
-    viewModel.updatePhoto(with: UIImage(), for: .front)
+    viewModel.updatePhoto(with: try TestPhotos.cropped(), for: .front)
 
     await #expect(throws: AppError.noInternetConnection) {
       try await viewModel.save(by: "uid")

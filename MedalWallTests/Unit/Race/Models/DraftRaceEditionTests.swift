@@ -58,27 +58,27 @@ struct DraftRaceEditionTests {
     #expect(draft.distances == edition.raceEvents)
   }
 
-  @Test("init(from:) sets existingPhotoUrl to nil when source edition has no photo")
+  @Test("init(from:) sets storedPhotoUrl to nil when source edition has no photo")
   func testInitFromEditionNilPhotoUrl() {
     let draft = DraftRaceEdition(from: makeEdition(photoUrl: nil))
 
-    #expect(draft.existingPhotoUrl == nil)
+    #expect(draft.storedPhotoUrl == nil)
   }
 
   @Test("init(from:) starts clean with no pending photo changes")
   func testInitFromEditionStartsClean() {
     let draft = DraftRaceEdition(from: makeEdition())
 
-    #expect(draft.newPhotoData == nil)
-    #expect(draft.isPhotoCleared == false)
+    #expect(draft.newPhoto == nil)
+    #expect(draft.isPhotoRemoved == false)
     #expect(draft.isModified == false)
   }
 
-  @Test("init(from:) carries forward the existing photo URL")
+  @Test("init(from:) carries forward the stored photo URL")
   func testInitFromEditionCarriesPhotoUrl() {
     let draft = DraftRaceEdition(from: makeEdition(photoUrl: "https://example.com/photo.jpg"))
 
-    #expect(draft.existingPhotoUrl == "https://example.com/photo.jpg")
+    #expect(draft.storedPhotoUrl == "https://example.com/photo.jpg")
   }
 
   // MARK: - init(year:isOneDay:startDate:endDate:distances:createdBy:)
@@ -101,65 +101,40 @@ struct DraftRaceEditionTests {
       distances: [], createdBy: createdBy
     )
 
-    #expect(draft.newPhotoData == nil)
-    #expect(draft.isPhotoCleared == false)
+    #expect(draft.newPhoto == nil)
+    #expect(draft.isPhotoRemoved == false)
     #expect(draft.isModified == false)
   }
 
   // MARK: - displayPhotoUrl
-  @Test("displayPhotoUrl returns existingPhotoUrl when no new photo and not cleared")
+  @Test("displayPhotoUrl returns storedPhotoUrl when no new photo and not removed")
   func testDisplayPhotoUrlReturnsExisting() {
     let draft = DraftRaceEdition(from: makeEdition(photoUrl: "https://example.com/photo.jpg"))
 
     #expect(draft.displayPhotoUrl == "https://example.com/photo.jpg")
   }
 
-  @Test("displayPhotoUrl is nil when new photo data is pending")
-  func testDisplayPhotoUrlNilWhenNewPhotoSet() {
+  @Test("displayPhotoUrl is nil when a new photo is pending")
+  func testDisplayPhotoUrlNilWhenNewPhotoSet() throws {
     var draft = DraftRaceEdition(from: makeEdition(photoUrl: "https://example.com/photo.jpg"))
-    draft.newPhotoData = Data()
+    draft.newPhoto = try TestPhotos.cropped()
 
     #expect(draft.displayPhotoUrl == nil)
   }
 
-  @Test("displayPhotoUrl is nil when photo has been cleared")
+  @Test("displayPhotoUrl is nil when the photo has been removed")
   func testDisplayPhotoUrlNilWhenCleared() {
     var draft = DraftRaceEdition(from: makeEdition(photoUrl: "https://example.com/photo.jpg"))
-    draft.isPhotoCleared = true
+    draft.isPhotoRemoved = true
 
     #expect(draft.displayPhotoUrl == nil)
   }
 
-  @Test("displayPhotoUrl is nil when no existing photo and nothing new")
+  @Test("displayPhotoUrl is nil when no stored photo and nothing new")
   func testDisplayPhotoUrlNilWhenNoPhoto() {
     let draft = DraftRaceEdition(from: makeEdition(photoUrl: nil))
 
     #expect(draft.displayPhotoUrl == nil)
-  }
-
-  // MARK: - displayPhoto
-  @Test("displayPhoto is nil when newPhotoData is nil")
-  func testDisplayPhotoNilWhenNoData() {
-    let draft = DraftRaceEdition(from: makeEdition())
-
-    #expect(draft.displayPhoto == nil)
-  }
-
-  @Test("displayPhoto is nil when newPhotoData is not valid image data")
-  func testDisplayPhotoNilForInvalidData() {
-    var draft = DraftRaceEdition(from: makeEdition())
-    draft.newPhotoData = Data([0x00, 0x01, 0x02])
-
-    #expect(draft.displayPhoto == nil)
-  }
-
-  @Test("displayPhoto returns a UIImage when newPhotoData contains valid JPEG data")
-  func testDisplayPhotoWithValidData() {
-    var draft = DraftRaceEdition(from: makeEdition())
-    let renderer = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1))
-    draft.newPhotoData = renderer.jpegData(withCompressionQuality: 1.0) { _ in }
-
-    #expect(draft.displayPhoto != nil)
   }
 
   // MARK: - dateDisplayLabel

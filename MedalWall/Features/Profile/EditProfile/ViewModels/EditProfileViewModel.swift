@@ -11,15 +11,13 @@ import SwiftUI
 final class EditProfileViewModel {
   // MARK: - Data
   var userName: UserName
-  var photo: UIImage?
+  /// The profile photo as its slot shows it and as save uploads it.
+  var photo: DraftPhoto
   var bio: String
   var gender: Gender?
   var birthday: Date?
 
   // MARK: - State
-  private(set) var isPhotoChanged = false
-  /// The stored photo while the form isn't showing it: still downloading, or one that couldn't be.
-  private(set) var storedPhotoStatus: StoredPhotoStatus?
   private(set) var isLoading = false
 
   // MARK: - Dependencies
@@ -30,7 +28,7 @@ final class EditProfileViewModel {
   init(profile: User, networkMonitor: (any NetworkMonitor)? = nil) {
     self.profile = profile
     self.networkMonitor = networkMonitor ?? NWPathNetworkMonitor()
-    self.photo = nil
+    self.photo = DraftPhoto(storedPhotoUrl: profile.photoUrl)
     self.userName = UserName(
       firstName: profile.firstName ?? "",
       lastName: profile.lastName ?? ""
@@ -38,7 +36,6 @@ final class EditProfileViewModel {
     self.bio = profile.bio ?? ""
     self.gender = profile.gender
     self.birthday = profile.birthday
-    self.storedPhotoStatus = profile.photoUrl == nil ? nil : .loading
   }
 
   // MARK: - Computed
@@ -46,34 +43,15 @@ final class EditProfileViewModel {
     !userName.trimmedFirstName.isEmpty && !userName.trimmedLastName.isEmpty
   }
 
-  /// The photo to upload on save — only a newly picked one, never the existing photo.
-  var photoToUpload: UIImage? { isPhotoChanged ? photo : nil }
+  /// The JPEG to upload on save: only a newly cropped photo's, never the stored photo's.
+  var photoToUpload: Data? { photo.isChanged ? photo.croppedPhoto?.jpegData : nil }
 
   // MARK: - Functions
-  /// Downloads the existing profile photo so the form can show it, unless a new one was
+  /// Downloads the stored profile photo so the form can show it, unless a new one was
   /// picked while it loaded, marking it as failed when it can't be downloaded.
-  func loadExistingPhoto() async {
-    let existingPhoto = await UIImage.load(from: profile.photoUrl)
-    guard !isPhotoChanged else { return }
-
-    photo = existingPhoto
-    if storedPhotoStatus == .loading {
-      storedPhotoStatus = existingPhoto == nil ? .failed : nil
-    }
-  }
-
-  /// Sets the newly picked profile photo and marks it as changed.
-  func updatePhoto(with uiImage: UIImage) {
-    photo = uiImage
-    isPhotoChanged = true
-    storedPhotoStatus = nil
-  }
-
-  /// Clears the profile photo and marks it as changed.
-  func clearPhoto() {
-    photo = nil
-    isPhotoChanged = true
-    storedPhotoStatus = nil
+  func loadStoredPhoto() async {
+    let storedPhoto = await UIImage.load(from: profile.photoUrl)
+    photo.showStored(storedPhoto)
   }
 
   /// Returns a copy of the profile with the current draft values applied.
@@ -85,7 +63,7 @@ final class EditProfileViewModel {
     updated.bio = updatedBio.isEmpty ? nil : updatedBio
     updated.gender = gender
     updated.birthday = birthday
-    if isPhotoChanged && photo == nil {
+    if photo.isChanged && photo.croppedPhoto == nil {
       updated.photoUrl = nil
     }
     return updated
@@ -99,6 +77,6 @@ final class EditProfileViewModel {
 
     guard await networkMonitor.isConnected() else { throw AppError.noInternetConnection }
 
-    try await userManager.updateUser(makeUpdatedUser(), photo: photoToUpload)
+    try await userManager.updateUser(makeUpdatedUser(), photoData: photoToUpload)
   }
 }
